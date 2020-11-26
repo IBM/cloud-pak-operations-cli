@@ -1,0 +1,7 @@
+module db2u-nfs 1.0;
+require {
+  type nfs_t;
+  type container_t;
+  class fifo_file { create open read unlink write ioctl getattr setattr };
+}
+allow container_t nfs_t:fifo_file { create open read unlink write ioctl getattr setattr };

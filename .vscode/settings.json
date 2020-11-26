@@ -1,0 +1,12 @@
+{
+	"files.exclude": {
+		"**/__pycache__": true,
+		"**/dg.egg-info": true
+	},
+	"python.analysis.typeCheckingMode": "basic",
+	"python.formatting.provider": "black",
+	"python.linting.enabled": true,
+	"python.linting.flake8Enabled": true,
+	"python.linting.pylintEnabled": false,
+	"python.pythonPath": ".venv/bin/python3.8"
+}
