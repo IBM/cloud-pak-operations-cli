@@ -25,7 +25,7 @@ def get_click_multi_command_class() -> type[click.Command]:
     )
 
 
-@click.command(cls=get_click_multi_command_class())
+@click.command(cls=get_click_multi_command_class(), hidden=True)
 def fyre():
     """FYRE-specific commands"""
 
