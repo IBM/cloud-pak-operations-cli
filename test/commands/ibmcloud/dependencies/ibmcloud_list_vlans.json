@@ -1,0 +1,30 @@
+[
+    {
+        "id": "2734442",
+        "type": "private",
+        "properties": {
+            "name": "",
+            "note": "",
+            "primary_router": "bcr01a.sjc03",
+            "vlan_number": "849",
+            "vlan_type": "standard",
+            "location": "24",
+            "local_disk_storage_capability": "true",
+            "san_storage_capability": "true"
+        }
+    },
+    {
+        "id": "2734440",
+        "type": "public",
+        "properties": {
+            "name": "",
+            "note": "",
+            "primary_router": "fcr01a.sjc03",
+            "vlan_number": "799",
+            "vlan_type": "standard",
+            "location": "24",
+            "local_disk_storage_capability": "true",
+            "san_storage_capability": "true"
+        }
+    }
+]

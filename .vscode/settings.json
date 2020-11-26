@@ -1,0 +1,37 @@
+{
+	"files.exclude": {
+		"**/__pycache__": true,
+		".vscode/.ropeproject": true,
+		"dg.egg-info": true
+	},
+	"python.analysis.typeCheckingMode": "basic",
+	"python.formatting.provider": "black",
+	"python.linting.enabled": true,
+	"python.linting.flake8Enabled": true,
+	"python.linting.pylintEnabled": false,
+	"python.pythonPath": "${env:DG_VENV_PYTHON_PATH}",
+	"python.sortImports.args": [
+		"--lines-between-types",
+		"1",
+		"--multi-line",
+		"3",
+		"--project",
+		"dg",
+		"--thirdparty",
+		"click",
+		"--thirdparty",
+		"openshift",
+		"--trailing-comma"
+	],
+	"python.testing.nosetestsEnabled": false,
+	"python.testing.pytestEnabled": false,
+	"python.testing.unittestArgs": [
+		"--start-directory",
+		"test",
+	],
+	"python.testing.unittestEnabled": true,
+	"search.exclude": {
+		".git": true,
+		".venv": true
+	},
+}
