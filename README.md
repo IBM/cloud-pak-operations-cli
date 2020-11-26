@@ -1,4 +1,5 @@
 # Data Gate CLI (dg)
+![Python Testing](https://github.com/IBM/data-gate-cli/workflows/Python%20Testing/badge.svg)
 
 ## Installation & Update
 
