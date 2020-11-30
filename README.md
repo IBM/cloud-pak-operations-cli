@@ -20,7 +20,7 @@ choco install python
 2. Install Data Gate CLI Python package (provides `dg` command)
 
 ```bash
-pip3 install git+ssh://git@github.ibm.com/Everest/dg.git
+pip3 install git+ssh://git@github.com/IBM/data-gate-cli.git
 ```
 
 Execute the following command to update the Data Gate CLI to the latest version:
@@ -52,7 +52,7 @@ dg adm update
 ### Cloning the Data Gate CLI GitHub repository
 
 ```bash
-git clone git@github.ibm.com:Everest/dg.git
+git clone git@github.com:IBM/data-gate-cli.git
 ```
 
 ### Creating a virtual environment
@@ -77,12 +77,12 @@ virtualenv .venv
 pip3 install --editable .
 ```
 
-### Create .env file within the cloned GitHub repository
+### Set environment variable
 
 - Linux/macOS:
 
 ```
-DG_VENV_PYTHON_PATH=.venv/bin/python3
+export DG_VENV_PYTHON_PATH=.venv/bin/python3
 ```
 
 - Windows:
