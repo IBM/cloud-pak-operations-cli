@@ -14,8 +14,6 @@ setup(
         "asyncssh",
         "click",
         "colorama",
-        "kubernetes < 12.0.0",
-        "openshift",
         "pyyaml",
         "requests",
         "semver",

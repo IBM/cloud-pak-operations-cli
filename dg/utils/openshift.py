@@ -18,8 +18,6 @@ import urllib.parse
 
 from typing import Final, List
 
-import kubernetes.config
-import openshift.dynamic
 import requests
 import semver
 
@@ -27,8 +25,6 @@ import dg.config
 import dg.utils.network
 
 OPENSHIFT_REST_API_VERSION: Final[str] = "v1"
-
-k8s_client = kubernetes.config.new_client_from_config()
 
 
 def enable_openshift_image_registry_default_route():
@@ -186,29 +182,52 @@ def get_openshift_version() -> semver.VersionInfo:
 def get_persistent_volume_name(
     namespace: str, persistent_volume_claim_name: str
 ) -> str:
-    dyn_client = openshift.dynamic.DynamicClient(k8s_client)
-    persistent_volume_claims = dyn_client.resources.get(
-        api_version=OPENSHIFT_REST_API_VERSION, kind="PersistentVolumeClaim"
-    )
+    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
+    oc_get_pvc_command = [
+        str(oc_cli_path),
+        "get",
+        "pvc",
+        "--namespace",
+        namespace,
+        "--output",
+        "json",
+    ]
 
-    persistent_volume_claim = persistent_volume_claims.get(
-        name=persistent_volume_claim_name, namespace=namespace
-    )
+    oc_get_pvc_command_result = json.loads(subprocess.check_output(oc_get_pvc_command))
 
-    return persistent_volume_claim.spec.volumeName
+    if len(oc_get_pvc_command_result["items"]) == 0:
+        raise Exception(
+            f"Namespace '{namespace}' does not contain a persistent volume claim with name "
+            f"'{persistent_volume_claim_name}''"
+        )
+
+    volumeName = oc_get_pvc_command_result["items"][0]["spec"]["volumeName"]
+
+    return volumeName
 
 
 def get_persistent_volume_id(namespace: str, persistent_volume_name: str):
-    dyn_client = openshift.dynamic.DynamicClient(k8s_client)
-    persistent_volumes = dyn_client.resources.get(
-        api_version=OPENSHIFT_REST_API_VERSION, kind="PersistentVolume"
+    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
+    oc_get_pv_command = [
+        str(oc_cli_path),
+        "get",
+        "pv",
+        "--output",
+        f"jsonpath='{{.items[?(@.metadata.name==\"{persistent_volume_name}\")].metadata.labels.volumeId}}'",
+    ]
+
+    oc_get_pv_command_result = (
+        subprocess.check_output(oc_get_pv_command, text=True)
+        .removeprefix("'")
+        .removesuffix("'")
     )
 
-    persistent_volume = persistent_volumes.get(
-        name=persistent_volume_name, namespace=namespace
-    )
+    if oc_get_pv_command_result == "":
+        raise Exception(
+            f"Persistent volume with name '{persistent_volume_name}' could not be found"
+        )
 
-    return persistent_volume.metadata.labels.volumeId
+    return oc_get_pv_command_result
 
 
 def log_in_to_openshift_cluster_with_password(
