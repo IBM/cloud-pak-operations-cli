@@ -1,6 +1,16 @@
 # Data Gate CLI (dg)
 ![Banner](./resources/banner.svg)
 
+<div align="center">
+    <p>
+        <a href="https://github.com/IBM/data-gate-cli/blob/master/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/IBM/data-gate-cli?style=for-the-badge"></a>
+	    <a href="https://github.com/IBM/data-gate-cli/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/IBM/data-gate-cli?style=for-the-badge"></a>
+        <a href="https://github.com/IBM/data-gate-cli/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/IBM/data-gate-cli?style=for-the-badge"></a>
+        <a href="https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FIBM%2Fdata-gate-cli"><img alt="Twitter URL" src="https://img.shields.io/twitter/url?color=blue&style=for-the-badge&url=https%3A%2F%2Fgithub.com%2FIBM%2Fdata-gate-cli"></a>
+        <a href="https://github.com/IBM/data-gate-cli/actions?query=workflow%3A%22Python+Testing%22+branch%3Amaster"><img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/IBM/data-gate-cli/Python%20Testing/master?label=Python%20Testing&style=for-the-badge"></a>
+    </p>
+</div>
+
 ## Installation & Update
 
 1. Install Python
@@ -66,6 +76,7 @@ Execute the following commands to create a [virtual environment](https://virtual
 pip3 install virtualenv
 virtualenv .venv
 . .venv/bin/activate
+pip3 install black flake8 isort
 pip3 install --editable .
 ```
 
@@ -75,6 +86,7 @@ pip3 install --editable .
 pip3 install virtualenv
 virtualenv .venv
 .venv/Scripts/activate
+pip3 install black flake8 isort
 pip3 install --editable .
 ```
 
