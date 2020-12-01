@@ -87,12 +87,12 @@ pip3 install flake8 isort
 pip3 install --editable .
 ```
 
-### Create .env file within the cloned GitHub repository
+### Set environment variable
 
 - Linux/macOS:
 
 ```
-DG_VENV_PYTHON_PATH=.venv/bin/python3
+export DG_VENV_PYTHON_PATH=.venv/bin/python3
 ```
 
 - Windows:
