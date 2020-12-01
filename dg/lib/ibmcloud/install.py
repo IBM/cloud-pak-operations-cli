@@ -201,7 +201,12 @@ def get_install_status(install_details: Any) -> str:
 
 
 def is_installation_finished(install_details: Any) -> bool:
-    return get_install_status(install_details) == "ACTIVE"
+    status = get_install_status(install_details)
+
+    if status == "FAILED":
+        raise Exception(f"Workspace '{install_details["workspace_id"]}' is in status '{status}'")
+
+    return status == "ACTIVE"
 
 
 def wait_until_installation_is_finished(install_details: Any) -> None:
