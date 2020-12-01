@@ -74,6 +74,7 @@ Execute the following commands to create a [virtual environment](https://virtual
 pip3 install virtualenv
 virtualenv .venv
 . .venv/bin/activate
+pip3 install flake8 isort black
 pip3 install --editable .
 ```
 
@@ -83,7 +84,7 @@ pip3 install --editable .
 pip3 install virtualenv
 virtualenv .venv
 .venv/Scripts/activate
-pip3 install flake8
+pip3 install flake8 isort black
 pip3 install --editable .
 ```
 
