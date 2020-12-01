@@ -6,8 +6,8 @@ setup(
     name="dg",
     version="0.1.0",
     description="Data Gate CLI",
-    url="https://github.ibm.com/Everest/dg",
-    download_url="https://github.ibm.com/Everest/dg",
+    url="https://github.com/IBM/data-gate-cli",
+    download_url="https://github.com/IBM/data-gate-cli",
     packages=find_packages(),
     include_package_data=True,
     install_requires=[
