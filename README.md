@@ -1,4 +1,13 @@
-# Data Gate CLI (dg)
+# `Data Gate CLI (dg)`
+<div align="center">
+    <p>
+        <a href="https://github.com/IBM/data-gate-cli/blob/master/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/IBM/data-gate-cli?style=for-the-badge"></a>
+	    <a href="https://github.com/IBM/data-gate-cli/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/IBM/data-gate-cli?style=for-the-badge"></a>
+        <a href="https://github.com/IBM/data-gate-cli/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/IBM/data-gate-cli?style=for-the-badge"></a>
+        <a href="https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FIBM%2Fdata-gate-cli"><img alt="Twitter URL" src="https://img.shields.io/twitter/url?color=blue&style=for-the-badge&url=https%3A%2F%2Fgithub.com%2FIBM%2Fdata-gate-cli"></a>
+        <a href="https://github.com/IBM/data-gate-cli/actions?query=workflow%3A%22Python+Testing%22+branch%3Amaster"><img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/IBM/data-gate-cli/Python%20Testing/master?label=Python%20Testing&style=for-the-badge"></a>
+    </p>
+</div>
 
 ## Installation & Update
 
@@ -20,7 +29,7 @@ choco install python
 2. Install Data Gate CLI Python package (provides `dg` command)
 
 ```bash
-pip3 install git+ssh://git@github.ibm.com/Everest/dg.git
+pip3 install git+ssh://git@github.com/IBM/data-gate-cli.git
 ```
 
 Execute the following command to update the Data Gate CLI to the latest version:
@@ -52,7 +61,7 @@ dg adm update
 ### Cloning the Data Gate CLI GitHub repository
 
 ```bash
-git clone git@github.ibm.com:Everest/dg.git
+git clone git@github.com:IBM/data-gate-cli.git
 ```
 
 ### Creating a virtual environment
@@ -65,6 +74,7 @@ Execute the following commands to create a [virtual environment](https://virtual
 pip3 install virtualenv
 virtualenv .venv
 . .venv/bin/activate
+pip3 install black flake8 isort
 pip3 install --editable .
 ```
 
@@ -74,15 +84,16 @@ pip3 install --editable .
 pip3 install virtualenv
 virtualenv .venv
 .venv/Scripts/activate
+pip3 install black flake8 isort
 pip3 install --editable .
 ```
 
-### Create .env file within the cloned GitHub repository
+### Set environment variable
 
 - Linux/macOS:
 
 ```
-DG_VENV_PYTHON_PATH=.venv/bin/python3
+export DG_VENV_PYTHON_PATH=.venv/bin/python3
 ```
 
 - Windows:

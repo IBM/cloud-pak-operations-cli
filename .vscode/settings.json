@@ -19,8 +19,6 @@
 		"dg",
 		"--thirdparty",
 		"click",
-		"--thirdparty",
-		"openshift",
 		"--trailing-comma"
 	],
 	"python.testing.nosetestsEnabled": false,
