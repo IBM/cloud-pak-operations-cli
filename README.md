@@ -1,4 +1,5 @@
 # Data Gate CLI (dg)
+![Banner](./resources/banner.svg)
 
 ## Installation & Update
 
