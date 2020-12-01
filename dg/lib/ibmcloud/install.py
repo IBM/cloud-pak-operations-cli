@@ -204,7 +204,7 @@ def is_installation_finished(install_details: Any) -> bool:
     status = get_install_status(install_details)
 
     if status == "FAILED":
-        raise Exception(f"Workspace '{install_details[\'workspace_id\']}' is in status '{status}'")
+        raise Exception(f"Workspace '{install_details['workspace_id']}' is in status '{status}'")
 
     return status == "ACTIVE"
 
