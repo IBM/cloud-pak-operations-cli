@@ -33,7 +33,6 @@ from dg.utils.operating_system import OperatingSystem
 
 
 class CloudPakForDataVersion(TypedDict):
-    assembly_versions: dict[str, str]
     development: dict[str, str]
     release: dict[str, str]
     cpd_installer_file_name_dict: dict[OperatingSystem, str]
@@ -73,38 +72,6 @@ class AbstractCloudPakForDataManager(ABC):
         """Downloads the version-specific IBM Cloud Pak for Data installer"""
 
         pass
-
-    def get_assembly_version(self, assembly_name: str) -> str:
-        """Returns the latest version of the assembly with the given name
-
-        The version of an assembly may differ from the IBM Cloud Pak for Data
-        version.
-
-        Parameters
-        ----------
-        assembly_name
-            name of the assembly for which the latest version shall be returned
-
-        Returns
-        -------
-        str
-            latest version of the assembly with the given name
-        """
-
-        cloud_pak_for_data_version_semver = str(self._get_cloud_pak_for_data_version())
-        cloud_pak_for_data_version: CloudPakForDataVersion = (
-            AbstractCloudPakForDataManager._cloud_pak_for_data_versions[
-                cloud_pak_for_data_version_semver
-            ]
-        )
-
-        version = (
-            cloud_pak_for_data_version["assembly_versions"][assembly_name]
-            if assembly_name in cloud_pak_for_data_version["assembly_versions"]
-            else cloud_pak_for_data_version_semver
-        )
-
-        return version
 
     def get_cloud_pak_for_data_installer_path(self) -> pathlib.Path:
         """Returns the path of the IBM Cloud Pak for Data installer
@@ -488,10 +455,6 @@ class AbstractCloudPakForDataManager(ABC):
 
     _cloud_pak_for_data_versions: CloudPakForDataVersions = {
         "3.0.1": {
-            "assembly_versions": {
-                "db2oltp": "3.0.2",
-                "db2wh": "3.0.2",
-            },
             "development": {
                 "directory_alias": "cpd-3-0-1-dev",
                 "download_url": "http://icpfs1.svl.ibm.com/zen/cp4d-builds/3.0.1/dev/installer/latest/",
@@ -511,7 +474,6 @@ class AbstractCloudPakForDataManager(ABC):
             ],
         },
         "3.5.0": {
-            "assembly_versions": {"lite": "3.5.1"},
             "development": {
                 "directory_alias": "cpd-3-5-0-dev",
                 "download_url": "http://icpfs1.svl.ibm.com/zen/cp4d-builds/3.5.0/dev/cpd-cli/latest/",
