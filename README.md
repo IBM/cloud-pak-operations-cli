@@ -1,4 +1,6 @@
-# `Data Gate CLI (dg)`
+# Data Gate CLI (dg)
+![Banner](./resources/banner.svg)
+
 <div align="center">
     <p>
         <a href="https://github.com/IBM/data-gate-cli/blob/master/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/IBM/data-gate-cli?style=for-the-badge"></a>

@@ -201,7 +201,12 @@ def get_install_status(install_details: Any) -> str:
 
 
 def is_installation_finished(install_details: Any) -> bool:
-    return get_install_status(install_details) == "ACTIVE"
+    status = get_install_status(install_details)
+
+    if status == "FAILED":
+        raise Exception(f"Workspace '{install_details['workspace_id']}' is in status '{status}'")
+
+    return status == "ACTIVE"
 
 
 def wait_until_installation_is_finished(install_details: Any) -> None:
@@ -214,8 +219,8 @@ def wait_until_installation_is_finished(install_details: Any) -> None:
             install_details,
         )
     except Exception:
-        log_file_content = get_installation_log(install_details)
-        raise Exception(f"Timeout exceeded, log file:\n{log_file_content}")
+        raise Exception(f"Timeout exceeded or workspace error, details can be found here:"
+                        "https://cloud.ibm.com/schematics/workspaces/{install_details['workspace_id']}/activity")
 
 
 def wait_until_preinstallation_is_finished(interval: int, timeout: int) -> None:
