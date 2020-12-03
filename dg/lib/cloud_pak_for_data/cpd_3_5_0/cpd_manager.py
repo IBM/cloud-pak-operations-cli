@@ -125,7 +125,6 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         storage_class: str,
         **kwargs: Any,
     ):
-        version = self.get_assembly_version(assembly_name)
         cpd_installer_path = self.get_cloud_pak_for_data_installer_path()
 
         # install as cluster admin to generate (and apply) preinstall YAML files
@@ -142,8 +141,6 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             "zen",
             "--repo",
             str(yaml_file_path),
-            "--version",
-            version,
         ]
 
         click.echo("Executing command: {}".format(" ".join(args)))
@@ -172,8 +169,6 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 "--storageclass",
                 storage_class,
                 "--verbose",
-                "--version",
-                version,
             ]
         else:
             # install assembly
@@ -213,8 +208,6 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 "--transfer-image-to",
                 f"{openshift_image_registry_route}/zen",
                 "--verbose",
-                "--version",
-                version,
             ]
 
         click.echo("Executing command: {}".format(" ".join(args)))
