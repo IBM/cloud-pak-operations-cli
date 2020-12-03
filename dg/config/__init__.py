@@ -214,14 +214,14 @@ class DataGateConfigurationManager:
 
         return pathlib.Path.home() / ".dg" / "settings.json"
 
-    def fyre_commands_hidden(self) -> bool:
-        """Returns false if Fyre options should be displayed in help texts. The
+    def are_fyre_commands_hidden(self) -> bool:
+        """Returns whether FYRE options shall be displayed in help texts. The
         functionality is always usable.
 
         Returns
         -------
         bool
-            true if options should be hidden
+            true, if FYRE options shall be displayed in help texts
             false if not
         """
 
@@ -235,14 +235,14 @@ class DataGateConfigurationManager:
 
         return result
 
-    def nuclear_commands_hidden(self) -> bool:
-        """Returns false if nuclear options should be displayed in help texts.
-        The functionality is always usable.
+    def are_nuclear_commands_hidden(self) -> bool:
+        """Returns whether nuclear options shall be displayed in help texts. The
+        functionality is always usable.
 
         Returns
         -------
         bool
-            true if options should be hidden
+            true, if nuclear options shall be displayed in help texts
             false if not
         """
 

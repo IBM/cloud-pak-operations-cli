@@ -28,7 +28,7 @@ def get_click_multi_command_class() -> type[click.Command]:
 
 @click.command(
     cls=get_click_multi_command_class(),
-    hidden=dg.config.data_gate_configuration_manager.fyre_commands_hidden(),
+    hidden=dg.config.data_gate_configuration_manager.are_fyre_commands_hidden(),
 )
 def fyre():
     """FYRE-specific commands"""

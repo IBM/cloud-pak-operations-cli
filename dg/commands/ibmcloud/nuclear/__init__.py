@@ -28,7 +28,7 @@ def get_click_multi_command_class() -> type[click.Command]:
 
 @click.command(
     cls=get_click_multi_command_class(),
-    hidden=dg.config.data_gate_configuration_manager.nuclear_commands_hidden(),
+    hidden=dg.config.data_gate_configuration_manager.are_nuclear_commands_hidden(),
 )
 def nuclear():
     """⚠ Caution - No-holds-barred administrative functions"""
