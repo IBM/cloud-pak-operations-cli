@@ -18,7 +18,7 @@ from typing import Union
 
 import click
 
-import dg.config
+import dg.config.cluster_credentials_manager
 import dg.utils.click
 import dg.utils.openshift
 import dg.utils.ssh
@@ -26,7 +26,7 @@ import dg.utils.ssh
 
 @click.command(
     context_settings=dg.utils.click.create_default_map_from_dict(
-        dg.config.data_gate_configuration_manager.get_current_credentials()
+        dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
 @click.option(

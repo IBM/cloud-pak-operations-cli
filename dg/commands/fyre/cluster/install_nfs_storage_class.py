@@ -20,7 +20,6 @@ from typing import Final, Union
 
 import click
 
-import dg.config
 import dg.config.cluster_credentials_manager
 import dg.utils.click
 import dg.utils.download
@@ -43,7 +42,7 @@ def get_private_ip_address_of_infrastructure_node(hostname_result: str):
 
 @click.command(
     context_settings=dg.utils.click.create_default_map_from_dict(
-        dg.config.data_gate_configuration_manager.get_current_credentials()
+        dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
 @click.option(

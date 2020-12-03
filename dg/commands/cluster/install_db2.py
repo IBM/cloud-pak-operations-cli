@@ -17,7 +17,6 @@ from typing import Union
 import click
 import semver
 
-import dg.config
 import dg.config.cluster_credentials_manager
 import dg.lib.cloud_pak_for_data.cpd_manager_factory
 import dg.utils.click
@@ -34,7 +33,7 @@ from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
 
 @click.command(
     context_settings=dg.utils.click.create_default_map_from_dict(
-        dg.config.data_gate_configuration_manager.get_current_credentials()
+        dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
 @click.option("--server", required=True, help="OpenShift server URL")
