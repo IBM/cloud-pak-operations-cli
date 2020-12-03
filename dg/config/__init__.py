@@ -230,8 +230,45 @@ class DataGateConfigurationManager:
         if self.get_dg_settings_file_path().exists():
             settings = json.loads(self.get_dg_settings_file_path().read_text())
 
-            if "fyre_commands" in settings and settings["fyre_commands"]:
-                result = False
+            if "fyre_commands" in settings:
+                value = str(settings["fyre_commands"])
+
+                if value.lower() in ("true", "yes", "enable"):
+                    result = True
+                elif value.lower() in ("false", "no", "disable"):
+                    result = False
+                else:
+                    raise Exception("Expected value of configuration parameter 'fyre_commands' to be a boolean, "
+                                    f"but found '{value}'")
+
+        return result
+
+    def are_nuclear_commands_hidden(self) -> bool:
+        """Returns whether nuclear options shall be displayed in help texts. The
+        functionality is always usable.
+
+        Returns
+        -------
+        bool
+            true, if nuclear options shall be displayed in help texts
+            false if not
+        """
+
+        result = True
+
+        if self.get_dg_settings_file_path().exists():
+            settings = json.loads(self.get_dg_settings_file_path().read_text())
+
+            if "nuclear_commands" in settings:
+                value = str(settings["nuclear_commands"])
+
+                if value.lower() in ("true", "yes", "enable"):
+                    result = True
+                elif value.lower() in ("false", "no", "disable"):
+                    result = False
+                else:
+                    raise Exception("Expected value of configuration parameter 'nuclear_commands' to be a boolean, "
+                                    f"but found '{value}'")
 
         return result
 
@@ -265,27 +302,6 @@ class DataGateConfigurationManager:
 
         with open(self.get_dg_settings_file_path(), "w+") as f:
             f.write(json.dumps(settings, indent=4))
-
-    def are_nuclear_commands_hidden(self) -> bool:
-        """Returns whether nuclear options shall be displayed in help texts. The
-        functionality is always usable.
-
-        Returns
-        -------
-        bool
-            true, if nuclear options shall be displayed in help texts
-            false if not
-        """
-
-        result = True
-
-        if self.get_dg_settings_file_path().exists():
-            settings = json.loads(self.get_dg_settings_file_path().read_text())
-
-            if "nuclear_commands" in settings and settings["nuclear_commands"]:
-                result = False
-
-        return result
 
 
 data_gate_configuration_manager = DataGateConfigurationManager()
