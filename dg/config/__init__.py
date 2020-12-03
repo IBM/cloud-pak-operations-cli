@@ -235,6 +235,29 @@ class DataGateConfigurationManager:
 
         return result
 
+    def set_dg_bool_config_value(self, key: str, value: bool):
+        """Set a given key:value pair in the dg configuration file
+
+        Parameters
+        ----------
+        key
+            name of the key to set
+
+        value
+            value to be set for key
+        """
+
+        settings = {}
+        if self.get_dg_settings_file_path().exists():
+            settings = json.loads(self.get_dg_settings_file_path().read_text())
+
+            settings[key] = value
+        else:
+            settings = {key: value}
+
+        with open(self.get_dg_settings_file_path(), "w+") as f:
+            f.write(json.dumps(settings, indent=4))
+
     def are_nuclear_commands_hidden(self) -> bool:
         """Returns whether nuclear options shall be displayed in help texts. The
         functionality is always usable.
