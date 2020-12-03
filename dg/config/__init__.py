@@ -203,5 +203,56 @@ class DataGateConfigurationManager:
         with open(dg_credentials_file_path, "w") as credentials_file:
             json.dump(credentials, credentials_file, indent="\t", sort_keys=True)
 
+    def get_dg_settings_file_path(self) -> pathlib.Path:
+        """Returns the path of the settings file
+
+        Returns
+        -------
+        str
+            path of the settings file
+        """
+
+        return pathlib.Path.home() / ".dg" / "settings.json"
+
+    def show_fyre_options(self) -> bool:
+        """Returns true if Fyre options should be shown
+
+        Returns
+        -------
+        bool
+            true if options should be shown
+            false if not
+        """
+
+        result = False
+
+        if self.get_dg_settings_file_path().exists():
+            settings = json.loads(self.get_dg_settings_file_path().read_text())
+
+            if "show_fyre" in settings and settings["show_fyre"]:
+                result = True
+
+        return result
+
+    def show_ibmcloud_nuclear_options(self) -> bool:
+        """Returns true if IBM Cloud nuclear options should be shown
+
+        Returns
+        -------
+        bool
+            true if options should be shown
+            false if not
+        """
+
+        result = False
+
+        if self.get_dg_settings_file_path().exists():
+            settings = json.loads(self.get_dg_settings_file_path().read_text())
+
+            if "show_ibmcloud_nuclear" in settings and settings["show_ibmcloud_nuclear"]:
+                result = True
+
+        return result
+
 
 data_gate_configuration_manager = DataGateConfigurationManager()
