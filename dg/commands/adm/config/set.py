@@ -31,12 +31,4 @@ import dg.config
 def set(key: str, value: str):
     """Set configuration value"""
 
-    bool_value = False
-    if value.lower() in ("true", "yes", "enable"):
-        bool_value = True
-    elif value.lower() in ("false", "no", "disable"):
-        bool_value = False
-    else:
-        raise Exception("Only boolean values are supported at the moment")
-
-    dg.config.data_gate_configuration_manager.set_dg_bool_config_value(key, bool_value)
+    dg.config.data_gate_configuration_manager.set_dg_bool_config_value(key, value)

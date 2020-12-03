@@ -235,7 +235,7 @@ class DataGateConfigurationManager:
 
         return result
 
-    def set_dg_bool_config_value(self, key: str, value: bool):
+    def set_dg_bool_config_value(self, key: str, value: str):
         """Set a given key:value pair in the dg configuration file
 
         Parameters
@@ -247,13 +247,21 @@ class DataGateConfigurationManager:
             value to be set for key
         """
 
+        bool_value = False
+        if value.lower() in ("true", "yes", "enable"):
+            bool_value = True
+        elif value.lower() in ("false", "no", "disable"):
+            bool_value = False
+        else:
+            raise Exception(f"Passed value '{value}' is not a boolean value.")
+
         settings = {}
         if self.get_dg_settings_file_path().exists():
             settings = json.loads(self.get_dg_settings_file_path().read_text())
 
-            settings[key] = value
+            settings[key] = bool_value
         else:
-            settings = {key: value}
+            settings = {key: bool_value}
 
         with open(self.get_dg_settings_file_path(), "w+") as f:
             f.write(json.dumps(settings, indent=4))
