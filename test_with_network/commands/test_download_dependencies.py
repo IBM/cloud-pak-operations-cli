@@ -15,15 +15,20 @@
 import os
 import pathlib
 import unittest
+import tempfile
+
+from unittest.mock import patch
 
 import click.testing
 
 import dg.config
-import dg.utils.download.ibm_cloud
 import dg.utils.file
 import dg.utils.operating_system
 
 from dg.dg import cli
+from dg.lib.download_manager.plugins.ibm_cloud_terraform_provider_plugin import (
+    IBMCloudTerraformProviderPlugIn,
+)
 
 
 class TestDownloadDependencies(unittest.TestCase):
@@ -45,7 +50,11 @@ class TestDownloadDependencies(unittest.TestCase):
             ).exists()
         )
 
-    def test_command(self):
+    @patch(
+        "dg.config.binaries_manager.data_gate_configuration_manager.get_home_directory_path",
+        return_value=pathlib.Path(tempfile.gettempdir()),
+    )
+    def test_command(self, test_mock):
         """Tests that dg adm download-dependencies downloads
         dependencies"""
 
@@ -54,7 +63,7 @@ class TestDownloadDependencies(unittest.TestCase):
         )
 
         terraform_plugins_directory_path = (
-            dg.utils.download.ibm_cloud.get_terraform_plugins_directory_path()
+            IBMCloudTerraformProviderPlugIn().get_terraform_plugins_directory_path()
         )
 
         for entry in dg_bin_directory_path.glob("*"):

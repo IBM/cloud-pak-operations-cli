@@ -95,7 +95,7 @@ def extract_archive(
 
                     tar_file.extract(member, target_directory_path)
                     execute_post_extraction_func_if_exists(
-                        target_directory_path / member.name
+                        target_directory_path / member.name, **kwargs
                     )
 
     elif archive_path.suffix == ".zip":
@@ -109,7 +109,7 @@ def extract_archive(
 
                     zip_file.extract(member, str(target_directory_path))
                     execute_post_extraction_func_if_exists(
-                        target_directory_path / member.filename
+                        target_directory_path / member.filename, **kwargs
                     )
 
 
