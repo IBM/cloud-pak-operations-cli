@@ -210,6 +210,9 @@ class ClusterCredentialsManager:
     def get_current_credentials(self) -> ContextData:
         """Returns user and current cluster credentials
 
+        User credentials are obtained from ~/.dg/credentials.json. Cluster
+        credentials are obtained from ~/.dg/clusters.json.
+
         Returns
         -------
         ContextData
