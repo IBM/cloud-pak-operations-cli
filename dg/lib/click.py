@@ -26,6 +26,49 @@ import dg.config.cluster_credentials_manager
 import dg.lib.openshift
 
 
+def check_cloud_pak_for_data_options(
+    ctx: click.Context, use_dev: bool, options: dict[str, Any]
+):
+    """Checks if values for required Click options were passed to a Click
+    command to install an IBM Cloud Pak for Data assembly
+
+    Parameters
+    ----------
+    use_dev
+        flag indicating whether a development build of an IBM Cloud Pak for Data
+        assembly shall be installed
+    options
+        options passed to a Click command
+    """
+
+    if use_dev:
+        if (
+            ("artifactory_user_name" in options)
+            and (options["artifactory_user_name"] is None)
+            and ("artifactory_api_key" in options)
+            and (options["artifactory_api_key"] is None)
+        ):
+            raise click.UsageError(
+                "Missing options '--artifactory-user-name' and '--artifactory-api-key'",
+                ctx,
+            )
+        elif ("artifactory_user_name" in options) and (
+            options["artifactory_user_name"] is None
+        ):
+            raise click.UsageError("Missing option '--artifactory-user-name'", ctx)
+        elif ("artifactory_api_key" in options) and (
+            options["artifactory_api_key"] is None
+        ):
+            raise click.UsageError("Missing option '--artifactory-api-key'", ctx)
+    else:
+        if ("ibm_cloud_pak_for_data_entitlement_key" in options) and (
+            options["ibm_cloud_pak_for_data_entitlement_key"] is None
+        ):
+            raise click.UsageError(
+                "Missing option '--ibm-cloud-pak-for-data-entitlement-key'", ctx
+            )
+
+
 def create_click_multi_command_class(
     modules: dict[str, ModuleType]
 ) -> type[click.Command]:

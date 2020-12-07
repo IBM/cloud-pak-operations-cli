@@ -326,10 +326,7 @@ class AbstractCloudPakForDataManager(ABC):
             )
         else:
             return self._prepare_yaml_file_for_release_build(
-                artifactory_user_name,
-                artifactory_api_key,
-                ibm_cloud_pak_for_data_entitlement_key,
-                assembly_name,
+                ibm_cloud_pak_for_data_entitlement_key
             )
 
     @abstractmethod
@@ -422,10 +419,7 @@ class AbstractCloudPakForDataManager(ABC):
 
     def _prepare_yaml_file_for_release_build(
         self,
-        artifactory_user_name: str,
-        artifactory_api_key: str,
         ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
-        assembly_name: str,
     ) -> pathlib.Path:
         """Prepares a YAML file for installing a release build of the assembly
         with the given name

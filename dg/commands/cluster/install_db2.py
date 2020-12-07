@@ -40,8 +40,8 @@ from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
 @click.option("--username", help="OpenShift username")
 @click.option("--password", help="OpenShift password")
 @click.option("--token", help="OpenShift OAuth access token")
-@click.option("--artifactory-user-name", required=True, help="Artifactory user name")
-@click.option("--artifactory-api-key", required=True, help="Artifactory API key")
+@click.option("--artifactory-user-name", help="Artifactory user name")
+@click.option("--artifactory-api-key", help="Artifactory API key")
 @click.option(
     "--ibm-cloud-pak-for-data-entitlement-key",
     help="IBM Cloud Pak for Data entitlement key",
@@ -85,12 +85,7 @@ def install_db2(
 ):
     """Install IBM Db2 or IBM Db2 Warehouse"""
 
-    if not use_dev and ibm_cloud_pak_for_data_entitlement_key is None:
-        raise click.UsageError(
-            "Missing option '--ibm-cloud-pak-for-data-entitlement-key'.",
-            ctx,
-        )
-
+    dg.lib.click.check_cloud_pak_for_data_options(ctx, use_dev, locals().copy())
     dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
 
     cloud_pak_for_data_manager = (
