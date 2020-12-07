@@ -394,7 +394,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         if result is None:
             raise Exception(
                 f"IBM Cloud Pak for Data installer release for Cloud Pak for Data "
-                f"{self._get_cloud_pak_for_data_version()} could not found on GitHub"
+                f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
 
         return result
@@ -434,7 +434,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         if result is None:
             raise Exception(
                 f"Download URL of IBM Cloud Pak for Data installer for Cloud Pak for Data "
-                f"{self._get_cloud_pak_for_data_version()} could not found on GitHub"
+                f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
 
         return result

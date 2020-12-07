@@ -14,16 +14,11 @@
 
 import click
 
-import dg.utils.download.ibm_cloud
-import dg.utils.download.openshift
-import dg.utils.download.terraform
+import dg.lib.download_manager
 
 
 @click.command()
 def download_dependencies():
     """Download dependencies"""
 
-    dg.utils.download.ibm_cloud.download_ibm_cloud_cli()
-    dg.utils.download.ibm_cloud.download_ibm_cloud_terraform_provider()
-    dg.utils.download.openshift.download_openshift_container_platform_cli()
-    dg.utils.download.terraform.download_terraform_cli()
+    dg.lib.download_manager.download_manager.download_dependencies_if_required()
