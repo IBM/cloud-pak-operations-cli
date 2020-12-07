@@ -41,8 +41,16 @@ class AbstractDownloadManagerPlugIn(ABC):
     def get_binary_alias(self) -> str:
         """Returns the alias of a dependency
 
-        The alias is used as a key in ~/.dg/binaries.json to store the latest
-        downloaded version.
+        The alias is used as a key in ~/.dg/binaries.json to store the version
+        of a downloaded dependency.
+
+        Example:
+
+        {
+            […]
+            "ibmcloud": "1.2.3",
+            […]
+        }
 
         Returns
         -------
@@ -54,12 +62,14 @@ class AbstractDownloadManagerPlugIn(ABC):
 
     @abstractmethod
     def get_latest_binary_version(self) -> semver.VersionInfo:
-        """Returns the latest version of a dependency
+        """Returns the latest version of a dependency available at the official
+        download location
 
         Returns
         -------
         semver.VersionInfo
-            latest version of a dependency
+            latest version of a dependency available at the official download
+            location
         """
 
         pass
@@ -68,6 +78,42 @@ class AbstractDownloadManagerPlugIn(ABC):
         self, owner: str, repo: str
     ) -> Union[semver.VersionInfo, None]:
         """Returns the latest version of a dependency on GitHub
+
+        This method parses the "name" key of the JSON document returned by the
+        GitHub Releases API, which has the following structure:
+
+        [
+            {
+                "url": […],
+                "html_url": […],
+                "assets_url": […],
+                "upload_url": […],
+                "tarball_url": […],
+                "zipball_url": […],
+                "id": […],
+                "node_id": […],
+                "tag_name": […],
+                "target_commitish": […],
+                "name": "v1.0.0",
+                "body": […],
+                "draft": […],
+                "prerelease": […],
+                "created_at": […],
+                "published_at": […],
+                "author": {
+                    […]
+                },
+                "assets": [
+                    […]
+                ]
+            },
+            {
+                […]
+                "name": "v2.0.0",
+                […]
+            },
+            […]
+        ]
 
         GitHub Releases API: https://developer.github.com/v3/repos/releases/
 
