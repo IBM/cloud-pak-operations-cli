@@ -19,12 +19,12 @@ import click
 import dg.config
 import dg.lib.ibmcloud.iam
 
+from dg.config import data_gate_configuration_manager
 from dg.lib.ibmcloud import (
     EXTERNAL_IBM_CLOUD_API_KEY_NAME,
     INTERNAL_IBM_CLOUD_API_KEY_NAME,
 )
 from dg.lib.ibmcloud.iam import api_key_exists, delete_api_key_in_ibmcloud
-from dg.lib.thirdparty import IBM_CLOUD_PATH
 
 
 @click.command()
@@ -51,8 +51,8 @@ def generate_api_key(delete_existing_api_key: bool) -> str:
                 ):
                     raise Exception(
                         f"Multiple API keys with the name {EXTERNAL_IBM_CLOUD_API_KEY_NAME} exist. You need to "
-                        f"manually delete them using '{str(IBM_CLOUD_PATH)} iam api-key-delete "
-                        f"{EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
+                        f"manually delete them using '{str(data_gate_configuration_manager.get_ibmcloud_cli_path())} "
+                        f"iam api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
                     )
 
         dg.config.data_gate_configuration_manager.store_credentials(

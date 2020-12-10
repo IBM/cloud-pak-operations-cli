@@ -15,7 +15,7 @@
 from typing import Any, Union
 
 from dg.commands.ibmcloud.common import is_logged_in
-from dg.lib.thirdparty import execute_ibmcloud_command
+from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
 
 
 def list_existing_clusters(json: bool) -> Union[str, Any]:
@@ -30,7 +30,7 @@ def list_existing_clusters(json: bool) -> Union[str, Any]:
     if json:
         command.append("--json")
 
-    result = execute_ibmcloud_command(command)
+    result = execute_ibmcloud_command_without_check(command)
 
     if result.returncode != 0 and "ibmcloud login" in result.stderr:
         raise Exception("Please use 'dg ibmcloud login' before running this command.")

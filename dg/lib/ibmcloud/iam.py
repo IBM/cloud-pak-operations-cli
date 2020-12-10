@@ -19,7 +19,7 @@ from typing import Any
 
 import dg.lib.ibmcloud
 
-from dg.lib.thirdparty import execute_ibmcloud_command_with_check
+from dg.lib.ibmcloud import execute_ibmcloud_command
 
 
 def api_key_exists(name: str) -> bool:
@@ -39,7 +39,7 @@ def api_key_exists(name: str) -> bool:
 
 
 def delete_api_key_in_ibmcloud():
-    execute_ibmcloud_command_with_check(
+    execute_ibmcloud_command(
         [
             "iam",
             "api-key-delete",
@@ -50,7 +50,7 @@ def delete_api_key_in_ibmcloud():
 
 
 def generate_api_key() -> str:
-    result = execute_ibmcloud_command_with_check(
+    result = execute_ibmcloud_command(
         [
             "iam",
             "api-key-create",
@@ -64,9 +64,7 @@ def generate_api_key() -> str:
 
 
 def get_api_keys() -> Any:
-    result = execute_ibmcloud_command_with_check(
-        ["iam", "api-keys", "--output", "JSON"]
-    )
+    result = execute_ibmcloud_command(["iam", "api-keys", "--output", "JSON"])
 
     return json.loads(result.stdout)
 
@@ -75,7 +73,7 @@ def get_oauth_token() -> str:
     """Retrieves the IAM access token for the currently logged on user"""
 
     command = ["iam", "oauth-tokens", "--output", "JSON"]
-    oauth_token_result = json.loads(execute_ibmcloud_command_with_check(command).stdout)
+    oauth_token_result = json.loads(execute_ibmcloud_command(command).stdout)
 
     if oauth_token_result and "iam_token" in oauth_token_result:
         result = oauth_token_result["iam_token"]

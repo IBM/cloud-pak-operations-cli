@@ -68,11 +68,9 @@ class TestAddClusterCommands(unittest.TestCase):
     def _add_cluster(self, cluster_data: ClusterData, num_expected_cluster: int):
         server = cluster_data["server"]
 
-        dg.lib.ibmcloud.status.execute_ibmcloud_command_with_check = (
-            unittest.mock.MagicMock(
-                return_value=CompletedProcess(
-                    args="", returncode=0, stdout=f'{{"serverURL": "{server}"}}'
-                )
+        dg.lib.ibmcloud.status.execute_ibmcloud_command = unittest.mock.MagicMock(
+            return_value=CompletedProcess(
+                args="", returncode=0, stdout=f'{{"serverURL": "{server}"}}'
             )
         )
 

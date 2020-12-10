@@ -19,6 +19,7 @@ from dg.commands.ibmcloud.common import (
     get_default_public_vlan,
     is_logged_in,
 )
+from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
 from dg.lib.ibmcloud.cluster.rm import delete_ibmcloud_cluster
 from dg.lib.ibmcloud.install import install_cp4d_with_preinstall
 from dg.lib.ibmcloud.login import login as login_to_ibm_cloud
@@ -28,7 +29,6 @@ from dg.lib.ibmcloud.status import (
     wait_for_cluster_deletion,
     wait_for_cluster_readiness,
 )
-from dg.lib.thirdparty import execute_ibmcloud_command
 
 
 @click.command()
@@ -115,7 +115,7 @@ def create(
     click.echo(
         "Executing cluster creation command 'ibmcloud " + " ".join(command) + "'"
     )
-    result = execute_ibmcloud_command(command)
+    result = execute_ibmcloud_command_without_check(command)
 
     if result.returncode != 0:
         if "E0007" in result.stdout:

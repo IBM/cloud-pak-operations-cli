@@ -12,10 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import subprocess
-
 import dg.config
 import dg.lib.ibmcloud
+import dg.lib.openshift
 
 from dg.lib.cluster.cluster import AbstractCluster, ClusterData
 
@@ -38,16 +37,6 @@ class IBMCloudCluster(AbstractCluster):
         if api_key is None:
             raise Exception("IBM Cloud API key not found in stored credentials")
 
-        oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
-        args = [
-            oc_cli_path,
-            "login",
-            "--password",
-            api_key,
-            "--server",
-            self.server,
-            "--username",
-            "apikey",
-        ]
-
-        subprocess.check_call(args)
+        dg.lib.openshift.log_in_to_openshift_cluster_with_password(
+            self.server, "apikey", api_key
+        )

@@ -12,9 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from dg.lib.thirdparty import (
-    execute_ibmcloud_command,
+from dg.lib.ibmcloud import (
     execute_ibmcloud_command_interactively,
+    execute_ibmcloud_command_without_check,
 )
 
 
@@ -29,7 +29,7 @@ def delete_ibmcloud_cluster(name: str, force_deletion: bool):
     if force_deletion:
         command.append("--force-delete-storage")
         command.append("-f")
-        result = execute_ibmcloud_command(command)
+        result = execute_ibmcloud_command_without_check(command)
 
         if result.returncode != 0:
             raise Exception(

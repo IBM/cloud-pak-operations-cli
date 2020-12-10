@@ -19,12 +19,13 @@ import click
 import dg.config
 
 from dg.commands.ibmcloud.common import is_logged_in
+from dg.config import data_gate_configuration_manager
 from dg.lib.ibmcloud import (
     EXTERNAL_IBM_CLOUD_API_KEY_NAME,
     INTERNAL_IBM_CLOUD_API_KEY_NAME,
+    execute_ibmcloud_command_without_check,
 )
 from dg.lib.ibmcloud.iam import delete_api_key_in_ibmcloud
-from dg.lib.thirdparty import IBM_CLOUD_PATH, execute_ibmcloud_command
 
 
 @click.command()
@@ -48,7 +49,8 @@ def logout(delete_api_key: bool):
             ):
                 raise Exception(
                     f"Multiple API keys with the name {EXTERNAL_IBM_CLOUD_API_KEY_NAME} exist. You need to manually "
-                    f"delete them using '{str(IBM_CLOUD_PATH)} iam api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
+                    f"delete them using '{str(data_gate_configuration_manager.get_ibmcloud_cli_path())} iam "
+                    f"api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
                 )
         click.echo("Deleting the Data Gate API key on disk")
         dg.config.data_gate_configuration_manager.store_credentials(
@@ -62,7 +64,7 @@ def logout(delete_api_key: bool):
 
 
 def _perform_logout():
-    logout_command = execute_ibmcloud_command(["logout"])
+    logout_command = execute_ibmcloud_command_without_check(["logout"])
     if logout_command.returncode != 0:
         raise Exception(
             f"'ibmcloud logout' failed: {logout_command.stdout}\n{logout_command.stderr}"
