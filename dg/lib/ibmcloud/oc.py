@@ -7,7 +7,7 @@ import semver
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
 )
-from dg.utils.thirdparty import execute_ibmcloud_command_with_check
+from dg.lib.thirdparty import execute_ibmcloud_command_with_check
 
 
 def get_latest_supported_openshift_version() -> str:

@@ -19,13 +19,13 @@ from typing import Union
 import click
 
 import dg.config.cluster_credentials_manager
-import dg.utils.click
-import dg.utils.openshift
+import dg.lib.click
+import dg.lib.openshift
 import dg.utils.ssh
 
 
 @click.command(
-    context_settings=dg.utils.click.create_default_map_from_dict(
+    context_settings=dg.lib.click.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
@@ -86,7 +86,7 @@ async def _init_node_for_db2(
     db2_edition: str,
     use_host_path_storage: bool,
 ):
-    command = dg.utils.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
+    command = dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
 
     async with dg.utils.ssh.RemoteClient(infrastructure_node_hostname) as remoteClient:
         await remoteClient.connect()

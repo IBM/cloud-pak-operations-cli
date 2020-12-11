@@ -27,10 +27,10 @@ import semver
 
 import dg.config
 import dg.lib.cloud_pak_for_data.cpd_manager
+import dg.lib.openshift
 import dg.utils.compression
 import dg.utils.download
 import dg.utils.file
-import dg.utils.openshift
 import dg.utils.operating_system
 
 from dg.config.binaries_manager import binaries_manager
@@ -173,10 +173,10 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         else:
             # install assembly
             openshift_image_registry_route = (
-                dg.utils.openshift.get_openshift_image_registry_default_route()
+                dg.lib.openshift.get_openshift_image_registry_default_route()
             )
 
-            target_registry_password = dg.utils.openshift.get_current_token()
+            target_registry_password = dg.lib.openshift.get_current_token()
 
             args = [
                 str(cpd_installer_path),

@@ -16,12 +16,12 @@ import json
 import pathlib
 
 from typing import Any, TypedDict, Union
-from dg.config import data_gate_configuration_manager
 
 from tabulate import tabulate
 
 import dg.lib.cluster
 
+from dg.config import data_gate_configuration_manager
 from dg.lib.cluster.cluster import AbstractCluster, ClusterData
 
 ContextData = dict[str, Any]

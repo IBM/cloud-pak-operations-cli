@@ -16,7 +16,7 @@ import subprocess
 
 import dg.config
 import dg.lib.fyre.openshift
-import dg.utils.openshift
+import dg.lib.openshift
 
 from dg.lib.cluster.cluster import AbstractCluster, ClusterData
 
@@ -26,7 +26,7 @@ class FYRECluster(AbstractCluster):
         super().__init__(server, cluster_data)
 
     def get_cluster_access_token(self) -> str:
-        token = dg.utils.openshift.get_cluster_access_token(
+        token = dg.lib.openshift.get_cluster_access_token(
             dg.lib.fyre.openshift.OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT.format(
                 self.cluster_data["cluster_name"]
             ),

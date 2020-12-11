@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from dg.utils.thirdparty import (
+from dg.lib.thirdparty import (
     execute_ibmcloud_command,
     execute_ibmcloud_command_interactively,
 )

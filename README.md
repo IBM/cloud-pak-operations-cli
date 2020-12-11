@@ -1,4 +1,5 @@
 # Data Gate CLI (dg)
+
 ![Banner](./resources/banner.svg)
 
 <div align="center">
@@ -120,7 +121,7 @@ To register a new Click group, add a Python package (i.e., a directory containin
 import click
 import pathlib
 
-import dg.utils.click as dgclick
+import dg.lib.click as dgclick
 
 
 def get_click_multi_command_class() -> type[click.Command]:
@@ -133,6 +134,23 @@ def get_click_multi_command_class() -> type[click.Command]:
 def {Click group name}():
     pass
 ```
+
+### Avoiding circular imports
+
+To avoid circular imports, a module contained in one of the Data Gate CLI packages shown in the table below is only allowed to import other modules of the following categories:
+
+- modules from the same package or other packages in the same row if no circular import is created
+- modules from other packages in rows below the row containing the package of the module
+
+| 1st level packages | 2nd level packages | 3rd level packages                                   |
+| ------------------ | ------------------ | ---------------------------------------------------- |
+| test               | …                  |                                                      |
+| dg                 | dg.commands        | dg.commands.adm<br />dg.commands.cluster<br />…      |
+|                    | dg.lib             | dg.lib.cloud_pak_for_data<br />dg.lib.cluster<br />… |
+|                    | dg.config          |                                                      |
+|                    | dg.utils           |                                                      |
+
+For example, a module contained in the `dg.config` package is allowed to import modules from the `dg.utils` package but must not import modules from the `dg.lib` package.
 
 #### Docstring Syntax
 

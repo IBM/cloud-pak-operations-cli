@@ -23,7 +23,7 @@ from typing import Any
 import click
 
 import dg.config.cluster_credentials_manager
-import dg.utils.openshift
+import dg.lib.openshift
 
 
 def create_click_multi_command_class(
@@ -168,11 +168,11 @@ def get_oc_login_command_for_remote_host(
         and ("password" in options)
         and (options["password"] is not None)
     ):
-        result = dg.utils.openshift.get_oc_login_command_with_password_for_remote_host(
+        result = dg.lib.openshift.get_oc_login_command_with_password_for_remote_host(
             options["server"], options["username"], options["password"]
         )
     elif ("token" in options) and (options["token"] is not None):
-        result = dg.utils.openshift.get_oc_login_command_with_token_for_remote_host(
+        result = dg.lib.openshift.get_oc_login_command_with_token_for_remote_host(
             options["server"], options["token"]
         )
     else:
@@ -188,7 +188,7 @@ def get_oc_login_command_for_remote_host(
 
         cluster_data = current_cluster.get_cluster_data()
 
-        result = dg.utils.openshift.get_oc_login_command_with_password_for_remote_host(
+        result = dg.lib.openshift.get_oc_login_command_with_password_for_remote_host(
             cluster_data["server"], cluster_data["username"], cluster_data["password"]
         )
 
@@ -249,11 +249,11 @@ def log_in_to_openshift_cluster(ctx: click.Context, options: dict[str, Any]):
         and ("password" in options)
         and (options["password"] is not None)
     ):
-        dg.utils.openshift.log_in_to_openshift_cluster_with_password(
+        dg.lib.openshift.log_in_to_openshift_cluster_with_password(
             options["server"], options["username"], options["password"]
         )
     elif ("token" in options) and (options["token"] is not None):
-        dg.utils.openshift.log_in_to_openshift_cluster_with_token(
+        dg.lib.openshift.log_in_to_openshift_cluster_with_token(
             options["server"], options["token"]
         )
     else:

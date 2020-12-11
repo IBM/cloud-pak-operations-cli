@@ -24,7 +24,7 @@ from dg.lib.ibmcloud.plugin import (
     is_catalogs_management_plugin_installed,
     is_container_service_plugin_installed,
 )
-from dg.utils.thirdparty import (
+from dg.lib.thirdparty import (
     execute_ibmcloud_command,
     execute_ibmcloud_command_interactively,
 )
