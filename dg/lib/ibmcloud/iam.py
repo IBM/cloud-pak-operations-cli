@@ -19,7 +19,7 @@ from typing import Any
 
 import dg.lib.ibmcloud
 
-from dg.utils.thirdparty import execute_ibmcloud_command_with_check
+from dg.lib.thirdparty import execute_ibmcloud_command_with_check
 
 
 def api_key_exists(name: str) -> bool:

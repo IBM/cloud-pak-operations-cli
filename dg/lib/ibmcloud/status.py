@@ -17,7 +17,7 @@ import json
 from typing import Any
 
 from dg.lib.ibmcloud.cluster.ls import list_existing_clusters
-from dg.utils.thirdparty import execute_ibmcloud_command_with_check
+from dg.lib.thirdparty import execute_ibmcloud_command_with_check
 from dg.utils.wait import wait_for
 
 

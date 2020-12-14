@@ -21,9 +21,9 @@ from typing import Final, Union
 import click
 
 import dg.config.cluster_credentials_manager
-import dg.utils.click
+import dg.lib.click
+import dg.lib.openshift
 import dg.utils.download
-import dg.utils.openshift
 import dg.utils.ssh
 
 SET_UP_OC4_URL: Final[
@@ -41,7 +41,7 @@ def get_private_ip_address_of_infrastructure_node(hostname_result: str):
 
 
 @click.command(
-    context_settings=dg.utils.click.create_default_map_from_dict(
+    context_settings=dg.lib.click.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
@@ -109,7 +109,7 @@ async def _install_nfs_storage_class(
         OpenShift OAuth access token
     """
 
-    command = dg.utils.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
+    command = dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
     set_up_oc4_path = dg.utils.download.download_file(
         urllib.parse.urlsplit(SET_UP_OC4_URL),
         auth=("", ibm_github_api_key),

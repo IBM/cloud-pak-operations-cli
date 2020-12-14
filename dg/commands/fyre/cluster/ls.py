@@ -20,7 +20,7 @@ import requests
 from tabulate import tabulate
 
 import dg.config
-import dg.utils.click
+import dg.lib.click
 import dg.utils.network
 
 IBM_FYRE_SHOW_OPENSHIFT_CLUSTERS_URL: Final[
@@ -29,7 +29,7 @@ IBM_FYRE_SHOW_OPENSHIFT_CLUSTERS_URL: Final[
 
 
 @click.command(
-    context_settings=dg.utils.click.create_default_map_from_json_file(
+    context_settings=dg.lib.click.create_default_map_from_json_file(
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )

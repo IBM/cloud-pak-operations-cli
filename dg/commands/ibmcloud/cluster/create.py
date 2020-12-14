@@ -28,7 +28,7 @@ from dg.lib.ibmcloud.status import (
     wait_for_cluster_deletion,
     wait_for_cluster_readiness,
 )
-from dg.utils.thirdparty import execute_ibmcloud_command
+from dg.lib.thirdparty import execute_ibmcloud_command
 
 
 @click.command()

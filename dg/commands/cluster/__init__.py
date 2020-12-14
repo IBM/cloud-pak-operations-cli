@@ -16,7 +16,7 @@ import pathlib
 
 import click
 
-import dg.utils.click as dgclick
+import dg.lib.click as dgclick
 
 
 def get_click_multi_command_class() -> type[click.Command]:

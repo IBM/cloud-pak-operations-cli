@@ -18,9 +18,9 @@ import click
 import semver
 
 import dg.config.cluster_credentials_manager
-import dg.utils.click
+import dg.lib.click
+import dg.lib.openshift
 import dg.utils.download
-import dg.utils.openshift
 
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
@@ -31,7 +31,7 @@ from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
 
 
 @click.command(
-    context_settings=dg.utils.click.create_default_map_from_dict(
+    context_settings=dg.lib.click.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
@@ -82,7 +82,7 @@ def install_assembly(
             ctx,
         )
 
-    dg.utils.click.log_in_to_openshift_cluster(ctx, locals().copy())
+    dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
 
     cloud_pak_for_data_manager = (
         CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(

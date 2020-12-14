@@ -17,13 +17,13 @@ from typing import Union
 import click
 
 import dg.config.cluster_credentials_manager
-import dg.utils.click
+import dg.lib.click
 
 from dg.lib.fyre.cluster.fyre_cluster_factory import fyre_cluster_factory
 
 
 @click.command(
-    context_settings=dg.utils.click.create_default_map_from_dict(
+    context_settings=dg.lib.click.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )

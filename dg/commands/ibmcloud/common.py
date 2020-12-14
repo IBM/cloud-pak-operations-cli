@@ -18,7 +18,7 @@ from typing import Any
 
 import click
 
-from dg.utils.thirdparty import execute_ibmcloud_command_with_check
+from dg.lib.thirdparty import execute_ibmcloud_command_with_check
 
 
 def is_logged_in() -> bool:

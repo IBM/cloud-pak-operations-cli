@@ -24,7 +24,7 @@ from dg.lib.ibmcloud import (
     INTERNAL_IBM_CLOUD_API_KEY_NAME,
 )
 from dg.lib.ibmcloud.iam import delete_api_key_in_ibmcloud
-from dg.utils.thirdparty import IBM_CLOUD_PATH, execute_ibmcloud_command
+from dg.lib.thirdparty import IBM_CLOUD_PATH, execute_ibmcloud_command
 
 
 @click.command()

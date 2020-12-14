@@ -31,7 +31,7 @@ from dg.lib.cloud_pak_for_data.cpd_manager import (
 )
 from dg.lib.ibmcloud import INTERNAL_IBM_CLOUD_API_KEY_NAME
 from dg.lib.ibmcloud.iam import get_oauth_token, get_tokens
-from dg.utils.thirdparty import execute_ibmcloud_command_with_check
+from dg.lib.thirdparty import execute_ibmcloud_command_with_check
 from dg.utils.wait import wait_for
 
 
@@ -204,7 +204,9 @@ def is_installation_finished(install_details: Any) -> bool:
     status = get_install_status(install_details)
 
     if status == "FAILED":
-        raise Exception(f"Workspace '{install_details['workspace_id']}' is in status '{status}'")
+        raise Exception(
+            f"Workspace '{install_details['workspace_id']}' is in status '{status}'"
+        )
 
     return status == "ACTIVE"
 
@@ -219,8 +221,10 @@ def wait_until_installation_is_finished(install_details: Any) -> None:
             install_details,
         )
     except Exception:
-        raise Exception(f"Timeout exceeded or workspace error, details can be found here:"
-                        "https://cloud.ibm.com/schematics/workspaces/{install_details['workspace_id']}/activity")
+        raise Exception(
+            f"Timeout exceeded or workspace error, details can be found here:"
+            "https://cloud.ibm.com/schematics/workspaces/{install_details['workspace_id']}/activity"
+        )
 
 
 def wait_until_preinstallation_is_finished(interval: int, timeout: int) -> None:
