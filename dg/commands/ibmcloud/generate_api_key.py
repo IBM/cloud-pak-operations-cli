@@ -16,7 +16,6 @@ from subprocess import CalledProcessError
 
 import click
 
-import dg.config
 import dg.lib.ibmcloud.iam
 
 from dg.config import data_gate_configuration_manager
@@ -55,13 +54,13 @@ def generate_api_key(delete_existing_api_key: bool) -> str:
                         f"iam api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
                     )
 
-        dg.config.data_gate_configuration_manager.store_credentials(
+        data_gate_configuration_manager.store_credentials(
             {INTERNAL_IBM_CLOUD_API_KEY_NAME: ""}
         )
 
     api_key = dg.lib.ibmcloud.iam.generate_api_key()
 
-    dg.config.data_gate_configuration_manager.store_credentials(
+    data_gate_configuration_manager.store_credentials(
         {INTERNAL_IBM_CLOUD_API_KEY_NAME: api_key}
     )
 

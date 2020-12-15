@@ -16,8 +16,6 @@ from subprocess import CalledProcessError
 
 import click
 
-import dg.config
-
 from dg.commands.ibmcloud.common import is_logged_in
 from dg.config import data_gate_configuration_manager
 from dg.lib.ibmcloud import (
@@ -53,7 +51,7 @@ def logout(delete_api_key: bool):
                     f"api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
                 )
         click.echo("Deleting the Data Gate API key on disk")
-        dg.config.data_gate_configuration_manager.store_credentials(
+        data_gate_configuration_manager.store_credentials(
             {INTERNAL_IBM_CLOUD_API_KEY_NAME: ""}
         )
 
