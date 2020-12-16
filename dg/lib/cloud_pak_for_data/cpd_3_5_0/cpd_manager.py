@@ -16,12 +16,10 @@ import io
 import json
 import pathlib
 import re
-import subprocess
 import urllib.parse
 
 from typing import Any, Union
 
-import click
 import requests
 import semver
 
@@ -129,7 +127,6 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         # install as cluster admin to generate (and apply) preinstall YAML files
         args = [
-            str(cpd_installer_path),
             "adm",
             "--accept-all-licenses",
             "--apply",
@@ -143,13 +140,11 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             str(yaml_file_path),
         ]
 
-        click.echo("Executing command: {}".format(" ".join(args)))
-        subprocess.check_call(args)
+        self.execute_cloud_pak_for_data_installer(args)
 
         if self._use_dev:
             # install assembly
             args = [
-                str(cpd_installer_path),
                 "install",
                 "--accept-all-licenses",
                 "--assembly",
@@ -179,7 +174,6 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             target_registry_password = dg.lib.openshift.get_current_token()
 
             args = [
-                str(cpd_installer_path),
                 "install",
                 "--accept-all-licenses",
                 "--assembly",
@@ -210,8 +204,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 "--verbose",
             ]
 
-        click.echo("Executing command: {}".format(" ".join(args)))
-        subprocess.check_call(args)
+        self.execute_cloud_pak_for_data_installer(args)
 
     def _download_cpd_installer_development(
         self, cloud_pak_for_data_version: CloudPakForDataVersion, file_name: str

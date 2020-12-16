@@ -29,16 +29,18 @@ from dg.commands.ibmcloud.common import (
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
 )
-from dg.lib.ibmcloud import INTERNAL_IBM_CLOUD_API_KEY_NAME
+from dg.lib.ibmcloud import (
+    INTERNAL_IBM_CLOUD_API_KEY_NAME,
+    execute_ibmcloud_command,
+)
 from dg.lib.ibmcloud.iam import get_oauth_token, get_tokens
-from dg.lib.thirdparty import execute_ibmcloud_command_with_check
 from dg.utils.wait import wait_for
 
 
 def _get_cp4d_version_locator(cp4d_version: str) -> str:
     cp4d_identifier = "Cloud Pak for Data"
 
-    catalog_search_result = execute_ibmcloud_command_with_check(
+    catalog_search_result = execute_ibmcloud_command(
         ["catalog", "search", cp4d_identifier, "--type", "software", "--output", "JSON"]
     )
     offerings = json.loads(catalog_search_result.stdout)
@@ -70,7 +72,7 @@ def execute_preinstall(cluster_id: str):
         str(AbstractCloudPakForDataManager.get_ibm_cloud_supported_version())
     )
 
-    execute_ibmcloud_command_with_check(
+    execute_ibmcloud_command(
         [
             "catalog",
             "offering",
@@ -222,7 +224,7 @@ def wait_until_installation_is_finished(install_details: Any) -> None:
         )
     except Exception:
         raise Exception(
-            f"Timeout exceeded or workspace error, details can be found here:"
+            "Timeout exceeded or workspace error, details can be found here: "
             "https://cloud.ibm.com/schematics/workspaces/{install_details['workspace_id']}/activity"
         )
 

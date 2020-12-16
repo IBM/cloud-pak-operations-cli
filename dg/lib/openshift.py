@@ -23,6 +23,7 @@ import semver
 
 import dg.config
 import dg.utils.network
+import dg.utils.process
 
 OPENSHIFT_REST_API_VERSION: Final[str] = "v1"
 
@@ -34,9 +35,7 @@ def enable_openshift_image_registry_default_route():
     https://docs.openshift.com/container-platform/latest/registry/configuring-registry-operator.html#registry-operator-default-crd_configuring-registry-operator
     """
 
-    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
-    oc_get_route_command = [
-        str(oc_cli_path),
+    oc_patch_args = [
         "patch",
         "configs.imageregistry.operator.openshift.io/cluster",
         "--patch",
@@ -45,7 +44,13 @@ def enable_openshift_image_registry_default_route():
         "merge",
     ]
 
-    subprocess.check_call(oc_get_route_command)
+    execute_oc_command(oc_patch_args)
+
+
+def execute_oc_command(args: list[str]) -> subprocess.CompletedProcess:
+    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
+
+    return dg.utils.process.execute_command(oc_cli_path, args)
 
 
 def get_cluster_access_token(
@@ -102,44 +107,52 @@ def get_current_token() -> str:
         current OAuth access token stored in ~/.kube/config
     """
 
-    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
-    oc_whoami_command = [
-        oc_cli_path,
+    oc_whoami_args = [
         "whoami",
         "--show-token",
     ]
 
-    oc_whoami_command_result = subprocess.check_output(oc_whoami_command, text=True)
+    oc_whoami_command_result = execute_oc_command(oc_whoami_args)
 
-    return oc_whoami_command_result.rstrip()
+    return oc_whoami_command_result.stdout.rstrip()
 
 
-def get_oc_login_command_with_password(
+def get_oc_login_args_with_password(
     server: str, username: str, password: str
 ) -> List[str]:
-    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
+    return [
+        "login",
+        "--insecure-skip-tls-verify",
+        "--password",
+        password,
+        "--server",
+        server,
+        "--username",
+        username,
+    ]
 
-    return _get_oc_login_command_with_password(
-        str(oc_cli_path), server, username, password
-    )
 
-
-def get_oc_login_command_with_token(server: str, token: str) -> List[str]:
-    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
-
-    return _get_oc_login_command_with_token(str(oc_cli_path), server, token)
+def get_oc_login_args_with_token(server: str, token: str) -> List[str]:
+    return [
+        "login",
+        "--insecure-skip-tls-verify",
+        "--server",
+        server,
+        "--token",
+        token,
+    ]
 
 
 def get_oc_login_command_with_password_for_remote_host(
     server: str, username: str, password: str
 ) -> str:
     return " ".join(
-        _get_oc_login_command_with_password("oc ", server, username, password)
+        ["oc"] + get_oc_login_args_with_password(server, username, password)
     )
 
 
 def get_oc_login_command_with_token_for_remote_host(server: str, token: str) -> str:
-    return " ".join(_get_oc_login_command_with_token("oc ", server, token))
+    return " ".join(["oc"] + get_oc_login_args_with_token(server, token))
 
 
 def get_openshift_image_registry_default_route() -> str:
@@ -151,9 +164,7 @@ def get_openshift_image_registry_default_route() -> str:
         Image Registry default route
     """
 
-    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
-    oc_get_route_command = [
-        str(oc_cli_path),
+    oc_get_route_args = [
         "get",
         "route",
         "--namespace",
@@ -163,18 +174,15 @@ def get_openshift_image_registry_default_route() -> str:
     ]
 
     oc_get_route_command_result = (
-        subprocess.check_output(oc_get_route_command, text=True)
-        .removeprefix("'")
-        .removesuffix("'")
+        execute_oc_command(oc_get_route_args).stdout.removeprefix("'").removesuffix("'")
     )
 
     return oc_get_route_command_result
 
 
 def get_openshift_version() -> semver.VersionInfo:
-    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
-    oc_version_command = [str(oc_cli_path), "version", "--output", "json"]
-    oc_version_command_result = json.loads(subprocess.check_output(oc_version_command))
+    oc_version_args = ["version", "--output", "json"]
+    oc_version_command_result = json.loads(execute_oc_command(oc_version_args).stdout)
 
     return semver.VersionInfo.parse(oc_version_command_result["openshiftVersion"])
 
@@ -182,9 +190,7 @@ def get_openshift_version() -> semver.VersionInfo:
 def get_persistent_volume_name(
     namespace: str, persistent_volume_claim_name: str
 ) -> str:
-    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
-    oc_get_pvc_command = [
-        str(oc_cli_path),
+    oc_get_pvc_args = [
         "get",
         "pvc",
         "--namespace",
@@ -193,7 +199,7 @@ def get_persistent_volume_name(
         "json",
     ]
 
-    oc_get_pvc_command_result = json.loads(subprocess.check_output(oc_get_pvc_command))
+    oc_get_pvc_command_result = json.loads(execute_oc_command(oc_get_pvc_args).stdout)
 
     if len(oc_get_pvc_command_result["items"]) == 0:
         raise Exception(
@@ -207,9 +213,7 @@ def get_persistent_volume_name(
 
 
 def get_persistent_volume_id(namespace: str, persistent_volume_name: str):
-    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
-    oc_get_pv_command = [
-        str(oc_cli_path),
+    oc_get_pv_args = [
         "get",
         "pv",
         "--output",
@@ -217,9 +221,7 @@ def get_persistent_volume_id(namespace: str, persistent_volume_name: str):
     ]
 
     oc_get_pv_command_result = (
-        subprocess.check_output(oc_get_pv_command, text=True)
-        .removeprefix("'")
-        .removesuffix("'")
+        execute_oc_command(oc_get_pv_args).stdout.removeprefix("'").removesuffix("'")
     )
 
     if oc_get_pv_command_result == "":
@@ -235,45 +237,15 @@ def log_in_to_openshift_cluster_with_password(
 ):
     """Logs in to a given Openshift cluster with the given credentials"""
 
-    oc_login_command = get_oc_login_command_with_password(server, username, password)
+    oc_login_args = get_oc_login_args_with_password(server, username, password)
 
-    subprocess.check_call(oc_login_command)
+    execute_oc_command(oc_login_args)
 
 
 def log_in_to_openshift_cluster_with_token(server: str, token: str):
     """Logs in to a given Openshift cluster with the given OAuth access
     token"""
 
-    oc_login_command = get_oc_login_command_with_token(server, token)
+    oc_login_args = get_oc_login_args_with_token(server, token)
 
-    subprocess.check_call(oc_login_command)
-
-
-def _get_oc_login_command_with_password(
-    oc_cli_path: str, server: str, username: str, password: str
-) -> List[str]:
-    return [
-        oc_cli_path,
-        "login",
-        "--insecure-skip-tls-verify",
-        "--password",
-        password,
-        "--server",
-        server,
-        "--username",
-        username,
-    ]
-
-
-def _get_oc_login_command_with_token(
-    oc_cli_path: str, server: str, token: str
-) -> List[str]:
-    return [
-        oc_cli_path,
-        "login",
-        "--insecure-skip-tls-verify",
-        "--server",
-        server,
-        "--token",
-        token,
-    ]
+    execute_oc_command(oc_login_args)

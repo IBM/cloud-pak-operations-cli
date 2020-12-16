@@ -29,7 +29,7 @@ from dg.lib.ibmcloud.status import get_cluster_status
 
 class TestIBMCloudCommon(unittest.TestCase):
     @patch(
-        "dg.lib.ibmcloud.iam.execute_ibmcloud_command_with_check",
+        "dg.lib.ibmcloud.iam.execute_ibmcloud_command",
         return_value=CompletedProcess(
             args="",
             stdout=(
@@ -43,7 +43,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         self.assertEqual("3O_fwBGvkWrug5VrI0aQJwRPuqX1Yb7_MtSTZK_qFthb", result)
 
     @patch(
-        "dg.lib.ibmcloud.iam.execute_ibmcloud_command_with_check",
+        "dg.lib.ibmcloud.iam.execute_ibmcloud_command",
         return_value=CompletedProcess(
             args="",
             stdout=(
@@ -58,7 +58,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         self.assertFalse(api_key_exists("dg.api.key.3"))
 
     @patch(
-        "dg.commands.ibmcloud.common.execute_ibmcloud_command_with_check",
+        "dg.commands.ibmcloud.common.execute_ibmcloud_command",
         return_value=CompletedProcess(
             args="",
             stdout=(
@@ -72,7 +72,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         self.assertRaises(Exception, get_default_public_vlan("sjc04"))
 
     @patch(
-        "dg.commands.ibmcloud.common.execute_ibmcloud_command_with_check",
+        "dg.commands.ibmcloud.common.execute_ibmcloud_command",
         return_value=CompletedProcess(
             args="",
             stdout=(
@@ -86,7 +86,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         self.assertRaises(Exception, get_default_private_vlan("sjc04"))
 
     @patch(
-        "dg.lib.ibmcloud.status.execute_ibmcloud_command_with_check",
+        "dg.lib.ibmcloud.status.execute_ibmcloud_command",
         return_value=CompletedProcess(
             args="",
             stdout=(
@@ -99,7 +99,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         self.assertFalse(get_cluster_status("datagate.test").is_ready())
 
     @patch(
-        "dg.lib.ibmcloud.status.execute_ibmcloud_command_with_check",
+        "dg.lib.ibmcloud.status.execute_ibmcloud_command",
         return_value=CompletedProcess(
             args="",
             stdout=(
@@ -112,7 +112,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         self.assertTrue(get_cluster_status("datagate.test").is_ready())
 
     @patch(
-        "dg.lib.ibmcloud.install.execute_ibmcloud_command_with_check",
+        "dg.lib.ibmcloud.install.execute_ibmcloud_command",
         return_value=CompletedProcess(
             args="",
             stdout=Path(

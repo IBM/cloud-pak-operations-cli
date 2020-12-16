@@ -16,7 +16,7 @@ from subprocess import CalledProcessError
 
 import click
 
-from dg.lib.thirdparty import execute_ibmcloud_command_with_check
+from dg.lib.ibmcloud import execute_ibmcloud_command
 
 
 @click.command()
@@ -33,7 +33,7 @@ def nuke_storage(zone: str):
         )
     ):
         list_command = ["sl", "file", "volume-list"]
-        volume_list_full = execute_ibmcloud_command_with_check(list_command)
+        volume_list_full = execute_ibmcloud_command(list_command)
         volumes_to_be_deleted = 0
         volume_ids_to_be_deleted = []
 
@@ -70,7 +70,7 @@ def nuke_storage(zone: str):
                         "--immediate",
                         "-f",
                     ]
-                    execute_ibmcloud_command_with_check(delete_command)
+                    execute_ibmcloud_command(delete_command)
 
                     click.echo(
                         f"File volume {volume_id} has been marked for immediate cancellation"

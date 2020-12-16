@@ -15,6 +15,7 @@
 import io
 import pathlib
 import socket
+import subprocess
 import tempfile
 import urllib.parse
 
@@ -28,6 +29,7 @@ import dg.config
 import dg.lib.openshift
 import dg.utils.download
 import dg.utils.operating_system
+import dg.utils.process
 
 from dg.utils.operating_system import OperatingSystem
 
@@ -72,6 +74,11 @@ class AbstractCloudPakForDataManager(ABC):
         """Downloads the version-specific IBM Cloud Pak for Data installer"""
 
         pass
+
+    def execute_cloud_pak_for_data_installer(self, args) -> subprocess.CompletedProcess:
+        cpd_installer_path = self.get_cloud_pak_for_data_installer_path()
+
+        return dg.utils.process.execute_command(cpd_installer_path, args)
 
     def get_cloud_pak_for_data_installer_path(self) -> pathlib.Path:
         """Returns the path of the IBM Cloud Pak for Data installer

@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import subprocess
-
 import dg.config
 import dg.lib.fyre.openshift
 import dg.lib.openshift
@@ -37,17 +35,6 @@ class FYRECluster(AbstractCluster):
         return token
 
     def login(self):
-        oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
-        args = [
-            oc_cli_path,
-            "login",
-            "--insecure-skip-tls-verify",
-            "--password",
-            self.cluster_data["password"],
-            "--server",
-            self.server,
-            "--username",
-            self.cluster_data["username"],
-        ]
-
-        subprocess.check_call(args)
+        dg.lib.openshift.log_in_to_openshift_cluster_with_password(
+            self.server, self.cluster_data["username"], self.cluster_data["password"]
+        )
