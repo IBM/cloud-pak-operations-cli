@@ -17,6 +17,8 @@ from typing import Union
 import click
 import semver
 
+from click_option_group import optgroup
+
 import dg.config.cluster_credentials_manager
 import dg.lib.click
 import dg.lib.openshift
@@ -35,44 +37,47 @@ from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--server", required=True, help="OpenShift server URL")
-@click.option("--username", help="OpenShift username")
-@click.option("--password", help="OpenShift password")
-@click.option("--token", help="OpenShift OAuth access token")
-@click.option("--artifactory-user-name", help="Artifactory user name")
-@click.option("--artifactory-api-key", help="Artifactory API key")
-@click.option(
+@optgroup.group("Release build options")
+@optgroup.option(
     "--ibm-cloud-pak-for-data-entitlement-key",
     help="IBM Cloud Pak for Data entitlement key",
 )
-@click.option(
+@optgroup.group("Development build options")
+@optgroup.option("--artifactory-user-name", help="Artifactory user name")
+@optgroup.option("--artifactory-api-key", help="Artifactory API key")
+@optgroup.option("--use-dev", is_flag=True, help="Use development build")
+@optgroup.group("Shared options")
+@optgroup.option("--server", required=True, help="OpenShift server URL")
+@optgroup.option("--username", help="OpenShift username")
+@optgroup.option("--password", help="OpenShift password")
+@optgroup.option("--token", help="OpenShift OAuth access token")
+@optgroup.option(
     "--assembly-name", required=True, help="Name of the assembly to be installed"
 )
-@click.option(
+@optgroup.option(
     "--storage-class",
     required=True,
     help="Storage class used for installation",
 )
-@click.option(
+@optgroup.option(
     "--version",
     default=AbstractCloudPakForDataManager.get_default_cloud_pak_for_data_version(),
     help="Cloud Pak for Data version",
 )
-@click.option("--use-dev", is_flag=True, help="Use development build")
 @click.pass_context
 def install_assembly(
     ctx: click.Context,
+    ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
+    artifactory_user_name: str,
+    artifactory_api_key: str,
+    use_dev: bool,
     server: str,
     username: Union[str, None],
     password: Union[str, None],
     token: Union[str, None],
-    artifactory_user_name: str,
-    artifactory_api_key: str,
-    ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
     assembly_name: str,
     storage_class: str,
     version: str,
-    use_dev: bool,
 ):
     """Install an IBM Cloud Pak for Data assembly"""
 

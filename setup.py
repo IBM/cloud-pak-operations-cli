@@ -14,6 +14,7 @@ setup(
         "asyncssh",
         "click",
         "colorama",
+        "click-option-group",
         "pyyaml",
         "requests",
         "semver",
