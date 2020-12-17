@@ -41,7 +41,16 @@ def _get_cp4d_version_locator(cp4d_version: str) -> str:
     cp4d_identifier = "Cloud Pak for Data"
 
     catalog_search_result = execute_ibmcloud_command(
-        ["catalog", "search", cp4d_identifier, "--type", "software", "--output", "JSON"]
+        [
+            "catalog",
+            "search",
+            cp4d_identifier,
+            "--type",
+            "software",
+            "--output",
+            "JSON",
+        ],
+        capture_output=True,
     )
     offerings = json.loads(catalog_search_result.stdout)
 

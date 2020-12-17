@@ -24,25 +24,25 @@ def delete_ibmcloud_cluster(name: str, force_deletion: bool):
     command = ["oc", "cluster", "rm", "--cluster", name]
     print("Executing cluster remove command 'ibmcloud " + " ".join(command) + "'")
 
-    returncode = 0
+    return_code = 0
 
     if force_deletion:
         command.append("--force-delete-storage")
         command.append("-f")
-        result = execute_ibmcloud_command_without_check(command)
+        result = execute_ibmcloud_command_without_check(command, capture_output=True)
 
-        if result.returncode != 0:
+        if result.return_code != 0:
             raise Exception(
                 f"""An error occurred while deleting the cluster.\nDetailed error\n:
                 stdout=\n{result.stdout}\nstderr=\n{result.stderr}"""
             )
         else:
-            returncode = result.returncode
+            return_code = result.return_code
             print(result.stdout)
     else:
-        returncode = execute_ibmcloud_command_interactively(command)
+        return_code = execute_ibmcloud_command_interactively(command)
 
-    if returncode == 0:
+    if return_code == 0:
         print(
             f"Cluster deletion request for cluster {name} successfully submitted. It might take a "
             f"while until the cluster status changes. You can check the status using 'dg ibmcloud cluster status "

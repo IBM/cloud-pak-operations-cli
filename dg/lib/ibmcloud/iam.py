@@ -57,14 +57,17 @@ def generate_api_key() -> str:
             dg.lib.ibmcloud.EXTERNAL_IBM_CLOUD_API_KEY_NAME,
             "--output",
             "JSON",
-        ]
+        ],
+        capture_output=True,
     )
 
     return json.loads(result.stdout)["apikey"]
 
 
 def get_api_keys() -> Any:
-    result = execute_ibmcloud_command(["iam", "api-keys", "--output", "JSON"])
+    result = execute_ibmcloud_command(
+        ["iam", "api-keys", "--output", "JSON"], capture_output=True
+    )
 
     return json.loads(result.stdout)
 

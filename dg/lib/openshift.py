@@ -13,7 +13,6 @@
 #  limitations under the License.
 
 import json
-import subprocess
 import urllib.parse
 
 from typing import Final, List
@@ -47,10 +46,42 @@ def enable_openshift_image_registry_default_route():
     execute_oc_command(oc_patch_args)
 
 
-def execute_oc_command(args: list[str]) -> subprocess.CompletedProcess:
+def execute_oc_command(
+    args: list[str],
+    capture_output=False,
+    check=True,
+    print_captured_output=False,
+) -> dg.utils.process.ProcessResult:
+    """Executes the OpenShift Container Platform CLI
+
+    Parameters
+    ----------
+    args
+        arguments to be passed to the OpenShift Container Platform CLI
+    capture_output
+        flag indicating whether output shall be captured
+    check
+        flag indicating whether an exception shall be thrown if the OpenShift
+        Container Platform CLI returns with a nonzero return code
+    print_captured_output
+        flag indicating whether captured output shall also be written to
+        stdout/stderr
+
+    Returns
+    -------
+    ProcessResult
+        object storing the return code and captured output (if requested)
+    """
+
     oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
 
-    return dg.utils.process.execute_command(oc_cli_path, args)
+    return dg.utils.process.execute_command(
+        oc_cli_path,
+        args,
+        capture_output=capture_output,
+        check=check,
+        print_captured_output=print_captured_output,
+    )
 
 
 def get_cluster_access_token(
@@ -112,7 +143,7 @@ def get_current_token() -> str:
         "--show-token",
     ]
 
-    oc_whoami_command_result = execute_oc_command(oc_whoami_args)
+    oc_whoami_command_result = execute_oc_command(oc_whoami_args, capture_output=True)
 
     return oc_whoami_command_result.stdout.rstrip()
 
@@ -174,7 +205,9 @@ def get_openshift_image_registry_default_route() -> str:
     ]
 
     oc_get_route_command_result = (
-        execute_oc_command(oc_get_route_args).stdout.removeprefix("'").removesuffix("'")
+        execute_oc_command(oc_get_route_args, capture_output=True)
+        .stdout.removeprefix("'")
+        .removesuffix("'")
     )
 
     return oc_get_route_command_result
@@ -182,7 +215,9 @@ def get_openshift_image_registry_default_route() -> str:
 
 def get_openshift_version() -> semver.VersionInfo:
     oc_version_args = ["version", "--output", "json"]
-    oc_version_command_result = json.loads(execute_oc_command(oc_version_args).stdout)
+    oc_version_command_result = json.loads(
+        execute_oc_command(oc_version_args, capture_output=True).stdout
+    )
 
     return semver.VersionInfo.parse(oc_version_command_result["openshiftVersion"])
 
@@ -199,7 +234,9 @@ def get_persistent_volume_name(
         "json",
     ]
 
-    oc_get_pvc_command_result = json.loads(execute_oc_command(oc_get_pvc_args).stdout)
+    oc_get_pvc_command_result = json.loads(
+        execute_oc_command(oc_get_pvc_args, capture_output=True).stdout
+    )
 
     if len(oc_get_pvc_command_result["items"]) == 0:
         raise Exception(
@@ -221,7 +258,9 @@ def get_persistent_volume_id(namespace: str, persistent_volume_name: str):
     ]
 
     oc_get_pv_command_result = (
-        execute_oc_command(oc_get_pv_args).stdout.removeprefix("'").removesuffix("'")
+        execute_oc_command(oc_get_pv_args, capture_output=True)
+        .stdout.removeprefix("'")
+        .removesuffix("'")
     )
 
     if oc_get_pv_command_result == "":

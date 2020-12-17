@@ -56,10 +56,10 @@ def login():
 
 def _login_using_api_key(apikey: str):
     login_command = execute_ibmcloud_command_without_check(
-        ["login", "--apikey", apikey, "--no-region"]
+        ["login", "--apikey", apikey, "--no-region"], capture_output=True
     )
 
-    if login_command.returncode != 0:
+    if login_command.return_code != 0:
         raise Exception(
             f"Login to IBM Cloud using the given API key failed:\n{login_command.stdout}"
         )
@@ -86,10 +86,10 @@ def _disable_update_notifications():
     ibmcloud config --check-version=false disables this behavior"""
 
     disable_command = execute_ibmcloud_command_without_check(
-        ["config", "--check-version=false"]
+        ["config", "--check-version=false"], capture_output=True
     )
 
-    if disable_command.returncode != 0:
+    if disable_command.return_code != 0:
         raise Exception(
             f"Disabling IBM Cloud CLI update notifications failed:\n{disable_command.stdout}"
         )

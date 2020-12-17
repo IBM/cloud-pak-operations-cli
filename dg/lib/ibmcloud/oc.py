@@ -46,7 +46,7 @@ def get_latest_supported_openshift_version() -> str:
 
 def _get_oc_versions_as_json() -> Any:
     args = ["oc", "versions", "--json"]
-    version_command_result = execute_ibmcloud_command(args)
+    version_command_result = execute_ibmcloud_command(args, capture_output=True)
     version_command_result_json = json.loads(version_command_result.stdout)
 
     return version_command_result_json

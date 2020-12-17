@@ -33,7 +33,7 @@ def nuke_storage(zone: str):
         )
     ):
         list_command = ["sl", "file", "volume-list"]
-        volume_list_full = execute_ibmcloud_command(list_command)
+        volume_list_full = execute_ibmcloud_command(list_command, capture_output=True)
         volumes_to_be_deleted = 0
         volume_ids_to_be_deleted = []
 

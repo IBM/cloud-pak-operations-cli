@@ -23,9 +23,9 @@ def _install_plugin(plugin_name: str):
     click.echo(f"Installing IBM Cloud plug-in '{plugin_name}'")
 
     args = ["plugin", "install", plugin_name]
-    result = execute_ibmcloud_command_without_check(args)
+    result = execute_ibmcloud_command_without_check(args, capture_output=True)
 
-    if result.returncode != 0:
+    if result.return_code != 0:
         raise Exception(
             f"An error occurred when attempting to install ibmcloud plug-in {plugin_name}:\n{result.stderr}"
         )
@@ -33,9 +33,9 @@ def _install_plugin(plugin_name: str):
 
 def _is_plugin_installed(plugin_name: str) -> bool:
     args = ["plugin", "list"]
-    result = execute_ibmcloud_command_without_check(args)
+    result = execute_ibmcloud_command_without_check(args, capture_output=True)
 
-    if result.returncode != 0:
+    if result.return_code != 0:
         raise Exception(
             f"An error occurred when attempting to check whether ibmcloud plug-in {plugin_name} is installed:\n"
             f"{result.stderr}"
