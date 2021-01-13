@@ -16,8 +16,8 @@ import json
 
 from typing import Any
 
+from dg.lib.ibmcloud import execute_ibmcloud_command
 from dg.lib.ibmcloud.cluster.ls import list_existing_clusters
-from dg.utils.thirdparty import execute_ibmcloud_command_with_check
 from dg.utils.wait import wait_for
 
 
@@ -66,8 +66,7 @@ def get_cluster_status(cluster_name: str) -> ClusterStatus:
     """
 
     args = ["oc", "cluster", "get", "--cluster", cluster_name, "--json"]
-    command_result = execute_ibmcloud_command_with_check(args)
-    result: ClusterStatus
+    command_result = execute_ibmcloud_command(args)
 
     try:
         status = ClusterStatus(json.loads(command_result.stdout))

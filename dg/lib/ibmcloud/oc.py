@@ -7,7 +7,7 @@ import semver
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
 )
-from dg.utils.thirdparty import execute_ibmcloud_command_with_check
+from dg.lib.ibmcloud import execute_ibmcloud_command
 
 
 def get_latest_supported_openshift_version() -> str:
@@ -46,7 +46,7 @@ def get_latest_supported_openshift_version() -> str:
 
 def _get_oc_versions_as_json() -> Any:
     args = ["oc", "versions", "--json"]
-    version_command_result = execute_ibmcloud_command_with_check(args)
+    version_command_result = execute_ibmcloud_command(args)
     version_command_result_json = json.loads(version_command_result.stdout)
 
     return version_command_result_json

@@ -22,7 +22,7 @@ import click.testing
 
 import dg.commands.adm.store_credentials
 import dg.config
-import dg.utils.click
+import dg.lib.click
 
 from dg.dg import cli
 
@@ -97,9 +97,7 @@ class TestStoreCredentialsCommand(unittest.TestCase):
         self.assertNotIn("ibm_github_api_key", default_map)
 
     def _load_credentials_file(self, dg_credentials_file_path: pathlib.Path):
-        json = dg.utils.click.create_default_map_from_json_file(
-            dg_credentials_file_path
-        )
+        json = dg.lib.click.create_default_map_from_json_file(dg_credentials_file_path)
 
         self.assertIn("default_map", json)
 

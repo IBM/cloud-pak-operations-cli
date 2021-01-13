@@ -15,13 +15,16 @@
 import json
 import pathlib
 
-from typing import TypedDict, Union
+from typing import Any, TypedDict, Union
 
 from tabulate import tabulate
 
 import dg.lib.cluster
 
+from dg.config import data_gate_configuration_manager
 from dg.lib.cluster.cluster import AbstractCluster, ClusterData
+
+ContextData = dict[str, Any]
 
 
 class ClustersFileContents(TypedDict):
@@ -204,6 +207,39 @@ class ClusterCredentialsManager:
 
         return cluster
 
+    def get_current_credentials(self) -> ContextData:
+        """Returns user and current cluster credentials
+
+        User credentials are obtained from ~/.dg/credentials.json. Cluster
+        credentials are obtained from ~/.dg/clusters.json.
+
+        Returns
+        -------
+        ContextData
+            user and current cluster credentials
+        """
+
+        dg_credentials_file_path = (
+            data_gate_configuration_manager.get_dg_credentials_file_path()
+        )
+        result: ContextData
+
+        if dg_credentials_file_path.exists() and (
+            dg_credentials_file_path.stat().st_size != 0
+        ):
+            with open(dg_credentials_file_path) as json_file:
+                result = json.load(json_file)
+        else:
+            result = {}
+
+        current_cluster = self.get_current_cluster()
+
+        if current_cluster is not None:
+            result.update(current_cluster.get_cluster_data())
+            result["server"] = current_cluster.get_server()
+
+        return result
+
     def get_dg_clusters_file_path(self) -> pathlib.Path:
         """Returns the path of the clusters file
 
@@ -213,7 +249,7 @@ class ClusterCredentialsManager:
             path of the clusters file
         """
 
-        return pathlib.Path.home() / ".dg" / "clusters.json"
+        return data_gate_configuration_manager.get_dg_directory_path() / "clusters.json"
 
     def reload(self):
         """Reloads the clusters file"""
@@ -331,7 +367,7 @@ class ClusterCredentialsManager:
     def _save_clusters_file(self):
         """Stores registered OpenShift clusters in a configuration file"""
 
-        (pathlib.Path.home() / ".dg").mkdir(exist_ok=True)
+        data_gate_configuration_manager.get_dg_directory_path().mkdir(exist_ok=True)
 
         with open(self.get_dg_clusters_file_path(), "w") as clusters_file:
             json.dump(

@@ -18,43 +18,9 @@ import sys
 
 from typing import Any, Union
 
-import dg.config.cluster_credentials_manager
-
-ContextData = dict[str, Any]
-
 
 class DataGateConfigurationManager:
     """Manages the Data Gate CLI configuration"""
-
-    def get_current_credentials(self) -> ContextData:
-        """Returns user and current cluster credentials
-
-        Returns
-        -------
-        ContextData
-            user and current cluster credentials
-        """
-
-        dg_credentials_file_path = self.get_dg_credentials_file_path()
-        result: ContextData
-
-        if dg_credentials_file_path.exists() and (
-            dg_credentials_file_path.stat().st_size != 0
-        ):
-            with open(dg_credentials_file_path) as json_file:
-                result = json.load(json_file)
-        else:
-            result = {}
-
-        current_cluster = (
-            dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
-        )
-
-        if current_cluster is not None:
-            result.update(current_cluster.get_cluster_data())
-            result["server"] = current_cluster.get_server()
-
-        return result
 
     def get_deps_directory_path(self) -> pathlib.Path:
         """Returns the path of the directory containing required non-Python
@@ -68,27 +34,41 @@ class DataGateConfigurationManager:
 
         return self.get_root_package_path() / "deps"
 
+    def get_dg_directory_path(self) -> pathlib.Path:
+        """Return the path of the Data Gate CLI directory
+
+        Returns
+        -------
+        pathlib.Path
+            path of the Data Gate CLI directory
+        """
+
+        return self.get_home_directory_path() / ".dg"
+
     def get_dg_bin_directory_path(self) -> pathlib.Path:
         """Returns the path of the binaries directory
 
         Returns
         -------
-        str
+        pathlib.Path
             path of the binaries directory
         """
 
-        return pathlib.Path.home() / ".dg" / "bin"
+        return self.get_dg_directory_path() / "bin"
 
     def get_dg_credentials_file_path(self) -> pathlib.Path:
         """Returns the path of the credentials file
 
         Returns
         -------
-        str
+        pathlib.Path
             path of the credentials file
         """
 
-        return pathlib.Path.home() / ".dg" / "credentials.json"
+        return self.get_dg_directory_path() / "credentials.json"
+
+    def get_home_directory_path(self) -> pathlib.Path:
+        return pathlib.Path.home()
 
     def get_ibmcloud_cli_path(self) -> pathlib.Path:
         """Returns the path to the IBM Cloud CLI

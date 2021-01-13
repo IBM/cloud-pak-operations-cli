@@ -16,17 +16,17 @@ import click
 
 import dg.config
 
-from dg.lib.ibmcloud import INTERNAL_IBM_CLOUD_API_KEY_NAME
+from dg.lib.ibmcloud import (
+    INTERNAL_IBM_CLOUD_API_KEY_NAME,
+    execute_ibmcloud_command_interactively,
+    execute_ibmcloud_command_without_check,
+)
 from dg.lib.ibmcloud.iam import generate_api_key
 from dg.lib.ibmcloud.plugin import (
     install_catalogs_management_plugin,
     install_container_service_plugin,
     is_catalogs_management_plugin_installed,
     is_container_service_plugin_installed,
-)
-from dg.utils.thirdparty import (
-    execute_ibmcloud_command,
-    execute_ibmcloud_command_interactively,
 )
 
 
@@ -55,7 +55,7 @@ def login():
 
 
 def _login_using_api_key(apikey: str):
-    login_command = execute_ibmcloud_command(
+    login_command = execute_ibmcloud_command_without_check(
         ["login", "--apikey", apikey, "--no-region"]
     )
 
@@ -85,7 +85,9 @@ def _disable_update_notifications():
 
     ibmcloud config --check-version=false disables this behavior"""
 
-    disable_command = execute_ibmcloud_command(["config", "--check-version=false"])
+    disable_command = execute_ibmcloud_command_without_check(
+        ["config", "--check-version=false"]
+    )
 
     if disable_command.returncode != 0:
         raise Exception(

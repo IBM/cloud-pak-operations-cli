@@ -14,16 +14,15 @@
 
 import click
 
-import dg.config
 import dg.config.cluster_credentials_manager
+import dg.lib.click
 import dg.lib.fyre.cluster.fyre_cluster_factory  # required to register FYREClusterFactory object
 import dg.lib.ibmcloud.cluster.ibmcloud_cluster_factory  # required to register IBMCloudClusterFactory object
-import dg.utils.click
 
 
 @click.command(
-    context_settings=dg.utils.click.create_default_map_from_dict(
-        dg.config.data_gate_configuration_manager.get_current_credentials()
+    context_settings=dg.lib.click.create_default_map_from_dict(
+        dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
 def login():

@@ -1,6 +1,6 @@
 import click
 
-from dg.utils.thirdparty import execute_ibmcloud_command_with_check
+from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
 
 
 def install_catalogs_management_plugin():
@@ -23,7 +23,7 @@ def _install_plugin(plugin_name: str):
     click.echo(f"Installing IBM Cloud plug-in '{plugin_name}'")
 
     args = ["plugin", "install", plugin_name]
-    result = execute_ibmcloud_command_with_check(args)
+    result = execute_ibmcloud_command_without_check(args)
 
     if result.returncode != 0:
         raise Exception(
@@ -33,7 +33,7 @@ def _install_plugin(plugin_name: str):
 
 def _is_plugin_installed(plugin_name: str) -> bool:
     args = ["plugin", "list"]
-    result = execute_ibmcloud_command_with_check(args)
+    result = execute_ibmcloud_command_without_check(args)
 
     if result.returncode != 0:
         raise Exception(

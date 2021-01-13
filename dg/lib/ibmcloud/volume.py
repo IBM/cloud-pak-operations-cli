@@ -18,7 +18,7 @@ import time
 from typing import Any, Final
 
 import dg.commands.ibmcloud.common
-import dg.utils.openshift
+import dg.lib.openshift
 
 MAX_NUM_MODIFICATION_CHECKS: Final[int] = 30
 NUM_SECONDS_TO_WAIT_BETWEEN_ITERATIONS: Final[int] = 10
@@ -42,11 +42,11 @@ def increase_openshift_image_registry_volume_capacity(
         number of seconds to wait between checks
     """
 
-    persistent_volume_name = dg.utils.openshift.get_persistent_volume_name(
+    persistent_volume_name = dg.lib.openshift.get_persistent_volume_name(
         "openshift-image-registry", "image-registry-storage"
     )
 
-    volume_id = dg.utils.openshift.get_persistent_volume_id(
+    volume_id = dg.lib.openshift.get_persistent_volume_id(
         "openshift-image-registry", persistent_volume_name
     )
 

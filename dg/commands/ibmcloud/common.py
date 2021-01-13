@@ -18,7 +18,7 @@ from typing import Any
 
 import click
 
-from dg.utils.thirdparty import execute_ibmcloud_command_with_check
+from dg.lib.ibmcloud import execute_ibmcloud_command
 
 
 def is_logged_in() -> bool:
@@ -34,7 +34,7 @@ def is_logged_in() -> bool:
 def get_ibmcloud_account_target_information() -> Any:
     """Get the targeted region, account, resource group, org or space"""
 
-    result = execute_ibmcloud_command_with_check(["target", "--output", "JSON"])
+    result = execute_ibmcloud_command(["target", "--output", "JSON"])
     target_information = json.loads(result.stdout)
 
     return target_information
@@ -67,7 +67,7 @@ def get_default_private_vlan(zone: str):
 
 def _get_default_vlan_id(vlan_type: str, zone: str) -> str:
     get_default_vlan_command = ["oc", "vlan", "ls", "--zone", zone, "--json"]
-    result = execute_ibmcloud_command_with_check(get_default_vlan_command)
+    result = execute_ibmcloud_command(get_default_vlan_command)
     result_json = json.loads(result.stdout)
 
     vlan_id = ""
@@ -91,7 +91,7 @@ def _get_default_vlan_id(vlan_type: str, zone: str) -> str:
 
 def get_volume_details(volume_id: str):
     args = ["sl", "file", "volume-detail", "--output", "json", volume_id]
-    result = execute_ibmcloud_command_with_check(args)
+    result = execute_ibmcloud_command(args)
 
     return json.loads(result.stdout)
 
@@ -107,4 +107,4 @@ def modify_volume_capacity(volume_id: str, new_capacity: int):
         "--force",
     ]
 
-    execute_ibmcloud_command_with_check(args)
+    execute_ibmcloud_command(args)

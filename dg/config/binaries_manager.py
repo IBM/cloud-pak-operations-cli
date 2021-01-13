@@ -17,6 +17,8 @@ import pathlib
 
 from typing import Union
 
+from dg.config import data_gate_configuration_manager
+
 BinariesFileContents = dict[str, str]
 
 
@@ -24,7 +26,7 @@ class BinariesManager:
     """Manages downloaded binaries"""
 
     def __init__(self):
-        self._binaries_file_contents = self.get_binaries_file_contents_with_default()
+        self._binaries_file_contents: Union[dict[str, str], None] = None
 
     def get_binaries_file_contents(self) -> Union[BinariesFileContents, None]:
         """Returns the contents of the binaries file
@@ -71,7 +73,7 @@ class BinariesManager:
             path of the binaries file
         """
 
-        return pathlib.Path.home() / ".dg" / "binaries.json"
+        return data_gate_configuration_manager.get_dg_directory_path() / "binaries.json"
 
     def get_binary_version(self, binary_alias: str) -> Union[str, None]:
         binaries = self._get_binary_versions()
@@ -93,16 +95,21 @@ class BinariesManager:
             versions of downloaded binaries
         """
 
+        if self._binaries_file_contents is None:
+            self._binaries_file_contents = (
+                self.get_binaries_file_contents_with_default()
+            )
+
         return self._binaries_file_contents
 
     def _save_binaries_file(self):
         """Stores versions of downloaded binaries in a configuration file"""
 
-        (pathlib.Path.home() / ".dg").mkdir(exist_ok=True)
+        data_gate_configuration_manager.get_dg_directory_path().mkdir(exist_ok=True)
 
         with open(self.get_dg_binaries_file_path(), "w") as binaries_file:
             json.dump(
-                self._binaries_file_contents,
+                self._get_binary_versions(),
                 binaries_file,
                 indent="\t",
                 sort_keys=True,

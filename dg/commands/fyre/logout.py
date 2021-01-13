@@ -15,7 +15,7 @@
 import click
 
 import dg.config
-import dg.utils.click
+import dg.lib.click
 
 
 @click.command()

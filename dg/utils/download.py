@@ -106,7 +106,7 @@ def download_file(url: urllib.parse.SplitResult, **kwargs: Any) -> pathlib.Path:
 
 
 def download_file_into_buffer(
-    url: urllib.parse.SplitResult, output_stream: io.BufferedIOBase
+    url: urllib.parse.SplitResult, output_stream: io.BufferedIOBase, **kwargs: Any
 ) -> str:
     """Downloads a file and writes its content into the given output
     stream.
@@ -117,6 +117,9 @@ def download_file_into_buffer(
         url of the file to be downloaded
     output_stream
         output stream the content of the downloaded file is written to
+    **kwargs
+        silent: bool
+            flag indicating whether output to stdout shall be suppressed
     """
 
     response = requests.get(urllib.parse.urlunsplit(url), stream=True)
@@ -135,7 +138,8 @@ def download_file_into_buffer(
     else:
         file_name = os.path.basename(urllib.parse.urlsplit(response.url).path)
 
-    click.echo("Downloading: {} [{}]".format(response.url, file_name))
+    if ("silent" not in kwargs) or not kwargs["silent"]:
+        click.echo("Downloading: {} [{}]".format(response.url, file_name))
 
     content_length = (
         int(str(response.headers.get("Content-Length")))
@@ -143,12 +147,16 @@ def download_file_into_buffer(
         else 0
     )
 
-    download_progress_bar = tqdm(total=content_length, unit="B", unit_scale=True)
+    if ("silent" in kwargs) and kwargs["silent"]:
+        for chunk in response.iter_content(chunk_size=1048576):  # 1 MiB
+            output_stream.write(chunk)
+    else:
+        download_progress_bar = tqdm(total=content_length, unit="B", unit_scale=True)
 
-    for chunk in response.iter_content(chunk_size=1048576):  # 1 MiB
-        output_stream.write(chunk)
-        download_progress_bar.update(len(chunk))
+        for chunk in response.iter_content(chunk_size=1048576):  # 1 MiB
+            output_stream.write(chunk)
+            download_progress_bar.update(len(chunk))
 
-    download_progress_bar.close()
+        download_progress_bar.close()
 
     return file_name

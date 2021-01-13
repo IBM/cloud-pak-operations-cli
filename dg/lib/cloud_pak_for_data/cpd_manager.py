@@ -15,6 +15,7 @@
 import io
 import pathlib
 import socket
+import subprocess
 import tempfile
 import urllib.parse
 
@@ -25,9 +26,10 @@ import semver
 import yaml
 
 import dg.config
+import dg.lib.openshift
 import dg.utils.download
-import dg.utils.openshift
 import dg.utils.operating_system
+import dg.utils.process
 
 from dg.utils.operating_system import OperatingSystem
 
@@ -58,7 +60,7 @@ class AbstractCloudPakForDataManager(ABC):
 
     def check_openshift_version(self):
         cloud_pak_for_data_version = self._get_cloud_pak_for_data_version()
-        openshift_version = dg.utils.openshift.get_openshift_version()
+        openshift_version = dg.lib.openshift.get_openshift_version()
 
         if not AbstractCloudPakForDataManager.is_openshift_version_supported(
             cloud_pak_for_data_version, openshift_version
@@ -72,6 +74,11 @@ class AbstractCloudPakForDataManager(ABC):
         """Downloads the version-specific IBM Cloud Pak for Data installer"""
 
         pass
+
+    def execute_cloud_pak_for_data_installer(self, args) -> subprocess.CompletedProcess:
+        cpd_installer_path = self.get_cloud_pak_for_data_installer_path()
+
+        return dg.utils.process.execute_command(cpd_installer_path, args)
 
     def get_cloud_pak_for_data_installer_path(self) -> pathlib.Path:
         """Returns the path of the IBM Cloud Pak for Data installer
@@ -199,11 +206,11 @@ class AbstractCloudPakForDataManager(ABC):
 
         if not self._use_dev:
             openshift_image_registry_route = (
-                dg.utils.openshift.get_openshift_image_registry_default_route()
+                dg.lib.openshift.get_openshift_image_registry_default_route()
             )
 
             if openshift_image_registry_route == "":
-                dg.utils.openshift.enable_openshift_image_registry_default_route()
+                dg.lib.openshift.enable_openshift_image_registry_default_route()
 
         self.install_assembly(
             assembly_name,

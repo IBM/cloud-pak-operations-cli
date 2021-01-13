@@ -16,21 +16,19 @@ import io
 import json
 import pathlib
 import re
-import subprocess
 import urllib.parse
 
 from typing import Any, Union
 
-import click
 import requests
 import semver
 
 import dg.config
 import dg.lib.cloud_pak_for_data.cpd_manager
+import dg.lib.openshift
 import dg.utils.compression
 import dg.utils.download
 import dg.utils.file
-import dg.utils.openshift
 import dg.utils.operating_system
 
 from dg.config.binaries_manager import binaries_manager
@@ -129,7 +127,6 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         # install as cluster admin to generate (and apply) preinstall YAML files
         args = [
-            str(cpd_installer_path),
             "adm",
             "--accept-all-licenses",
             "--apply",
@@ -143,13 +140,11 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             str(yaml_file_path),
         ]
 
-        click.echo("Executing command: {}".format(" ".join(args)))
-        subprocess.check_call(args)
+        self.execute_cloud_pak_for_data_installer(args)
 
         if self._use_dev:
             # install assembly
             args = [
-                str(cpd_installer_path),
                 "install",
                 "--accept-all-licenses",
                 "--assembly",
@@ -173,13 +168,12 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         else:
             # install assembly
             openshift_image_registry_route = (
-                dg.utils.openshift.get_openshift_image_registry_default_route()
+                dg.lib.openshift.get_openshift_image_registry_default_route()
             )
 
-            target_registry_password = dg.utils.openshift.get_current_token()
+            target_registry_password = dg.lib.openshift.get_current_token()
 
             args = [
-                str(cpd_installer_path),
                 "install",
                 "--accept-all-licenses",
                 "--assembly",
@@ -210,8 +204,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 "--verbose",
             ]
 
-        click.echo("Executing command: {}".format(" ".join(args)))
-        subprocess.check_call(args)
+        self.execute_cloud_pak_for_data_installer(args)
 
     def _download_cpd_installer_development(
         self, cloud_pak_for_data_version: CloudPakForDataVersion, file_name: str
@@ -418,7 +411,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         if result is None:
             raise Exception(
                 f"IBM Cloud Pak for Data installer release for Cloud Pak for Data "
-                f"{self._get_cloud_pak_for_data_version()} could not found on GitHub"
+                f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
 
         return result
@@ -466,7 +459,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         if result is None:
             raise Exception(
                 f"Download URL of IBM Cloud Pak for Data installer for Cloud Pak for Data "
-                f"{self._get_cloud_pak_for_data_version()} could not found on GitHub"
+                f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
 
         return result
