@@ -36,6 +36,7 @@ import dg.utils.operating_system
 from dg.config.binaries_manager import binaries_manager
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
+    CloudPakForDataAssemblyBuildType,
     CloudPakForDataVersion,
 )
 
@@ -43,8 +44,8 @@ from dg.lib.cloud_pak_for_data.cpd_manager import (
 class CloudPakForDataManager(AbstractCloudPakForDataManager):
     """IBM Cloud Pak for Data 3.0.1 management class"""
 
-    def __init__(self, use_dev: bool):
-        super().__init__(use_dev)
+    def __init__(self, build_type: CloudPakForDataAssemblyBuildType):
+        super().__init__(build_type)
 
         self._cloud_pak_for_data_version = semver.VersionInfo.parse("3.0.1")
 
@@ -56,7 +57,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             ]
         )
 
-        if self._use_dev:
+        if self._build_type == CloudPakForDataAssemblyBuildType.DEV:
             directory_alias = cloud_pak_for_data_version["development"][
                 "directory_alias"
             ]
@@ -124,7 +125,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         self.execute_cloud_pak_for_data_installer(args)
 
-        if self._use_dev:
+        if self._build_type == CloudPakForDataAssemblyBuildType.DEV:
             # install assembly
             args = [
                 "--accept-all-licenses",

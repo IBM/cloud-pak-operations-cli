@@ -27,6 +27,7 @@ import dg.utils.download
 
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
+    CloudPakForDataAssemblyBuildType,
 )
 from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
     CloudPakForDataManagerFactory,
@@ -38,20 +39,20 @@ from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@optgroup.group("Release build options")
-@optgroup.option(
-    "--ibm-cloud-pak-for-data-entitlement-key",
-    help="IBM Cloud Pak for Data entitlement key",
-)
-@optgroup.group("Development build options")
-@optgroup.option("--artifactory-user-name", help="Artifactory user name")
-@optgroup.option("--artifactory-api-key", help="Artifactory API key")
-@optgroup.option("--use-dev", is_flag=True, help="Use development build")
 @optgroup.group("Shared options")
 @optgroup.option("--server", required=True, help="OpenShift server URL")
 @optgroup.option("--username", help="OpenShift username")
 @optgroup.option("--password", help="OpenShift password")
 @optgroup.option("--token", help="OpenShift OAuth access token")
+@optgroup.option(
+    "--build-type",
+    default=f"{CloudPakForDataAssemblyBuildType.RELEASE.name}",
+    help=f"Build type (default: {CloudPakForDataAssemblyBuildType.RELEASE.name.lower()})",
+    type=click.Choice(
+        list(map(lambda x: x.name.lower(), CloudPakForDataAssemblyBuildType)),
+        case_sensitive=False,
+    ),
+)
 @optgroup.option(
     "--db2-edition",
     required=True,
@@ -68,30 +69,45 @@ from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
     default=AbstractCloudPakForDataManager.get_default_cloud_pak_for_data_version(),
     help="Cloud Pak for Data version",
 )
+@optgroup.group("Release build options")
+@optgroup.option(
+    "--ibm-cloud-pak-for-data-entitlement-key",
+    help="IBM Cloud Pak for Data entitlement key",
+)
+@optgroup.group("Development build options")
+@optgroup.option("--artifactory-user-name", help="Artifactory user name")
+@optgroup.option("--artifactory-api-key", help="Artifactory API key")
 @click.pass_context
 def install_db2(
     ctx: click.Context,
     ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
     artifactory_user_name: str,
     artifactory_api_key: str,
-    use_dev: bool,
     server: str,
     username: Union[str, None],
     password: Union[str, None],
     token: Union[str, None],
+    build_type: str,
     db2_edition: str,
     storage_class: str,
     version: str,
 ):
     """Install IBM Db2 or IBM Db2 Warehouse"""
 
-    dg.lib.click.check_cloud_pak_for_data_options(ctx, use_dev, locals().copy())
+    cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[
+        build_type.upper()
+    ]
+
+    dg.lib.click.check_cloud_pak_for_data_options(
+        ctx, cloud_pak_for_data_assembly_build_type, locals().copy()
+    )
+
     dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
 
     cloud_pak_for_data_manager = (
         CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(
             semver.VersionInfo.parse(version)
-        )(use_dev)
+        )(cloud_pak_for_data_assembly_build_type)
     )
 
     cloud_pak_for_data_manager.install_assembly_with_prerequisites(

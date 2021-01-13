@@ -25,23 +25,26 @@ import click
 import dg.config.cluster_credentials_manager
 import dg.lib.openshift
 
+from dg.lib.cloud_pak_for_data.cpd_manager import CloudPakForDataAssemblyBuildType
+
 
 def check_cloud_pak_for_data_options(
-    ctx: click.Context, use_dev: bool, options: dict[str, Any]
+    ctx: click.Context,
+    build_type: CloudPakForDataAssemblyBuildType,
+    options: dict[str, Any],
 ):
     """Checks if values for required Click options were passed to a Click
     command to install an IBM Cloud Pak for Data assembly
 
     Parameters
     ----------
-    use_dev
-        flag indicating whether a development build of an IBM Cloud Pak for Data
-        assembly shall be installed
+    build_type
+        build type of an IBM Cloud Pak for Data assembly to be installed
     options
         options passed to a Click command
     """
 
-    if use_dev:
+    if build_type == CloudPakForDataAssemblyBuildType.DEV:
         if (
             ("artifactory_user_name" in options)
             and (options["artifactory_user_name"] is None)

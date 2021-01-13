@@ -20,6 +20,7 @@ import tempfile
 import urllib.parse
 
 from abc import ABC, abstractmethod
+from enum import Enum
 from typing import Any, TypedDict, Union
 
 import semver
@@ -32,6 +33,11 @@ import dg.utils.operating_system
 import dg.utils.process
 
 from dg.utils.operating_system import OperatingSystem
+
+
+class CloudPakForDataAssemblyBuildType(Enum):
+    DEV = 1
+    RELEASE = 2
 
 
 class CloudPakForDataVersion(TypedDict):
@@ -55,8 +61,8 @@ CloudPakForDataVersions = TypedDict(
 class AbstractCloudPakForDataManager(ABC):
     """Base class of all IBM Cloud Pak for Data management classes"""
 
-    def __init__(self, use_dev: bool):
-        self._use_dev = use_dev
+    def __init__(self, build_type: CloudPakForDataAssemblyBuildType):
+        self._build_type = build_type
 
     def check_openshift_version(self):
         cloud_pak_for_data_version = self._get_cloud_pak_for_data_version()
@@ -97,7 +103,7 @@ class AbstractCloudPakForDataManager(ABC):
 
         directory_alias = (
             cloud_pak_for_data_version["development"]["directory_alias"]
-            if self._use_dev
+            if self._build_type == CloudPakForDataAssemblyBuildType.DEV
             else cloud_pak_for_data_version["release"]["directory_alias"]
         )
 
@@ -204,7 +210,7 @@ class AbstractCloudPakForDataManager(ABC):
             assembly_name,
         )
 
-        if not self._use_dev:
+        if self._build_type == CloudPakForDataAssemblyBuildType.RELEASE:
             openshift_image_registry_route = (
                 dg.lib.openshift.get_openshift_image_registry_default_route()
             )
@@ -320,7 +326,7 @@ class AbstractCloudPakForDataManager(ABC):
             name of the assembly to be installed
         """
 
-        if self._use_dev:
+        if self._build_type == CloudPakForDataAssemblyBuildType.DEV:
             return self._prepare_yaml_file_for_development_build(
                 artifactory_user_name, artifactory_api_key, assembly_name
             )
