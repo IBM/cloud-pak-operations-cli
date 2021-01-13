@@ -135,7 +135,7 @@ def {Click group name}():
     pass
 ```
 
-### Avoiding circular imports
+#### Avoiding circular imports
 
 To avoid circular imports, a module contained in one of the Data Gate CLI packages shown in the table below is only allowed to import other modules of the following categories:
 

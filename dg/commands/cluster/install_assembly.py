@@ -17,6 +17,8 @@ from typing import Union
 import click
 import semver
 
+from click_option_group import optgroup
+
 import dg.config.cluster_credentials_manager
 import dg.lib.click
 import dg.lib.openshift
@@ -24,6 +26,7 @@ import dg.utils.download
 
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
+    CloudPakForDataAssemblyBuildType,
 )
 from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
     CloudPakForDataManagerFactory,
@@ -35,59 +38,72 @@ from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--server", required=True, help="OpenShift server URL")
-@click.option("--username", help="OpenShift username")
-@click.option("--password", help="OpenShift password")
-@click.option("--token", help="OpenShift OAuth access token")
-@click.option("--artifactory-user-name", required=True, help="Artifactory user name")
-@click.option("--artifactory-api-key", required=True, help="Artifactory API key")
-@click.option(
-    "--ibm-cloud-pak-for-data-entitlement-key",
-    help="IBM Cloud Pak for Data entitlement key",
-)
-@click.option(
+@optgroup.group("Shared options")
+@optgroup.option("--server", required=True, help="OpenShift server URL")
+@optgroup.option("--username", help="OpenShift username")
+@optgroup.option("--password", help="OpenShift password")
+@optgroup.option("--token", help="OpenShift OAuth access token")
+@optgroup.option(
     "--assembly-name", required=True, help="Name of the assembly to be installed"
 )
-@click.option(
+@optgroup.option(
+    "--build-type",
+    default=f"{CloudPakForDataAssemblyBuildType.RELEASE.name}",
+    help=f"Build type (default: {CloudPakForDataAssemblyBuildType.RELEASE.name.lower()})",
+    type=click.Choice(
+        list(map(lambda x: x.name.lower(), CloudPakForDataAssemblyBuildType)),
+        case_sensitive=False,
+    ),
+)
+@optgroup.option(
     "--storage-class",
     required=True,
     help="Storage class used for installation",
 )
-@click.option(
+@optgroup.option(
     "--version",
     default=AbstractCloudPakForDataManager.get_default_cloud_pak_for_data_version(),
     help="Cloud Pak for Data version",
 )
-@click.option("--use-dev", is_flag=True, help="Use development build")
+@optgroup.group("Release build options")
+@optgroup.option(
+    "--ibm-cloud-pak-for-data-entitlement-key",
+    help="IBM Cloud Pak for Data entitlement key",
+)
+@optgroup.group("Development build options")
+@optgroup.option("--artifactory-user-name", help="Artifactory user name")
+@optgroup.option("--artifactory-api-key", help="Artifactory API key")
 @click.pass_context
 def install_assembly(
     ctx: click.Context,
+    ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
+    artifactory_user_name: str,
+    artifactory_api_key: str,
     server: str,
     username: Union[str, None],
     password: Union[str, None],
     token: Union[str, None],
-    artifactory_user_name: str,
-    artifactory_api_key: str,
-    ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
     assembly_name: str,
+    build_type: str,
     storage_class: str,
     version: str,
-    use_dev: bool,
 ):
     """Install an IBM Cloud Pak for Data assembly"""
 
-    if not use_dev and ibm_cloud_pak_for_data_entitlement_key is None:
-        raise click.UsageError(
-            "Missing option '--ibm-cloud-pak-for-data-entitlement-key'.",
-            ctx,
-        )
+    cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[
+        build_type.upper()
+    ]
+
+    dg.lib.click.check_cloud_pak_for_data_options(
+        ctx, cloud_pak_for_data_assembly_build_type, locals().copy()
+    )
 
     dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
 
     cloud_pak_for_data_manager = (
         CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(
             semver.VersionInfo.parse(version)
-        )(use_dev)
+        )(cloud_pak_for_data_assembly_build_type)
     )
 
     cloud_pak_for_data_manager.install_assembly_with_prerequisites(
