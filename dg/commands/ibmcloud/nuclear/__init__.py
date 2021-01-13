@@ -16,6 +16,7 @@ import pathlib
 
 import click
 
+import dg.config
 import dg.lib.click as dgclick
 
 

@@ -25,7 +25,7 @@ class DataGateConfigurationManager:
     supported_true_boolean_values = ["true", "yes", "enable", "enabled", "active"]
     supported_false_boolean_values = ["false", "no", "disable", "disabled", "inactive"]
 
-    def get_current_credentials(self) -> ContextData:
+    def get_current_credentials(self) -> pathlib.Path:
         """Returns user and current cluster credentials
 
         Returns
