@@ -22,9 +22,11 @@ from typing import Any, Union
 class DataGateConfigurationManager:
     """Manages the Data Gate CLI configuration"""
 
-    def get_deps_directory_path(self) -> pathlib.Path:
-        """Returns the path of the directory containing required non-Python
-        files
+    supported_true_boolean_values = ["true", "yes", "enable", "enabled", "active"]
+    supported_false_boolean_values = ["false", "no", "disable", "disabled", "inactive"]
+
+    def get_current_credentials(self) -> ContextData:
+        """Returns user and current cluster credentials
 
         Returns
         -------
@@ -201,27 +203,11 @@ class DataGateConfigurationManager:
         Returns
         -------
         bool
-            true, if FYRE options shall be displayed in help texts
+            true, if FYRE options shall be hidden in help texts
             false if not
         """
 
-        result = True
-
-        if self.get_dg_settings_file_path().exists():
-            settings = json.loads(self.get_dg_settings_file_path().read_text())
-
-            if "fyre_commands" in settings:
-                value = str(settings["fyre_commands"])
-
-                if value.lower() in ("true", "yes", "enable"):
-                    result = True
-                elif value.lower() in ("false", "no", "disable"):
-                    result = False
-                else:
-                    raise Exception("Expected value of configuration parameter 'fyre_commands' to be a boolean, "
-                                    f"but found '{value}'")
-
-        return result
+        return not self.get_dg_bool_config_value("fyre_commands", False)
 
     def are_nuclear_commands_hidden(self) -> bool:
         """Returns whether nuclear options shall be displayed in help texts. The
@@ -230,25 +216,41 @@ class DataGateConfigurationManager:
         Returns
         -------
         bool
-            true, if nuclear options shall be displayed in help texts
+            true, if nuclear options shall be hidden in help texts
             false if not
         """
 
-        result = True
+        return not self.get_dg_bool_config_value("nuclear_commands", False)
+
+    def get_dg_bool_config_value(self, key: str, default_value: bool) -> bool:
+        """Get the value for a given key from the dg configuration file
+
+        Parameters
+        ----------
+        key
+            name of the key of the value to get
+
+        default_value
+            default_value value to use if key cannot be found in the config file
+        """
+        result = default_value
 
         if self.get_dg_settings_file_path().exists():
             settings = json.loads(self.get_dg_settings_file_path().read_text())
 
-            if "nuclear_commands" in settings:
-                value = str(settings["nuclear_commands"])
+            if key in settings:
+                value = str(settings[key])
 
-                if value.lower() in ("true", "yes", "enable"):
+                if value.lower() in self.supported_true_boolean_values:
                     result = True
-                elif value.lower() in ("false", "no", "disable"):
+                elif value.lower() in self.supported_false_boolean_values:
                     result = False
                 else:
-                    raise Exception("Expected value of configuration parameter 'nuclear_commands' to be a boolean, "
-                                    f"but found '{value}'")
+                    raise Exception(
+                        f"Expected value of configuration parameter '{key}' must be a boolean of the form "
+                        f"[{', '.join(self.supported_true_boolean_values)}] or "
+                        f"[{', '.join(self.supported_false_boolean_values)}] but found '{value}'."
+                    )
 
         return result
 
@@ -264,21 +266,22 @@ class DataGateConfigurationManager:
             value to be set for key
         """
 
-        bool_value = False
-        if value.lower() in ("true", "yes", "enable"):
-            bool_value = True
-        elif value.lower() in ("false", "no", "disable"):
-            bool_value = False
-        else:
-            raise Exception(f"Passed value '{value}' is not a boolean value.")
+        if (
+            value.lower() not in (self.supported_true_boolean_values + self.supported_false_boolean_values)
+        ):
+            raise Exception(
+                f"Passed value '{value}' for '{key}' must be a boolean of the form "
+                f"[{', '.join(self.supported_true_boolean_values)}] or "
+                f"[{', '.join(self.supported_false_boolean_values)}]."
+            )
 
         settings = {}
         if self.get_dg_settings_file_path().exists():
             settings = json.loads(self.get_dg_settings_file_path().read_text())
 
-            settings[key] = bool_value
+            settings[key] = value
         else:
-            settings = {key: bool_value}
+            settings = {key: value}
 
         with open(self.get_dg_settings_file_path(), "w+") as f:
             f.write(json.dumps(settings, indent=4))
