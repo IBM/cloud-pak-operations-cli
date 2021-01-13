@@ -22,9 +22,11 @@ from typing import Any, Union
 class DataGateConfigurationManager:
     """Manages the Data Gate CLI configuration"""
 
-    def get_deps_directory_path(self) -> pathlib.Path:
-        """Returns the path of the directory containing required non-Python
-        files
+    supported_true_boolean_values = ["true", "yes", "enable", "enabled", "active"]
+    supported_false_boolean_values = ["false", "no", "disable", "disabled", "inactive"]
+
+    def get_current_credentials(self) -> pathlib.Path:
+        """Returns user and current cluster credentials
 
         Returns
         -------
@@ -182,6 +184,107 @@ class DataGateConfigurationManager:
 
         with open(dg_credentials_file_path, "w") as credentials_file:
             json.dump(credentials, credentials_file, indent="\t", sort_keys=True)
+
+    def get_dg_settings_file_path(self) -> pathlib.Path:
+        """Returns the path of the settings file
+
+        Returns
+        -------
+        str
+            path of the settings file
+        """
+
+        return pathlib.Path.home() / ".dg" / "settings.json"
+
+    def are_fyre_commands_hidden(self) -> bool:
+        """Returns whether FYRE options shall be displayed in help texts. The
+        functionality is always usable.
+
+        Returns
+        -------
+        bool
+            true, if FYRE options shall be hidden in help texts
+            false if not
+        """
+
+        return not self.get_dg_bool_config_value("fyre_commands", False)
+
+    def are_nuclear_commands_hidden(self) -> bool:
+        """Returns whether nuclear options shall be displayed in help texts. The
+        functionality is always usable.
+
+        Returns
+        -------
+        bool
+            true, if nuclear options shall be hidden in help texts
+            false if not
+        """
+
+        return not self.get_dg_bool_config_value("nuclear_commands", False)
+
+    def get_dg_bool_config_value(self, key: str, default_value: bool) -> bool:
+        """Get the value for a given key from the dg configuration file
+
+        Parameters
+        ----------
+        key
+            name of the key of the value to get
+
+        default_value
+            default_value value to use if key cannot be found in the config file
+        """
+        result = default_value
+
+        if self.get_dg_settings_file_path().exists():
+            settings = json.loads(self.get_dg_settings_file_path().read_text())
+
+            if key in settings:
+                value = str(settings[key])
+
+                if value.lower() in self.supported_true_boolean_values:
+                    result = True
+                elif value.lower() in self.supported_false_boolean_values:
+                    result = False
+                else:
+                    raise Exception(
+                        f"Expected value of configuration parameter '{key}' must be a boolean of the form "
+                        f"[{', '.join(self.supported_true_boolean_values)}] or "
+                        f"[{', '.join(self.supported_false_boolean_values)}] but found '{value}'."
+                    )
+
+        return result
+
+    def set_dg_bool_config_value(self, key: str, value: str):
+        """Set a given key:value pair in the dg configuration file
+
+        Parameters
+        ----------
+        key
+            name of the key to set
+
+        value
+            value to be set for key
+        """
+
+        if (
+            value.lower() not in (self.supported_true_boolean_values + self.supported_false_boolean_values)
+        ):
+            raise Exception(
+                f"Passed value '{value}' for '{key}' must be a boolean of the form "
+                f"[{', '.join(self.supported_true_boolean_values)}] or "
+                f"[{', '.join(self.supported_false_boolean_values)}]."
+            )
+
+        settings = {}
+        if self.get_dg_settings_file_path().exists():
+            settings = json.loads(self.get_dg_settings_file_path().read_text())
+
+            settings[key] = value
+        else:
+            settings = {key: value}
+
+        with open(self.get_dg_settings_file_path(), "w+") as f:
+            f.write(json.dumps(settings, indent=4))
 
 
 data_gate_configuration_manager = DataGateConfigurationManager()

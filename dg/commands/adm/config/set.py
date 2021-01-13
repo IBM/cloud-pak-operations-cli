@@ -12,25 +12,23 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import pathlib
-
 import click
 
 import dg.config
-import dg.lib.click as dgclick
 
 
-def get_click_multi_command_class() -> type[click.Command]:
-    return dgclick.create_click_multi_command_class(
-        dgclick.import_packages_and_modules(__name__, pathlib.Path(__file__).parent)
-    )
-
-
-@click.command(
-    cls=get_click_multi_command_class(),
-    hidden=dg.config.data_gate_configuration_manager.are_fyre_commands_hidden(),
+@click.command()
+@click.option(
+    "--key",
+    required=True,
+    help="Key name which should be set",
 )
-def fyre():
-    """FYRE-specific commands"""
+@click.option(
+    "--value",
+    required=True,
+    help="Value to which key should be set",
+)
+def set(key: str, value: str):
+    """Set configuration value"""
 
-    pass
+    dg.config.data_gate_configuration_manager.set_dg_bool_config_value(key, value)

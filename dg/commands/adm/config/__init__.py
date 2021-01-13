@@ -16,7 +16,6 @@ import pathlib
 
 import click
 
-import dg.config
 import dg.lib.click as dgclick
 
 
@@ -26,11 +25,8 @@ def get_click_multi_command_class() -> type[click.Command]:
     )
 
 
-@click.command(
-    cls=get_click_multi_command_class(),
-    hidden=dg.config.data_gate_configuration_manager.are_fyre_commands_hidden(),
-)
-def fyre():
-    """FYRE-specific commands"""
+@click.command(cls=get_click_multi_command_class())
+def config():
+    """Modify the dg configuration"""
 
     pass
