@@ -10,10 +10,42 @@ EXTERNAL_IBM_CLOUD_API_KEY_NAME: Final[str] = "dg.api.key"
 INTERNAL_IBM_CLOUD_API_KEY_NAME: Final[str] = "ibm_cloud_api_key"
 
 
-def execute_ibmcloud_command(args: list[str]) -> subprocess.CompletedProcess:
+def execute_ibmcloud_command(
+    args: list[str],
+    capture_output=False,
+    check=True,
+    print_captured_output=False,
+) -> dg.utils.process.ProcessResult:
+    """Executes the IBM Cloud CLI
+
+    Parameters
+    ----------
+    args
+        arguments to be passed to the IBM Cloud CLI
+    capture_output
+        flag indicating whether output shall be captured
+    check
+        flag indicating whether an exception shall be thrown if the IBM Cloud
+        CLI returns with a nonzero return code
+    print_captured_output
+        flag indicating whether captured output shall also be written to
+        stdout/stderr
+
+    Returns
+    -------
+    ProcessResult
+        object storing the return code and captured output (if requested)
+    """
+
     ibmcloud_cli_path = data_gate_configuration_manager.get_ibmcloud_cli_path()
 
-    return dg.utils.process.execute_command(ibmcloud_cli_path, args)
+    return dg.utils.process.execute_command(
+        ibmcloud_cli_path,
+        args,
+        capture_output=capture_output,
+        check=check,
+        print_captured_output=print_captured_output,
+    )
 
 
 def execute_ibmcloud_command_interactively(args: list[str]) -> int:
@@ -31,7 +63,30 @@ def execute_ibmcloud_command_interactively(args: list[str]) -> int:
 
 def execute_ibmcloud_command_without_check(
     args: list[str],
-) -> subprocess.CompletedProcess:
-    ibmcloud_cli_path = data_gate_configuration_manager.get_ibmcloud_cli_path()
+    capture_output=False,
+    print_captured_output=False,
+) -> dg.utils.process.ProcessResult:
+    """Executes the IBM Cloud CLI without checking its return code
 
-    return dg.utils.process.execute_command_without_check(ibmcloud_cli_path, args)
+    Parameters
+    ----------
+    args
+        arguments to be passed to the IBM Cloud CLI
+    capture_output
+        flag indicating whether output shall be captured
+    print_captured_output
+        flag indicating whether captured output shall also be written to
+        stdout/stderr
+
+    Returns
+    -------
+    ProcessResult
+        object storing the return code and captured output (if requested)
+    """
+
+    return execute_ibmcloud_command(
+        args,
+        capture_output=capture_output,
+        check=False,
+        print_captured_output=print_captured_output,
+    )

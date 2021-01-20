@@ -15,7 +15,6 @@
 import io
 import pathlib
 import socket
-import subprocess
 import tempfile
 import urllib.parse
 
@@ -81,7 +80,9 @@ class AbstractCloudPakForDataManager(ABC):
 
         pass
 
-    def execute_cloud_pak_for_data_installer(self, args) -> subprocess.CompletedProcess:
+    def execute_cloud_pak_for_data_installer(
+        self, args
+    ) -> dg.utils.process.ProcessResult:
         cpd_installer_path = self.get_cloud_pak_for_data_installer_path()
 
         return dg.utils.process.execute_command(cpd_installer_path, args)

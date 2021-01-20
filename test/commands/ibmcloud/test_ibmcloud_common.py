@@ -15,7 +15,6 @@
 import unittest
 
 from pathlib import Path
-from subprocess import CompletedProcess
 from unittest.mock import patch
 
 from dg.commands.ibmcloud.common import (
@@ -25,17 +24,18 @@ from dg.commands.ibmcloud.common import (
 from dg.lib.ibmcloud.iam import api_key_exists, generate_api_key
 from dg.lib.ibmcloud.install import _get_cp4d_version_locator
 from dg.lib.ibmcloud.status import get_cluster_status
+from dg.utils.process import ProcessResult
 
 
 class TestIBMCloudCommon(unittest.TestCase):
     @patch(
         "dg.lib.ibmcloud.iam.execute_ibmcloud_command",
-        return_value=CompletedProcess(
-            args="",
+        return_value=ProcessResult(
+            stderr="",
             stdout=(
                 Path(__file__).parent / "dependencies/ibmcloud_generate_api_key.json"
             ).read_text(),
-            returncode=0,
+            return_code=0,
         ),
     )
     def test_generate_api_key(self, test_mock):
@@ -44,12 +44,12 @@ class TestIBMCloudCommon(unittest.TestCase):
 
     @patch(
         "dg.lib.ibmcloud.iam.execute_ibmcloud_command",
-        return_value=CompletedProcess(
-            args="",
+        return_value=ProcessResult(
+            stderr="",
             stdout=(
                 Path(__file__).parent / "dependencies/ibmcloud_api_keys.json"
             ).read_text(),
-            returncode=0,
+            return_code=0,
         ),
     )
     def test_api_key_exists(self, test_mock):
@@ -59,12 +59,12 @@ class TestIBMCloudCommon(unittest.TestCase):
 
     @patch(
         "dg.commands.ibmcloud.common.execute_ibmcloud_command",
-        return_value=CompletedProcess(
-            args="",
+        return_value=ProcessResult(
+            stderr="",
             stdout=(
                 Path(__file__).parent / "dependencies/ibmcloud_list_vlans.json"
             ).read_text(),
-            returncode=0,
+            return_code=0,
         ),
     )
     def test_get_default_public_vlan(self, test_mock):
@@ -73,12 +73,12 @@ class TestIBMCloudCommon(unittest.TestCase):
 
     @patch(
         "dg.commands.ibmcloud.common.execute_ibmcloud_command",
-        return_value=CompletedProcess(
-            args="",
+        return_value=ProcessResult(
+            stderr="",
             stdout=(
                 Path(__file__).parent / "dependencies/ibmcloud_list_vlans.json"
             ).read_text(),
-            returncode=0,
+            return_code=0,
         ),
     )
     def test_get_default_private_vlan(self, test_mock):
@@ -87,12 +87,12 @@ class TestIBMCloudCommon(unittest.TestCase):
 
     @patch(
         "dg.lib.ibmcloud.status.execute_ibmcloud_command",
-        return_value=CompletedProcess(
-            args="",
+        return_value=ProcessResult(
+            stderr="",
             stdout=(
                 Path(__file__).parent / "dependencies/ibmcloud_oc_cluster_status.json"
             ).read_text(),
-            returncode=0,
+            return_code=0,
         ),
     )
     def test_is_cluster_ready_false(self, test_mock):
@@ -100,12 +100,12 @@ class TestIBMCloudCommon(unittest.TestCase):
 
     @patch(
         "dg.lib.ibmcloud.status.execute_ibmcloud_command",
-        return_value=CompletedProcess(
-            args="",
+        return_value=ProcessResult(
+            stderr="",
             stdout=(
                 Path(__file__).parent / "dependencies/ibmcloud_oc_cluster_status_2.json"
             ).read_text(),
-            returncode=0,
+            return_code=0,
         ),
     )
     def test_is_cluster_ready_true(self, test_mock):
@@ -113,12 +113,12 @@ class TestIBMCloudCommon(unittest.TestCase):
 
     @patch(
         "dg.lib.ibmcloud.install.execute_ibmcloud_command",
-        return_value=CompletedProcess(
-            args="",
+        return_value=ProcessResult(
+            stderr="",
             stdout=Path(
                 "test/dependencies/ibmcloud_catalog_search_pak.json"
             ).read_text(),
-            returncode=0,
+            return_code=0,
         ),
     )
     def test_get_cp4d_version_locator(self, test_mock):

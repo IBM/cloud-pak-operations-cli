@@ -34,7 +34,10 @@ def is_logged_in() -> bool:
 def get_ibmcloud_account_target_information() -> Any:
     """Get the targeted region, account, resource group, org or space"""
 
-    result = execute_ibmcloud_command(["target", "--output", "JSON"])
+    result = execute_ibmcloud_command(
+        ["target", "--output", "JSON"], capture_output=True
+    )
+
     target_information = json.loads(result.stdout)
 
     return target_information
@@ -67,7 +70,7 @@ def get_default_private_vlan(zone: str):
 
 def _get_default_vlan_id(vlan_type: str, zone: str) -> str:
     get_default_vlan_command = ["oc", "vlan", "ls", "--zone", zone, "--json"]
-    result = execute_ibmcloud_command(get_default_vlan_command)
+    result = execute_ibmcloud_command(get_default_vlan_command, capture_output=True)
     result_json = json.loads(result.stdout)
 
     vlan_id = ""
@@ -91,7 +94,7 @@ def _get_default_vlan_id(vlan_type: str, zone: str) -> str:
 
 def get_volume_details(volume_id: str):
     args = ["sl", "file", "volume-detail", "--output", "json", volume_id]
-    result = execute_ibmcloud_command(args)
+    result = execute_ibmcloud_command(args, capture_output=True)
 
     return json.loads(result.stdout)
 

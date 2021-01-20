@@ -30,9 +30,9 @@ def list_existing_clusters(json: bool) -> Union[str, Any]:
     if json:
         command.append("--json")
 
-    result = execute_ibmcloud_command_without_check(command)
+    result = execute_ibmcloud_command_without_check(command, capture_output=True)
 
-    if result.returncode != 0 and "ibmcloud login" in result.stderr:
+    if result.return_code != 0 and "ibmcloud login" in result.stderr:
         raise Exception("Please use 'dg ibmcloud login' before running this command.")
 
     return result.stdout

@@ -62,8 +62,11 @@ def logout(delete_api_key: bool):
 
 
 def _perform_logout():
-    logout_command = execute_ibmcloud_command_without_check(["logout"])
-    if logout_command.returncode != 0:
+    logout_command = execute_ibmcloud_command_without_check(
+        ["logout"], capture_output=True
+    )
+
+    if logout_command.return_code != 0:
         raise Exception(
             f"'ibmcloud logout' failed: {logout_command.stdout}\n{logout_command.stderr}"
         )

@@ -115,9 +115,9 @@ def create(
     click.echo(
         "Executing cluster creation command 'ibmcloud " + " ".join(command) + "'"
     )
-    result = execute_ibmcloud_command_without_check(command)
+    result = execute_ibmcloud_command_without_check(command, capture_output=True)
 
-    if result.returncode != 0:
+    if result.return_code != 0:
         if "E0007" in result.stdout:
             raise Exception(
                 f"The cluster with the name '{cluster_name}' already exists. Detailed error:\n{result.stdout}\n"

@@ -66,7 +66,7 @@ def get_cluster_status(cluster_name: str) -> ClusterStatus:
     """
 
     args = ["oc", "cluster", "get", "--cluster", cluster_name, "--json"]
-    command_result = execute_ibmcloud_command(args)
+    command_result = execute_ibmcloud_command(args, capture_output=True)
 
     try:
         status = ClusterStatus(json.loads(command_result.stdout))

@@ -18,13 +18,13 @@ import tempfile
 import unittest
 import unittest.mock
 
-from subprocess import CompletedProcess
 from typing import TypedDict
 
 import click.testing
 
 import dg.lib.ibmcloud.cluster
 import dg.lib.ibmcloud.status
+import dg.utils.process
 
 from dg.config.cluster_credentials_manager import cluster_credentials_manager
 from dg.dg import cli
@@ -69,8 +69,8 @@ class TestAddClusterCommands(unittest.TestCase):
         server = cluster_data["server"]
 
         dg.lib.ibmcloud.status.execute_ibmcloud_command = unittest.mock.MagicMock(
-            return_value=CompletedProcess(
-                args="", returncode=0, stdout=f'{{"serverURL": "{server}"}}'
+            return_value=dg.utils.process.ProcessResult(
+                stderr="", stdout=f'{{"serverURL": "{server}"}}', return_code=0
             )
         )
 
