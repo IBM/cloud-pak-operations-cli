@@ -22,7 +22,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: IBM/data-gate-cli:latest
+          tags: ibm/data-gate-cli:latest
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
