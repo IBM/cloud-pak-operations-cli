@@ -14,6 +14,7 @@
 
 import click
 
+from dg.lib.error import IBMCloudException
 from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
 from dg.lib.ibmcloud.cluster.rm import delete_ibmcloud_cluster
 from dg.lib.ibmcloud.install import install_cp4d_with_preinstall
@@ -118,23 +119,19 @@ def create(
     result = execute_ibmcloud_command_without_check(command, capture_output=True)
 
     if result.return_code != 0:
-        if "E0007" in result.stdout:
-            raise Exception(
-                f"The cluster with the name '{cluster_name}' already exists. Detailed error:\n{result.stdout}\n"
-                f"{result.stderr}"
-            )
+        if "E0007" in result.stderr:
+            raise IBMCloudException(result.stderr)
         else:
             if cluster_exists(cluster_name):
                 # There was an error, but the cluster was created nonetheless, print a warning
 
                 click.echo(
-                    f"Warning: An error occurred while creating the cluster, but 'ibmcloud oc cluster ls' shows a\n"
-                    f"cluster with the name '{cluster_name}'.\nDetailed error:\n{result.stdout}\n{result.stderr}"
+                    f"Warning: An error occurred while creating the cluster, but 'ibmcloud oc cluster ls' shows a "
+                    f"cluster with the name '{cluster_name}' – error details:\n"
+                    f"{IBMCloudException.get_parsed_error_message(result.stderr)}"
                 )
             else:
-                raise Exception(
-                    f"An error occurred while creating the cluster.\nDetailed error:\n{result.stdout}\n{result.stderr}"
-                )
+                raise IBMCloudException(result.stderr)
     else:
         click.echo(result.stdout)
 

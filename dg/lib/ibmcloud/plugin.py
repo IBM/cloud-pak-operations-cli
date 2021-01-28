@@ -1,5 +1,6 @@
 import click
 
+from dg.lib.error import IBMCloudException
 from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
 
 
@@ -26,8 +27,9 @@ def _install_plugin(plugin_name: str):
     result = execute_ibmcloud_command_without_check(args, capture_output=True)
 
     if result.return_code != 0:
-        raise Exception(
-            f"An error occurred when attempting to install ibmcloud plug-in {plugin_name}:\n{result.stderr}"
+        raise IBMCloudException(
+            f"An error occurred when attempting to install ibmcloud plug-in {plugin_name}",
+            result.stderr,
         )
 
 
@@ -36,9 +38,9 @@ def _is_plugin_installed(plugin_name: str) -> bool:
     result = execute_ibmcloud_command_without_check(args, capture_output=True)
 
     if result.return_code != 0:
-        raise Exception(
-            f"An error occurred when attempting to check whether ibmcloud plug-in {plugin_name} is installed:\n"
-            f"{result.stderr}"
+        raise IBMCloudException(
+            f"An error occurred when attempting to check whether ibmcloud plug-in {plugin_name} is installed",
+            result.stderr,
         )
 
     is_installed = plugin_name in result.stdout

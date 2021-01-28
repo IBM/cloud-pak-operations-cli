@@ -16,6 +16,7 @@ import click
 
 import dg.lib.ibmcloud.status
 
+from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud.cluster.ibmcloud_cluster_factory import (
     ibm_cloud_cluster_factory,
 )
@@ -35,6 +36,6 @@ def login(cluster_name: str):
 
         cluster.login()
     else:
-        raise Exception(
+        raise DataGateCLIException(
             f"The cluster {cluster_name} is not ready yet, hence, it is not possible to log in to it."
         )

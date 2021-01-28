@@ -20,6 +20,8 @@ from typing import Callable, Optional
 
 import click
 
+from dg.lib.error import DataGateCLIException
+
 
 class ProcessResult:
     def __init__(self, return_code: int, stderr: str, stdout: str):
@@ -94,7 +96,7 @@ def execute_command(
         if len(stderr_buffer) != 0:
             error_output = f" ({stderr_buffer})"
 
-        raise Exception(
+        raise DataGateCLIException(
             f"Command '{command_string}' failed with return code {return_code}{error_output}"
         )
 

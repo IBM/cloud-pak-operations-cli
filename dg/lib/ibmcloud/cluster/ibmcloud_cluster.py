@@ -17,6 +17,7 @@ import dg.lib.ibmcloud
 import dg.lib.openshift
 
 from dg.lib.cluster.cluster import AbstractCluster, ClusterData
+from dg.lib.error import DataGateCLIException
 
 
 class IBMCloudCluster(AbstractCluster):
@@ -35,7 +36,9 @@ class IBMCloudCluster(AbstractCluster):
         )
 
         if api_key is None:
-            raise Exception("IBM Cloud API key not found in stored credentials")
+            raise DataGateCLIException(
+                "IBM Cloud API key not found in stored credentials"
+            )
 
         dg.lib.openshift.log_in_to_openshift_cluster_with_password(
             self.server, "apikey", api_key

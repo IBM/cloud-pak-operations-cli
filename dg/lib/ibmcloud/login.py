@@ -16,6 +16,7 @@ import click
 
 import dg.config
 
+from dg.lib.error import DataGateCLIException, IBMCloudException
 from dg.lib.ibmcloud import (
     INTERNAL_IBM_CLOUD_API_KEY_NAME,
     execute_ibmcloud_command_interactively,
@@ -78,7 +79,7 @@ def _login_using_api_key(apikey: str):
     )
 
     if login_command.return_code != 0:
-        raise Exception(
+        raise DataGateCLIException(
             f"Login to IBM Cloud using the given API key failed:\n{login_command.stdout}"
         )
     else:
@@ -91,7 +92,7 @@ def _login_interactively():
     )
 
     if login_command_return_code != 0:
-        raise Exception("Interactive login to IBM Cloud failed.")
+        raise DataGateCLIException("Interactive login to IBM Cloud failed.")
 
 
 def _disable_update_notifications():
@@ -108,8 +109,9 @@ def _disable_update_notifications():
     )
 
     if disable_command.return_code != 0:
-        raise Exception(
-            f"Disabling IBM Cloud CLI update notifications failed:\n{disable_command.stdout}"
+        raise IBMCloudException(
+            "Disabling IBM Cloud CLI update notifications failed",
+            disable_command.stderr,
         )
 
 

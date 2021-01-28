@@ -19,6 +19,8 @@ import dg.lib.click
 import dg.lib.fyre.cluster.fyre_cluster_factory  # required to register FYREClusterFactory object
 import dg.lib.ibmcloud.cluster.ibmcloud_cluster_factory  # required to register IBMCloudClusterFactory object
 
+from dg.lib.error import DataGateCLIException
+
 
 @click.command(
     context_settings=dg.lib.click.create_default_map_from_dict(
@@ -33,6 +35,6 @@ def login():
     )
 
     if current_cluster is None:
-        raise Exception("No current cluster selected")
+        raise DataGateCLIException("No current cluster selected")
 
     current_cluster.login()

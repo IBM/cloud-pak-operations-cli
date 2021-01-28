@@ -14,6 +14,10 @@
 
 from time import sleep
 
+import click
+
+from dg.lib.error import DataGateCLIException
+
 
 def wait_for(timeout, interval, action_name, predicate, *args, **kwargs):
     time_passed = 0
@@ -22,15 +26,12 @@ def wait_for(timeout, interval, action_name, predicate, *args, **kwargs):
         time_passed_output = f"Time spent / timeout ({str(time_passed).rjust(4, ' ')}s / {str(timeout).rjust(4, ' ')}s)"
 
         if predicate(*args, **kwargs):
-            print(time_passed_output)
-            print(f"{action_name} finished successfully.")
+            click.echo(time_passed_output)
+            click.echo(f"{action_name} finished successfully.")
             break
 
-        print(
-            time_passed_output,
-            end="\r",
-        )
+        click.echo(f"{time_passed_output}\r", nl=False)
         sleep(interval)
         time_passed += interval
     else:
-        raise Exception(f"{action_name} timed out.")
+        raise DataGateCLIException(f"{action_name} timed out")

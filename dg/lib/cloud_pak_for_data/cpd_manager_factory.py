@@ -21,6 +21,7 @@ import dg.lib.cloud_pak_for_data.cpd_manager
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
 )
+from dg.lib.error import DataGateCLIException
 
 
 class CloudPakForDataManagerFactory:
@@ -51,7 +52,7 @@ class CloudPakForDataManagerFactory:
             cloud_pak_for_data_version
             not in CloudPakForDataManagerFactory._cloud_pak_for_data_managers
         ):
-            raise Exception(
+            raise DataGateCLIException(
                 f"Unknown Cloud Pak for Data version ({str(cloud_pak_for_data_version)})"
             )
 

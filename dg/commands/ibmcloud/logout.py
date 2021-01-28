@@ -17,6 +17,7 @@ from subprocess import CalledProcessError
 import click
 
 from dg.config import data_gate_configuration_manager
+from dg.lib.error import DataGateCLIException, IBMCloudException
 from dg.lib.ibmcloud import (
     EXTERNAL_IBM_CLOUD_API_KEY_NAME,
     INTERNAL_IBM_CLOUD_API_KEY_NAME,
@@ -45,7 +46,7 @@ def logout(delete_api_key: bool):
                 f"Multiple API keys matches found with name '{EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
                 in error.stderr
             ):
-                raise Exception(
+                raise DataGateCLIException(
                     f"Multiple API keys with the name {EXTERNAL_IBM_CLOUD_API_KEY_NAME} exist. You need to manually "
                     f"delete them using '{str(data_gate_configuration_manager.get_ibmcloud_cli_path())} iam "
                     f"api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
@@ -67,6 +68,4 @@ def _perform_logout():
     )
 
     if logout_command.return_code != 0:
-        raise Exception(
-            f"'ibmcloud logout' failed: {logout_command.stdout}\n{logout_command.stderr}"
-        )
+        raise IBMCloudException("'ibmcloud logout' failed", logout_command.stderr)

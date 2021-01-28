@@ -29,6 +29,7 @@ import dg.utils.operating_system
 from dg.lib.download_manager.download_manager_plugin import (
     AbstractDownloadManagerPlugIn,
 )
+from dg.lib.error import DataGateCLIException
 from dg.utils.operating_system import OperatingSystem
 
 
@@ -126,7 +127,7 @@ class OpenShiftClientCLIPlugIn(AbstractDownloadManagerPlugIn):
         )
 
         if search_result is None:
-            raise Exception("OpenShift Client CLI could not be parsed")
+            raise DataGateCLIException("OpenShift Client CLI could not be parsed")
 
         version = semver.VersionInfo.parse(f"{search_result.group(1)}")
 
