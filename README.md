@@ -55,6 +55,14 @@ dg adm update
 . $(pip3 show dg | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-zsh.sh
 ```
 
+## Running from docker
+
+The latest version of data-gate-cli on the master branch can also be run inside a docker container from `quay.io/ibm/data-gate-cli:latest`
+
+```bash
+docker run -it quay.io/ibm/data-gate-cli:latest /bin/bash
+```
+
 ## Development
 
 ### Recommended Visual Studio Code plug-ins
