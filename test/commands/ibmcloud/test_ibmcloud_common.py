@@ -17,13 +17,13 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from dg.commands.ibmcloud.common import (
-    get_default_private_vlan,
-    get_default_public_vlan,
-)
 from dg.lib.ibmcloud.iam import api_key_exists, generate_api_key
 from dg.lib.ibmcloud.install import _get_cp4d_version_locator
 from dg.lib.ibmcloud.status import get_cluster_status
+from dg.lib.ibmcloud.vlan import (
+    get_default_private_vlan,
+    get_default_public_vlan,
+)
 from dg.utils.process import ProcessResult
 
 
@@ -58,7 +58,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         self.assertFalse(api_key_exists("dg.api.key.3"))
 
     @patch(
-        "dg.commands.ibmcloud.common.execute_ibmcloud_command",
+        "dg.lib.ibmcloud.vlan.execute_ibmcloud_command",
         return_value=ProcessResult(
             stderr="",
             stdout=(
@@ -72,7 +72,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         self.assertRaises(Exception, get_default_public_vlan("sjc04"))
 
     @patch(
-        "dg.commands.ibmcloud.common.execute_ibmcloud_command",
+        "dg.lib.ibmcloud.vlan.execute_ibmcloud_command",
         return_value=ProcessResult(
             stderr="",
             stdout=(

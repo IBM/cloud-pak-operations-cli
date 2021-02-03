@@ -12,13 +12,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import json
 import logging
 import time
 
 from typing import Any, Final
 
-import dg.commands.ibmcloud.common
 import dg.lib.openshift
+
+from dg.lib.ibmcloud import execute_ibmcloud_command
 
 MAX_NUM_MODIFICATION_CHECKS: Final[int] = 30
 NUM_SECONDS_TO_WAIT_BETWEEN_ITERATIONS: Final[int] = 10
@@ -50,16 +52,14 @@ def increase_openshift_image_registry_volume_capacity(
         "openshift-image-registry", persistent_volume_name
     )
 
-    volume_details = dg.commands.ibmcloud.common.get_volume_details(volume_id)
+    volume_details = _get_volume_details(volume_id)
     volume_capacity = _get_volume_capacity(volume_details)
 
     if volume_capacity < required_volume_capacity:
-        dg.commands.ibmcloud.common.modify_volume_capacity(
-            volume_id, required_volume_capacity
-        )
+        _modify_volume_capacity(volume_id, required_volume_capacity)
 
         for i in range(max_num_modification_checks):
-            volume_details = dg.commands.ibmcloud.common.get_volume_details(volume_id)
+            volume_details = _get_volume_details(volume_id)
             volume_capacity = _get_volume_capacity(volume_details)
 
             if volume_capacity == required_volume_capacity:
@@ -92,3 +92,24 @@ def _get_volume_capacity(volume_details: dict[str, Any]):
     assert "capacityGb" in volume_details
 
     return volume_details["capacityGb"]
+
+
+def _get_volume_details(volume_id: str):
+    args = ["sl", "file", "volume-detail", "--output", "json", volume_id]
+    result = execute_ibmcloud_command(args, capture_output=True)
+
+    return json.loads(result.stdout)
+
+
+def _modify_volume_capacity(volume_id: str, new_capacity: int):
+    args = [
+        "sl",
+        "file",
+        "volume-modify",
+        volume_id,
+        "--new-size",
+        str(new_capacity),
+        "--force",
+    ]
+
+    execute_ibmcloud_command(args)

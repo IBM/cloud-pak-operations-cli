@@ -22,10 +22,6 @@ import requests
 
 import dg.config
 
-from dg.commands.ibmcloud.common import (
-    get_ibmcloud_account_target_information,
-    is_logged_in,
-)
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
 )
@@ -34,6 +30,8 @@ from dg.lib.ibmcloud import (
     execute_ibmcloud_command,
 )
 from dg.lib.ibmcloud.iam import get_oauth_token, get_tokens
+from dg.lib.ibmcloud.login import is_logged_in
+from dg.lib.ibmcloud.target import get_ibmcloud_account_target_information
 from dg.utils.wait import wait_for
 
 
