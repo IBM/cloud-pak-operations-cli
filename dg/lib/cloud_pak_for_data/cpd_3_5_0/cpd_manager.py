@@ -393,7 +393,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         for release in response_json:
             search_result = re.search(
-                f".*({str(self._cloud_pak_for_data_version)}(-\\d+)*).*",
+                f".*({self._cloud_pak_for_data_version.major}\\.{self._cloud_pak_for_data_version.minor}\\.\\d+(-\\d+)*).*",
                 release["name"],
             )
 
