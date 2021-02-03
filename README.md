@@ -57,7 +57,7 @@ dg adm update
 
 ## Running from docker
 
-The latest version of data-gate-cli on the master branch can also be run inside a docker container from `quay.io/ibm/data-gate-cli:latest`
+The latest version of the Data Gate CLI on the master branch can also be run inside a Docker container from `quay.io/ibm/data-gate-cli:latest`
 
 ```bash
 docker run -it quay.io/ibm/data-gate-cli:latest /bin/bash
