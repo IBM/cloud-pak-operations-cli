@@ -95,7 +95,7 @@ def create(
         "--entitlement",
         "cloud_pak",
         "--flavor",
-        "b2c.16x64",
+        "b3c.16x64",
         "--hardware",
         "dedicated",
         "--name",
