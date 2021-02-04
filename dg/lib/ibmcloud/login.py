@@ -28,6 +28,24 @@ from dg.lib.ibmcloud.plugin import (
     is_catalogs_management_plugin_installed,
     is_container_service_plugin_installed,
 )
+from dg.lib.ibmcloud.target import get_ibmcloud_account_target_information
+
+
+def is_logged_in() -> bool:
+    target_information = get_ibmcloud_account_target_information()
+    login_status = target_information and "user" in target_information
+
+    return login_status
+
+
+def is_logged_in_and_print_help_message_if_not():
+    if not is_logged_in():
+        click.echo(
+            (
+                "It seems you're not logged in to the IBM cloud CLI. Please execute `dg ibmcloud login` (interactive) "
+                "and afterwards re-run the current command."
+            )
+        )
 
 
 def login():

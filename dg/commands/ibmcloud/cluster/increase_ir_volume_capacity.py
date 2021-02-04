@@ -17,7 +17,6 @@ from typing import Final
 import click
 
 import dg.commands.ibmcloud.cluster.login
-import dg.commands.ibmcloud.common
 import dg.lib.ibmcloud.volume
 
 REQUIRED_OPENSHIFT_IMAGE_REGISTRY_VOLUME_CAPACITY_IN_GB: Final[int] = 200

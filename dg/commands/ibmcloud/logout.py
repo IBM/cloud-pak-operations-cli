@@ -16,7 +16,6 @@ from subprocess import CalledProcessError
 
 import click
 
-from dg.commands.ibmcloud.common import is_logged_in
 from dg.config import data_gate_configuration_manager
 from dg.lib.ibmcloud import (
     EXTERNAL_IBM_CLOUD_API_KEY_NAME,
@@ -24,6 +23,7 @@ from dg.lib.ibmcloud import (
     execute_ibmcloud_command_without_check,
 )
 from dg.lib.ibmcloud.iam import delete_api_key_in_ibmcloud
+from dg.lib.ibmcloud.login import is_logged_in
 
 
 @click.command()

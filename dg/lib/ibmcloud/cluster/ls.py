@@ -14,8 +14,8 @@
 
 from typing import Any, Union
 
-from dg.commands.ibmcloud.common import is_logged_in
 from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
+from dg.lib.ibmcloud.login import is_logged_in
 
 
 def list_existing_clusters(json: bool) -> Union[str, Any]:
