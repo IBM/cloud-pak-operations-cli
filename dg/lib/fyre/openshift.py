@@ -12,9 +12,184 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import pathlib
+
 from typing import Final
+
+import dg.lib.openshift
+import dg.utils.process
+import dg.utils.ssh
 
 OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT: Final[str] = (
     "https://oauth-openshift.apps.{}.os.fyre.ibm.com/oauth/authorize?"
     "client_id=openshift-challenging-client&response_type=token"
 )
+
+
+def init_node_for_db2(node: str, db2_edition: str, use_host_path_storage: bool):
+    """Initializes a worker node before creating a Db2 instance
+
+    Parameters
+    ----------
+    node
+        hostname of the worker node to be initialized
+    db2_edition
+        Db2 edition
+    use_host_path_storage
+        flag indicating whether hostpath storage shall be used
+    """
+
+    dg.lib.openshift.execute_oc_command(
+        _get_oc_adm_taint_node_command(node, db2_edition)
+    )
+
+    dg.lib.openshift.execute_oc_command(_get_oc_label_node_command(node, db2_edition))
+    dg.utils.process.execute_command(
+        pathlib.Path("ssh"), _get_ssh_setsebool_container_manage_cgroup_command(node)
+    )
+
+    if use_host_path_storage:
+        label_storage_path(node)
+
+
+async def init_node_for_db2_from_remote_host(
+    infrastructure_node_hostname: str,
+    node: str,
+    db2_edition: str,
+    use_host_path_storage: bool,
+    oc_login_command_for_remote_host: str,
+):
+    """Initializes a worker node from a remote host before creating a Db2
+    instance
+
+    Parameters
+    ----------
+    infrastructure_node_hostname
+        infrastructure node hostname
+    node
+        hostname of the worker node to be initialized
+    db2_edition
+        Db2 edition
+    use_host_path_storage
+        flag indicating whether hostpath storage shall be used
+    oc_login_command_for_remote_host
+        oc login command for logging in to OpenShift on the remote host
+    """
+
+    async with dg.utils.ssh.RemoteClient(infrastructure_node_hostname) as remoteClient:
+        await remoteClient.connect()
+        await remoteClient.execute(oc_login_command_for_remote_host)
+        await remoteClient.execute(
+            "oc " + " ".join(_get_oc_adm_taint_node_command(node, db2_edition))
+        )
+
+        await remoteClient.execute(
+            "oc " + " ".join(_get_oc_label_node_command(node, db2_edition))
+        )
+
+        await remoteClient.execute(
+            "ssh " + " ".join(_get_ssh_setsebool_container_manage_cgroup_command(node))
+        )
+
+        if use_host_path_storage:
+            await label_storage_path_from_remote_host(remoteClient, node)
+
+
+def label_storage_path(node: str):
+    """Labels the storage path on the given node
+
+    See https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/svc-db2/hostpath-selinux-aese.html
+
+    Parameters
+    ----------
+    node
+        node on which the storage path shall be labeled
+    """
+
+    dg.utils.process.execute_command(pathlib.Path("ssh"), _get_ssh_mkdir_command(node))
+    dg.utils.process.execute_command(pathlib.Path("ssh"), _get_ssh_chmod_command(node))
+    dg.utils.process.execute_command(
+        pathlib.Path("ssh"), _get_ssh_semanage_command(node)
+    )
+
+    dg.utils.process.execute_command(
+        pathlib.Path("ssh"), _get_ssh_restorecon_command(node)
+    )
+
+
+async def label_storage_path_from_remote_host(
+    remoteClient: dg.utils.ssh.RemoteClient, node: str
+):
+    """Labels the storage path on the given node from a remote host
+
+    See https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/svc-db2/hostpath-selinux-aese.html
+
+    Parameters
+    ----------
+    remoteClient
+        SSH client
+    node
+        node on which the storage path shall be labeled
+    """
+
+    await remoteClient.execute("ssh " + _join_args(_get_ssh_mkdir_command(node)))
+    await remoteClient.execute("ssh " + _join_args(_get_ssh_chmod_command(node)))
+    await remoteClient.execute("ssh " + _join_args(_get_ssh_semanage_command(node)))
+    await remoteClient.execute("ssh " + _join_args(_get_ssh_restorecon_command(node)))
+
+
+def _get_oc_adm_taint_node_command(node: str, db2_edition: str) -> list[str]:
+    return [
+        "adm",
+        "taint",
+        "node",
+        node,
+        f"icp4data=database-{db2_edition}:NoSchedule",
+    ]
+
+
+def _get_oc_label_node_command(node: str, db2_edition: str) -> list[str]:
+    return ["label", "node", node, f"icp4data=database-{db2_edition}"]
+
+
+def _get_ssh_mkdir_command(node: str) -> list[str]:
+    return [f"core@{node}", "mkdir", "--parents", "/var/home/core/data"]
+
+
+def _get_ssh_chmod_command(node: str) -> list[str]:
+    return [f"core@{node}", "chmod", "777", "/var/home/core/data"]
+
+
+def _get_ssh_restorecon_command(node: str) -> list[str]:
+    return [f"core@{node}", "sudo", "restorecon", "-Rv", "/var/home/core/data"]
+
+
+def _get_ssh_semanage_command(node: str) -> list[str]:
+    return [
+        f"core@{node}",
+        'sudo semanage fcontext --add --type container_file_t "/var/home/core/data(/.*)?"',
+    ]
+
+
+def _get_ssh_setsebool_container_manage_cgroup_command(node: str) -> list[str]:
+    return [
+        f"core@{node}",
+        "sudo",
+        "setsebool",
+        "-P",
+        "container_manage_cgroup",
+        "true",
+    ]
+
+
+def _join_args(args: list[str]) -> str:
+    args_copy = args.copy()
+
+    for i in range(len(args_copy)):
+        if " " in args[i]:
+            if "'" in args[i]:
+                args_copy[i] = args_copy[i].replace("'", "\\'")
+
+            args_copy[i] = f"'{args[i]}'"
+
+    return " ".join(args_copy)
