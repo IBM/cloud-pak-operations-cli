@@ -20,6 +20,7 @@ from typing import Any, Final
 
 import dg.lib.openshift
 
+from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud import execute_ibmcloud_command
 
 MAX_NUM_MODIFICATION_CHECKS: Final[int] = 30
@@ -70,7 +71,7 @@ def increase_openshift_image_registry_volume_capacity(
                 break
             else:
                 if i == max_num_modification_checks - 1:
-                    raise Exception(
+                    raise DataGateCLIException(
                         f"OpenShift image registry volume capacity change was not applied yet – timeout was reached "
                         f"after {max_num_modification_checks * num_seconds_to_wait_between_iterations} seconds"
                     )

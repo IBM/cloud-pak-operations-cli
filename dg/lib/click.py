@@ -25,7 +25,9 @@ import click
 import dg.config.cluster_credentials_manager
 import dg.lib.openshift
 
-from dg.lib.cloud_pak_for_data.cpd_manager import CloudPakForDataAssemblyBuildType
+from dg.lib.cloud_pak_for_data.cpd_manager import (
+    CloudPakForDataAssemblyBuildType,
+)
 
 
 def check_cloud_pak_for_data_options(

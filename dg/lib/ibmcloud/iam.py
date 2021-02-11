@@ -19,6 +19,7 @@ from typing import Any
 
 import dg.lib.ibmcloud
 
+from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud import execute_ibmcloud_command
 
 
@@ -81,7 +82,9 @@ def get_oauth_token() -> str:
     if oauth_token_result and "iam_token" in oauth_token_result:
         result = oauth_token_result["iam_token"]
     else:
-        raise Exception(f"Unable to retrieve oauth token using command '{command}'")
+        raise DataGateCLIException(
+            f"Unable to retrieve oauth token using command '{command}'"
+        )
 
     return result
 

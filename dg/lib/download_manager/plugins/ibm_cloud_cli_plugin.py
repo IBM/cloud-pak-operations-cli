@@ -27,6 +27,7 @@ import dg.utils.operating_system
 from dg.lib.download_manager.download_manager_plugin import (
     AbstractDownloadManagerPlugIn,
 )
+from dg.lib.error import DataGateCLIException
 from dg.utils.operating_system import OperatingSystem
 
 
@@ -57,7 +58,9 @@ class IBMCloudCLIPlugIn(AbstractDownloadManagerPlugIn):
         )
 
         if latest_version is None:
-            raise Exception("No IBM Cloud CLI release could be found on GitHub")
+            raise DataGateCLIException(
+                "No IBM Cloud CLI release could be found on GitHub"
+            )
 
         return latest_version
 

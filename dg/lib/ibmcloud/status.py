@@ -16,6 +16,7 @@ import json
 
 from typing import Any
 
+from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud import execute_ibmcloud_command
 from dg.lib.ibmcloud.cluster.ls import list_existing_clusters
 from dg.utils.wait import wait_for
@@ -75,7 +76,7 @@ def get_cluster_status(cluster_name: str) -> ClusterStatus:
     except json.JSONDecodeError as exception:
         command_string = "ibmcloud " + " ".join(args)
 
-        raise Exception(
+        raise DataGateCLIException(
             f"Invalid JSON received from command {command_string}:\n{command_result.stdout}"
         ) from exception
 
@@ -125,6 +126,6 @@ def wait_for_cluster_readiness(cluster_name: str):
             cluster_name,
         )
     except Exception:
-        raise Exception(
+        raise DataGateCLIException(
             f"Timeout for cluster creation exceeded, current cluster status:\n{get_cluster_status(cluster_name)}"
         )

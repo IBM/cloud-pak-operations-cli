@@ -2,6 +2,7 @@ import json
 
 import click
 
+from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud import execute_ibmcloud_command
 
 
@@ -33,7 +34,7 @@ def _get_default_vlan_id(vlan_type: str, zone: str) -> str:
     if not vlan_id:
         click.echo("Returned VLAN information:" + result.stdout)
 
-        raise Exception(
+        raise DataGateCLIException(
             f"Could not obtain default {vlan_type} VLAN ID for zone {zone}."
         )
 

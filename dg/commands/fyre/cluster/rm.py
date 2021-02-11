@@ -24,6 +24,8 @@ import dg.config.cluster_credentials_manager
 import dg.lib.click
 import dg.utils.network
 
+from dg.lib.error import DataGateCLIException
+
 IBM_FYRE_DELETE_CLUSTER_URL: Final[
     str
 ] = "https://api.fyre.ibm.com/rest/v1/?operation=delete"
@@ -60,7 +62,7 @@ def rm(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
         status = json_response["status"]
 
         if status != "submitted":
-            raise Exception(
+            raise DataGateCLIException(
                 "Failed to delete FYRE cluster ({})".format(json_response["details"])
             )
 
@@ -74,7 +76,7 @@ def rm(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
                 server
             )
     else:
-        raise Exception(
+        raise DataGateCLIException(
             "Failed to delete FYRE cluster (HTTP status code: {})".format(
                 response.status_code
             )

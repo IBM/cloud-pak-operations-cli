@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 import json
-import re
+import re as regex
 
 from abc import ABC, abstractmethod
 from typing import Union
@@ -137,7 +137,7 @@ class AbstractDownloadManagerPlugIn(ABC):
         result: Union[semver.VersionInfo, None] = None
 
         for release in response_json:
-            search_result = re.search(
+            search_result = regex.search(
                 "v(\\d+\\.\\d+\\.\\d+)$",
                 release["name"],
             )

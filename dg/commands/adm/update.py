@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import re
+import re as regex
 import subprocess
 
 from importlib import metadata
@@ -24,7 +24,9 @@ import click
 def update():
     """Update the Data Gate CLI to the latest version"""
 
-    search_result = re.search("https://(.*)", metadata.metadata("dg")["Download-URL"])
+    search_result = regex.search(
+        "https://(.*)", metadata.metadata("dg")["Download-URL"]
+    )
 
     if search_result is not None:
         git_hub_url_without_scheme = search_result.group(1)

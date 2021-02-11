@@ -20,6 +20,8 @@ import requests
 import dg.config
 import dg.utils.network
 
+from dg.lib.error import DataGateCLIException
+
 IBM_FYRE_SHOW_CLUSTERS_URL: Final[
     str
 ] = "https://api.fyre.ibm.com/rest/v1/?operation=query&request=showclusters"
@@ -45,7 +47,7 @@ def login(
     )
 
     if not response.ok:
-        raise Exception(
+        raise DataGateCLIException(
             "Failed to log in to FYRE (HTTP status code: {})".format(
                 response.status_code
             )

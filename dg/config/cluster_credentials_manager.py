@@ -23,6 +23,7 @@ import dg.lib.cluster
 
 from dg.config import data_gate_configuration_manager
 from dg.lib.cluster.cluster import AbstractCluster, ClusterData
+from dg.lib.error import DataGateCLIException
 
 ContextData = dict[str, Any]
 
@@ -78,7 +79,7 @@ class ClusterCredentialsManager:
         cluster = self.get_cluster(alias_or_server)
 
         if cluster is None:
-            raise Exception("Cluster not found ({})".format(alias_or_server))
+            raise DataGateCLIException("Cluster not found ({})".format(alias_or_server))
 
         if ("alias" in cluster_data_to_be_added) and (
             (new_alias := cluster_data_to_be_added["alias"]) != ""
@@ -203,7 +204,7 @@ class ClusterCredentialsManager:
             cluster = self.get_cluster(server_of_current_cluster)
 
             if cluster is None:
-                raise Exception("Current cluster not found")
+                raise DataGateCLIException("Current cluster not found")
 
         return cluster
 
@@ -269,7 +270,7 @@ class ClusterCredentialsManager:
         cluster = self.get_cluster(alias_or_server)
 
         if cluster is None:
-            raise Exception("Cluster not found ({})".format(alias_or_server))
+            raise DataGateCLIException("Cluster not found ({})".format(alias_or_server))
 
         clusters = self._get_clusters()
         clusters.pop(cluster.get_server())
@@ -292,7 +293,7 @@ class ClusterCredentialsManager:
         cluster = self.get_cluster(alias_or_server)
 
         if cluster is None:
-            raise Exception("Cluster not found ({})".format(alias_or_server))
+            raise DataGateCLIException("Cluster not found ({})".format(alias_or_server))
 
         self._clusters_file_contents["current_cluster"] = cluster.get_server()
         self._save_clusters_file()
@@ -307,7 +308,7 @@ class ClusterCredentialsManager:
         """
 
         if "clusters" not in self._clusters_file_contents:
-            raise Exception("Corrupt configuration file")
+            raise DataGateCLIException("Corrupt configuration file")
 
         return self._clusters_file_contents["clusters"]
 
@@ -338,7 +339,7 @@ class ClusterCredentialsManager:
             if ("alias" in cluster_data) and (
                 cluster_data["alias"] == alias_to_be_searched
             ):
-                raise Exception("Alias already exists")
+                raise DataGateCLIException("Alias already exists")
 
     def _raise_if_alias_or_server_exists(
         self, alias_to_be_searched: str, server_to_be_searched: str
@@ -358,11 +359,11 @@ class ClusterCredentialsManager:
 
         for server, cluster_data in clusters.items():
             if server == server_to_be_searched:
-                raise Exception("Server already exists")
+                raise DataGateCLIException("Server already exists")
             elif ("alias" in cluster_data) and (
                 cluster_data["alias"] == alias_to_be_searched
             ):
-                raise Exception("Alias already exists")
+                raise DataGateCLIException("Alias already exists")
 
     def _save_clusters_file(self):
         """Stores registered OpenShift clusters in a configuration file"""

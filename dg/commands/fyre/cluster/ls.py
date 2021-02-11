@@ -23,6 +23,8 @@ import dg.config
 import dg.lib.click
 import dg.utils.network
 
+from dg.lib.error import DataGateCLIException
+
 IBM_FYRE_SHOW_OPENSHIFT_CLUSTERS_URL: Final[
     str
 ] = "https://api.fyre.ibm.com/rest/v1/?operation=query&request=showclusters"
@@ -47,7 +49,7 @@ def ls(fyre_user_name: str, fyre_api_key: str):
     )
 
     if not response.ok:
-        raise Exception(
+        raise DataGateCLIException(
             "Failed to get FYRE clusters (HTTP status code: {})".format(
                 response.status_code
             )

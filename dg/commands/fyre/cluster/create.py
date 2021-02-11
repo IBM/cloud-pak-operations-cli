@@ -23,6 +23,8 @@ import dg.config
 import dg.lib.click
 import dg.utils.network
 
+from dg.lib.error import DataGateCLIException
+
 IBM_FYRE_DEPLOY_OPENSHIFT_CLUSTER_URL: Final[
     str
 ] = "https://api.fyre.ibm.com/rest/v1/?operation=deployopenshiftcluster"
@@ -69,11 +71,11 @@ def create(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
         status = json_response["status"]
 
         if status != "submitted":
-            raise Exception(
+            raise DataGateCLIException(
                 "Failed to deploy FYRE cluster ({})".format(json_response["details"])
             )
     else:
-        raise Exception(
+        raise DataGateCLIException(
             "Failed to deploy FYRE cluster (HTTP status code: {})".format(
                 response.status_code
             )

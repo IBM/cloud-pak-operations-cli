@@ -16,7 +16,7 @@ import io
 import json
 import os
 import pathlib
-import re
+import re as regex
 import stat
 import urllib.parse
 
@@ -39,6 +39,7 @@ from dg.lib.cloud_pak_for_data.cpd_manager import (
     CloudPakForDataAssemblyBuildType,
     CloudPakForDataVersion,
 )
+from dg.lib.error import DataGateCLIException
 
 
 class CloudPakForDataManager(AbstractCloudPakForDataManager):
@@ -366,7 +367,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         result: Union[tuple[semver.VersionInfo, str], None] = None
 
         for release in response_json:
-            search_result = re.search(
+            search_result = regex.search(
                 f".*({str(self._cloud_pak_for_data_version)}(-\\d+)*).*",
                 release["name"],
             )
@@ -384,7 +385,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 break
 
         if result is None:
-            raise Exception(
+            raise DataGateCLIException(
                 f"IBM Cloud Pak for Data installer release for Cloud Pak for Data "
                 f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
@@ -414,7 +415,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         for asset in assets:
             if (
-                re.search(
+                regex.search(
                     "cloudpak4data-ee-\\d+\\.\\d+\\.\\d+(-\\d+)*\\.tgz", asset["name"]
                 )
                 is not None
@@ -424,7 +425,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 break
 
         if result is None:
-            raise Exception(
+            raise DataGateCLIException(
                 f"Download URL of IBM Cloud Pak for Data installer for Cloud Pak for Data "
                 f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
@@ -448,13 +449,13 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             parsed IBM Cloud Pak for Data version
         """
 
-        search_result = re.search(
+        search_result = regex.search(
             '<a href="buildNumber-\\d*">buildNumber-(\\d*)</a>',
             file_contents,
         )
 
         if search_result is None:
-            raise Exception("Cloud Pak for Data version could not be parsed")
+            raise DataGateCLIException("Cloud Pak for Data version could not be parsed")
 
         version = semver.VersionInfo.parse(
             f"{self._cloud_pak_for_data_version}+{search_result.group(1)}"

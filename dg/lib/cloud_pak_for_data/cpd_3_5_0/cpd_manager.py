@@ -15,7 +15,7 @@
 import io
 import json
 import pathlib
-import re
+import re as regex
 import urllib.parse
 
 from typing import Any, Union
@@ -37,6 +37,7 @@ from dg.lib.cloud_pak_for_data.cpd_manager import (
     CloudPakForDataAssemblyBuildType,
     CloudPakForDataVersion,
 )
+from dg.lib.error import DataGateCLIException
 from dg.utils.operating_system import OperatingSystem
 
 cloud_pak_for_data_configuration_data_dict = {
@@ -392,8 +393,9 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         result: Union[tuple[semver.VersionInfo, str], None] = None
 
         for release in response_json:
-            search_result = re.search(
-                f".*({self._cloud_pak_for_data_version.major}\\.{self._cloud_pak_for_data_version.minor}\\.\\d+(-\\d+)*).*",
+            search_result = regex.search(
+                f".*({self._cloud_pak_for_data_version.major}\\.{self._cloud_pak_for_data_version.minor}"
+                f"\\.\\d+(-\\d+)*).*",
                 release["name"],
             )
 
@@ -412,7 +414,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 break
 
         if result is None:
-            raise Exception(
+            raise DataGateCLIException(
                 f"IBM Cloud Pak for Data installer release for Cloud Pak for Data "
                 f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
@@ -449,7 +451,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         for asset in assets:
             if (
-                re.search(
+                regex.search(
                     f"cpd-cli-{file_name_infix}-EE-\\d+.\\d+.\\d+(-\\d+)*\\.{extension}",
                     asset["name"],
                 )
@@ -460,7 +462,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 break
 
         if result is None:
-            raise Exception(
+            raise DataGateCLIException(
                 f"Download URL of IBM Cloud Pak for Data installer for Cloud Pak for Data "
                 f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
@@ -484,13 +486,13 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             parsed IBM Cloud Pak for Data version
         """
 
-        search_result = re.search(
+        search_result = regex.search(
             "cpd-cli[\\S\\s]*?Build Number: (\\d*)[\\S\\s]*?CPD Release Version: ([\\d\\.]*)",
             file_contents,
         )
 
         if search_result is None:
-            raise Exception("Cloud Pak for Data version could not be parsed")
+            raise DataGateCLIException("Cloud Pak for Data version could not be parsed")
 
         version = semver.VersionInfo.parse(
             f"{search_result.group(2)}+{search_result.group(1)}"

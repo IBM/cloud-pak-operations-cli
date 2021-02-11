@@ -7,6 +7,7 @@ import semver
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
 )
+from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud import execute_ibmcloud_command
 
 
@@ -34,7 +35,7 @@ def get_latest_supported_openshift_version() -> str:
                     current_openshift_version = openshift_version
 
     if current_openshift_version is None:
-        raise Exception(
+        raise DataGateCLIException(
             f"None of the OpenShift versions available in IBM Cloud is supported by IBM Cloud Pak for Data "
             f"{str(ibm_cloud_supported_cloud_pak_for_data_version)}:\n{version_command_result_json}"
         )

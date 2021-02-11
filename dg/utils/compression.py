@@ -14,7 +14,7 @@
 
 import os
 import pathlib
-import re
+import re as regex
 import tarfile
 import zipfile
 
@@ -81,7 +81,7 @@ def extract_archive(
                             "directoryPathToStartExtraction"
                         ]
 
-                        search_result = re.search(
+                        search_result = regex.search(
                             f"({directory_path_to_start_extraction}/).*", member.name
                         )
 

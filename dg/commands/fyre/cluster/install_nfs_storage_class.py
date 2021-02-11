@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 import asyncio
-import re
+import re as regex
 import urllib.parse
 
 from typing import Final, Union
@@ -26,18 +26,20 @@ import dg.lib.openshift
 import dg.utils.download
 import dg.utils.ssh
 
+from dg.lib.error import DataGateCLIException
+
 SET_UP_OC4_URL: Final[
     str
 ] = "https://github.ibm.com/api/v3/repos/PrivateCloud/cpd-fyre-cluster/contents/set_up_oc4.sh"
 
 
 def get_private_ip_address_of_infrastructure_node(hostname_result: str):
-    search_result = re.search("(10\\.\\d+\\.\\d+\\.\\d+)", hostname_result)
+    search_result = regex.search("(10\\.\\d+\\.\\d+\\.\\d+)", hostname_result)
 
     if search_result is not None:
         return search_result[1]
     else:
-        raise Exception("Private IP address not found")
+        raise DataGateCLIException("Private IP address not found")
 
 
 @click.command(

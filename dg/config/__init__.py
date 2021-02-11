@@ -18,6 +18,8 @@ import sys
 
 from typing import Any, Union
 
+from dg.lib.error import DataGateCLIException
+
 
 class DataGateConfigurationManager:
     """Manages the Data Gate CLI configuration"""
@@ -247,7 +249,7 @@ class DataGateConfigurationManager:
                 ):
                     result = False
                 else:
-                    raise Exception(
+                    raise DataGateCLIException(
                         f"Expected value of configuration parameter '{key}' must be a boolean of the form "
                         f"[{', '.join(DataGateConfigurationManager._supported_true_boolean_values)}] or "
                         f"[{', '.join(DataGateConfigurationManager._supported_false_boolean_values)}] but found "
@@ -271,7 +273,7 @@ class DataGateConfigurationManager:
             DataGateConfigurationManager._supported_true_boolean_values
             + DataGateConfigurationManager._supported_false_boolean_values
         ):
-            raise Exception(
+            raise DataGateCLIException(
                 f"Passed value '{value}' for '{key}' must be a boolean of the form "
                 f"[{', '.join(DataGateConfigurationManager._supported_true_boolean_values)}] or "
                 f"[{', '.join(DataGateConfigurationManager._supported_false_boolean_values)}]."

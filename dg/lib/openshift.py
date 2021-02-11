@@ -24,6 +24,8 @@ import dg.config
 import dg.utils.network
 import dg.utils.process
 
+from dg.lib.error import DataGateCLIException
+
 OPENSHIFT_REST_API_VERSION: Final[str] = "v1"
 
 
@@ -115,14 +117,14 @@ def get_cluster_access_token(
     )
 
     if "Location" not in response.headers:
-        raise Exception("HTTP Location header not found")
+        raise DataGateCLIException("HTTP Location header not found")
 
     fragment = urllib.parse.parse_qs(
         urllib.parse.urlparse(response.headers["Location"]).fragment
     )
 
     if "access_token" not in fragment:
-        raise Exception("access_token key not found in URL fragment")
+        raise DataGateCLIException("access_token key not found in URL fragment")
 
     access_token = fragment["access_token"][0]
 
@@ -239,7 +241,7 @@ def get_persistent_volume_name(
     )
 
     if len(oc_get_pvc_command_result["items"]) == 0:
-        raise Exception(
+        raise DataGateCLIException(
             f"Namespace '{namespace}' does not contain a persistent volume claim with name "
             f"'{persistent_volume_claim_name}''"
         )
@@ -264,7 +266,7 @@ def get_persistent_volume_id(namespace: str, persistent_volume_name: str):
     )
 
     if oc_get_pv_command_result == "":
-        raise Exception(
+        raise DataGateCLIException(
             f"Persistent volume with name '{persistent_volume_name}' could not be found"
         )
 

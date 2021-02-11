@@ -15,7 +15,7 @@
 import io
 import os
 import pathlib
-import re
+import re as regex
 import tempfile
 import urllib.parse
 
@@ -68,7 +68,7 @@ def download_file(url: urllib.parse.SplitResult, **kwargs: Any) -> pathlib.Path:
 
     if "Content-Disposition" in response.headers:
         content_disposition = response.headers["Content-Disposition"]
-        search_result = re.search('filename="?([^;"]+)"?', content_disposition)
+        search_result = regex.search('filename="?([^;"]+)"?', content_disposition)
         file_name = (
             search_result.group(1)
             if search_result is not None
@@ -129,7 +129,7 @@ def download_file_into_buffer(
 
     if "Content-Disposition" in response.headers:
         content_disposition = response.headers["Content-Disposition"]
-        search_result = re.search('filename="?([^;"]+)"?', content_disposition)
+        search_result = regex.search('filename="?([^;"]+)"?', content_disposition)
         file_name = (
             search_result.group(1)
             if search_result is not None
