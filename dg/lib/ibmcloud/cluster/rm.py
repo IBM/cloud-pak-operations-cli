@@ -25,8 +25,6 @@ def delete_ibmcloud_cluster(name: str, force_deletion: bool):
     """Delete an existing OpenShift cluster on IBM Cloud"""
 
     command = ["oc", "cluster", "rm", "--cluster", name]
-    click.echo("Executing cluster remove command 'ibmcloud " + " ".join(command) + "'")
-
     return_code = 0
 
     if force_deletion:

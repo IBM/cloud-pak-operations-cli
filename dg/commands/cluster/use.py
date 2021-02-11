@@ -16,8 +16,11 @@ import click
 
 import dg.config.cluster_credentials_manager
 
+from dg.utils.logging import loglevel_option
+
 
 @click.command()
+@loglevel_option()
 @click.argument("alias_or_server")
 def use(alias_or_server: str):
     """Set the current registered OpenShift cluster"""

@@ -15,9 +15,11 @@
 import click
 
 from dg.lib.ibmcloud.login import login as login_to_ibm_cloud
+from dg.utils.logging import loglevel_option
 
 
 @click.command()
+@loglevel_option()
 def login():
     """Log in to IBM Cloud"""
 

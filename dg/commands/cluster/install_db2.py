@@ -32,6 +32,7 @@ from dg.lib.cloud_pak_for_data.cpd_manager import (
 from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
     CloudPakForDataManagerFactory,
 )
+from dg.utils.logging import loglevel_option
 
 
 @click.command(
@@ -77,6 +78,7 @@ from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
 @optgroup.group("Development build options")
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
+@loglevel_option()
 @click.pass_context
 def install_db2(
     ctx: click.Context,

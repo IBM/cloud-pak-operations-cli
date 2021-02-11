@@ -19,8 +19,11 @@ from importlib import metadata
 
 import click
 
+from dg.utils.logging import loglevel_option
+
 
 @click.command()
+@loglevel_option()
 def update():
     """Update the Data Gate CLI to the latest version"""
 

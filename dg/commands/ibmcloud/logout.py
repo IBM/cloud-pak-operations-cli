@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import logging
+
 from subprocess import CalledProcessError
 
 import click
@@ -25,6 +27,9 @@ from dg.lib.ibmcloud import (
 )
 from dg.lib.ibmcloud.iam import delete_api_key_in_ibmcloud
 from dg.lib.ibmcloud.login import is_logged_in
+from dg.utils.logging import loglevel_option
+
+logger = logging.getLogger(__name__)
 
 
 @click.command()
@@ -34,11 +39,13 @@ from dg.lib.ibmcloud.login import is_logged_in
     help="Delete the API key which was created for the Data Gate CLI (in IBM Cloud and on disk)",
     is_flag=True,
 )
+@loglevel_option()
 def logout(delete_api_key: bool):
     """Log out from IBM Cloud"""
 
     if delete_api_key:
-        click.echo("Deleting the Data Gate API key in IBM Cloud")
+        logger.info("Deleting the Data Gate API key in IBM Cloud")
+
         try:
             delete_api_key_in_ibmcloud()
         except CalledProcessError as error:
@@ -51,15 +58,14 @@ def logout(delete_api_key: bool):
                     f"delete them using '{str(data_gate_configuration_manager.get_ibmcloud_cli_path())} iam "
                     f"api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
                 )
-        click.echo("Deleting the Data Gate API key on disk")
+
+        logger.info("Deleting the Data Gate API key on disk")
         data_gate_configuration_manager.store_credentials(
             {INTERNAL_IBM_CLOUD_API_KEY_NAME: ""}
         )
 
     if is_logged_in():
         _perform_logout()
-    else:
-        click.echo("Not logged in, no need to logout")
 
 
 def _perform_logout():

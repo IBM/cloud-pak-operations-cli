@@ -21,6 +21,8 @@ import dg.config.cluster_credentials_manager
 import dg.lib.click
 import dg.utils.ssh
 
+from dg.utils.logging import loglevel_option
+
 
 @click.command(
     context_settings=dg.lib.click.create_default_map_from_dict(
@@ -31,6 +33,7 @@ import dg.utils.ssh
     "--infrastructure-node-hostname", required=True, help="Infrastructure node hostname"
 )
 @click.option("--node", required=True, help="Worker node to be initialized")
+@loglevel_option()
 def init_node_for_data_gate(
     infrastructure_node_hostname: str,
     node: str,

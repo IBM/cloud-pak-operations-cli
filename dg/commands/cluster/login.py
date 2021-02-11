@@ -20,6 +20,7 @@ import dg.lib.fyre.cluster.fyre_cluster_factory  # required to register FYREClus
 import dg.lib.ibmcloud.cluster.ibmcloud_cluster_factory  # required to register IBMCloudClusterFactory object
 
 from dg.lib.error import DataGateCLIException
+from dg.utils.logging import loglevel_option
 
 
 @click.command(
@@ -27,6 +28,7 @@ from dg.lib.error import DataGateCLIException
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
+@loglevel_option()
 def login():
     """Log in to the current OpenShift cluster"""
 

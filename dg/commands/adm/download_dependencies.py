@@ -16,8 +16,11 @@ import click
 
 import dg.lib.download_manager
 
+from dg.utils.logging import loglevel_option
+
 
 @click.command()
+@loglevel_option()
 def download_dependencies():
     """Download dependencies"""
 

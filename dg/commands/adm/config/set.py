@@ -16,6 +16,8 @@ import click
 
 import dg.config
 
+from dg.utils.logging import loglevel_option
+
 
 @click.command()
 @click.option(
@@ -28,6 +30,7 @@ import dg.config
     required=True,
     help="Value to which key should be set",
 )
+@loglevel_option()
 def set(key: str, value: str):
     """Set configuration value"""
 

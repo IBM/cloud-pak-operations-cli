@@ -23,6 +23,8 @@ import dg.lib.click
 import dg.lib.fyre.openshift
 import dg.utils.network
 
+from dg.utils.logging import loglevel_option
+
 
 @click.command(
     context_settings=dg.lib.click.create_default_map_from_dict(
@@ -46,6 +48,7 @@ import dg.utils.network
     help="Db2 edition",
 )
 @click.option("--use-host-path-storage", is_flag=True, help="Use hostpath storage")
+@loglevel_option()
 @click.pass_context
 def init_node_for_db2(
     ctx: click.Context,

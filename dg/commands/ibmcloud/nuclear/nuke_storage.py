@@ -12,23 +12,30 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import logging
+
 from subprocess import CalledProcessError
 
 import click
 
 from dg.lib.ibmcloud import execute_ibmcloud_command
+from dg.utils.logging import loglevel_option
+
+logger = logging.getLogger(__name__)
 
 
 @click.command()
 @click.option(
     "--zone", required=True, help="Zone to delete deployments in (e.g. sjc03)"
 )
+@loglevel_option()
 def nuke_storage(zone: str):
     """Immediately cancel ALL classic file storage volumes on IBM Cloud in a given zone"""
 
     if click.confirm(
         click.style(
             f"Do you really wish to immediately cancel all classic file storage volumes in zone '{zone}'?",
+            bold=True,
             fg="red",
         )
     ):
@@ -40,7 +47,7 @@ def nuke_storage(zone: str):
         click.echo()
         click.secho(
             f"The following volumes are marked for cancellation in zone '{zone}':",
-            fg="white",
+            bold=True,
         )
         for line in volume_list_full.stdout.split("\n"):
             if zone in line:
@@ -49,13 +56,13 @@ def nuke_storage(zone: str):
                 volume_id = line.split(" ")[0]
                 volume_ids_to_be_deleted.append(volume_id)
 
-        click.echo("")
+        click.echo()
         if click.confirm(
             click.style(
                 f"☠ You will immediately cancel {volumes_to_be_deleted} possible in-use volumes. Are you sure? ☠",
-                fg="red",
                 blink=True,
                 bold=True,
+                fg="red",
             )
         ):
             volumes_deleted = 0
@@ -72,25 +79,25 @@ def nuke_storage(zone: str):
                     ]
                     execute_ibmcloud_command(delete_command)
 
-                    click.echo(
+                    logging.info(
                         f"File volume {volume_id} has been marked for immediate cancellation"
                     )
                     volumes_deleted += 1
                 except CalledProcessError as exception:
                     if "No billing item is found to cancel" in exception.stderr:
-                        click.echo(
+                        logging.warning(
                             f"No billing item found for volume ID {volume_id}. This volume has most likely already "
                             f"been canceled."
                         )
                     else:
-                        click.echo(
-                            f"An error occurred during cancellation of volume id {volume_id}:"
+                        logging.warning(
+                            f"An error occurred while canceling volume ID {volume_id} – error details:\n"
+                            f"{exception.stderr}"
                         )
-                        click.echo(exception.stderr)
 
-            click.secho(
+            logging.info(
                 f"In total, {volumes_deleted} volumes have been marked for cancellation.",
-                fg="white",
+                bold=True,
             )
     else:
         click.echo("Aborting.")

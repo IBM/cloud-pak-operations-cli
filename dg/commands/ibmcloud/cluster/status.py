@@ -16,6 +16,8 @@ import click
 
 import dg.lib.ibmcloud.status
 
+from dg.utils.logging import loglevel_option
+
 
 @click.command()
 @click.option("--cluster-name", required=True, help="cluster name")
@@ -25,6 +27,7 @@ import dg.lib.ibmcloud.status
     help="Prints the command output in JSON format.",
     is_flag=True,
 )
+@loglevel_option("WARNING")
 def status(cluster_name: str, json: bool):
     """Display the status of a given cluster"""
 

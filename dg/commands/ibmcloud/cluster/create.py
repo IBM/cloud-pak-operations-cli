@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import logging
+
 import click
 
 from dg.lib.error import IBMCloudException
@@ -30,6 +32,9 @@ from dg.lib.ibmcloud.vlan import (
     get_default_private_vlan,
     get_default_public_vlan,
 )
+from dg.utils.logging import loglevel_option
+
+logger = logging.getLogger(__name__)
 
 
 @click.command()
@@ -57,6 +62,7 @@ from dg.lib.ibmcloud.vlan import (
     help="Remove any prompts during cluster creation.",
     is_flag=True,
 )
+@loglevel_option()
 def create(
     cluster_name: str, full_installation: bool, remove_existing: bool, force: bool
 ):
@@ -66,21 +72,26 @@ def create(
         login_to_ibm_cloud()
 
     if remove_existing:
-        click.secho(
-            f"Deleting existing cluster '{cluster_name}'.", fg="bright_white", bold=True
+        logger.info(
+            click.style(
+                f"Deleting existing cluster '{cluster_name}'.",
+                bold=True,
+            )
         )
+
         if cluster_exists(cluster_name):
             delete_ibmcloud_cluster(cluster_name, force)
             wait_for_cluster_deletion(cluster_name)
         else:
-            click.echo(
+            logging.info(
                 f"Skipping deletion, as cluster '{cluster_name}' could not be found."
             )
 
-    click.secho(
-        f"Creating OpenShift cluster with name '{cluster_name}' in IBM Cloud.",
-        fg="bright_white",
-        bold=True,
+    logging.info(
+        click.style(
+            f"Creating OpenShift cluster with name '{cluster_name}' in IBM Cloud.",
+            bold=True,
+        )
     )
 
     openshift_version = get_latest_supported_openshift_version()
@@ -113,9 +124,7 @@ def create(
         "--zone",
         zone,
     ]
-    click.echo(
-        "Executing cluster creation command 'ibmcloud " + " ".join(command) + "'"
-    )
+
     result = execute_ibmcloud_command_without_check(command, capture_output=True)
 
     if result.return_code != 0:
@@ -126,7 +135,7 @@ def create(
             if cluster_exists(cluster_name):
                 # There was an error, but the cluster was created nonetheless, print a warning
 
-                click.echo(
+                logging.warning(
                     f"Warning: An error occurred while creating the cluster, but 'ibmcloud oc cluster ls' shows a "
                     f"cluster with the name '{cluster_name}' – error details:\n"
                     f"{IBMCloudException.get_parsed_error_message(result.stderr)}"
@@ -137,13 +146,14 @@ def create(
         click.echo(result.stdout)
 
     if full_installation:
-
-        click.echo(f"Waiting for creation of cluster '{cluster_name}' to complete.")
+        logging.info(f"Waiting for creation of cluster '{cluster_name}' to complete.")
         wait_for_cluster_readiness(cluster_name)
 
-        click.secho(
-            f"Installing Cloud Pak for Data on cluster '{cluster_name}'.",
-            fg="bright_white",
-            bold=True,
+        logging.info(
+            click.style(
+                f"Installing Cloud Pak for Data on cluster '{cluster_name}'.",
+                bold=True,
+            )
         )
+
         install_cp4d_with_preinstall(cluster_name)

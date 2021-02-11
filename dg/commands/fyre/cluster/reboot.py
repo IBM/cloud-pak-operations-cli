@@ -24,6 +24,7 @@ import dg.lib.click
 import dg.utils.network
 
 from dg.lib.error import DataGateCLIException
+from dg.utils.logging import loglevel_option
 
 IBM_FYRE_REBOOT_CLUSTER_URL: Final[
     str
@@ -42,6 +43,7 @@ IBM_FYRE_REBOOT_CLUSTER_URL: Final[
 )
 @click.option("--fyre-user-name", required=True, help="Fyre API user name")
 @click.option("--fyre-api-key", required=True, help="Fyre API key")
+@loglevel_option()
 def reboot(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
     """Reboot a cluster on FYRE"""
 

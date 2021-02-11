@@ -20,6 +20,7 @@ import dg.config.cluster_credentials_manager
 import dg.lib.click
 
 from dg.lib.fyre.cluster.fyre_cluster_factory import fyre_cluster_factory
+from dg.utils.logging import loglevel_option
 
 
 @click.command(
@@ -30,6 +31,7 @@ from dg.lib.fyre.cluster.fyre_cluster_factory import fyre_cluster_factory
 @click.option("--cluster-name", required=True, help="cluster name")
 @click.option("--username", help="OpenShift username")
 @click.option("--password", help="OpenShift password")
+@loglevel_option()
 @click.pass_context
 def login(
     ctx: click.Context,

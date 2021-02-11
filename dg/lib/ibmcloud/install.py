@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import logging
+
 import json
 
 from time import sleep
@@ -34,6 +36,8 @@ from dg.lib.ibmcloud.iam import get_oauth_token, get_tokens
 from dg.lib.ibmcloud.login import is_logged_in
 from dg.lib.ibmcloud.target import get_ibmcloud_account_target_information
 from dg.utils.wait import wait_for
+
+logger = logging.getLogger(__name__)
 
 
 def _get_cp4d_version_locator(cp4d_version: str) -> str:
@@ -169,7 +173,7 @@ def execute_install(cluster_id: str, api_key: str) -> Any:
     response = requests.post(url, headers=headers, json=data)
 
     if response.ok:
-        click.echo("Installation request submitted successfully.")
+        logging.info("Installation request submitted successfully.")
     else:
         raise DataGateCLIException(
             f"Failed to start Cloud Pak for Data installation on cluster {cluster_id}:\n"
@@ -364,21 +368,21 @@ def install_cp4d_with_preinstall(cluster_name: str):
             f"login' to log in."
         )
 
-    click.echo(
+    logging.info(
         f"Executing Cloud Pak for Data pre-installation on cluster {cluster_name}"
     )
 
     execute_preinstall(cluster_name)
 
     # TODO Use proper endpoint to obtain preinstall status (Current function in ibmcloud CLI is not working)
-    click.echo(f"Waiting for preinstallation on cluster {cluster_name} to finish:")
+    logging.info(f"Waiting for preinstallation on cluster {cluster_name} to finish:")
     wait_until_preinstallation_is_finished(1, 300)
 
-    click.echo(f"Executing Cloud Pak for Data installation on cluster {cluster_name}")
+    logging.info(f"Executing Cloud Pak for Data installation on cluster {cluster_name}")
     install_details = execute_install(cluster_name, api_key)
 
-    click.echo(f"Waiting for installation on cluster {cluster_name} to finish:")
+    logging.info(f"Waiting for installation on cluster {cluster_name} to finish:")
     wait_until_installation_is_finished(install_details)
 
     url = get_cp4d_url(install_details)
-    click.echo(f"Cloud Pak for Data URL: {url}")
+    logging.info(f"Cloud Pak for Data URL: {url}")

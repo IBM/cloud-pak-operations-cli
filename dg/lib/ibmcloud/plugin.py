@@ -1,7 +1,9 @@
-import click
+import logging
 
 from dg.lib.error import IBMCloudException
 from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
+
+logger = logging.getLogger(__name__)
 
 
 def install_catalogs_management_plugin():
@@ -21,7 +23,7 @@ def is_container_service_plugin_installed() -> bool:
 
 
 def _install_plugin(plugin_name: str):
-    click.echo(f"Installing IBM Cloud plug-in '{plugin_name}'")
+    logging.info(f"Installing IBM Cloud plug-in '{plugin_name}'")
 
     args = ["plugin", "install", plugin_name]
     result = execute_ibmcloud_command_without_check(args, capture_output=True)

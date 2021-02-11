@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 import io
+import logging
 import os
 import pathlib
 import re as regex
@@ -21,10 +22,11 @@ import urllib.parse
 
 from typing import Any
 
-import click
 import requests
 
 from tqdm import tqdm
+
+logger = logging.getLogger(__name__)
 
 
 def download_file(url: urllib.parse.SplitResult, **kwargs: Any) -> pathlib.Path:
@@ -77,7 +79,7 @@ def download_file(url: urllib.parse.SplitResult, **kwargs: Any) -> pathlib.Path:
     else:
         file_name = os.path.basename(urllib.parse.urlsplit(response.url).path)
 
-    click.echo("Downloading: {} [{}]".format(response.url, file_name))
+    logger.info("Downloading: {} [{}]".format(response.url, file_name))
 
     content_length = (
         int(str(response.headers.get("Content-Length")))
@@ -139,7 +141,7 @@ def download_file_into_buffer(
         file_name = os.path.basename(urllib.parse.urlsplit(response.url).path)
 
     if ("silent" not in kwargs) or not kwargs["silent"]:
-        click.echo("Downloading: {} [{}]".format(response.url, file_name))
+        logger.info("Downloading: {} [{}]".format(response.url, file_name))
 
     content_length = (
         int(str(response.headers.get("Content-Length")))

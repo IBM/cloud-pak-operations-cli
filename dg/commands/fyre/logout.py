@@ -17,8 +17,11 @@ import click
 import dg.config
 import dg.lib.click
 
+from dg.utils.logging import loglevel_option
+
 
 @click.command()
+@loglevel_option()
 def logout():
     """Log out from FYRE"""
 

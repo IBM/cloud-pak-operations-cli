@@ -15,10 +15,12 @@
 import click
 
 from dg.lib.ibmcloud.install import install_cp4d_with_preinstall
+from dg.utils.logging import loglevel_option
 
 
 @click.command()
 @click.option("-c", "--cluster-name", required=True, help="cluster name")
+@loglevel_option()
 def install(cluster_name: str):
     """Install Cloud Pak for Data, including Db2 Warehouse and Db2 Data Gate, on the given IBM Cloud cluster"""
 

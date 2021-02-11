@@ -23,6 +23,8 @@ import dg.lib.click
 import dg.lib.fyre.nfs
 import dg.utils.network
 
+from dg.utils.logging import loglevel_option
+
 
 @click.command(
     context_settings=dg.lib.click.create_default_map_from_dict(
@@ -41,6 +43,7 @@ import dg.utils.network
 @click.option("--username", help="OpenShift username")
 @click.option("--password", help="OpenShift password")
 @click.option("--token", help="OpenShift OAuth access token")
+@loglevel_option()
 @click.pass_context
 def install_nfs_storage_class(
     ctx: click.Context,

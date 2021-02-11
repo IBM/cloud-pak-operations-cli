@@ -12,7 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import logging
 import sys
 
 import click
@@ -20,13 +19,9 @@ import pkg_resources
 
 import dg.commands
 import dg.utils.debugger
+import dg.utils.logging
 
-logging.basicConfig(
-    datefmt="%Y-%m-%dT%H:%M:%S%z",
-    format="%(asctime)s [%(levelname)s]: %(message)s",
-    level=logging.WARNING,
-)
-
+dg.utils.logging.init_root_logger()
 
 if dg.utils.debugger.is_debugpy_running() and (len(sys.argv) == 2):
     if sys.argv[1] == "":

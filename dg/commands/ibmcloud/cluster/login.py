@@ -20,10 +20,12 @@ from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud.cluster.ibmcloud_cluster_factory import (
     ibm_cloud_cluster_factory,
 )
+from dg.utils.logging import loglevel_option
 
 
 @click.command()
 @click.option("--cluster-name", required=True, help="cluster name")
+@loglevel_option()
 def login(cluster_name: str):
     """Log in to an OpenShift cluster"""
 
