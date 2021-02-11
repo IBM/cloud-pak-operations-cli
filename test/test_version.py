@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import re
+import re as regex
 import unittest
 
 import click.testing
@@ -29,7 +29,7 @@ class TestVersionCommand(unittest.TestCase):
 
         self.assertEqual(result.exit_code, 0)
 
-        search_result = re.search("Data Gate CLI \\d+\\.\\d+\\.\\d+", result.output)
+        search_result = regex.search("Data Gate CLI \\d+\\.\\d+\\.\\d+", result.output)
 
         self.assertNotEqual(search_result, None)
 

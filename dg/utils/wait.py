@@ -34,4 +34,4 @@ def wait_for(timeout, interval, action_name, predicate, *args, **kwargs):
         sleep(interval)
         time_passed += interval
     else:
-        raise DataGateCLIException(f"{action_name} timed out")
+        raise DataGateCLIException(f"{action_name} timed out.")

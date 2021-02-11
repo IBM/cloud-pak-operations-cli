@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 import asyncio
-import re
+import re as regex
 import urllib.parse
 
 from typing import Final, Union
@@ -34,7 +34,7 @@ SET_UP_OC4_URL: Final[
 
 
 def get_private_ip_address_of_infrastructure_node(hostname_result: str):
-    search_result = re.search("(10\\.\\d+\\.\\d+\\.\\d+)", hostname_result)
+    search_result = regex.search("(10\\.\\d+\\.\\d+\\.\\d+)", hostname_result)
 
     if search_result is not None:
         return search_result[1]

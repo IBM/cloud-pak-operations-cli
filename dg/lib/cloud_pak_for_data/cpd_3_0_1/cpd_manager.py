@@ -16,7 +16,7 @@ import io
 import json
 import os
 import pathlib
-import re
+import re as regex
 import stat
 import urllib.parse
 
@@ -367,7 +367,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         result: Union[tuple[semver.VersionInfo, str], None] = None
 
         for release in response_json:
-            search_result = re.search(
+            search_result = regex.search(
                 f".*({str(self._cloud_pak_for_data_version)}(-\\d+)*).*",
                 release["name"],
             )
@@ -415,7 +415,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         for asset in assets:
             if (
-                re.search(
+                regex.search(
                     "cloudpak4data-ee-\\d+\\.\\d+\\.\\d+(-\\d+)*\\.tgz", asset["name"]
                 )
                 is not None
@@ -449,7 +449,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             parsed IBM Cloud Pak for Data version
         """
 
-        search_result = re.search(
+        search_result = regex.search(
             '<a href="buildNumber-\\d*">buildNumber-(\\d*)</a>',
             file_contents,
         )

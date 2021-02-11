@@ -97,7 +97,7 @@ def execute_command(
             error_output = f" ({stderr_buffer})"
 
         raise DataGateCLIException(
-            f"Command '{command_string}' failed with return code {return_code}{error_output}"
+            f"Command '{command_string}' failed with return code {return_code}{error_output}."
         )
 
     return ProcessResult(

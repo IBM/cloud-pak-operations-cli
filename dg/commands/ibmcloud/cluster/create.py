@@ -120,6 +120,7 @@ def create(
 
     if result.return_code != 0:
         if "E0007" in result.stderr:
+            # a cluster with the same name already exists
             raise IBMCloudException(result.stderr)
         else:
             if cluster_exists(cluster_name):

@@ -15,7 +15,7 @@
 import io
 import os
 import pathlib
-import re
+import re as regex
 import urllib.parse
 
 import semver
@@ -121,7 +121,7 @@ class OpenShiftClientCLIPlugIn(AbstractDownloadManagerPlugIn):
             parsed OpenShift Client CLI version
         """
 
-        search_result = re.search(
+        search_result = regex.search(
             "Version:  (\\d+\\.\\d+\\.\\d+)",
             file_contents,
         )

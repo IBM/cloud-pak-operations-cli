@@ -15,7 +15,7 @@
 import io
 import json
 import pathlib
-import re
+import re as regex
 import urllib.parse
 
 from typing import Any, Union
@@ -393,8 +393,9 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         result: Union[tuple[semver.VersionInfo, str], None] = None
 
         for release in response_json:
-            search_result = re.search(
-                f".*({self._cloud_pak_for_data_version.major}\\.{self._cloud_pak_for_data_version.minor}\\.\\d+(-\\d+)*).*",
+            search_result = regex.search(
+                f".*({self._cloud_pak_for_data_version.major}\\.{self._cloud_pak_for_data_version.minor}"
+                f"\\.\\d+(-\\d+)*).*",
                 release["name"],
             )
 
@@ -450,7 +451,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         for asset in assets:
             if (
-                re.search(
+                regex.search(
                     f"cpd-cli-{file_name_infix}-EE-\\d+.\\d+.\\d+(-\\d+)*\\.{extension}",
                     asset["name"],
                 )
@@ -485,7 +486,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             parsed IBM Cloud Pak for Data version
         """
 
-        search_result = re.search(
+        search_result = regex.search(
             "cpd-cli[\\S\\s]*?Build Number: (\\d*)[\\S\\s]*?CPD Release Version: ([\\d\\.]*)",
             file_contents,
         )
