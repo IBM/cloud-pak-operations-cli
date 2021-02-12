@@ -20,8 +20,8 @@ import click
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click
-import dg.lib.openshift
-import dg.utils.ssh
+import dg.lib.fyre.openshift
+import dg.utils.network
 
 
 @click.command(
@@ -60,80 +60,22 @@ def init_node_for_db2(
 ):
     """Initialize a worker node before creating a Db2 instance"""
 
-    asyncio.get_event_loop().run_until_complete(
-        _init_node_for_db2(
-            ctx,
-            infrastructure_node_hostname,
-            server,
-            username,
-            password,
-            token,
-            node,
-            db2_edition,
-            use_host_path_storage,
+    if dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
+        dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
+        dg.lib.fyre.openshift.init_node_for_db2(
+            node, db2_edition, use_host_path_storage
         )
-    )
+    else:
+        oc_login_command_for_remote_host = (
+            dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
+        )
 
-
-async def _init_node_for_db2(
-    ctx: click.Context,
-    infrastructure_node_hostname: str,
-    server: str,
-    username: Union[str, None],
-    password: Union[str, None],
-    token: Union[str, None],
-    node: str,
-    db2_edition: str,
-    use_host_path_storage: bool,
-):
-    command = dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
-
-    async with dg.utils.ssh.RemoteClient(infrastructure_node_hostname) as remoteClient:
-        await remoteClient.connect()
-        await remoteClient.execute(command)
-        await remoteClient.execute(
-            "oc adm taint node {} icp4data=database-{}:NoSchedule".format(
-                node, db2_edition
+        asyncio.get_event_loop().run_until_complete(
+            dg.lib.fyre.openshift.init_node_for_db2_from_remote_host(
+                infrastructure_node_hostname,
+                node,
+                db2_edition,
+                use_host_path_storage,
+                oc_login_command_for_remote_host,
             )
         )
-
-        await remoteClient.execute(
-            "oc label node {} icp4data=database-{}".format(node, db2_edition)
-        )
-
-        await remoteClient.execute(
-            "ssh core@{} sudo setsebool -P container_manage_cgroup true".format(node)
-        )
-
-        if use_host_path_storage:
-            await _label_storage_path(remoteClient, node)
-
-
-async def _label_storage_path(remoteClient: dg.utils.ssh.RemoteClient, node: str):
-    """Labels the storage path on the given node
-
-    See https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_current/cpd/svc/dbs/ ↩
-        hostpath-selinux-aese.html#hostpath-selinux-aese
-
-    Parameters
-    ----------
-    remoteClient
-        SSH client
-    node
-        node on which the storage path shall be labeled
-    """
-
-    await remoteClient.execute(
-        "ssh core@{} mkdir --parents /var/home/core/data".format(node)
-    )
-
-    await remoteClient.execute("ssh core@{} chmod 777 /var/home/core/data".format(node))
-    await remoteClient.execute(
-        "ssh core@{} 'sudo semanage fcontext --add --type container_file_t \"/var/home/core/data(/.*)?\"'".format(
-            node
-        )
-    )
-
-    await remoteClient.execute(
-        "ssh core@{} sudo restorecon -Rv /var/home/core/data".format(node)
-    )

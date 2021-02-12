@@ -13,33 +13,15 @@
 #  limitations under the License.
 
 import asyncio
-import re as regex
-import urllib.parse
 
-from typing import Final, Union
+from typing import Union
 
 import click
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click
-import dg.lib.openshift
-import dg.utils.download
-import dg.utils.ssh
-
-from dg.lib.error import DataGateCLIException
-
-SET_UP_OC4_URL: Final[
-    str
-] = "https://github.ibm.com/api/v3/repos/PrivateCloud/cpd-fyre-cluster/contents/set_up_oc4.sh"
-
-
-def get_private_ip_address_of_infrastructure_node(hostname_result: str):
-    search_result = regex.search("(10\\.\\d+\\.\\d+\\.\\d+)", hostname_result)
-
-    if search_result is not None:
-        return search_result[1]
-    else:
-        raise DataGateCLIException("Private IP address not found")
+import dg.lib.fyre.nfs
+import dg.utils.network
 
 
 @click.command(
@@ -71,70 +53,18 @@ def install_nfs_storage_class(
 ):
     """Install NFS storage class"""
 
-    asyncio.get_event_loop().run_until_complete(
-        _install_nfs_storage_class(
-            ctx,
-            infrastructure_node_hostname,
-            ibm_github_api_key,
-            server,
-            username,
-            password,
-            token,
-        )
-    )
-
-
-async def _install_nfs_storage_class(
-    ctx: click.Context,
-    infrastructure_node_hostname: str,
-    ibm_github_api_key: str,
-    server: str,
-    username: Union[str, None],
-    password: Union[str, None],
-    token: Union[str, None],
-):
-    """Installs NFS storage class
-
-    Parameters
-    ----------
-    infrastructure_node_hostname
-        infrastructure node hostname
-    ibm_github_api_key
-        IBM GitHub API key
-    server
-        OpenShift API server URL
-    username
-        OpenShift username
-    password
-        OpenShift password
-    token
-        OpenShift OAuth access token
-    """
-
-    command = dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
-    set_up_oc4_path = dg.utils.download.download_file(
-        urllib.parse.urlsplit(SET_UP_OC4_URL),
-        auth=("", ibm_github_api_key),
-        headers={"Accept": "application/vnd.github.v3.raw"},
-    )
-
-    async with dg.utils.ssh.RemoteClient(infrastructure_node_hostname) as remoteClient:
-        await remoteClient.connect()
-        await remoteClient.execute(command)
-
-        hostname_result = await remoteClient.execute(
-            "hostname --all-ip-addresses", print_output=False
+    if dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
+        dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
+        dg.lib.fyre.nfs.install_nfs_storage_class(ibm_github_api_key)
+    else:
+        oc_login_command_for_remote_host = (
+            dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
         )
 
-        private_ip_address_of_infrastructure_node = (
-            get_private_ip_address_of_infrastructure_node(hostname_result)
-        )
-
-        await remoteClient.upload(set_up_oc4_path)
-        await remoteClient.execute("chmod a+x " + set_up_oc4_path.name)
-        await remoteClient.execute(
-            "./"
-            + set_up_oc4_path.name
-            + " "
-            + private_ip_address_of_infrastructure_node
+        asyncio.get_event_loop().run_until_complete(
+            dg.lib.fyre.nfs.install_nfs_storage_class_on_remote_host(
+                infrastructure_node_hostname,
+                ibm_github_api_key,
+                oc_login_command_for_remote_host,
+            )
         )

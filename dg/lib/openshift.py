@@ -52,6 +52,7 @@ def execute_oc_command(
     args: list[str],
     capture_output=False,
     check=True,
+    oc_cli_path=dg.config.data_gate_configuration_manager.get_oc_cli_path(),
     print_captured_output=False,
 ) -> dg.utils.process.ProcessResult:
     """Executes the OpenShift Container Platform CLI
@@ -65,6 +66,8 @@ def execute_oc_command(
     check
         flag indicating whether an exception shall be thrown if the OpenShift
         Container Platform CLI returns with a nonzero return code
+    oc_cli_path
+        path to the OpenShift Container Platform CLI
     print_captured_output
         flag indicating whether captured output shall also be written to
         stdout/stderr
@@ -74,8 +77,6 @@ def execute_oc_command(
     ProcessResult
         object storing the return code and captured output (if requested)
     """
-
-    oc_cli_path = dg.config.data_gate_configuration_manager.get_oc_cli_path()
 
     return dg.utils.process.execute_command(
         oc_cli_path,

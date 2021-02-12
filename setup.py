@@ -15,6 +15,7 @@ setup(
         "click",
         "colorama",
         "click-option-group",
+        "netifaces",
         "pyyaml",
         "requests",
         "semver",

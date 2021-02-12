@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import logging
 import pathlib
 
 from typing import Union
@@ -21,6 +22,8 @@ import click
 import colorama
 
 from dg.lib.error import DataGateCLIException
+
+asyncssh.set_log_level(logging.WARNING)
 
 
 class RemoteClient:
@@ -71,6 +74,8 @@ class RemoteClient:
             flag indicating whether the output of the command (stdout and stderr)
             shall be printed to stdout and stderr
         """
+
+        logging.info(f"Executing command on {self._hostname}: {command}")
 
         if self._connection is None:
             raise DataGateCLIException("Not connected to " + self._hostname)
