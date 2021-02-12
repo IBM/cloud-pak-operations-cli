@@ -20,7 +20,7 @@ import click
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click
-import dg.lib.fyre.network
+import dg.lib.fyre.nfs
 import dg.utils.network
 
 
@@ -55,14 +55,14 @@ def install_nfs_storage_class(
 
     if dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
         dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
-        dg.lib.fyre.network.install_nfs_storage_class(ibm_github_api_key)
+        dg.lib.fyre.nfs.install_nfs_storage_class(ibm_github_api_key)
     else:
         oc_login_command_for_remote_host = (
             dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
         )
 
         asyncio.get_event_loop().run_until_complete(
-            dg.lib.fyre.network.install_nfs_storage_class_on_remote_host(
+            dg.lib.fyre.nfs.install_nfs_storage_class_on_remote_host(
                 infrastructure_node_hostname,
                 ibm_github_api_key,
                 oc_login_command_for_remote_host,

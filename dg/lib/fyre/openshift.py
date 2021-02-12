@@ -25,6 +25,8 @@ OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT: Final[str] = (
     "client_id=openshift-challenging-client&response_type=token"
 )
 
+STORAGE_PATH: Final[str] = "/var/home/core/data"
+
 
 def init_node_for_db2(node: str, db2_edition: str, use_host_path_storage: bool):
     """Initializes a worker node before creating a Db2 instance
@@ -106,14 +108,20 @@ def label_storage_path(node: str):
         node on which the storage path shall be labeled
     """
 
-    dg.utils.process.execute_command(pathlib.Path("ssh"), _get_ssh_mkdir_command(node))
-    dg.utils.process.execute_command(pathlib.Path("ssh"), _get_ssh_chmod_command(node))
     dg.utils.process.execute_command(
-        pathlib.Path("ssh"), _get_ssh_semanage_command(node)
+        pathlib.Path("ssh"), _get_ssh_mkdir_storage_path_command(node)
     )
 
     dg.utils.process.execute_command(
-        pathlib.Path("ssh"), _get_ssh_restorecon_command(node)
+        pathlib.Path("ssh"), _get_ssh_chmod_storage_path_command(node)
+    )
+
+    dg.utils.process.execute_command(
+        pathlib.Path("ssh"), _get_ssh_semanage_storage_path_command(node)
+    )
+
+    dg.utils.process.execute_command(
+        pathlib.Path("ssh"), _get_ssh_restorecon_storage_path_command(node)
     )
 
 
@@ -132,10 +140,21 @@ async def label_storage_path_from_remote_host(
         node on which the storage path shall be labeled
     """
 
-    await remoteClient.execute("ssh " + _join_args(_get_ssh_mkdir_command(node)))
-    await remoteClient.execute("ssh " + _join_args(_get_ssh_chmod_command(node)))
-    await remoteClient.execute("ssh " + _join_args(_get_ssh_semanage_command(node)))
-    await remoteClient.execute("ssh " + _join_args(_get_ssh_restorecon_command(node)))
+    await remoteClient.execute(
+        "ssh " + _join_args(_get_ssh_mkdir_storage_path_command(node))
+    )
+
+    await remoteClient.execute(
+        "ssh " + _join_args(_get_ssh_chmod_storage_path_command(node))
+    )
+
+    await remoteClient.execute(
+        "ssh " + _join_args(_get_ssh_semanage_storage_path_command(node))
+    )
+
+    await remoteClient.execute(
+        "ssh " + _join_args(_get_ssh_restorecon_storage_path_command(node))
+    )
 
 
 def _get_oc_adm_taint_node_command(node: str, db2_edition: str) -> list[str]:
@@ -152,22 +171,22 @@ def _get_oc_label_node_command(node: str, db2_edition: str) -> list[str]:
     return ["label", "node", node, f"icp4data=database-{db2_edition}"]
 
 
-def _get_ssh_mkdir_command(node: str) -> list[str]:
-    return [f"core@{node}", "mkdir", "--parents", "/var/home/core/data"]
+def _get_ssh_mkdir_storage_path_command(node: str) -> list[str]:
+    return [f"core@{node}", "mkdir", "--parents", STORAGE_PATH]
 
 
-def _get_ssh_chmod_command(node: str) -> list[str]:
-    return [f"core@{node}", "chmod", "777", "/var/home/core/data"]
+def _get_ssh_chmod_storage_path_command(node: str) -> list[str]:
+    return [f"core@{node}", "chmod", "777", STORAGE_PATH]
 
 
-def _get_ssh_restorecon_command(node: str) -> list[str]:
-    return [f"core@{node}", "sudo", "restorecon", "-Rv", "/var/home/core/data"]
+def _get_ssh_restorecon_storage_path_command(node: str) -> list[str]:
+    return [f"core@{node}", "sudo", "restorecon", "-Rv", STORAGE_PATH]
 
 
-def _get_ssh_semanage_command(node: str) -> list[str]:
+def _get_ssh_semanage_storage_path_command(node: str) -> list[str]:
     return [
         f"core@{node}",
-        'sudo semanage fcontext --add --type container_file_t "/var/home/core/data(/.*)?"',
+        f'sudo semanage fcontext --add --type container_file_t "{STORAGE_PATH}(/.*)?"',
     ]
 
 
