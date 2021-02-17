@@ -178,14 +178,4 @@ Unable to connect to the server: dial tcp: lookup {OpenShift cluster} on {DNS na
 
 ## IBM-internal
 
-### Compiling and installing Python 3.9 on FYRE infrastructure nodes
-
-```
-yum install gcc libffi-devel openssl-devel zlib-devel
-wget https://www.python.org/ftp/python/3.9.0/Python-3.9.0.tgz
-tar -xf Python-3.9.0.tgz
-cd Python-3.9.0
-./configure
-make
-make install
-```
+- [Installing IBM Cloud Pak for Data on a FYRE-based OpenShift cluster](docs/installing_ibm_cloud_pak_for_data_on_a_fyre-based_openshift_cluster.md)
