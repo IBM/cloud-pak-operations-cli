@@ -34,7 +34,16 @@ class ClusterStatus:
         return self._status_output
 
     def get_server_url(self) -> str:
-        return self._status_output["serverURL"]
+        result = ""
+
+        if "masterURL" in self._status_output:
+            # IBM Cloud Kubernetes Service cluster
+            result = self._status_output["masterURL"]
+        elif "serverURL" in self._status_output:
+            # OpenShift cluster
+            result = self._status_output["serverURL"]
+
+        return result
 
     def has_name(self, name: str) -> bool:
         return ("name" in self._status_output) and (self._status_output["name"] == name)
