@@ -41,8 +41,8 @@ IBM_FYRE_DEPLOY_OPENSHIFT_CLUSTER_URL: Final[
     required=True,
     help="Name of the OpenShift cluster to be deployed",
 )
-@click.option("--fyre-user-name", required=True, help="Fyre API user name")
-@click.option("--fyre-api-key", required=True, help="Fyre API key")
+@click.option("--fyre-user-name", required=True, help="FYRE API user name")
+@click.option("--fyre-api-key", required=True, help="FYRE API key")
 def create(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
     """Create a new OpenShift cluster on FYRE"""
 
