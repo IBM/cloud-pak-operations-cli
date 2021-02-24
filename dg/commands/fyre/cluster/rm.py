@@ -25,14 +25,14 @@ import dg.lib.click
 import dg.utils.network
 
 from dg.lib.error import DataGateCLIException
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 IBM_FYRE_DELETE_CLUSTER_URL: Final[
     str
 ] = "https://api.fyre.ibm.com/rest/v1/?operation=delete"
 
 
-@click.command(
+@loglevel_command(
     context_settings=dg.lib.click.create_default_map_from_json_file(
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
@@ -44,7 +44,6 @@ IBM_FYRE_DELETE_CLUSTER_URL: Final[
 )
 @click.option("--fyre-user-name", required=True, help="Fyre API user name")
 @click.option("--fyre-api-key", required=True, help="Fyre API key")
-@loglevel_option()
 def rm(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
     """Delete a cluster on FYRE"""
 

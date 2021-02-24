@@ -12,16 +12,13 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import click
-
 import dg.config
 import dg.lib.click
 
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
-@loglevel_option()
+@loglevel_command()
 def logout():
     """Log out from FYRE"""
 

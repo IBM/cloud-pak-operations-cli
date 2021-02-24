@@ -18,10 +18,10 @@ import dg.config.cluster_credentials_manager
 import dg.lib.click
 
 from dg.lib.fyre.cluster.fyre_cluster_factory import fyre_cluster_factory
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command(
+@loglevel_command(
     context_settings=dg.lib.click.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
@@ -38,7 +38,6 @@ from dg.utils.logging import loglevel_option
     help="Print oc login command instead of just the OAuth access token",
     is_flag=True,
 )
-@loglevel_option()
 @click.pass_context
 def get_cluster_access_token(
     ctx: click.Context,

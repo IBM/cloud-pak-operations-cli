@@ -21,17 +21,16 @@ import dg.config
 import dg.utils.network
 
 from dg.lib.error import DataGateCLIException
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 IBM_FYRE_SHOW_CLUSTERS_URL: Final[
     str
 ] = "https://api.fyre.ibm.com/rest/v1/?operation=query&request=showclusters"
 
 
-@click.command()
+@loglevel_command()
 @click.option("--fyre-api-key", required=True, help="FYRE API key")
 @click.option("--fyre-user-name", required=True, help="FYRE user name")
-@loglevel_option()
 def login(
     fyre_api_key: Union[str, None],
     fyre_user_name: Union[str, None],

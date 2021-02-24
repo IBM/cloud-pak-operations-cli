@@ -31,10 +31,10 @@ from dg.lib.cloud_pak_for_data.cpd_manager import (
 from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
     CloudPakForDataManagerFactory,
 )
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command(
+@loglevel_command(
     context_settings=dg.lib.click.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
@@ -74,7 +74,6 @@ from dg.utils.logging import loglevel_option
 @optgroup.group("Development build options")
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
-@loglevel_option()
 @click.pass_context
 def install_assembly(
     ctx: click.Context,

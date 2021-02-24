@@ -1,4 +1,5 @@
 import logging
+
 from typing import Callable
 
 import click
@@ -96,19 +97,40 @@ def init_root_logger():
     logging.getLogger().handlers = [click_logging_handler]
 
 
-def loglevel_option(default="INFO") -> Callable:
+def loglevel_command(name=None, default_log_level="INFO", **attrs):
+    """Decorator creating a click.Command object with a --loglevel option
+
+    Parameters
+    ----------
+    name
+        command name
+    default_log_level
+        default log level
+    """
+
+    def decorator(f):
+        command = click.command(
+            name, cls=_getClickCommandWithLogLevelOption(default_log_level), **attrs
+        )(f)
+
+        return command
+
+    return decorator
+
+
+def loglevel_option(default_log_level="INFO") -> Callable:
     """Decorator adding a --loglevel option to a Click command
 
     Parameters
     ----------
-    default
+    default_log_level
         default log level
     """
 
     return click.option(
         "--loglevel",
         callback=lambda ctx, param, value: logging.getLogger().setLevel(value),
-        default=default,
+        default=default_log_level,
         expose_value=False,
         help="Log level",
         is_eager=True,
@@ -116,3 +138,48 @@ def loglevel_option(default="INFO") -> Callable:
             ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], case_sensitive=False
         ),
     )
+
+
+def _getClickCommandWithLogLevelOption(default_log_level: str) -> type[click.Command]:
+    """Creates a definition of a subclass of click.Command
+
+    This method creates a definition of a subclass of click.Command. Click
+    commands based on this subclass have a --loglevel option.
+
+    Parameters
+    ----------
+    default_log_level
+        default log level set when executing a command
+
+    Returns
+    -------
+    click.Command
+        Definition of a subclass of click.Command
+    """
+
+    class ClickCommandWithLogLevelOption(click.Command):
+        """Click command with a --loglevel option"""
+
+        def __init__(self, *args, **kwargs):
+            """Constructor
+
+            Appends a --loglevel option"""
+
+            super().__init__(*args, **kwargs)
+
+            option = click.Option(
+                ["--loglevel"],
+                callback=lambda ctx, param, value: logging.getLogger().setLevel(value),
+                default=default_log_level,
+                expose_value=False,
+                help="Log level",
+                is_eager=True,
+                type=click.Choice(
+                    ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"],
+                    case_sensitive=False,
+                ),
+            )
+
+            self.params.append(option)
+
+    return ClickCommandWithLogLevelOption

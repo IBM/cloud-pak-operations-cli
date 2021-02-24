@@ -17,13 +17,10 @@ import subprocess
 
 from importlib import metadata
 
-import click
-
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
-@loglevel_option()
+@loglevel_command()
 def update():
     """Update the Data Gate CLI to the latest version"""
 

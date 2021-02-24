@@ -12,15 +12,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import click
-
 import dg.lib.download_manager
 
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
-@loglevel_option()
+@loglevel_command()
 def download_dependencies():
     """Download dependencies"""
 

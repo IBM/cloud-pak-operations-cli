@@ -25,10 +25,10 @@ from dg.lib.ibmcloud import (
     INTERNAL_IBM_CLOUD_API_KEY_NAME,
 )
 from dg.lib.ibmcloud.iam import api_key_exists, delete_api_key_in_ibmcloud
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
+@loglevel_command()
 @click.option(
     "--delete-existing-api-key",
     required=False,
@@ -37,7 +37,6 @@ from dg.utils.logging import loglevel_option
     ),
     is_flag=True,
 )
-@loglevel_option()
 def generate_api_key(delete_existing_api_key: bool) -> str:
     """Generates an IBM Cloud API key and stores it in the Data Gate CLI
     credentials file"""

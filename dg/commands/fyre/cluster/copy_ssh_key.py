@@ -19,10 +19,10 @@ import click
 import dg.config.cluster_credentials_manager
 import dg.lib.click
 
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command(
+@loglevel_command(
     context_settings=dg.lib.click.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
@@ -30,7 +30,6 @@ from dg.utils.logging import loglevel_option
 @click.option(
     "--infrastructure-node-hostname", required=True, help="Infrastructure node hostname"
 )
-@loglevel_option()
 def copy_ssh_key(infrastructure_node_hostname: str):
     """Copy the current user's public SSH key to the infrastructure node"""
 

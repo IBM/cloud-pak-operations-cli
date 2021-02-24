@@ -24,21 +24,20 @@ import dg.lib.click
 import dg.utils.network
 
 from dg.lib.error import DataGateCLIException
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 IBM_FYRE_SHOW_OPENSHIFT_CLUSTERS_URL: Final[
     str
 ] = "https://api.fyre.ibm.com/rest/v1/?operation=query&request=showclusters"
 
 
-@click.command(
+@loglevel_command(
     context_settings=dg.lib.click.create_default_map_from_json_file(
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
 @click.option("--fyre-user-name", required=True, help="Fyre API user name")
 @click.option("--fyre-api-key", required=True, help="Fyre API key")
-@loglevel_option()
 def ls(fyre_user_name: str, fyre_api_key: str):
     """List OpenShift clusters on FYRE"""
 

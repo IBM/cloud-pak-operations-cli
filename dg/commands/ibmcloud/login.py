@@ -12,14 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import click
-
 from dg.lib.ibmcloud.login import login as login_to_ibm_cloud
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
-@loglevel_option()
+@loglevel_command()
 def login():
     """Log in to IBM Cloud"""
 

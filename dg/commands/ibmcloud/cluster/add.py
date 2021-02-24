@@ -18,10 +18,10 @@ import dg.config.cluster_credentials_manager
 import dg.lib.ibmcloud.cluster
 import dg.lib.ibmcloud.status
 
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
+@loglevel_command()
 @click.option(
     "--alias", help="Alias used to reference a cluster instead of its server URL"
 )
@@ -30,7 +30,6 @@ from dg.utils.logging import loglevel_option
     required=True,
     help="Name of the OpenShift cluster to be registered",
 )
-@loglevel_option()
 def add(alias: str, cluster_name: str):
     """Register an existing OpenShift cluster on IBM Cloud"""
 

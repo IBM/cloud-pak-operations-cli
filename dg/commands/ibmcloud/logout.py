@@ -27,19 +27,18 @@ from dg.lib.ibmcloud import (
 )
 from dg.lib.ibmcloud.iam import delete_api_key_in_ibmcloud
 from dg.lib.ibmcloud.login import is_logged_in
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 logger = logging.getLogger(__name__)
 
 
-@click.command()
+@loglevel_command()
 @click.option(
     "--delete-api-key",
     required=False,
     help="Delete the API key which was created for the Data Gate CLI (in IBM Cloud and on disk)",
     is_flag=True,
 )
-@loglevel_option()
 def logout(delete_api_key: bool):
     """Log out from IBM Cloud"""
 

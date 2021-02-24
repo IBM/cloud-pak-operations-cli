@@ -32,12 +32,12 @@ from dg.lib.ibmcloud.vlan import (
     get_default_private_vlan,
     get_default_public_vlan,
 )
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 logger = logging.getLogger(__name__)
 
 
-@click.command()
+@loglevel_command()
 @click.option("-c", "--cluster-name", required=True, help="cluster name")
 @click.option(
     "-i",
@@ -62,7 +62,6 @@ logger = logging.getLogger(__name__)
     help="Remove any prompts during cluster creation.",
     is_flag=True,
 )
-@loglevel_option()
 def create(
     cluster_name: str, full_installation: bool, remove_existing: bool, force: bool
 ):
@@ -136,8 +135,8 @@ def create(
                 # There was an error, but the cluster was created nonetheless, print a warning
 
                 logging.warning(
-                    f"Warning: An error occurred while creating the cluster, but 'ibmcloud oc cluster ls' shows a "
-                    f"cluster with the name '{cluster_name}' – error details:\n"
+                    f"An error occurred while creating the cluster, but 'ibmcloud oc cluster ls' shows a cluster with "
+                    f"the name '{cluster_name}' – error details:\n"
                     f"{IBMCloudException.get_parsed_error_message(result.stderr)}"
                 )
             else:

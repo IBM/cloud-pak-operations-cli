@@ -19,16 +19,15 @@ from subprocess import CalledProcessError
 import click
 
 from dg.lib.ibmcloud import execute_ibmcloud_command
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 logger = logging.getLogger(__name__)
 
 
-@click.command()
+@loglevel_command()
 @click.option(
     "--zone", required=True, help="Zone to delete deployments in (e.g. sjc03)"
 )
-@loglevel_option()
 def nuke_storage(zone: str):
     """Immediately cancel ALL classic file storage volumes on IBM Cloud in a given zone"""
 

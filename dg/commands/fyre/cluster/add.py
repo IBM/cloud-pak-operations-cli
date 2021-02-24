@@ -17,10 +17,10 @@ import click
 import dg.config.cluster_credentials_manager
 import dg.lib.fyre.cluster
 
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
+@loglevel_command()
 @click.option(
     "--alias", help="Alias used to reference a cluster instead of its server URL"
 )
@@ -30,7 +30,6 @@ from dg.utils.logging import loglevel_option
     help="Name of the OpenShift cluster to be registered",
 )
 @click.option("--password", required=True, help="kubeadmin password")
-@loglevel_option()
 def add(cluster_name: str, alias: str, password: str):
     """Register an existing OpenShift cluster on FYRE"""
 

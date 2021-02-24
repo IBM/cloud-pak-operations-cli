@@ -16,14 +16,13 @@ import click
 
 import dg.config.cluster_credentials_manager
 
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
+@loglevel_command()
 @click.argument("alias_or_server")
 @click.option("--alias", help="Alias")
 @click.option("--password", help="kubeadmin password")
-@loglevel_option()
 def edit(alias_or_server: str, alias: str, password: str):
     """Edit metadata of a registered OpenShift cluster"""
 

@@ -16,11 +16,10 @@ import click
 
 import dg.config.cluster_credentials_manager
 
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
-@loglevel_option()
+@loglevel_command()
 def current():
     """Get the current registered OpenShift cluster"""
 

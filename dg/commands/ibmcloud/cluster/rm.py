@@ -15,10 +15,10 @@
 import click
 
 from dg.lib.ibmcloud.cluster.rm import delete_ibmcloud_cluster
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
+@loglevel_command()
 @click.option("-c", "--cluster-name", required=True, help="cluster name")
 @click.option(
     "--force",
@@ -27,7 +27,6 @@ from dg.utils.logging import loglevel_option
     help="Force deletion of the cluster",
     is_flag=True,
 )
-@loglevel_option()
 def rm(cluster_name: str, force_deletion: bool):
     """Delete an existing OpenShift cluster on IBM Cloud"""
 

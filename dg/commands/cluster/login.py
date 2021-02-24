@@ -12,23 +12,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import click
-
 import dg.config.cluster_credentials_manager
 import dg.lib.click
 import dg.lib.fyre.cluster.fyre_cluster_factory  # required to register FYREClusterFactory object
 import dg.lib.ibmcloud.cluster.ibmcloud_cluster_factory  # required to register IBMCloudClusterFactory object
 
 from dg.lib.error import DataGateCLIException
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command(
+@loglevel_command(
     context_settings=dg.lib.click.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@loglevel_option()
 def login():
     """Log in to the current OpenShift cluster"""
 

@@ -15,17 +15,16 @@
 import click
 
 from dg.lib.ibmcloud.cluster.ls import list_existing_clusters
-from dg.utils.logging import loglevel_option
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
+@loglevel_command(default_log_level="WARNING")
 @click.option(
     "--json",
     required=False,
     help="Prints the command output in JSON format.",
     is_flag=True,
 )
-@loglevel_option("WARNING")
 def ls(json: bool):
     """List all available clusters"""
 
