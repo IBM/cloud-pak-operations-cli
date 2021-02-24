@@ -32,9 +32,10 @@ from dg.lib.cloud_pak_for_data.cpd_manager import (
 from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
     CloudPakForDataManagerFactory,
 )
+from dg.utils.logging import loglevel_command
 
 
-@click.command(
+@loglevel_command(
     context_settings=dg.lib.click.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )

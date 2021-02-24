@@ -24,13 +24,14 @@ import dg.lib.click
 import dg.utils.network
 
 from dg.lib.error import DataGateCLIException
+from dg.utils.logging import loglevel_command
 
 IBM_FYRE_DEPLOY_OPENSHIFT_CLUSTER_URL: Final[
     str
 ] = "https://api.fyre.ibm.com/rest/v1/?operation=deployopenshiftcluster"
 
 
-@click.command(
+@loglevel_command(
     context_settings=dg.lib.click.create_default_map_from_json_file(
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )

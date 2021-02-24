@@ -16,8 +16,10 @@ import click
 
 import dg.config.cluster_credentials_manager
 
+from dg.utils.logging import loglevel_command
 
-@click.command()
+
+@loglevel_command()
 def ls():
     """List registered OpenShift clusters"""
 

@@ -17,8 +17,10 @@ import click
 import dg.config.cluster_credentials_manager
 import dg.lib.fyre.cluster
 
+from dg.utils.logging import loglevel_command
 
-@click.command()
+
+@loglevel_command()
 @click.option(
     "--alias", help="Alias used to reference a cluster instead of its server URL"
 )

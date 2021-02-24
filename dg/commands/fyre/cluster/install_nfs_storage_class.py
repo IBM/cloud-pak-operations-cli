@@ -23,8 +23,10 @@ import dg.lib.click
 import dg.lib.fyre.nfs
 import dg.utils.network
 
+from dg.utils.logging import loglevel_command
 
-@click.command(
+
+@loglevel_command(
     context_settings=dg.lib.click.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )

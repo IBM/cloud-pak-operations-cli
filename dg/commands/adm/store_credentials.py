@@ -18,8 +18,10 @@ import click
 
 import dg.config
 
+from dg.utils.logging import loglevel_command
 
-@click.command()
+
+@loglevel_command()
 @click.option("--artifactory-api-key", help="Artifactory API key")
 @click.option("--artifactory-user-name", help="Artifactory user name")
 @click.option("--ibm-cloud-api-key", help="IBM Cloud API key")
