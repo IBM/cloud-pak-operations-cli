@@ -8,6 +8,8 @@
 
 ## Linux/macOS/Windows:
 
+To create a FYRE cluster using the following command, your FYRE memory quota must be greater than or equal to 220 GiB and may be adjusted by one of the owners of your FYRE product group.
+
 - Create FYRE cluster:
 
   ```bash
@@ -23,9 +25,9 @@
 
   ```bash
   yum install gcc libffi-devel openssl-devel zlib-devel
-  wget https://www.python.org/ftp/python/3.9.1/Python-3.9.1.tgz
-  tar -xf Python-3.9.1.tgz
-  cd Python-3.9.1
+  wget https://www.python.org/ftp/python/3.9.2/Python-3.9.2.tgz
+  tar -xf Python-3.9.2.tgz
+  cd Python-3.9.2
   ./configure
   make
   make install
@@ -49,5 +51,5 @@
   dg cluster install-cloud-pak-for-data --storage-class nfs-client
   dg cluster install-assembly --assembly-name dmc --storage-class nfs-client
   dg cluster install-data-gate --storage-class nfs-client
-  dg cluster install-db2 --db2-edition [db2oltp|db2wh] --storage-class nfs-client
+  dg cluster install-db2 --db2-edition {[db2oltp|db2wh]} --storage-class nfs-client
   ```

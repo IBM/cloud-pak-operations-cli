@@ -36,8 +36,8 @@ IBM_FYRE_SHOW_OPENSHIFT_CLUSTERS_URL: Final[
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
-@click.option("--fyre-user-name", required=True, help="Fyre API user name")
-@click.option("--fyre-api-key", required=True, help="Fyre API key")
+@click.option("--fyre-user-name", required=True, help="FYRE API user name")
+@click.option("--fyre-api-key", required=True, help="FYRE API key")
 def ls(fyre_user_name: str, fyre_api_key: str):
     """List OpenShift clusters on FYRE"""
 
