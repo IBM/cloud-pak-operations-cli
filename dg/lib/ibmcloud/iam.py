@@ -57,7 +57,7 @@ def generate_api_key() -> str:
             "api-key-create",
             dg.lib.ibmcloud.EXTERNAL_IBM_CLOUD_API_KEY_NAME,
             "--output",
-            "JSON",
+            "json",
         ],
         capture_output=True,
     )
@@ -67,7 +67,7 @@ def generate_api_key() -> str:
 
 def get_api_keys() -> Any:
     result = execute_ibmcloud_command(
-        ["iam", "api-keys", "--output", "JSON"], capture_output=True
+        ["iam", "api-keys", "--output", "json"], capture_output=True
     )
 
     return json.loads(result.stdout)
@@ -76,8 +76,10 @@ def get_api_keys() -> Any:
 def get_oauth_token() -> str:
     """Retrieves the IAM access token for the currently logged on user"""
 
-    command = ["iam", "oauth-tokens", "--output", "JSON"]
-    oauth_token_result = json.loads(execute_ibmcloud_command(command).stdout)
+    command = ["iam", "oauth-tokens", "--output", "json"]
+    oauth_token_result = json.loads(
+        execute_ibmcloud_command(command, capture_output=True).stdout
+    )
 
     if oauth_token_result and "iam_token" in oauth_token_result:
         result = oauth_token_result["iam_token"]

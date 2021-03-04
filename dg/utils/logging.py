@@ -78,12 +78,12 @@ class ScopedLoggingDisabler:
 
     def __enter__(self):
         if self._is_enabled:
-            logging.getLogger().disabled = self._previous_value
+            self._previous_value = logging.getLogger().disabled
+            logging.getLogger().disabled = True
 
     def __exit__(self, exc_type, exc_value, traceback):
         if self._is_enabled:
-            self._previous_value = logging.getLogger().disabled
-            logging.getLogger().disabled = False
+            logging.getLogger().disabled = self._previous_value
 
 
 def init_root_logger():

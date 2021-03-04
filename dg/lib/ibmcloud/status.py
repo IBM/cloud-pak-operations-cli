@@ -16,6 +16,8 @@ import json
 
 from typing import Any
 
+import dg.utils.logging
+
 from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud import execute_ibmcloud_command
 from dg.lib.ibmcloud.cluster.ls import list_existing_clusters
@@ -118,13 +120,14 @@ def wait_for_cluster_readiness(cluster_name: str):
     """
 
     try:
-        wait_for(
-            3600,
-            30,
-            f"Cluster creation for cluster {cluster_name}",
-            _is_cluster_ready,
-            cluster_name,
-        )
+        with dg.utils.logging.ScopedLoggingDisabler():
+            wait_for(
+                3600,
+                30,
+                f"Cluster creation for cluster {cluster_name}",
+                _is_cluster_ready,
+                cluster_name,
+            )
     except Exception:
         raise DataGateCLIException(
             f"Timeout for cluster creation exceeded, current cluster status:\n{get_cluster_status(cluster_name)}"
