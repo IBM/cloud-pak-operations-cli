@@ -135,27 +135,6 @@ def {Click group name}():
     pass
 ```
 
-#### Avoiding circular imports
-
-To avoid circular imports, a module contained in one of the Data Gate CLI packages shown in the table below is only allowed to import other modules of the following categories:
-
-- modules from the same package or other packages in the same row if no circular import is created
-- modules from other packages in rows below the row containing the package of the module
-
-| 1st level packages | 2nd level packages | 3rd level packages                                   |
-| ------------------ | ------------------ | ---------------------------------------------------- |
-| test               | …                  |                                                      |
-| dg                 | dg.commands        | dg.commands.adm<br />dg.commands.cluster<br />…      |
-|                    | dg.lib             | dg.lib.cloud_pak_for_data<br />dg.lib.cluster<br />… |
-|                    | dg.config          |                                                      |
-|                    | dg.utils           |                                                      |
-
-For example, a module contained in the `dg.config` package is allowed to import modules from the `dg.utils` package but must not import modules from the `dg.lib` package.
-
-#### Docstring Syntax
-
-[numpydoc docstring guide](https://numpydoc.readthedocs.io/en/latest/format.html)
-
 #### Running unit tests
 
 Unit tests are based on the `unittest` package and contained in the `test` package. Execute the following command to execute all unit tests within your virtual environment:
@@ -163,6 +142,10 @@ Unit tests are based on the `unittest` package and contained in the `test` packa
 ```bash
 python -m unittest discover test
 ```
+
+#### References
+
+- [Coding Guidelines](docs/coding_guidelines.md)
 
 ## Known issues
 
