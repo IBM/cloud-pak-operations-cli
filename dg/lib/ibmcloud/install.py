@@ -12,9 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import logging
-
 import json
+import logging
 
 from time import sleep
 from typing import Any
@@ -23,6 +22,7 @@ import click
 import requests
 
 import dg.config
+import dg.utils.logging
 
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
@@ -51,7 +51,7 @@ def _get_cp4d_version_locator(cp4d_version: str) -> str:
             "--type",
             "software",
             "--output",
-            "JSON",
+            "json",
         ],
         capture_output=True,
     )
@@ -229,17 +229,18 @@ def is_installation_finished(install_details: Any) -> bool:
 
 def wait_until_installation_is_finished(install_details: Any) -> None:
     try:
-        wait_for(
-            3600,
-            30,
-            "Cloud Pak for Data installation",
-            is_installation_finished,
-            install_details,
-        )
+        with dg.utils.logging.ScopedLoggingDisabler():
+            wait_for(
+                3600,
+                30,
+                "Cloud Pak for Data installation",
+                is_installation_finished,
+                install_details,
+            )
     except Exception:
         raise DataGateCLIException(
-            "Timeout exceeded or workspace error, details can be found here: "
-            "https://cloud.ibm.com/schematics/workspaces/{install_details['workspace_id']}/activity"
+            f"Timeout exceeded or workspace error, details can be found here: "
+            f"https://cloud.ibm.com/schematics/workspaces/{install_details['workspace_id']}/activity"
         )
 
 
