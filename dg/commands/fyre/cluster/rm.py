@@ -27,9 +27,7 @@ import dg.utils.network
 from dg.lib.error import DataGateCLIException
 from dg.utils.logging import loglevel_command
 
-IBM_FYRE_DELETE_CLUSTER_URL: Final[
-    str
-] = "https://api.fyre.ibm.com/rest/v1/?operation=delete"
+IBM_FYRE_DELETE_CLUSTER_URL: Final[str] = "https://api.fyre.ibm.com/rest/v1/?operation=delete"
 
 
 @loglevel_command(
@@ -63,22 +61,12 @@ def rm(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
         status = json_response["status"]
 
         if status != "submitted":
-            raise DataGateCLIException(
-                "Failed to delete FYRE cluster ({})".format(json_response["details"])
-            )
+            raise DataGateCLIException("Failed to delete FYRE cluster ({})".format(json_response["details"]))
 
         server = "https://api.{}.os.fyre.ibm.com:6443".format(cluster_name)
-        cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_cluster(
-            server
-        )
+        cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_cluster(server)
 
         if cluster is not None:
-            dg.config.cluster_credentials_manager.cluster_credentials_manager.remove_cluster(
-                server
-            )
+            dg.config.cluster_credentials_manager.cluster_credentials_manager.remove_cluster(server)
     else:
-        raise DataGateCLIException(
-            "Failed to delete FYRE cluster (HTTP status code: {})".format(
-                response.status_code
-            )
-        )
+        raise DataGateCLIException("Failed to delete FYRE cluster (HTTP status code: {})".format(response.status_code))

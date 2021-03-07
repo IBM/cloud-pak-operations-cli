@@ -142,9 +142,7 @@ class DataGateConfigurationManager:
         dg_credentials_file_path = self.get_dg_credentials_file_path()
         result: Union[str, None] = None
 
-        if dg_credentials_file_path.exists() and (
-            dg_credentials_file_path.stat().st_size != 0
-        ):
+        if dg_credentials_file_path.exists() and (dg_credentials_file_path.stat().st_size != 0):
             with open(dg_credentials_file_path) as json_file:
                 result = json.load(json_file)
 
@@ -238,15 +236,9 @@ class DataGateConfigurationManager:
             if key in settings:
                 value = str(settings[key])
 
-                if (
-                    value.lower()
-                    in DataGateConfigurationManager._supported_true_boolean_values
-                ):
+                if value.lower() in DataGateConfigurationManager._supported_true_boolean_values:
                     result = True
-                elif (
-                    value.lower()
-                    in DataGateConfigurationManager._supported_false_boolean_values
-                ):
+                elif value.lower() in DataGateConfigurationManager._supported_false_boolean_values:
                     result = False
                 else:
                     raise DataGateCLIException(

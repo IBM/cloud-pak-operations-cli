@@ -25,9 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 @loglevel_command()
-@click.option(
-    "--zone", required=True, help="Zone to delete deployments in (e.g. sjc03)"
-)
+@click.option("--zone", required=True, help="Zone to delete deployments in (e.g. sjc03)")
 def nuke_storage(zone: str):
     """Immediately cancel ALL classic file storage volumes on IBM Cloud in a given zone"""
 
@@ -78,9 +76,7 @@ def nuke_storage(zone: str):
                     ]
                     execute_ibmcloud_command(delete_command)
 
-                    logging.info(
-                        f"File volume {volume_id} has been marked for immediate cancellation"
-                    )
+                    logging.info(f"File volume {volume_id} has been marked for immediate cancellation")
                     volumes_deleted += 1
                 except CalledProcessError as exception:
                     if "No billing item is found to cancel" in exception.stderr:

@@ -71,18 +71,14 @@ def _get_cp4d_version_locator(cp4d_version: str) -> str:
                             version = version["id"]
                             break
     else:
-        raise IBMCloudException(
-            "Unable to retrieve version locator", catalog_search_result.stderr
-        )
+        raise IBMCloudException("Unable to retrieve version locator", catalog_search_result.stderr)
 
     version_locator = catalog_id + "." + version
     return version_locator
 
 
 def execute_preinstall(cluster_id: str):
-    version_locator = _get_cp4d_version_locator(
-        str(AbstractCloudPakForDataManager.get_ibm_cloud_supported_version())
-    )
+    version_locator = _get_cp4d_version_locator(str(AbstractCloudPakForDataManager.get_ibm_cloud_supported_version()))
 
     execute_ibmcloud_command(
         [
@@ -133,9 +129,7 @@ def _get_entitlement_key(api_key: str) -> str:
 
 
 def execute_install(cluster_id: str, api_key: str) -> Any:
-    version_locator = _get_cp4d_version_locator(
-        str(AbstractCloudPakForDataManager.get_ibm_cloud_supported_version())
-    )
+    version_locator = _get_cp4d_version_locator(str(AbstractCloudPakForDataManager.get_ibm_cloud_supported_version()))
 
     token = get_tokens(api_key)
     auth_token = token["token_type"] + " " + token["access_token"]
@@ -145,11 +139,7 @@ def execute_install(cluster_id: str, api_key: str) -> Any:
     resource_group = "Default"
     entitlement_key = _get_entitlement_key(api_key)
 
-    url = (
-        "https://cm.globalcatalog.cloud.ibm.com/api/v1-beta/versions/"
-        + version_locator
-        + "/install"
-    )
+    url = "https://cm.globalcatalog.cloud.ibm.com/api/v1-beta/versions/" + version_locator + "/install"
     headers = {
         "Accept": "application/json",
         "Authorization": auth_token,
@@ -188,9 +178,7 @@ def get_schematics_workspace_details(install_details: Any) -> Any:
     result = ""
 
     if install_details is None or "workspace_id" not in install_details:
-        raise DataGateCLIException(
-            "Unable to retrieve IBM Schematics workspace details"
-        )
+        raise DataGateCLIException("Unable to retrieve IBM Schematics workspace details")
 
     workspace_id = install_details["workspace_id"]
     auth_token = get_oauth_token()
@@ -220,9 +208,7 @@ def is_installation_finished(install_details: Any) -> bool:
     status = get_install_status(install_details)
 
     if status == "FAILED":
-        raise DataGateCLIException(
-            f"Workspace '{install_details['workspace_id']}' is in status '{status}'"
-        )
+        raise DataGateCLIException(f"Workspace '{install_details['workspace_id']}' is in status '{status}'")
 
     return status == "ACTIVE"
 
@@ -267,19 +253,11 @@ def get_installation_log(install_details: Any) -> str:
     result = ""
 
     try:
-        log_path = get_schematics_workspace_details(install_details)["runtime_data"][0][
-            "log_store_url"
-        ]
+        log_path = get_schematics_workspace_details(install_details)["runtime_data"][0]["log_store_url"]
     except Exception:
-        raise DataGateCLIException(
-            "Unable to retrieve log path value for IBM Schematics workspace"
-        )
+        raise DataGateCLIException("Unable to retrieve log path value for IBM Schematics workspace")
 
-    if (
-        install_details is None
-        or "workspace_id" not in install_details
-        or (log_path == "")
-    ):
+    if install_details is None or "workspace_id" not in install_details or (log_path == ""):
         raise DataGateCLIException("Unable to retrieve IBM Schematics log path")
 
     workspace_id = install_details["workspace_id"]
@@ -306,18 +284,12 @@ def get_workspace_output_values(install_details: Any) -> Any:
     result = ""
 
     if install_details is None or "workspace_id" not in install_details:
-        raise DataGateCLIException(
-            "Unable to retrieve IBM Schematics workspace output values"
-        )
+        raise DataGateCLIException("Unable to retrieve IBM Schematics workspace output values")
 
     workspace_id = install_details["workspace_id"]
     auth_token = get_oauth_token()
 
-    url = (
-        "https://schematics.cloud.ibm.com/v1/workspaces/"
-        + workspace_id
-        + "/output_values"
-    )
+    url = "https://schematics.cloud.ibm.com/v1/workspaces/" + workspace_id + "/output_values"
     headers = {"Authorization": auth_token}
 
     response = requests.get(url, headers=headers)
@@ -341,9 +313,9 @@ def get_cp4d_url(install_details: Any) -> str:
 
     if workspace_output_values:
         try:
-            resource_controller_url = workspace_output_values[0]["output_values"][0][
-                "resource_cloud"
-            ]["value"]["resource_controller_url"]
+            resource_controller_url = workspace_output_values[0]["output_values"][0]["resource_cloud"]["value"][
+                "resource_controller_url"
+            ]
         except Exception:
             raise DataGateCLIException(
                 f"Unable to retrieve Cloud Pak for Data URL. Details:\n{workspace_output_values}"
@@ -355,24 +327,17 @@ def get_cp4d_url(install_details: Any) -> str:
 def install_cp4d_with_preinstall(cluster_name: str):
     """Install Cloud Pak for Data, including Db2 Warehouse and Db2 Data Gate, on the given IBM Cloud cluster"""
 
-    api_key = dg.config.data_gate_configuration_manager.get_value_from_credentials_file(
-        INTERNAL_IBM_CLOUD_API_KEY_NAME
-    )
+    api_key = dg.config.data_gate_configuration_manager.get_value_from_credentials_file(INTERNAL_IBM_CLOUD_API_KEY_NAME)
 
     if not is_logged_in() or api_key is None:
-        credentials_file_path = (
-            dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
-        )
+        credentials_file_path = dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
 
         raise DataGateCLIException(
             f"Not logged in to IBM Cloud or no API key found in {credentials_file_path}. Please run 'dg ibmcloud "
             f"login' to log in."
         )
 
-    logging.info(
-        f"Executing Cloud Pak for Data pre-installation on cluster {cluster_name}"
-    )
-
+    logging.info(f"Executing Cloud Pak for Data pre-installation on cluster {cluster_name}")
     execute_preinstall(cluster_name)
 
     # TODO Use proper endpoint to obtain preinstall status (Current function in ibmcloud CLI is not working)

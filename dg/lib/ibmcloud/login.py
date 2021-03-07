@@ -54,9 +54,7 @@ def login():
 
     _disable_update_notifications()
 
-    api_key = dg.config.data_gate_configuration_manager.get_value_from_credentials_file(
-        INTERNAL_IBM_CLOUD_API_KEY_NAME
-    )
+    api_key = dg.config.data_gate_configuration_manager.get_value_from_credentials_file(INTERNAL_IBM_CLOUD_API_KEY_NAME)
 
     if api_key is not None:
         # implicit login using $HOME/.dg/credentials.json
@@ -79,17 +77,13 @@ def _login_using_api_key(apikey: str):
     )
 
     if login_command.return_code != 0:
-        raise DataGateCLIException(
-            f"Login to IBM Cloud using the given API key failed:\n{login_command.stdout}"
-        )
+        raise DataGateCLIException(f"Login to IBM Cloud using the given API key failed:\n{login_command.stdout}")
     else:
         click.echo(login_command.stdout)
 
 
 def _login_interactively():
-    login_command_return_code = execute_ibmcloud_command_interactively(
-        ["login", "--no-region", "--sso"]
-    )
+    login_command_return_code = execute_ibmcloud_command_interactively(["login", "--no-region", "--sso"])
 
     if login_command_return_code != 0:
         raise DataGateCLIException("Interactive login to IBM Cloud failed.")
@@ -104,9 +98,7 @@ def _disable_update_notifications():
 
     ibmcloud config --check-version=false disables this behavior"""
 
-    disable_command = execute_ibmcloud_command_without_check(
-        ["config", "--check-version=false"], capture_output=True
-    )
+    disable_command = execute_ibmcloud_command_without_check(["config", "--check-version=false"], capture_output=True)
 
     if disable_command.return_code != 0:
         raise IBMCloudException(
@@ -118,6 +110,4 @@ def _disable_update_notifications():
 def generate_and_save_api_key():
     api_key = generate_api_key()
 
-    dg.config.data_gate_configuration_manager.store_credentials(
-        {INTERNAL_IBM_CLOUD_API_KEY_NAME: api_key}
-    )
+    dg.config.data_gate_configuration_manager.store_credentials({INTERNAL_IBM_CLOUD_API_KEY_NAME: api_key})

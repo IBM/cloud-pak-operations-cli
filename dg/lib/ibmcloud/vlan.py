@@ -24,10 +24,7 @@ def _get_default_vlan_id(vlan_type: str, zone: str) -> str:
 
     if result_json:
         for vlan in result_json:
-            if (
-                vlan["type"] == vlan_type
-                and vlan["properties"]["vlan_type"] == "standard"
-            ):
+            if vlan["type"] == vlan_type and vlan["properties"]["vlan_type"] == "standard":
                 vlan_id = vlan["id"]
 
                 break
@@ -35,8 +32,6 @@ def _get_default_vlan_id(vlan_type: str, zone: str) -> str:
     if not vlan_id:
         logging.info("Returned VLAN information:" + result.stdout)
 
-        raise DataGateCLIException(
-            f"Could not obtain default {vlan_type} VLAN ID for zone {zone}."
-        )
+        raise DataGateCLIException(f"Could not obtain default {vlan_type} VLAN ID for zone {zone}.")
 
     return vlan_id

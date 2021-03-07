@@ -21,12 +21,8 @@ class FYREClusterFactory(AbstractClusterFactory):
     def create_cluster(self, server: str, cluster_data: ClusterData) -> AbstractCluster:
         return FYRECluster(server, cluster_data)
 
-    def create_cluster_using_cluster_name(
-        self, cluster_name: str, cluster_data: ClusterData
-    ) -> AbstractCluster:
-        return FYRECluster(
-            "https://api.{}.os.fyre.ibm.com:6443".format(cluster_name), cluster_data
-        )
+    def create_cluster_using_cluster_name(self, cluster_name: str, cluster_data: ClusterData) -> AbstractCluster:
+        return FYRECluster("https://api.{}.os.fyre.ibm.com:6443".format(cluster_name), cluster_data)
 
 
 fyre_cluster_factory = FYREClusterFactory()

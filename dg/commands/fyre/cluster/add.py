@@ -21,9 +21,7 @@ from dg.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.option(
-    "--alias", help="Alias used to reference a cluster instead of its server URL"
-)
+@click.option("--alias", help="Alias used to reference a cluster instead of its server URL")
 @click.option(
     "--cluster-name",
     required=True,

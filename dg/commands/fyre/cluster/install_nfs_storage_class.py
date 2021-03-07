@@ -31,9 +31,7 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option(
-    "--infrastructure-node-hostname", required=True, help="Infrastructure node hostname"
-)
+@click.option("--infrastructure-node-hostname", required=True, help="Infrastructure node hostname")
 @click.option(
     "--ibm-github-api-key",
     required=True,
@@ -59,9 +57,7 @@ def install_nfs_storage_class(
         dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
         dg.lib.fyre.nfs.install_nfs_storage_class(ibm_github_api_key)
     else:
-        oc_login_command_for_remote_host = (
-            dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
-        )
+        oc_login_command_for_remote_host = dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
 
         asyncio.get_event_loop().run_until_complete(
             dg.lib.fyre.nfs.install_nfs_storage_class_on_remote_host(

@@ -26,9 +26,7 @@ import dg.utils.network
 from dg.lib.error import DataGateCLIException
 from dg.utils.logging import loglevel_command
 
-IBM_FYRE_DEPLOY_OPENSHIFT_CLUSTER_URL: Final[
-    str
-] = "https://api.fyre.ibm.com/rest/v1/?operation=deployopenshiftcluster"
+IBM_FYRE_DEPLOY_OPENSHIFT_CLUSTER_URL: Final[str] = "https://api.fyre.ibm.com/rest/v1/?operation=deployopenshiftcluster"
 
 
 @loglevel_command(
@@ -72,12 +70,6 @@ def create(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
         status = json_response["status"]
 
         if status != "submitted":
-            raise DataGateCLIException(
-                "Failed to deploy FYRE cluster ({})".format(json_response["details"])
-            )
+            raise DataGateCLIException("Failed to deploy FYRE cluster ({})".format(json_response["details"]))
     else:
-        raise DataGateCLIException(
-            "Failed to deploy FYRE cluster (HTTP status code: {})".format(
-                response.status_code
-            )
-        )
+        raise DataGateCLIException("Failed to deploy FYRE cluster (HTTP status code: {})".format(response.status_code))

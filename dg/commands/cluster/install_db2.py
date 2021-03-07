@@ -95,21 +95,14 @@ def install_db2(
 ):
     """Install IBM Db2 or IBM Db2 Warehouse"""
 
-    cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[
-        build_type.upper()
-    ]
+    cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[build_type.upper()]
 
-    dg.lib.click.check_cloud_pak_for_data_options(
-        ctx, cloud_pak_for_data_assembly_build_type, locals().copy()
-    )
-
+    dg.lib.click.check_cloud_pak_for_data_options(ctx, cloud_pak_for_data_assembly_build_type, locals().copy())
     dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
 
-    cloud_pak_for_data_manager = (
-        CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(
-            semver.VersionInfo.parse(version)
-        )(cloud_pak_for_data_assembly_build_type)
-    )
+    cloud_pak_for_data_manager = CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(
+        semver.VersionInfo.parse(version)
+    )(cloud_pak_for_data_assembly_build_type)
 
     cloud_pak_for_data_manager.install_assembly_with_prerequisites(
         artifactory_user_name,

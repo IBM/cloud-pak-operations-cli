@@ -81,9 +81,7 @@ class AbstractCloudPakForDataManager(ABC):
 
         pass
 
-    def execute_cloud_pak_for_data_installer(
-        self, args
-    ) -> dg.utils.process.ProcessResult:
+    def execute_cloud_pak_for_data_installer(self, args) -> dg.utils.process.ProcessResult:
         cpd_installer_path = self.get_cloud_pak_for_data_installer_path()
 
         return dg.utils.process.execute_command(cpd_installer_path, args)
@@ -98,9 +96,7 @@ class AbstractCloudPakForDataManager(ABC):
         """
 
         cloud_pak_for_data_version: CloudPakForDataVersion = (
-            AbstractCloudPakForDataManager._cloud_pak_for_data_versions[
-                str(self._get_cloud_pak_for_data_version())
-            ]
+            AbstractCloudPakForDataManager._cloud_pak_for_data_versions[str(self._get_cloud_pak_for_data_version())]
         )
 
         directory_alias = (
@@ -127,9 +123,7 @@ class AbstractCloudPakForDataManager(ABC):
             default IBM Cloud Pak for Data version
         """
 
-        return AbstractCloudPakForDataManager._cloud_pak_for_data_versions[
-            "default_version"
-        ]
+        return AbstractCloudPakForDataManager._cloud_pak_for_data_versions["default_version"]
 
     @staticmethod
     def get_ibm_cloud_supported_version() -> semver.VersionInfo:
@@ -142,9 +136,7 @@ class AbstractCloudPakForDataManager(ABC):
         """
 
         return semver.VersionInfo.parse(
-            AbstractCloudPakForDataManager._cloud_pak_for_data_versions[
-                "ibm_cloud_supported_version"
-            ]
+            AbstractCloudPakForDataManager._cloud_pak_for_data_versions["ibm_cloud_supported_version"]
         )
 
     @abstractmethod
@@ -213,9 +205,7 @@ class AbstractCloudPakForDataManager(ABC):
         )
 
         if self._build_type == CloudPakForDataAssemblyBuildType.RELEASE:
-            openshift_image_registry_route = (
-                dg.lib.openshift.get_openshift_image_registry_default_route()
-            )
+            openshift_image_registry_route = dg.lib.openshift.get_openshift_image_registry_default_route()
 
             if openshift_image_registry_route == "":
                 dg.lib.openshift.enable_openshift_image_registry_default_route()
@@ -228,9 +218,7 @@ class AbstractCloudPakForDataManager(ABC):
         )
 
     @staticmethod
-    def is_openshift_version_in_range(
-        openshift_version: semver.VersionInfo, allowed_ranges: dict
-    ):
+    def is_openshift_version_in_range(openshift_version: semver.VersionInfo, allowed_ranges: dict):
         """Returns whether the given OpenShift version is contained in one of
         the given allowed ranges
 
@@ -254,17 +242,13 @@ class AbstractCloudPakForDataManager(ABC):
 
         for version_range in allowed_ranges:
             if ">=" in version_range and "<" in version_range:
-                is_openshift_version_in_range = (
-                    openshift_version.compare(version_range[">="]) >= 0
-                ) and (openshift_version.compare(version_range["<"]) == -1)
-            elif ">=" in version_range:
-                is_openshift_version_in_range = (
-                    openshift_version.compare(version_range[">="]) >= 0
-                )
-            elif "<" in version_range:
-                is_openshift_version_in_range = (
+                is_openshift_version_in_range = (openshift_version.compare(version_range[">="]) >= 0) and (
                     openshift_version.compare(version_range["<"]) == -1
                 )
+            elif ">=" in version_range:
+                is_openshift_version_in_range = openshift_version.compare(version_range[">="]) >= 0
+            elif "<" in version_range:
+                is_openshift_version_in_range = openshift_version.compare(version_range["<"]) == -1
 
             if is_openshift_version_in_range:
                 break
@@ -295,14 +279,12 @@ class AbstractCloudPakForDataManager(ABC):
             Pak for Data version
         """
 
-        allowed_ranges = AbstractCloudPakForDataManager._cloud_pak_for_data_versions[
-            str(cloud_pak_for_data_version)
-        ]["required_openshift_version"]
+        allowed_ranges = AbstractCloudPakForDataManager._cloud_pak_for_data_versions[str(cloud_pak_for_data_version)][
+            "required_openshift_version"
+        ]
 
-        is_openshift_version_supported = (
-            AbstractCloudPakForDataManager.is_openshift_version_in_range(
-                openshift_version, allowed_ranges
-            )
+        is_openshift_version_supported = AbstractCloudPakForDataManager.is_openshift_version_in_range(
+            openshift_version, allowed_ranges
         )
 
         return is_openshift_version_supported
@@ -333,9 +315,7 @@ class AbstractCloudPakForDataManager(ABC):
                 artifactory_user_name, artifactory_api_key, assembly_name
             )
         else:
-            return self._prepare_yaml_file_for_release_build(
-                ibm_cloud_pak_for_data_entitlement_key
-            )
+            return self._prepare_yaml_file_for_release_build(ibm_cloud_pak_for_data_entitlement_key)
 
     @abstractmethod
     def _get_cloud_pak_for_data_version(self) -> semver.VersionInfo:
@@ -379,13 +359,8 @@ class AbstractCloudPakForDataManager(ABC):
         yaml_content: Any = None
 
         with io.BytesIO() as buffer:
-            file_name = dg.utils.download.download_file_into_buffer(
-                urllib.parse.urlsplit(url), buffer
-            )
-
-            yaml_content = yaml.load(
-                buffer.getvalue().decode("utf-8"), Loader=yaml.FullLoader
-            )
+            file_name = dg.utils.download.download_file_into_buffer(urllib.parse.urlsplit(url), buffer)
+            yaml_content = yaml.load(buffer.getvalue().decode("utf-8"), Loader=yaml.FullLoader)
 
         try:
             # add Artifactory credentials to YAML document
@@ -396,10 +371,7 @@ class AbstractCloudPakForDataManager(ABC):
             # currently, cp4d-darwin cannot resolve icpfs1.svl.ibm.com to an IP
             # address
             # workaround START - TODO remove when cpd-darwin issue is fixed
-            if (
-                dg.utils.operating_system.get_operating_system()
-                == OperatingSystem.MAC_OS
-            ):
+            if dg.utils.operating_system.get_operating_system() == OperatingSystem.MAC_OS:
                 for element in yaml_content["fileservers"]:
                     unresolved_file_server_url = element["url"]
                     resolved_url = unresolved_file_server_url.replace(
@@ -418,10 +390,7 @@ class AbstractCloudPakForDataManager(ABC):
                     yaml_file,
                 )
         except yaml.YAMLError as exc:
-            raise DataGateCLIException(
-                "Exception while adding Artifactory credentials to YAML file: "
-                + str(exc)
-            )
+            raise DataGateCLIException("Exception while adding Artifactory credentials to YAML file: " + str(exc))
 
         return file_path
 
@@ -447,9 +416,7 @@ class AbstractCloudPakForDataManager(ABC):
             / f"repo-{str(self._get_cloud_pak_for_data_version())}.yaml"
         ) as repo_file:
             yaml_content = yaml.load(repo_file, Loader=yaml.FullLoader)
-            yaml_content["registry"][0][
-                "apikey"
-            ] = ibm_cloud_pak_for_data_entitlement_key
+            yaml_content["registry"][0]["apikey"] = ibm_cloud_pak_for_data_entitlement_key
 
             # Save modified YAML document to a file
             file_path = pathlib.Path(tempfile.gettempdir()) / "repo.yaml"

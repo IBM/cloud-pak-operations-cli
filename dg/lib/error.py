@@ -18,9 +18,7 @@ class DataGateCLIException(Exception):
         self._stdout = stdout
 
     def __str__(self):
-        output = (
-            f"{colorama.Style.BRIGHT}{self._error_message}{colorama.Style.RESET_ALL}"
-        )
+        output = f"{colorama.Style.BRIGHT}{self._error_message}{colorama.Style.RESET_ALL}"
 
         if self._stderr is not None:
             output += f" – error details:\n{self._stderr}"
@@ -37,9 +35,7 @@ class DataGateCLIException(Exception):
 class IBMCloudException(DataGateCLIException):
     @classmethod
     def get_parsed_error_message(cls, error_message: str) -> str:
-        search_result = regex.search(
-            "FAILED\\n(.*)\\n\\n(Incident ID: .*)\\n", error_message, regex.DOTALL
-        )
+        search_result = regex.search("FAILED\\n(.*)\\n\\n(Incident ID: .*)\\n", error_message, regex.DOTALL)
 
         if search_result is not None:
             output = f"{search_result.group(1)} [{search_result.group(2)}]"
@@ -60,9 +56,7 @@ class IBMCloudException(DataGateCLIException):
         output: Union[str, None] = None
 
         if self._stderr is None:
-            output = self._get_highlighted_str(
-                IBMCloudException.get_parsed_error_message(self._error_message)
-            )
+            output = self._get_highlighted_str(IBMCloudException.get_parsed_error_message(self._error_message))
         else:
             output = (
                 f"{self._get_highlighted_str(self._error_message)} – error details:\n"

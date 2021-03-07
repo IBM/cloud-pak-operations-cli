@@ -57,26 +57,18 @@ def check_cloud_pak_for_data_options(
                 "Missing options '--artifactory-user-name' and '--artifactory-api-key'",
                 ctx,
             )
-        elif ("artifactory_user_name" in options) and (
-            options["artifactory_user_name"] is None
-        ):
+        elif ("artifactory_user_name" in options) and (options["artifactory_user_name"] is None):
             raise click.UsageError("Missing option '--artifactory-user-name'", ctx)
-        elif ("artifactory_api_key" in options) and (
-            options["artifactory_api_key"] is None
-        ):
+        elif ("artifactory_api_key" in options) and (options["artifactory_api_key"] is None):
             raise click.UsageError("Missing option '--artifactory-api-key'", ctx)
     else:
         if ("ibm_cloud_pak_for_data_entitlement_key" in options) and (
             options["ibm_cloud_pak_for_data_entitlement_key"] is None
         ):
-            raise click.UsageError(
-                "Missing option '--ibm-cloud-pak-for-data-entitlement-key'", ctx
-            )
+            raise click.UsageError("Missing option '--ibm-cloud-pak-for-data-entitlement-key'", ctx)
 
 
-def create_click_multi_command_class(
-    modules: dict[str, ModuleType]
-) -> type[click.Command]:
+def create_click_multi_command_class(modules: dict[str, ModuleType]) -> type[click.Command]:
     """Creates a definition of a subclass of click.MultiCommand
 
     This method creates a definition of a subclass of click.MultiCommand
@@ -104,9 +96,7 @@ def create_click_multi_command_class(
             except Exception as exception:
                 click.ClickException(str(exception)).show()
 
-        def get_command(
-            self: click.MultiCommand, ctx: click.Context, cmd_name: str
-        ) -> click.Command:
+        def get_command(self: click.MultiCommand, ctx: click.Context, cmd_name: str) -> click.Command:
             if cmd_name not in commands:
                 raise click.ClickException("Unknown command")
 
@@ -205,9 +195,7 @@ def get_click_commands(module: ModuleType) -> dict[str, click.Command]:
     return commands
 
 
-def get_oc_login_command_for_remote_host(
-    ctx: click.Context, options: dict[str, Any]
-) -> str:
+def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, Any]) -> str:
     result: str
 
     if (
@@ -220,13 +208,9 @@ def get_oc_login_command_for_remote_host(
             options["server"], options["username"], options["password"]
         )
     elif ("token" in options) and (options["token"] is not None):
-        result = dg.lib.openshift.get_oc_login_command_with_token_for_remote_host(
-            options["server"], options["token"]
-        )
+        result = dg.lib.openshift.get_oc_login_command_with_token_for_remote_host(options["server"], options["token"])
     else:
-        current_cluster = (
-            dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
-        )
+        current_cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
 
         if current_cluster is None:
             raise click.UsageError(
@@ -243,9 +227,7 @@ def get_oc_login_command_for_remote_host(
     return result
 
 
-def import_packages_and_modules(
-    package_name: str, package_directory_path: pathlib.Path
-) -> dict[str, ModuleType]:
+def import_packages_and_modules(package_name: str, package_directory_path: pathlib.Path) -> dict[str, ModuleType]:
     """Imports all subpackages and submodules within the current package
 
     Parameters
@@ -266,23 +248,15 @@ def import_packages_and_modules(
     for file_path in package_directory_path.iterdir():
         if file_path.is_dir() and (file_path / "__init__.py").exists():
             package_or_module_name = file_path.name
-            logging.debug(
-                "Importing package {}.{}".format(package_name, package_or_module_name)
-            )
 
+            logging.debug("Importing package {}.{}".format(package_name, package_or_module_name))
             modules[package_or_module_name] = importlib.import_module(
                 "{}.{}".format(package_name, package_or_module_name)
             )
-        elif (
-            file_path.is_file()
-            and (file_path.suffix == ".py")
-            and (file_path.name != "__init__.py")
-        ):
+        elif file_path.is_file() and (file_path.suffix == ".py") and (file_path.name != "__init__.py"):
             package_or_module_name = file_path.name[:-3]
-            logging.debug(
-                "Importing module {}.{}".format(package_name, package_or_module_name)
-            )
 
+            logging.debug("Importing module {}.{}".format(package_name, package_or_module_name))
             modules[package_or_module_name] = importlib.import_module(
                 "{}.{}".format(package_name, package_or_module_name)
             )
@@ -301,9 +275,7 @@ def log_in_to_openshift_cluster(ctx: click.Context, options: dict[str, Any]):
             options["server"], options["username"], options["password"]
         )
     elif ("token" in options) and (options["token"] is not None):
-        dg.lib.openshift.log_in_to_openshift_cluster_with_token(
-            options["server"], options["token"]
-        )
+        dg.lib.openshift.log_in_to_openshift_cluster_with_token(options["server"], options["token"])
     else:
         raise click.UsageError(
             "You must either set options '--server' and '--password', '--token', or set a current cluster.",

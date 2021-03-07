@@ -23,9 +23,7 @@ import dg.utils.network
 from dg.lib.error import DataGateCLIException
 from dg.utils.logging import loglevel_command
 
-IBM_FYRE_SHOW_CLUSTERS_URL: Final[
-    str
-] = "https://api.fyre.ibm.com/rest/v1/?operation=query&request=showclusters"
+IBM_FYRE_SHOW_CLUSTERS_URL: Final[str] = "https://api.fyre.ibm.com/rest/v1/?operation=query&request=showclusters"
 
 
 @loglevel_command()
@@ -48,12 +46,6 @@ def login(
     )
 
     if not response.ok:
-        raise DataGateCLIException(
-            "Failed to log in to FYRE (HTTP status code: {})".format(
-                response.status_code
-            )
-        )
+        raise DataGateCLIException("Failed to log in to FYRE (HTTP status code: {})".format(response.status_code))
 
-    dg.config.data_gate_configuration_manager.store_credentials(
-        credentials_to_be_stored
-    )
+    dg.config.data_gate_configuration_manager.store_credentials(credentials_to_be_stored)

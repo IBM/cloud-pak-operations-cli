@@ -24,6 +24,4 @@ from dg.utils.logging import loglevel_command
 def use(alias_or_server: str):
     """Set the current registered OpenShift cluster"""
 
-    dg.config.cluster_credentials_manager.cluster_credentials_manager.set_cluster(
-        alias_or_server
-    )
+    dg.config.cluster_credentials_manager.cluster_credentials_manager.set_cluster(alias_or_server)

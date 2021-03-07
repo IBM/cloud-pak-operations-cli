@@ -39,9 +39,7 @@ class ClusterCredentialsManager:
     def __init__(self):
         self._clusters_file_contents = self.get_clusters_file_contents_with_default()
 
-    def add_cluster(
-        self, alias: str, server: str, type: str, cluster_data: ClusterData
-    ):
+    def add_cluster(self, alias: str, server: str, type: str, cluster_data: ClusterData):
         """Registers an existing OpenShift cluster
 
         Parameters
@@ -81,9 +79,7 @@ class ClusterCredentialsManager:
         if cluster is None:
             raise DataGateCLIException("Cluster not found ({})".format(alias_or_server))
 
-        if ("alias" in cluster_data_to_be_added) and (
-            (new_alias := cluster_data_to_be_added["alias"]) != ""
-        ):
+        if ("alias" in cluster_data_to_be_added) and ((new_alias := cluster_data_to_be_added["alias"]) != ""):
             self._raise_if_alias_exists(new_alias)
 
         cluster_data = cluster.get_cluster_data()
@@ -178,9 +174,7 @@ class ClusterCredentialsManager:
             contents of the clusters file or a default value if it does not exist
         """
 
-        clusters_file_contents: Union[
-            ClustersFileContents, None
-        ] = self.get_clusters_file_contents()
+        clusters_file_contents: Union[ClustersFileContents, None] = self.get_clusters_file_contents()
 
         if clusters_file_contents is None:
             clusters_file_contents = {"clusters": {}, "current_cluster": ""}
@@ -220,14 +214,10 @@ class ClusterCredentialsManager:
             user and current cluster credentials
         """
 
-        dg_credentials_file_path = (
-            data_gate_configuration_manager.get_dg_credentials_file_path()
-        )
+        dg_credentials_file_path = data_gate_configuration_manager.get_dg_credentials_file_path()
         result: ContextData
 
-        if dg_credentials_file_path.exists() and (
-            dg_credentials_file_path.stat().st_size != 0
-        ):
+        if dg_credentials_file_path.exists() and (dg_credentials_file_path.stat().st_size != 0):
             with open(dg_credentials_file_path) as json_file:
                 result = json.load(json_file)
         else:
@@ -336,14 +326,10 @@ class ClusterCredentialsManager:
         clusters = self._get_clusters()
 
         for cluster_data in clusters.values():
-            if ("alias" in cluster_data) and (
-                cluster_data["alias"] == alias_to_be_searched
-            ):
+            if ("alias" in cluster_data) and (cluster_data["alias"] == alias_to_be_searched):
                 raise DataGateCLIException("Alias already exists")
 
-    def _raise_if_alias_or_server_exists(
-        self, alias_to_be_searched: str, server_to_be_searched: str
-    ):
+    def _raise_if_alias_or_server_exists(self, alias_to_be_searched: str, server_to_be_searched: str):
         """Raises an exception if the given alias or server URL is already
         associated with a registered OpenShift cluster
 
@@ -360,9 +346,7 @@ class ClusterCredentialsManager:
         for server, cluster_data in clusters.items():
             if server == server_to_be_searched:
                 raise DataGateCLIException("Server already exists")
-            elif ("alias" in cluster_data) and (
-                cluster_data["alias"] == alias_to_be_searched
-            ):
+            elif ("alias" in cluster_data) and (cluster_data["alias"] == alias_to_be_searched):
                 raise DataGateCLIException("Alias already exists")
 
     def _save_clusters_file(self):

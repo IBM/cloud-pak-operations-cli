@@ -48,17 +48,12 @@ def get_cluster_access_token(
 ):
     """Obtain an OAuth access token for an OpenShift cluster"""
 
-    cluster = fyre_cluster_factory.create_cluster_using_cluster_name(
-        cluster_name, locals().copy()
-    )
-
+    cluster = fyre_cluster_factory.create_cluster_using_cluster_name(cluster_name, locals().copy())
     access_token = cluster.get_cluster_access_token()
 
     if not print_login_command:
         click.echo(access_token)
     else:
         click.echo(
-            "oc login --insecure-skip-tls-verify --server={} --token={}".format(
-                cluster.get_server(), access_token
-            )
+            "oc login --insecure-skip-tls-verify --server={} --token={}".format(cluster.get_server(), access_token)
         )

@@ -29,9 +29,7 @@ from dg.utils.logging import loglevel_command
 def login():
     """Log in to the current OpenShift cluster"""
 
-    current_cluster = (
-        dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
-    )
+    current_cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
 
     if current_cluster is None:
         raise DataGateCLIException("No current cluster selected")

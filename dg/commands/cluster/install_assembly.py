@@ -44,9 +44,7 @@ from dg.utils.logging import loglevel_command
 @optgroup.option("--username", help="OpenShift username")
 @optgroup.option("--password", help="OpenShift password")
 @optgroup.option("--token", help="OpenShift OAuth access token")
-@optgroup.option(
-    "--assembly-name", required=True, help="Name of the assembly to be installed"
-)
+@optgroup.option("--assembly-name", required=True, help="Name of the assembly to be installed")
 @optgroup.option(
     "--build-type",
     default=f"{CloudPakForDataAssemblyBuildType.RELEASE.name}",
@@ -91,21 +89,14 @@ def install_assembly(
 ):
     """Install an IBM Cloud Pak for Data assembly"""
 
-    cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[
-        build_type.upper()
-    ]
+    cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[build_type.upper()]
 
-    dg.lib.click.check_cloud_pak_for_data_options(
-        ctx, cloud_pak_for_data_assembly_build_type, locals().copy()
-    )
-
+    dg.lib.click.check_cloud_pak_for_data_options(ctx, cloud_pak_for_data_assembly_build_type, locals().copy())
     dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
 
-    cloud_pak_for_data_manager = (
-        CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(
-            semver.VersionInfo.parse(version)
-        )(cloud_pak_for_data_assembly_build_type)
-    )
+    cloud_pak_for_data_manager = CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(
+        semver.VersionInfo.parse(version)
+    )(cloud_pak_for_data_assembly_build_type)
 
     cloud_pak_for_data_manager.install_assembly_with_prerequisites(
         artifactory_user_name,

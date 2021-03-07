@@ -48,10 +48,7 @@ def logout(delete_api_key: bool):
         try:
             delete_api_key_in_ibmcloud()
         except CalledProcessError as error:
-            if (
-                f"Multiple API keys matches found with name '{EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
-                in error.stderr
-            ):
+            if f"Multiple API keys matches found with name '{EXTERNAL_IBM_CLOUD_API_KEY_NAME}'" in error.stderr:
                 raise DataGateCLIException(
                     f"Multiple API keys with the name {EXTERNAL_IBM_CLOUD_API_KEY_NAME} exist. You need to manually "
                     f"delete them using '{str(data_gate_configuration_manager.get_ibmcloud_cli_path())} iam "
@@ -59,18 +56,14 @@ def logout(delete_api_key: bool):
                 )
 
         logger.info("Deleting the Data Gate API key on disk")
-        data_gate_configuration_manager.store_credentials(
-            {INTERNAL_IBM_CLOUD_API_KEY_NAME: ""}
-        )
+        data_gate_configuration_manager.store_credentials({INTERNAL_IBM_CLOUD_API_KEY_NAME: ""})
 
     if is_logged_in():
         _perform_logout()
 
 
 def _perform_logout():
-    logout_command = execute_ibmcloud_command_without_check(
-        ["logout"], capture_output=True
-    )
+    logout_command = execute_ibmcloud_command_without_check(["logout"], capture_output=True)
 
     if logout_command.return_code != 0:
         raise IBMCloudException("'ibmcloud logout' failed", logout_command.stderr)

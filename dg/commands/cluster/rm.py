@@ -24,6 +24,4 @@ from dg.utils.logging import loglevel_command
 def rm(alias_or_server: str):
     """Remove a registered OpenShift cluster"""
 
-    dg.config.cluster_credentials_manager.cluster_credentials_manager.remove_cluster(
-        alias_or_server
-    )
+    dg.config.cluster_credentials_manager.cluster_credentials_manager.remove_cluster(alias_or_server)
