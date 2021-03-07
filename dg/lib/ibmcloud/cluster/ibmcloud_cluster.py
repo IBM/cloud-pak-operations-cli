@@ -29,17 +29,11 @@ class IBMCloudCluster(AbstractCluster):
         return ""
 
     def login(self):
-        api_key = (
-            dg.config.data_gate_configuration_manager.get_value_from_credentials_file(
-                dg.lib.ibmcloud.INTERNAL_IBM_CLOUD_API_KEY_NAME
-            )
+        api_key = dg.config.data_gate_configuration_manager.get_value_from_credentials_file(
+            dg.lib.ibmcloud.INTERNAL_IBM_CLOUD_API_KEY_NAME
         )
 
         if api_key is None:
-            raise DataGateCLIException(
-                "IBM Cloud API key not found in stored credentials"
-            )
+            raise DataGateCLIException("IBM Cloud API key not found in stored credentials")
 
-        dg.lib.openshift.log_in_to_openshift_cluster_with_password(
-            self.server, "apikey", api_key
-        )
+        dg.lib.openshift.log_in_to_openshift_cluster_with_password(self.server, "apikey", api_key)

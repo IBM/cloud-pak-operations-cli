@@ -41,14 +41,9 @@ def init_node_for_db2(node: str, db2_edition: str, use_host_path_storage: bool):
         flag indicating whether hostpath storage shall be used
     """
 
-    dg.lib.openshift.execute_oc_command(
-        _get_oc_adm_taint_node_command(node, db2_edition)
-    )
-
+    dg.lib.openshift.execute_oc_command(_get_oc_adm_taint_node_command(node, db2_edition))
     dg.lib.openshift.execute_oc_command(_get_oc_label_node_command(node, db2_edition))
-    dg.utils.process.execute_command(
-        pathlib.Path("ssh"), _get_ssh_setsebool_container_manage_cgroup_command(node)
-    )
+    dg.utils.process.execute_command(pathlib.Path("ssh"), _get_ssh_setsebool_container_manage_cgroup_command(node))
 
     if use_host_path_storage:
         label_storage_path(node)
@@ -81,17 +76,9 @@ async def init_node_for_db2_from_remote_host(
     async with dg.utils.ssh.RemoteClient(infrastructure_node_hostname) as remoteClient:
         await remoteClient.connect()
         await remoteClient.execute(oc_login_command_for_remote_host)
-        await remoteClient.execute(
-            "oc " + " ".join(_get_oc_adm_taint_node_command(node, db2_edition))
-        )
-
-        await remoteClient.execute(
-            "oc " + " ".join(_get_oc_label_node_command(node, db2_edition))
-        )
-
-        await remoteClient.execute(
-            "ssh " + " ".join(_get_ssh_setsebool_container_manage_cgroup_command(node))
-        )
+        await remoteClient.execute("oc " + " ".join(_get_oc_adm_taint_node_command(node, db2_edition)))
+        await remoteClient.execute("oc " + " ".join(_get_oc_label_node_command(node, db2_edition)))
+        await remoteClient.execute("ssh " + " ".join(_get_ssh_setsebool_container_manage_cgroup_command(node)))
 
         if use_host_path_storage:
             await label_storage_path_from_remote_host(remoteClient, node)
@@ -108,26 +95,13 @@ def label_storage_path(node: str):
         node on which the storage path shall be labeled
     """
 
-    dg.utils.process.execute_command(
-        pathlib.Path("ssh"), _get_ssh_mkdir_storage_path_command(node)
-    )
-
-    dg.utils.process.execute_command(
-        pathlib.Path("ssh"), _get_ssh_chmod_storage_path_command(node)
-    )
-
-    dg.utils.process.execute_command(
-        pathlib.Path("ssh"), _get_ssh_semanage_storage_path_command(node)
-    )
-
-    dg.utils.process.execute_command(
-        pathlib.Path("ssh"), _get_ssh_restorecon_storage_path_command(node)
-    )
+    dg.utils.process.execute_command(pathlib.Path("ssh"), _get_ssh_mkdir_storage_path_command(node))
+    dg.utils.process.execute_command(pathlib.Path("ssh"), _get_ssh_chmod_storage_path_command(node))
+    dg.utils.process.execute_command(pathlib.Path("ssh"), _get_ssh_semanage_storage_path_command(node))
+    dg.utils.process.execute_command(pathlib.Path("ssh"), _get_ssh_restorecon_storage_path_command(node))
 
 
-async def label_storage_path_from_remote_host(
-    remoteClient: dg.utils.ssh.RemoteClient, node: str
-):
+async def label_storage_path_from_remote_host(remoteClient: dg.utils.ssh.RemoteClient, node: str):
     """Labels the storage path on the given node from a remote host
 
     See https://www.ibm.com/support/producthub/icpdata/docs/content/SSQNUZ_latest/svc-db2/hostpath-selinux-aese.html
@@ -140,21 +114,10 @@ async def label_storage_path_from_remote_host(
         node on which the storage path shall be labeled
     """
 
-    await remoteClient.execute(
-        "ssh " + _join_args(_get_ssh_mkdir_storage_path_command(node))
-    )
-
-    await remoteClient.execute(
-        "ssh " + _join_args(_get_ssh_chmod_storage_path_command(node))
-    )
-
-    await remoteClient.execute(
-        "ssh " + _join_args(_get_ssh_semanage_storage_path_command(node))
-    )
-
-    await remoteClient.execute(
-        "ssh " + _join_args(_get_ssh_restorecon_storage_path_command(node))
-    )
+    await remoteClient.execute("ssh " + _join_args(_get_ssh_mkdir_storage_path_command(node)))
+    await remoteClient.execute("ssh " + _join_args(_get_ssh_chmod_storage_path_command(node)))
+    await remoteClient.execute("ssh " + _join_args(_get_ssh_semanage_storage_path_command(node)))
+    await remoteClient.execute("ssh " + _join_args(_get_ssh_restorecon_storage_path_command(node)))
 
 
 def _get_oc_adm_taint_node_command(node: str, db2_edition: str) -> list[str]:

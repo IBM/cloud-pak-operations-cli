@@ -40,8 +40,5 @@ def login(
 ):
     """Log in to an OpenShift cluster"""
 
-    cluster = fyre_cluster_factory.create_cluster_using_cluster_name(
-        cluster_name, locals().copy()
-    )
-
+    cluster = fyre_cluster_factory.create_cluster_using_cluster_name(cluster_name, locals().copy())
     cluster.login()

@@ -54,18 +54,14 @@ class TerraformPlugin(AbstractDownloadManagerPlugIn):
 
     # override
     def get_latest_binary_version(self) -> semver.VersionInfo:
-        latest_version = self._get_latest_binary_version_on_github(
-            "hashicorp", "terraform"
-        )
+        latest_version = self._get_latest_binary_version_on_github("hashicorp", "terraform")
 
         if latest_version is None:
             raise DataGateCLIException("No Terraform release could be found on GitHub")
 
         return latest_version
 
-    def _extract_archive(
-        self, archive_path: pathlib.Path, operating_system: OperatingSystem
-    ):
+    def _extract_archive(self, archive_path: pathlib.Path, operating_system: OperatingSystem):
         """Extracts the given archive in a dependency-specific manner
 
         Parameters
@@ -76,19 +72,15 @@ class TerraformPlugin(AbstractDownloadManagerPlugIn):
             current operating system
         """
 
-        target_directory_path = (
-            dg.config.data_gate_configuration_manager.get_dg_bin_directory_path()
-        )
+        target_directory_path = dg.config.data_gate_configuration_manager.get_dg_bin_directory_path()
 
-        if (
-            operating_system == dg.utils.operating_system.OperatingSystem.LINUX_X86_64
-        ) or (operating_system == dg.utils.operating_system.OperatingSystem.MAC_OS):
+        if (operating_system == dg.utils.operating_system.OperatingSystem.LINUX_X86_64) or (
+            operating_system == dg.utils.operating_system.OperatingSystem.MAC_OS
+        ):
             # change file mode (see https://bugs.python.org/issue15795)
-            post_extraction_func: dg.utils.compression.PostExtractionFunc = (
-                lambda path: os.chmod(
-                    path,
-                    os.stat(path).st_mode | stat.S_IXGRP | stat.S_IXOTH | stat.S_IXUSR,
-                )
+            post_extraction_func: dg.utils.compression.PostExtractionFunc = lambda path: os.chmod(
+                path,
+                os.stat(path).st_mode | stat.S_IXGRP | stat.S_IXOTH | stat.S_IXUSR,
             )
 
             dg.utils.compression.extract_archive(

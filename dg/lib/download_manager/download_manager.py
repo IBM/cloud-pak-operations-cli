@@ -48,8 +48,6 @@ class DownloadManager:
             current_version = binaries_manager.get_binary_version(binary_alias)
             latest_version = download_manager_plugin.get_latest_binary_version()
 
-            if (current_version is None) or (
-                latest_version.compare(current_version) == 1
-            ):
+            if (current_version is None) or (latest_version.compare(current_version) == 1):
                 download_manager_plugin.download_binary_version(latest_version)
                 binaries_manager.set_binary_version(binary_alias, str(latest_version))

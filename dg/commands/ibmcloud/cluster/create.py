@@ -62,9 +62,7 @@ logger = logging.getLogger(__name__)
     help="Remove any prompts during cluster creation.",
     is_flag=True,
 )
-def create(
-    cluster_name: str, full_installation: bool, remove_existing: bool, force: bool
-):
+def create(cluster_name: str, full_installation: bool, remove_existing: bool, force: bool):
     """Create a new OpenShift cluster on IBM Cloud"""
 
     if not is_logged_in():
@@ -82,9 +80,7 @@ def create(
             delete_ibmcloud_cluster(cluster_name, force)
             wait_for_cluster_deletion(cluster_name)
         else:
-            logging.info(
-                f"Skipping deletion, as cluster '{cluster_name}' could not be found."
-            )
+            logging.info(f"Skipping deletion, as cluster '{cluster_name}' could not be found.")
 
     logging.info(
         click.style(

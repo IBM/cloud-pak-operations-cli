@@ -50,9 +50,9 @@ class IBMCloudTerraformProviderPlugIn(AbstractDownloadManagerPlugIn):
     # override
     def download_binary_version(self, version: semver.VersionInfo):
         operating_system = dg.utils.operating_system.get_operating_system()
-        file_name = self._ibmcloud_terraform_provider_plugin_configuration_data_dict[
-            operating_system
-        ]["ibm_cloud_terraform_provider_file_name"]
+        file_name = self._ibmcloud_terraform_provider_plugin_configuration_data_dict[operating_system][
+            "ibm_cloud_terraform_provider_file_name"
+        ]
 
         url = f"https://github.com/IBM-Cloud/terraform-provider-ibm/releases/download/v{str(version)}/{file_name}"
         archive_path = dg.utils.download.download_file(urllib.parse.urlsplit(url))
@@ -66,14 +66,10 @@ class IBMCloudTerraformProviderPlugIn(AbstractDownloadManagerPlugIn):
 
     # override
     def get_latest_binary_version(self) -> semver.VersionInfo:
-        latest_version = self._get_latest_binary_version_on_github(
-            "IBM-Cloud", "terraform-provider-ibm"
-        )
+        latest_version = self._get_latest_binary_version_on_github("IBM-Cloud", "terraform-provider-ibm")
 
         if latest_version is None:
-            raise DataGateCLIException(
-                "No IBM Cloud Terraform Provider release could be found on GitHub"
-            )
+            raise DataGateCLIException("No IBM Cloud Terraform Provider release could be found on GitHub")
 
         return latest_version
 
@@ -90,14 +86,12 @@ class IBMCloudTerraformProviderPlugIn(AbstractDownloadManagerPlugIn):
 
         return (
             dg.config.data_gate_configuration_manager.get_home_directory_path()
-            / self._ibmcloud_terraform_provider_plugin_configuration_data_dict[
-                operating_system
-            ]["terraform_plugins_directory_path"]
+            / self._ibmcloud_terraform_provider_plugin_configuration_data_dict[operating_system][
+                "terraform_plugins_directory_path"
+            ]
         )
 
-    def _extract_archive(
-        self, archive_path: pathlib.Path, target_directory_path: pathlib.Path
-    ):
+    def _extract_archive(self, archive_path: pathlib.Path, target_directory_path: pathlib.Path):
         """Extracts the given archive in a dependency-specific manner
 
         Parameters
@@ -108,9 +102,7 @@ class IBMCloudTerraformProviderPlugIn(AbstractDownloadManagerPlugIn):
             path of the directory the archive shall be extracted to
         """
 
-        for entry in pathlib.Path(target_directory_path).glob(
-            "terraform-provider-ibm*"
-        ):
+        for entry in pathlib.Path(target_directory_path).glob("terraform-provider-ibm*"):
             os.remove(entry)
 
         dg.utils.compression.extract_archive(archive_path, target_directory_path)

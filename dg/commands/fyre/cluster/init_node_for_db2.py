@@ -31,16 +31,12 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option(
-    "--infrastructure-node-hostname", required=True, help="Infrastructure node hostname"
-)
+@click.option("--infrastructure-node-hostname", required=True, help="Infrastructure node hostname")
 @click.option("--server", required=True, help="OpenShift API server URL")
 @click.option("--username", help="OpenShift username")
 @click.option("--password", help="OpenShift password")
 @click.option("--token", help="OpenShift OAuth access token")
-@click.option(
-    "--node", required=True, help="Hostname of the worker node to be initialized"
-)
+@click.option("--node", required=True, help="Hostname of the worker node to be initialized")
 @click.option(
     "--db2-edition",
     required=True,
@@ -64,13 +60,9 @@ def init_node_for_db2(
 
     if dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
         dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
-        dg.lib.fyre.openshift.init_node_for_db2(
-            node, db2_edition, use_host_path_storage
-        )
+        dg.lib.fyre.openshift.init_node_for_db2(node, db2_edition, use_host_path_storage)
     else:
-        oc_login_command_for_remote_host = (
-            dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
-        )
+        oc_login_command_for_remote_host = dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
 
         asyncio.get_event_loop().run_until_complete(
             dg.lib.fyre.openshift.init_node_for_db2_from_remote_host(

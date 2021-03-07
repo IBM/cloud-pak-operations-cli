@@ -26,9 +26,7 @@ def disable_insecure_request_warning():
     # InsecureRequestWarning: Unverified HTTPS request is being made to host
     # '…'. Adding certificate verification is strongly advised. See:
     # https://urllib3.readthedocs.io/en/latest/advanced-usage.html#ssl-warnings
-    requests.packages.urllib3.disable_warnings(
-        category=requests.packages.urllib3.exceptions.InsecureRequestWarning
-    )
+    requests.packages.urllib3.disable_warnings(category=requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 
 def get_local_ipv4_addresses() -> list[ipaddress.IPv4Address]:
@@ -93,8 +91,6 @@ def parse_hostname_result(hostname_result: str) -> list[ipaddress.IPv4Address]:
     """
 
     hostname_result_list = hostname_result.rstrip().split(" ")
-    ipv4_addresses: list[ipaddress.IPv4Address] = list(
-        map(lambda str: ipaddress.ip_address(str), hostname_result_list)
-    )
+    ipv4_addresses: list[ipaddress.IPv4Address] = list(map(lambda str: ipaddress.ip_address(str), hostname_result_list))
 
     return ipv4_addresses

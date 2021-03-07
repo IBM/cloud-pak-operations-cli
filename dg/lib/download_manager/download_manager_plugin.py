@@ -74,9 +74,7 @@ class AbstractDownloadManagerPlugIn(ABC):
 
         pass
 
-    def _get_latest_binary_version_on_github(
-        self, owner: str, repo: str
-    ) -> Union[semver.VersionInfo, None]:
+    def _get_latest_binary_version_on_github(self, owner: str, repo: str) -> Union[semver.VersionInfo, None]:
         """Returns the latest version of a dependency on GitHub
 
         This method parses the "name" key of the JSON document returned by the

@@ -89,26 +89,15 @@ def install_cloud_pak_for_data(
 ):
     """Install IBM Cloud Pak for Data"""
 
-    cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[
-        build_type.upper()
-    ]
+    cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[build_type.upper()]
 
-    dg.lib.click.check_cloud_pak_for_data_options(
-        ctx, cloud_pak_for_data_assembly_build_type, locals().copy()
-    )
-
+    dg.lib.click.check_cloud_pak_for_data_options(ctx, cloud_pak_for_data_assembly_build_type, locals().copy())
     dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
 
-    override_yaml_file_path = (
-        dg.config.data_gate_configuration_manager.get_deps_directory_path()
-        / "override.yaml"
-    )
-
-    cloud_pak_for_data_manager = (
-        CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(
-            semver.VersionInfo.parse(version)
-        )(cloud_pak_for_data_assembly_build_type)
-    )
+    override_yaml_file_path = dg.config.data_gate_configuration_manager.get_deps_directory_path() / "override.yaml"
+    cloud_pak_for_data_manager = CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(
+        semver.VersionInfo.parse(version)
+    )(cloud_pak_for_data_assembly_build_type)
 
     cloud_pak_for_data_manager.check_openshift_version()
     cloud_pak_for_data_manager.install_assembly_with_prerequisites(

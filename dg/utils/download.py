@@ -82,18 +82,12 @@ def download_file(url: urllib.parse.SplitResult, **kwargs: Any) -> pathlib.Path:
     logger.info("Downloading: {} [{}]".format(response.url, file_name))
 
     content_length = (
-        int(str(response.headers.get("Content-Length")))
-        if response.headers.get("Content-Length") is not None
-        else 0
+        int(str(response.headers.get("Content-Length"))) if response.headers.get("Content-Length") is not None else 0
     )
 
     download_progress_bar = tqdm(total=content_length, unit="B", unit_scale=True)
     path = (
-        pathlib.Path(
-            kwargs["target_directory_path"]
-            if "target_directory_path" in kwargs
-            else tempfile.gettempdir()
-        )
+        pathlib.Path(kwargs["target_directory_path"] if "target_directory_path" in kwargs else tempfile.gettempdir())
         / file_name
     )
 
@@ -107,9 +101,7 @@ def download_file(url: urllib.parse.SplitResult, **kwargs: Any) -> pathlib.Path:
     return path
 
 
-def download_file_into_buffer(
-    url: urllib.parse.SplitResult, output_stream: io.BufferedIOBase, **kwargs: Any
-) -> str:
+def download_file_into_buffer(url: urllib.parse.SplitResult, output_stream: io.BufferedIOBase, **kwargs: Any) -> str:
     """Downloads a file and writes its content into the given output
     stream.
 
@@ -144,9 +136,7 @@ def download_file_into_buffer(
         logger.info("Downloading: {} [{}]".format(response.url, file_name))
 
     content_length = (
-        int(str(response.headers.get("Content-Length")))
-        if response.headers.get("Content-Length") is not None
-        else 0
+        int(str(response.headers.get("Content-Length"))) if response.headers.get("Content-Length") is not None else 0
     )
 
     if ("silent" in kwargs) and kwargs["silent"]:

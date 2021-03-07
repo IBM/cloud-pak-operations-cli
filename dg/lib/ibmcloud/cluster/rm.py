@@ -33,9 +33,7 @@ def delete_ibmcloud_cluster(name: str, force_deletion: bool):
         result = execute_ibmcloud_command_without_check(command, capture_output=True)
 
         if result.return_code != 0:
-            raise IBMCloudException(
-                "An error occurred while deleting the cluster", result.stderr
-            )
+            raise IBMCloudException("An error occurred while deleting the cluster", result.stderr)
         else:
             return_code = result.return_code
             click.echo(result.stdout)

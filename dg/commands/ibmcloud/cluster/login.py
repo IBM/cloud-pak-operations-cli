@@ -31,10 +31,7 @@ def login(cluster_name: str):
     cluster_status = dg.lib.ibmcloud.status.get_cluster_status(cluster_name)
 
     if cluster_status.is_ready():
-        cluster = ibm_cloud_cluster_factory.create_cluster(
-            cluster_status.get_server_url(), {}
-        )
-
+        cluster = ibm_cloud_cluster_factory.create_cluster(cluster_status.get_server_url(), {})
         cluster.login()
     else:
         raise DataGateCLIException(

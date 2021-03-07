@@ -23,9 +23,7 @@ from dg.utils.logging import loglevel_command
 def current():
     """Get the current registered OpenShift cluster"""
 
-    current_cluster = (
-        dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
-    )
+    current_cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
 
     if current_cluster is not None:
         click.echo(current_cluster.get_server())

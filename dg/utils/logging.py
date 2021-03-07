@@ -46,9 +46,7 @@ class ClickLoggingFormatter(logging.Formatter):
         }
 
         return (
-            click.style(
-                logging.Formatter.format(self, record), **colors[record.levelname]
-            )
+            click.style(logging.Formatter.format(self, record), **colors[record.levelname])
             if record.levelname in colors
             else logging.Formatter.format(self, record)
         )
@@ -109,9 +107,7 @@ def loglevel_command(name=None, default_log_level="INFO", **attrs):
     """
 
     def decorator(f):
-        command = click.command(
-            name, cls=_getClickCommandWithLogLevelOption(default_log_level), **attrs
-        )(f)
+        command = click.command(name, cls=_getClickCommandWithLogLevelOption(default_log_level), **attrs)(f)
 
         return command
 
@@ -134,9 +130,7 @@ def loglevel_option(default_log_level="INFO") -> Callable:
         expose_value=False,
         help="Log level",
         is_eager=True,
-        type=click.Choice(
-            ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], case_sensitive=False
-        ),
+        type=click.Choice(["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], case_sensitive=False),
     )
 
 

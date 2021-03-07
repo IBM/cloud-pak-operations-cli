@@ -53,14 +53,10 @@ class IBMCloudCLIPlugIn(AbstractDownloadManagerPlugIn):
 
     # override
     def get_latest_binary_version(self) -> semver.VersionInfo:
-        latest_version = self._get_latest_binary_version_on_github(
-            "IBM-Cloud", "ibm-cloud-cli-release"
-        )
+        latest_version = self._get_latest_binary_version_on_github("IBM-Cloud", "ibm-cloud-cli-release")
 
         if latest_version is None:
-            raise DataGateCLIException(
-                "No IBM Cloud CLI release could be found on GitHub"
-            )
+            raise DataGateCLIException("No IBM Cloud CLI release could be found on GitHub")
 
         return latest_version
 
@@ -73,19 +69,12 @@ class IBMCloudCLIPlugIn(AbstractDownloadManagerPlugIn):
             path of the archive to be extracted
         """
 
-        member_identification_func: dg.utils.compression.MemberIdentificationFunc = (
-            lambda path, file_type: (
-                (
-                    (os.path.basename(path) == "ibmcloud")
-                    or (os.path.basename(path) == "ibmcloud.exe")
-                )
-                and (file_type == dg.utils.file.FileType.RegularFile)
-            )
+        member_identification_func: dg.utils.compression.MemberIdentificationFunc = lambda path, file_type: (
+            ((os.path.basename(path) == "ibmcloud") or (os.path.basename(path) == "ibmcloud.exe"))
+            and (file_type == dg.utils.file.FileType.RegularFile)
         )
 
-        target_directory_path = (
-            dg.config.data_gate_configuration_manager.get_dg_bin_directory_path()
-        )
+        target_directory_path = dg.config.data_gate_configuration_manager.get_dg_bin_directory_path()
 
         dg.utils.compression.extract_archive(
             archive_path,

@@ -41,6 +41,4 @@ def store_credentials(
 
     credentials_to_be_stored = locals().copy()
 
-    dg.config.data_gate_configuration_manager.store_credentials(
-        credentials_to_be_stored
-    )
+    dg.config.data_gate_configuration_manager.store_credentials(credentials_to_be_stored)

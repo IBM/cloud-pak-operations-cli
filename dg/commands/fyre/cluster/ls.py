@@ -50,11 +50,7 @@ def ls(fyre_user_name: str, fyre_api_key: str):
     )
 
     if not response.ok:
-        raise DataGateCLIException(
-            "Failed to get FYRE clusters (HTTP status code: {})".format(
-                response.status_code
-            )
-        )
+        raise DataGateCLIException("Failed to get FYRE clusters (HTTP status code: {})".format(response.status_code))
 
     clusters = response.json()["clusters"]
 

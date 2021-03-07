@@ -29,9 +29,7 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option(
-    "--infrastructure-node-hostname", required=True, help="Infrastructure node hostname"
-)
+@click.option("--infrastructure-node-hostname", required=True, help="Infrastructure node hostname")
 @click.option("--node", required=True, help="Worker node to be initialized")
 def init_node_for_data_gate(
     infrastructure_node_hostname: str,
@@ -39,44 +37,28 @@ def init_node_for_data_gate(
 ):
     """Initialize a worker node before creating a Data Gate instance"""
 
-    asyncio.get_event_loop().run_until_complete(
-        _init_node_for_data_gate(infrastructure_node_hostname, node)
-    )
+    asyncio.get_event_loop().run_until_complete(_init_node_for_data_gate(infrastructure_node_hostname, node))
 
 
-async def _compile_selinux_policy_module(
-    remoteClient: dg.utils.ssh.RemoteClient, node: str
-):
-    await remoteClient.execute(
-        "ssh core@{} sudo checkmodule -m --mls --output db2u-nfs.mod db2u-nfs.te".format(
-            node
-        )
-    )
+async def _compile_selinux_policy_module(remoteClient: dg.utils.ssh.RemoteClient, node: str):
+    await remoteClient.execute("ssh core@{} sudo checkmodule -m --mls --output db2u-nfs.mod db2u-nfs.te".format(node))
 
 
 async def _copy_type_enforcement_file_to_infrastructure_node(
     remoteClient: dg.utils.ssh.RemoteClient,
 ):
     await remoteClient.upload(
-        dg.config.data_gate_configuration_manager.get_deps_directory_path()
-        / "db2u-nfs"
-        / "db2u-nfs.te"
+        dg.config.data_gate_configuration_manager.get_deps_directory_path() / "db2u-nfs" / "db2u-nfs.te"
     )
 
 
-async def _copy_type_enforcement_file_to_worker_node(
-    remoteClient: dg.utils.ssh.RemoteClient, node: str
-):
+async def _copy_type_enforcement_file_to_worker_node(remoteClient: dg.utils.ssh.RemoteClient, node: str):
     await remoteClient.execute("scp db2u-nfs.te core@{}:".format(node))
 
 
-async def _create_selinux_policy_module_package(
-    remoteClient: dg.utils.ssh.RemoteClient, node: str
-):
+async def _create_selinux_policy_module_package(remoteClient: dg.utils.ssh.RemoteClient, node: str):
     await remoteClient.execute(
-        "ssh core@{} sudo semodule_package --module db2u-nfs.mod --outfile db2u-nfs.pp".format(
-            node
-        )
+        "ssh core@{} sudo semodule_package --module db2u-nfs.mod --outfile db2u-nfs.pp".format(node)
     )
 
 
@@ -93,9 +75,5 @@ async def _init_node_for_data_gate(
         await _install_selinux_policy_module_package(remoteClient, node)
 
 
-async def _install_selinux_policy_module_package(
-    remoteClient: dg.utils.ssh.RemoteClient, node: str
-):
-    await remoteClient.execute(
-        "ssh core@{} sudo semodule --install db2u-nfs.pp".format(node)
-    )
+async def _install_selinux_policy_module_package(remoteClient: dg.utils.ssh.RemoteClient, node: str):
+    await remoteClient.execute("ssh core@{} sudo semodule --install db2u-nfs.pp".format(node))
