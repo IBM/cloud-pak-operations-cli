@@ -13,9 +13,7 @@ class TestNetworkUtilities(unittest.TestCase):
         ipv4_addresses = dg.utils.network.parse_hostname_result(hostname_result)
 
         self.assertEqual(
-            dg.lib.fyre.network.get_private_ip_address_of_infrastructure_node(
-                ipv4_addresses
-            ),
+            dg.lib.fyre.network.get_private_ip_address_of_infrastructure_node(ipv4_addresses),
             ipaddress.ip_address("10.0.0.1"),
         )
 

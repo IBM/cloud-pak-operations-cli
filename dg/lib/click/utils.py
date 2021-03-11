@@ -12,12 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import importlib
 import json
-import logging
 import pathlib
 
-from types import ModuleType
 from typing import Any
 
 import click
@@ -40,6 +37,8 @@ def check_cloud_pak_for_data_options(
 
     Parameters
     ----------
+    ctx
+        Click context
     build_type
         build type of an IBM Cloud Pak for Data assembly to be installed
     options
@@ -68,85 +67,6 @@ def check_cloud_pak_for_data_options(
             raise click.UsageError("Missing option '--ibm-cloud-pak-for-data-entitlement-key'", ctx)
 
 
-def create_click_multi_command_class(modules: dict[str, ModuleType]) -> type[click.Command]:
-    """Creates a definition of a subclass of click.MultiCommand
-
-    This method creates a definition of a subclass of click.MultiCommand
-    providing Click commands found in the given Python modules.
-
-    Parameters
-    ----------
-    modules
-        Python modules to be searched for Click commands
-
-    Returns
-    -------
-    click.Command
-        Definition of a subclass of click.MultiCommand
-    """
-
-    command_names, commands = create_click_multi_command_data_structures(modules)
-
-    class MultiCommand(click.MultiCommand):
-        def __call__(self, *args, **kwargs):
-            """Handle exceptions raised by Click commands"""
-
-            try:
-                return self.main(*args, **kwargs)
-            except Exception as exception:
-                click.ClickException(str(exception)).show()
-
-        def get_command(self: click.MultiCommand, ctx: click.Context, cmd_name: str) -> click.Command:
-            if cmd_name not in commands:
-                raise click.ClickException("Unknown command")
-
-            return commands[cmd_name]
-
-        def list_commands(self: click.MultiCommand, ctx: click.Context) -> list[str]:
-            return command_names
-
-    return MultiCommand
-
-
-def create_click_multi_command_data_structures(
-    modules: dict[str, ModuleType]
-) -> tuple[list[str], dict[str, click.Command]]:
-    """Creates click.MultiCommand data structures
-
-    This method creates two data structures based on Click commands within
-    the given Python modules. These data structures may be used when
-    defining a subclass of click.MultiCommand:
-
-    - a list of Click command names
-    - a dictionary associating Click command names with Click commands
-
-    Parameters
-    ----------
-    modules
-        Python modules
-
-    Returns
-    -------
-    tuple[list[str], dict[str, click.Command]]
-        tuple consisting of a list of Click command names and a dictionary
-        associating Click command names with Click commands
-    """
-
-    command_names: list[str] = []
-    commands: dict[str, click.Command] = {}
-
-    for module_name, module in modules.items():
-        module_commands = get_click_commands(module)
-
-        if len(module_commands) != 0:
-            commands.update(module_commands)
-            command_names.append(module_name.replace("_", "-"))
-
-    command_names.sort()
-
-    return command_names, commands
-
-
 def create_default_map_from_dict(dict: dict[str, Any]):
     default_map_dict = {}
     default_map_dict["default_map"] = dict
@@ -164,35 +84,6 @@ def create_default_map_from_json_file(path: pathlib.Path):
             default_map_dict["default_map"] = credentials_file_contents
 
     return default_map_dict
-
-
-def get_click_commands(module: ModuleType) -> dict[str, click.Command]:
-    """Returns Click commands within a Python module
-
-    This method searches the given Python module for Click commands.
-
-    Parameters
-    ----------
-    modules
-        Python modules
-
-    Returns
-    -------
-    dict[str, click.Command]
-        dictionary associating Click command names with Click commands
-    """
-
-    commands: dict[str, click.Command] = {}
-
-    for attributeName in dir(module):
-        attribute = getattr(module, attributeName)
-
-        if isinstance(attribute, click.Command):
-            command_name = attributeName.replace("_", "-")
-
-            commands[command_name] = attribute
-
-    return commands
 
 
 def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, Any]) -> str:
@@ -225,43 +116,6 @@ def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, 
         )
 
     return result
-
-
-def import_packages_and_modules(package_name: str, package_directory_path: pathlib.Path) -> dict[str, ModuleType]:
-    """Imports all subpackages and submodules within the current package
-
-    Parameters
-    ----------
-    package_name
-        name of the current package (__name__)
-    package_directory_path
-        path of the directory of the current package (__file__)
-
-    Returns
-    -------
-    dict[str, ModuleType]
-        dictionary associating names of imported modules with imported modules
-    """
-
-    modules: dict[str, ModuleType] = {}
-
-    for file_path in package_directory_path.iterdir():
-        if file_path.is_dir() and (file_path / "__init__.py").exists():
-            package_or_module_name = file_path.name
-
-            logging.debug("Importing package {}.{}".format(package_name, package_or_module_name))
-            modules[package_or_module_name] = importlib.import_module(
-                "{}.{}".format(package_name, package_or_module_name)
-            )
-        elif file_path.is_file() and (file_path.suffix == ".py") and (file_path.name != "__init__.py"):
-            package_or_module_name = file_path.name[:-3]
-
-            logging.debug("Importing module {}.{}".format(package_name, package_or_module_name))
-            modules[package_or_module_name] = importlib.import_module(
-                "{}.{}".format(package_name, package_or_module_name)
-            )
-
-    return modules
 
 
 def log_in_to_openshift_cluster(ctx: click.Context, options: dict[str, Any]):

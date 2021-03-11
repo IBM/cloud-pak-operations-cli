@@ -19,7 +19,7 @@ from typing import Union
 import click
 
 import dg.config.cluster_credentials_manager
-import dg.lib.click
+import dg.lib.click.utils
 import dg.lib.fyre.openshift
 import dg.utils.network
 
@@ -27,7 +27,7 @@ from dg.utils.logging import loglevel_command
 
 
 @loglevel_command(
-    context_settings=dg.lib.click.create_default_map_from_dict(
+    context_settings=dg.lib.click.utils.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
@@ -59,10 +59,10 @@ def init_node_for_db2(
     """Initialize a worker node before creating a Db2 instance"""
 
     if dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
-        dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
+        dg.lib.click.utils.log_in_to_openshift_cluster(ctx, locals().copy())
         dg.lib.fyre.openshift.init_node_for_db2(node, db2_edition, use_host_path_storage)
     else:
-        oc_login_command_for_remote_host = dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
+        oc_login_command_for_remote_host = dg.lib.click.utils.get_oc_login_command_for_remote_host(ctx, locals().copy())
 
         asyncio.get_event_loop().run_until_complete(
             dg.lib.fyre.openshift.init_node_for_db2_from_remote_host(

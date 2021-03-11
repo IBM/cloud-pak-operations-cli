@@ -21,7 +21,7 @@ from click_option_group import optgroup
 
 import dg.config
 import dg.config.cluster_credentials_manager
-import dg.lib.click
+import dg.lib.click.utils
 import dg.lib.cluster
 import dg.lib.openshift
 import dg.utils.download
@@ -37,7 +37,7 @@ from dg.utils.logging import loglevel_command
 
 
 @loglevel_command(
-    context_settings=dg.lib.click.create_default_map_from_dict(
+    context_settings=dg.lib.click.utils.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
@@ -91,8 +91,8 @@ def install_cloud_pak_for_data(
 
     cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[build_type.upper()]
 
-    dg.lib.click.check_cloud_pak_for_data_options(ctx, cloud_pak_for_data_assembly_build_type, locals().copy())
-    dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
+    dg.lib.click.utils.check_cloud_pak_for_data_options(ctx, cloud_pak_for_data_assembly_build_type, locals().copy())
+    dg.lib.click.utils.log_in_to_openshift_cluster(ctx, locals().copy())
 
     override_yaml_file_path = dg.config.data_gate_configuration_manager.get_deps_directory_path() / "override.yaml"
     cloud_pak_for_data_manager = CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(

@@ -19,7 +19,7 @@ from typing import Union
 import click
 
 import dg.config.cluster_credentials_manager
-import dg.lib.click
+import dg.lib.click.utils
 import dg.lib.fyre.nfs
 import dg.utils.network
 
@@ -27,7 +27,7 @@ from dg.utils.logging import loglevel_command
 
 
 @loglevel_command(
-    context_settings=dg.lib.click.create_default_map_from_dict(
+    context_settings=dg.lib.click.utils.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
@@ -54,10 +54,10 @@ def install_nfs_storage_class(
     """Install NFS storage class"""
 
     if dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
-        dg.lib.click.log_in_to_openshift_cluster(ctx, locals().copy())
+        dg.lib.click.utils.log_in_to_openshift_cluster(ctx, locals().copy())
         dg.lib.fyre.nfs.install_nfs_storage_class(ibm_github_api_key)
     else:
-        oc_login_command_for_remote_host = dg.lib.click.get_oc_login_command_for_remote_host(ctx, locals().copy())
+        oc_login_command_for_remote_host = dg.lib.click.utils.get_oc_login_command_for_remote_host(ctx, locals().copy())
 
         asyncio.get_event_loop().run_until_complete(
             dg.lib.fyre.nfs.install_nfs_storage_class_on_remote_host(
