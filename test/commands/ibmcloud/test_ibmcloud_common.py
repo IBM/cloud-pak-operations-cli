@@ -32,9 +32,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         "dg.lib.ibmcloud.iam.execute_ibmcloud_command",
         return_value=ProcessResult(
             stderr="",
-            stdout=(
-                Path(__file__).parent / "dependencies/ibmcloud_generate_api_key.json"
-            ).read_text(),
+            stdout=(Path(__file__).parent / "dependencies/ibmcloud_generate_api_key.json").read_text(),
             return_code=0,
         ),
     )
@@ -46,9 +44,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         "dg.lib.ibmcloud.iam.execute_ibmcloud_command",
         return_value=ProcessResult(
             stderr="",
-            stdout=(
-                Path(__file__).parent / "dependencies/ibmcloud_api_keys.json"
-            ).read_text(),
+            stdout=(Path(__file__).parent / "dependencies/ibmcloud_api_keys.json").read_text(),
             return_code=0,
         ),
     )
@@ -61,9 +57,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         "dg.lib.ibmcloud.vlan.execute_ibmcloud_command",
         return_value=ProcessResult(
             stderr="",
-            stdout=(
-                Path(__file__).parent / "dependencies/ibmcloud_list_vlans.json"
-            ).read_text(),
+            stdout=(Path(__file__).parent / "dependencies/ibmcloud_list_vlans.json").read_text(),
             return_code=0,
         ),
     )
@@ -75,9 +69,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         "dg.lib.ibmcloud.vlan.execute_ibmcloud_command",
         return_value=ProcessResult(
             stderr="",
-            stdout=(
-                Path(__file__).parent / "dependencies/ibmcloud_list_vlans.json"
-            ).read_text(),
+            stdout=(Path(__file__).parent / "dependencies/ibmcloud_list_vlans.json").read_text(),
             return_code=0,
         ),
     )
@@ -89,9 +81,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         "dg.lib.ibmcloud.status.execute_ibmcloud_command",
         return_value=ProcessResult(
             stderr="",
-            stdout=(
-                Path(__file__).parent / "dependencies/ibmcloud_oc_cluster_status.json"
-            ).read_text(),
+            stdout=(Path(__file__).parent / "dependencies/ibmcloud_oc_cluster_status.json").read_text(),
             return_code=0,
         ),
     )
@@ -102,9 +92,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         "dg.lib.ibmcloud.status.execute_ibmcloud_command",
         return_value=ProcessResult(
             stderr="",
-            stdout=(
-                Path(__file__).parent / "dependencies/ibmcloud_oc_cluster_status_2.json"
-            ).read_text(),
+            stdout=(Path(__file__).parent / "dependencies/ibmcloud_oc_cluster_status_2.json").read_text(),
             return_code=0,
         ),
     )
@@ -115,9 +103,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         "dg.lib.ibmcloud.install.execute_ibmcloud_command",
         return_value=ProcessResult(
             stderr="",
-            stdout=Path(
-                "test/dependencies/ibmcloud_catalog_search_pak.json"
-            ).read_text(),
+            stdout=Path("test/dependencies/ibmcloud_catalog_search_pak.json").read_text(),
             return_code=0,
         ),
     )

@@ -118,19 +118,14 @@ To register a new Click command, add the Python module containing the command to
 To register a new Click group, add a Python package (i.e., a directory containing a file named `__init__.py`) to the `commands` directory or one of its subdirectories. Furthermore, add the following code to `__init__.py` to automatically register Click commands within Python modules contained in the package:
 
 ```python
+import sys
+
 import click
-import pathlib
 
-import dg.lib.click as dgclick
-
-
-def get_click_multi_command_class() -> type[click.Command]:
-    return dgclick.create_click_multi_command_class(
-        dgclick.import_packages_and_modules(__name__, pathlib.Path(__file__).parent)
-    )
+from dg.lib.click.lazy_loading_multi_command import create_click_multi_command_class
 
 
-@click.command(cls=get_click_multi_command_class())
+@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
 def {Click group name}():
     pass
 ```

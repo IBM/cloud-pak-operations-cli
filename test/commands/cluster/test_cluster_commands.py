@@ -131,22 +131,14 @@ class TestClusterCommands(unittest.TestCase):
 
         self._add_cluster(cluster_1_data)
         self.assertEqual(
-            len(
-                cluster_credentials_manager.get_clusters_file_contents_with_default()[
-                    "clusters"
-                ]
-            ),
+            len(cluster_credentials_manager.get_clusters_file_contents_with_default()["clusters"]),
             1,
         )
 
         # remove cluster-1
         self._rm_cluster(cluster_1_data["server"])
         self.assertEqual(
-            len(
-                cluster_credentials_manager.get_clusters_file_contents_with_default()[
-                    "clusters"
-                ]
-            ),
+            len(cluster_credentials_manager.get_clusters_file_contents_with_default()["clusters"]),
             0,
         )
 

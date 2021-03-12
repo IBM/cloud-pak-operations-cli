@@ -69,9 +69,7 @@ class TestAddClusterCommands(unittest.TestCase):
         server = cluster_data["server"]
 
         dg.lib.ibmcloud.status.execute_ibmcloud_command = unittest.mock.MagicMock(
-            return_value=dg.utils.process.ProcessResult(
-                stderr="", stdout=f'{{"serverURL": "{server}"}}', return_code=0
-            )
+            return_value=dg.utils.process.ProcessResult(stderr="", stdout=f'{{"serverURL": "{server}"}}', return_code=0)
         )
 
         runner = click.testing.CliRunner()
@@ -93,11 +91,7 @@ class TestAddClusterCommands(unittest.TestCase):
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(
-            len(
-                cluster_credentials_manager.get_clusters_file_contents_with_default()[
-                    "clusters"
-                ]
-            ),
+            len(cluster_credentials_manager.get_clusters_file_contents_with_default()["clusters"]),
             num_expected_cluster,
         )
 

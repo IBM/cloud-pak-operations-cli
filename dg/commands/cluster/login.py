@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 import dg.config.cluster_credentials_manager
-import dg.lib.click
+import dg.lib.click.utils
 import dg.lib.fyre.cluster.fyre_cluster_factory  # required to register FYREClusterFactory object
 import dg.lib.ibmcloud.cluster.ibmcloud_cluster_factory  # required to register IBMCloudClusterFactory object
 
@@ -22,7 +22,7 @@ from dg.utils.logging import loglevel_command
 
 
 @loglevel_command(
-    context_settings=dg.lib.click.create_default_map_from_dict(
+    context_settings=dg.lib.click.utils.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )

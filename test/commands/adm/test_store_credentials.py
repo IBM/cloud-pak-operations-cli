@@ -22,7 +22,7 @@ import click.testing
 
 import dg.commands.adm.store_credentials
 import dg.config
-import dg.lib.click
+import dg.lib.click.utils
 
 from dg.dg import cli
 
@@ -31,15 +31,13 @@ class TestStoreCredentialsCommand(unittest.TestCase):
     def test_store_credentials(self):
         """Tests that dg adm store-credentials creates credentials.json"""
 
-        dg_credentials_file_path = (
-            pathlib.Path(tempfile.gettempdir()) / "credentials.json"
-        )
+        dg_credentials_file_path = pathlib.Path(tempfile.gettempdir()) / "credentials.json"
 
         if dg_credentials_file_path.exists():
             os.remove(dg_credentials_file_path)
 
-        dg.config.data_gate_configuration_manager.get_dg_credentials_file_path = (
-            unittest.mock.MagicMock(return_value=dg_credentials_file_path)
+        dg.config.data_gate_configuration_manager.get_dg_credentials_file_path = unittest.mock.MagicMock(
+            return_value=dg_credentials_file_path
         )
 
         # check that key-value pairs were added to credentials.json
@@ -97,7 +95,7 @@ class TestStoreCredentialsCommand(unittest.TestCase):
         self.assertNotIn("ibm_github_api_key", default_map)
 
     def _load_credentials_file(self, dg_credentials_file_path: pathlib.Path):
-        json = dg.lib.click.create_default_map_from_json_file(dg_credentials_file_path)
+        json = dg.lib.click.utils.create_default_map_from_json_file(dg_credentials_file_path)
 
         self.assertIn("default_map", json)
 

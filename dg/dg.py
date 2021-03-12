@@ -21,6 +21,10 @@ import dg.commands
 import dg.utils.debugger
 import dg.utils.logging
 
+from dg.lib.click.lazy_loading_multi_command import (
+    create_click_multi_command_class,
+)
+
 dg.utils.logging.init_root_logger()
 
 if dg.utils.debugger.is_debugpy_running() and (len(sys.argv) == 2):
@@ -35,7 +39,10 @@ if dg.utils.debugger.is_debugpy_running() and (len(sys.argv) == 2):
         sys.argv = [sys.argv[0]] + sys.argv[1].split()
 
 
-@click.group(cls=dg.commands.get_click_multi_command_class(), invoke_without_command=True)
+@click.group(
+    cls=create_click_multi_command_class(dg.commands),
+    invoke_without_command=True,
+)
 @click.option("--version", is_flag=True, help="Show the version number of the Data Gate CLI")
 @click.pass_context
 def cli(ctx: click.Context, version: bool):

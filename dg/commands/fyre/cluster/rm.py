@@ -21,7 +21,7 @@ import requests
 
 import dg.config
 import dg.config.cluster_credentials_manager
-import dg.lib.click
+import dg.lib.click.utils
 import dg.utils.network
 
 from dg.lib.error import DataGateCLIException
@@ -31,7 +31,7 @@ IBM_FYRE_DELETE_CLUSTER_URL: Final[str] = "https://api.fyre.ibm.com/rest/v1/?ope
 
 
 @loglevel_command(
-    context_settings=dg.lib.click.create_default_map_from_json_file(
+    context_settings=dg.lib.click.utils.create_default_map_from_json_file(
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
