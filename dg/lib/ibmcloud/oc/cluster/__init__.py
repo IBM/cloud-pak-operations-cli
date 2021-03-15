@@ -12,17 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import sys
+from typing import Final
 
-import click
-
-from dg.lib.click.lazy_loading_multi_command import (
-    create_click_multi_command_class,
-)
-
-
-@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
-def cluster():
-    """Manage a RedHat OpenShift cluster"""
-
-    pass
+CLUSTER_TYPE_ID: Final[str] = "6446c4cb-7e82-4f68-88bb-458bd5a0bcc4"

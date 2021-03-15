@@ -17,8 +17,8 @@ import click
 import dg.lib.ibmcloud.status
 
 from dg.lib.error import DataGateCLIException
-from dg.lib.ibmcloud.cluster.ibmcloud_cluster_factory import (
-    ibm_cloud_cluster_factory,
+from dg.lib.ibmcloud.oc.cluster.roks_cluster_factory import (
+    roks_cluster_factory,
 )
 from dg.utils.logging import loglevel_command
 
@@ -31,7 +31,7 @@ def login(cluster_name: str):
     cluster_status = dg.lib.ibmcloud.status.get_cluster_status(cluster_name)
 
     if cluster_status.is_ready():
-        cluster = ibm_cloud_cluster_factory.create_cluster(cluster_status.get_server_url(), {})
+        cluster = roks_cluster_factory.create_cluster(cluster_status.get_server_url(), {})
         cluster.login()
     else:
         raise DataGateCLIException(

@@ -21,3 +21,7 @@ class AbstractClusterFactory(ABC):
     @abstractmethod
     def create_cluster(self, server: str, cluster_data: ClusterData) -> AbstractCluster:
         pass
+
+    @abstractmethod
+    def get_cluster_type_name(self) -> str:
+        pass

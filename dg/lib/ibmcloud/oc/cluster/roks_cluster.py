@@ -20,7 +20,7 @@ from dg.lib.cluster.cluster import AbstractCluster, ClusterData
 from dg.lib.error import DataGateCLIException
 
 
-class IBMCloudCluster(AbstractCluster):
+class ROKSCluster(AbstractCluster):
     def __init__(self, server: str, cluster_data: ClusterData):
         super().__init__(server, cluster_data)
 

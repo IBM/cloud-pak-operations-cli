@@ -12,6 +12,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Final
+import click
 
-CLUSTER_TYPE_ID: Final[str] = "2303cfcf-470b-4bf3-a228-db13d18cbfee"
+from dg.lib.ibmcloud.oc.cluster.ls import list_existing_clusters
+from dg.utils.logging import loglevel_command
+
+
+@loglevel_command(default_log_level="WARNING")
+@click.option(
+    "--json",
+    required=False,
+    help="Prints the command output in JSON format.",
+    is_flag=True,
+)
+def ls(json: bool):
+    """List all available clusters"""
+
+    click.echo(list_existing_clusters(json))

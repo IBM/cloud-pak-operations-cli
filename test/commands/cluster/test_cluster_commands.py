@@ -51,6 +51,9 @@ class UnitTestClusterFactory(dg.lib.cluster.cluster_factory.AbstractClusterFacto
     def create_cluster(self, server: str, cluster_data: ClusterData) -> AbstractCluster:
         return UnitTestCluster(server, cluster_data)
 
+    def get_cluster_type_name(self):
+        return ""
+
 
 dg.lib.cluster.cluster_factories["Unit Test"] = UnitTestClusterFactory()
 

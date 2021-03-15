@@ -22,7 +22,7 @@ from typing import TypedDict
 
 import click.testing
 
-import dg.lib.ibmcloud.cluster
+import dg.lib.ibmcloud.oc.cluster
 import dg.lib.ibmcloud.status
 import dg.utils.process
 
@@ -77,6 +77,7 @@ class TestAddClusterCommands(unittest.TestCase):
             cli,
             [
                 "ibmcloud",
+                "oc",
                 "cluster",
                 "add",
                 "--alias",
@@ -143,5 +144,5 @@ class TestAddClusterCommands(unittest.TestCase):
         self.assertEqual(returned_cluster_data["cluster_name"], cluster_name)
         self.assertEqual(
             returned_cluster_data["type"],
-            dg.lib.ibmcloud.cluster.CLUSTER_TYPE,
+            dg.lib.ibmcloud.oc.cluster.CLUSTER_TYPE_ID,
         )

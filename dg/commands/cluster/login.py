@@ -14,8 +14,6 @@
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.lib.fyre.cluster.fyre_cluster_factory  # required to register FYREClusterFactory object
-import dg.lib.ibmcloud.cluster.ibmcloud_cluster_factory  # required to register IBMCloudClusterFactory object
 
 from dg.lib.error import DataGateCLIException
 from dg.utils.logging import loglevel_command

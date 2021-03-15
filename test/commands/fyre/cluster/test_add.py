@@ -145,6 +145,5 @@ class TestAddClusterCommands(unittest.TestCase):
         )
 
         self.assertEqual(returned_cluster_data["password"], cluster_data["password"])
-        self.assertEqual(returned_cluster_data["type"], dg.lib.fyre.cluster.CLUSTER_TYPE)
-
+        self.assertEqual(returned_cluster_data["type"], dg.lib.fyre.cluster.CLUSTER_TYPE_ID)
         self.assertEqual(returned_cluster_data["username"], "kubeadmin")

@@ -12,20 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import sys
+
 import click
 
-from dg.lib.ibmcloud.cluster.ls import list_existing_clusters
-from dg.utils.logging import loglevel_command
-
-
-@loglevel_command(default_log_level="WARNING")
-@click.option(
-    "--json",
-    required=False,
-    help="Prints the command output in JSON format.",
-    is_flag=True,
+from dg.lib.click.lazy_loading_multi_command import (
+    create_click_multi_command_class,
 )
-def ls(json: bool):
-    """List all available clusters"""
 
-    click.echo(list_existing_clusters(json))
+
+@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
+def cluster():
+    """Manage a Red Hat OpenShift on IBM Cloud cluster"""
+
+    pass

@@ -12,6 +12,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Final
+import click
 
-CLUSTER_TYPE: Final[str] = "IBM Cloud"
+from dg.lib.ibmcloud.oc.cluster.rm import delete_ibmcloud_cluster
+from dg.utils.logging import loglevel_command
+
+
+@loglevel_command()
+@click.option("-c", "--cluster-name", required=True, help="cluster name")
+@click.option(
+    "--force",
+    "force_deletion",
+    required=False,
+    help="Force deletion of the cluster",
+    is_flag=True,
+)
+def rm(cluster_name: str, force_deletion: bool):
+    """Delete an existing OpenShift cluster on IBM Cloud"""
+
+    delete_ibmcloud_cluster(cluster_name, force_deletion)

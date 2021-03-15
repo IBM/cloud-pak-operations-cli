@@ -20,7 +20,7 @@ import dg.utils.logging
 
 from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud import execute_ibmcloud_command
-from dg.lib.ibmcloud.cluster.ls import list_existing_clusters
+from dg.lib.ibmcloud.oc.cluster.ls import list_existing_clusters
 from dg.utils.wait import wait_for
 
 
@@ -36,7 +36,16 @@ class ClusterStatus:
         return self._status_output
 
     def get_server_url(self) -> str:
-        return self._status_output["serverURL"]
+        result = ""
+
+        if "masterURL" in self._status_output:
+            # IBM Cloud Kubernetes Service cluster
+            result = self._status_output["masterURL"]
+        elif "serverURL" in self._status_output:
+            # Red Hat OpenShift on IBM Cloud cluster
+            result = self._status_output["serverURL"]
+
+        return result
 
     def has_name(self, name: str) -> bool:
         return ("name" in self._status_output) and (self._status_output["name"] == name)

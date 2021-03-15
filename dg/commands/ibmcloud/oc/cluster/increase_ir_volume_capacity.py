@@ -12,14 +12,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from dg.lib.cluster.cluster import AbstractCluster
-from dg.lib.cluster.cluster_factory import AbstractClusterFactory, ClusterData
-from dg.lib.ibmcloud.cluster.ibmcloud_cluster import IBMCloudCluster
+from typing import Final
+
+import click
+
+import dg.lib.ibmcloud.volume
+
+from dg.utils.logging import loglevel_command
+
+REQUIRED_OPENSHIFT_IMAGE_REGISTRY_VOLUME_CAPACITY_IN_GB: Final[int] = 200
 
 
-class IBMCloudClusterFactory(AbstractClusterFactory):
-    def create_cluster(self, server: str, cluster_data: ClusterData) -> AbstractCluster:
-        return IBMCloudCluster(server, cluster_data)
+@loglevel_command()
+@click.option("--name", required=True, help="cluster name")
+def increase_ir_volume_capacity(name: str):
+    """Increase capacity of volume in openshift-image-registry namespace"""
 
-
-ibm_cloud_cluster_factory = IBMCloudClusterFactory()
+    dg.lib.ibmcloud.volume.increase_openshift_image_registry_volume_capacity(
+        REQUIRED_OPENSHIFT_IMAGE_REGISTRY_VOLUME_CAPACITY_IN_GB, 30
+    )

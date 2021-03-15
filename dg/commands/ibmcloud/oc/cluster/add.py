@@ -15,7 +15,7 @@
 import click
 
 import dg.config.cluster_credentials_manager
-import dg.lib.ibmcloud.cluster
+import dg.lib.ibmcloud.oc.cluster
 import dg.lib.ibmcloud.status
 
 from dg.utils.logging import loglevel_command
@@ -26,17 +26,17 @@ from dg.utils.logging import loglevel_command
 @click.option(
     "--cluster-name",
     required=True,
-    help="Name of the OpenShift cluster to be registered",
+    help="Name of the Red Hat OpenShift on IBM Cloud cluster to be registered",
 )
 def add(alias: str, cluster_name: str):
-    """Register an existing OpenShift cluster on IBM Cloud"""
+    """Register an existing Red Hat OpenShift on IBM Cloud cluster"""
 
     server = dg.lib.ibmcloud.status.get_cluster_status(cluster_name).get_server_url()
 
     dg.config.cluster_credentials_manager.cluster_credentials_manager.add_cluster(
         alias if (alias is not None) else "",
         server,
-        dg.lib.ibmcloud.cluster.CLUSTER_TYPE,
+        dg.lib.ibmcloud.oc.cluster.CLUSTER_TYPE_ID,
         {
             "cluster_name": cluster_name,
         },
