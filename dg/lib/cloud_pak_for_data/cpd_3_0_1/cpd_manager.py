@@ -16,7 +16,7 @@ import io
 import json
 import os
 import pathlib
-import re
+import re as regex
 import stat
 import urllib.parse
 
@@ -39,6 +39,7 @@ from dg.lib.cloud_pak_for_data.cpd_manager import (
     CloudPakForDataAssemblyBuildType,
     CloudPakForDataVersion,
 )
+from dg.lib.error import DataGateCLIException
 
 
 class CloudPakForDataManager(AbstractCloudPakForDataManager):
@@ -52,55 +53,30 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
     # override
     def download_cpd_installer(self):
         cloud_pak_for_data_version: CloudPakForDataVersion = (
-            AbstractCloudPakForDataManager._cloud_pak_for_data_versions[
-                str(self._cloud_pak_for_data_version)
-            ]
+            AbstractCloudPakForDataManager._cloud_pak_for_data_versions[str(self._cloud_pak_for_data_version)]
         )
 
         if self._build_type == CloudPakForDataAssemblyBuildType.DEV:
-            directory_alias = cloud_pak_for_data_version["development"][
-                "directory_alias"
-            ]
-
+            directory_alias = cloud_pak_for_data_version["development"]["directory_alias"]
             current_version = binaries_manager.get_binary_version(directory_alias)
-            latest_version = self._get_cpd_installer_latest_development_version(
-                cloud_pak_for_data_version
-            )
+            latest_version = self._get_cpd_installer_latest_development_version(cloud_pak_for_data_version)
 
-            if (current_version is None) or (
-                latest_version.compare(current_version) == 1
-            ):
-                file_name = self._get_cpd_installer_development_version_file_name(
-                    cloud_pak_for_data_version
-                )
+            if (current_version is None) or (latest_version.compare(current_version) == 1):
+                file_name = self._get_cpd_installer_development_version_file_name(cloud_pak_for_data_version)
 
-                self._download_cpd_installer_development(
-                    cloud_pak_for_data_version, file_name
-                )
-
-                binaries_manager.set_binary_version(
-                    directory_alias, str(latest_version)
-                )
+                self._download_cpd_installer_development(cloud_pak_for_data_version, file_name)
+                binaries_manager.set_binary_version(directory_alias, str(latest_version))
         else:
             directory_alias = cloud_pak_for_data_version["release"]["directory_alias"]
             current_version = binaries_manager.get_binary_version(directory_alias)
             (
                 latest_version,
                 download_url,
-            ) = self._get_cpd_installer_latest_release_version(
-                cloud_pak_for_data_version
-            )
+            ) = self._get_cpd_installer_latest_release_version(cloud_pak_for_data_version)
 
-            if (current_version is None) or (
-                latest_version.compare(current_version) == 1
-            ):
-                self._download_cpd_installer_release(
-                    cloud_pak_for_data_version, download_url
-                )
-
-                binaries_manager.set_binary_version(
-                    directory_alias, str(latest_version)
-                )
+            if (current_version is None) or (latest_version.compare(current_version) == 1):
+                self._download_cpd_installer_release(cloud_pak_for_data_version, download_url)
+                binaries_manager.set_binary_version(directory_alias, str(latest_version))
 
     # override
     def install_assembly(
@@ -147,12 +123,8 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             ]
         else:
             # install assembly
-            openshift_image_registry_route = (
-                dg.lib.openshift.get_openshift_image_registry_default_route()
-            )
-
+            openshift_image_registry_route = dg.lib.openshift.get_openshift_image_registry_default_route()
             target_registry_password = dg.lib.openshift.get_current_token()
-
             args = [
                 "--accept-all-licenses",
                 "--assembly",
@@ -183,9 +155,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         self.execute_cloud_pak_for_data_installer(args)
 
-    def _download_cpd_installer_development(
-        self, cloud_pak_for_data_version: CloudPakForDataVersion, file_name: str
-    ):
+    def _download_cpd_installer_development(self, cloud_pak_for_data_version: CloudPakForDataVersion, file_name: str):
         """Downloads the IBM Cloud Pak for Data 3.0.1 development build
         installer with the given file name
 
@@ -206,9 +176,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             os.makedirs(target_directory_path)
 
         file_path = dg.utils.download.download_file(
-            urllib.parse.urlsplit(
-                cloud_pak_for_data_version["development"]["download_url"] + file_name
-            ),
+            urllib.parse.urlsplit(cloud_pak_for_data_version["development"]["download_url"] + file_name),
             target_directory_path=target_directory_path,
         )
 
@@ -217,9 +185,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             os.stat(file_path).st_mode | stat.S_IXGRP | stat.S_IXOTH | stat.S_IXUSR,
         )
 
-    def _download_cpd_installer_release(
-        self, cloud_pak_for_data_version: CloudPakForDataVersion, download_url: str
-    ):
+    def _download_cpd_installer_release(self, cloud_pak_for_data_version: CloudPakForDataVersion, download_url: str):
         """Downloads the IBM Cloud Pak for Data 3.0.1 release build installer
 
         Parameters
@@ -230,9 +196,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             URL of the IBM Cloud Pak for Data 3.0.1 release build to be downloaded
         """
 
-        archive_path = dg.utils.download.download_file(
-            urllib.parse.urlsplit(download_url)
-        )
+        archive_path = dg.utils.download.download_file(urllib.parse.urlsplit(download_url))
 
         self._extract_cpd_installer(cloud_pak_for_data_version, archive_path)
 
@@ -252,19 +216,11 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             path of the IBM Cloud Pak for Data 3.0.1 release build installer archive
         """
 
-        cpd_installer_file_name_dict = cloud_pak_for_data_version[
-            "cpd_installer_file_name_dict"
-        ]
-
+        cpd_installer_file_name_dict = cloud_pak_for_data_version["cpd_installer_file_name_dict"]
         operating_system = dg.utils.operating_system.get_operating_system()
-        member_identification_func: dg.utils.compression.MemberIdentificationFunc = (
-            lambda path, file_type: (
-                (
-                    os.path.basename(path)
-                    == cpd_installer_file_name_dict[operating_system]
-                )
-                and (file_type == dg.utils.file.FileType.RegularFile)
-            )
+        member_identification_func: dg.utils.compression.MemberIdentificationFunc = lambda path, file_type: (
+            (os.path.basename(path) == cpd_installer_file_name_dict[operating_system])
+            and (file_type == dg.utils.file.FileType.RegularFile)
         )
 
         target_directory_path = (
@@ -303,9 +259,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         """
 
         operating_system = dg.utils.operating_system.get_operating_system()
-        file_name = cloud_pak_for_data_version["cpd_installer_file_name_dict"][
-            operating_system
-        ]
+        file_name = cloud_pak_for_data_version["cpd_installer_file_name_dict"][operating_system]
 
         return file_name
 
@@ -329,9 +283,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         with io.BytesIO() as buffer:
             dg.utils.download.download_file_into_buffer(
-                urllib.parse.urlsplit(
-                    cloud_pak_for_data_version["development"]["download_url"]
-                ),
+                urllib.parse.urlsplit(cloud_pak_for_data_version["development"]["download_url"]),
                 buffer,
             )
 
@@ -366,17 +318,15 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         result: Union[tuple[semver.VersionInfo, str], None] = None
 
         for release in response_json:
-            search_result = re.search(
+            search_result = regex.search(
                 f".*({str(self._cloud_pak_for_data_version)}(-\\d+)*).*",
                 release["name"],
             )
 
             if search_result is not None:
                 version = semver.VersionInfo.parse(search_result.group(1))
-                browser_download_url = (
-                    self._get_cpd_installer_latest_release_version_browser_download_url(
-                        release["assets"]
-                    )
+                browser_download_url = self._get_cpd_installer_latest_release_version_browser_download_url(
+                    release["assets"]
                 )
 
                 result = (version, browser_download_url)
@@ -384,16 +334,14 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 break
 
         if result is None:
-            raise Exception(
+            raise DataGateCLIException(
                 f"IBM Cloud Pak for Data installer release for Cloud Pak for Data "
                 f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
 
         return result
 
-    def _get_cpd_installer_latest_release_version_browser_download_url(
-        self, assets: Any
-    ) -> str:
+    def _get_cpd_installer_latest_release_version_browser_download_url(self, assets: Any) -> str:
         """Returns the URL of the latest release build version of the IBM Cloud
         Pak for Data 3.0.1 installer
 
@@ -413,27 +361,20 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         result = None
 
         for asset in assets:
-            if (
-                re.search(
-                    "cloudpak4data-ee-\\d+\\.\\d+\\.\\d+(-\\d+)*\\.tgz", asset["name"]
-                )
-                is not None
-            ):
+            if regex.search("cloudpak4data-ee-\\d+\\.\\d+\\.\\d+(-\\d+)*\\.tgz", asset["name"]) is not None:
                 result = asset["browser_download_url"]
 
                 break
 
         if result is None:
-            raise Exception(
+            raise DataGateCLIException(
                 f"Download URL of IBM Cloud Pak for Data installer for Cloud Pak for Data "
                 f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
 
         return result
 
-    def _parse_cloud_pak_for_data_version_from_versions_file(
-        self, file_contents: str
-    ) -> semver.VersionInfo:
+    def _parse_cloud_pak_for_data_version_from_versions_file(self, file_contents: str) -> semver.VersionInfo:
         """Parses the IBM Cloud Pak for Data version contained in the given file
         contents
 
@@ -448,16 +389,14 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             parsed IBM Cloud Pak for Data version
         """
 
-        search_result = re.search(
+        search_result = regex.search(
             '<a href="buildNumber-\\d*">buildNumber-(\\d*)</a>',
             file_contents,
         )
 
         if search_result is None:
-            raise Exception("Cloud Pak for Data version could not be parsed")
+            raise DataGateCLIException("Cloud Pak for Data version could not be parsed")
 
-        version = semver.VersionInfo.parse(
-            f"{self._cloud_pak_for_data_version}+{search_result.group(1)}"
-        )
+        version = semver.VersionInfo.parse(f"{self._cloud_pak_for_data_version}+{search_result.group(1)}")
 
         return version

@@ -15,9 +15,10 @@
 import click
 
 from dg.lib.ibmcloud.cluster.rm import delete_ibmcloud_cluster
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
+@loglevel_command()
 @click.option("-c", "--cluster-name", required=True, help="cluster name")
 @click.option(
     "--force",

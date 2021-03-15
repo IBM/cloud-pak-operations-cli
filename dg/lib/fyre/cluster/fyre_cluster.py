@@ -25,9 +25,7 @@ class FYRECluster(AbstractCluster):
 
     def get_cluster_access_token(self) -> str:
         token = dg.lib.openshift.get_cluster_access_token(
-            dg.lib.fyre.openshift.OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT.format(
-                self.cluster_data["cluster_name"]
-            ),
+            dg.lib.fyre.openshift.OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT.format(self.cluster_data["cluster_name"]),
             self.cluster_data["username"],
             self.cluster_data["password"],
         )

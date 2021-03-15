@@ -20,21 +20,24 @@ import requests
 from tabulate import tabulate
 
 import dg.config
-import dg.lib.click
+import dg.lib.click.utils
 import dg.utils.network
+
+from dg.lib.error import DataGateCLIException
+from dg.utils.logging import loglevel_command
 
 IBM_FYRE_SHOW_OPENSHIFT_CLUSTERS_URL: Final[
     str
 ] = "https://api.fyre.ibm.com/rest/v1/?operation=query&request=showclusters"
 
 
-@click.command(
-    context_settings=dg.lib.click.create_default_map_from_json_file(
+@loglevel_command(
+    context_settings=dg.lib.click.utils.create_default_map_from_json_file(
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
-@click.option("--fyre-user-name", required=True, help="Fyre API user name")
-@click.option("--fyre-api-key", required=True, help="Fyre API key")
+@click.option("--fyre-user-name", required=True, help="FYRE API user name")
+@click.option("--fyre-api-key", required=True, help="FYRE API key")
 def ls(fyre_user_name: str, fyre_api_key: str):
     """List OpenShift clusters on FYRE"""
 
@@ -47,11 +50,7 @@ def ls(fyre_user_name: str, fyre_api_key: str):
     )
 
     if not response.ok:
-        raise Exception(
-            "Failed to get FYRE clusters (HTTP status code: {})".format(
-                response.status_code
-            )
-        )
+        raise DataGateCLIException("Failed to get FYRE clusters (HTTP status code: {})".format(response.status_code))
 
     clusters = response.json()["clusters"]
 

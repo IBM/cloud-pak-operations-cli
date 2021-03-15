@@ -17,13 +17,14 @@ from typing import Final
 import click
 
 import dg.commands.ibmcloud.cluster.login
-import dg.commands.ibmcloud.common
 import dg.lib.ibmcloud.volume
+
+from dg.utils.logging import loglevel_command
 
 REQUIRED_OPENSHIFT_IMAGE_REGISTRY_VOLUME_CAPACITY_IN_GB: Final[int] = 200
 
 
-@click.command()
+@loglevel_command()
 @click.option("--name", required=True, help="cluster name")
 def increase_ir_volume_capacity(name: str):
     """Increase capacity of volume in openshift-image-registry namespace"""

@@ -55,9 +55,7 @@ class BinariesManager:
             contents of the binaries file or a default value if it does not exist
         """
 
-        binaries_file_contents: Union[
-            BinariesFileContents, None
-        ] = self.get_binaries_file_contents()
+        binaries_file_contents: Union[BinariesFileContents, None] = self.get_binaries_file_contents()
 
         if binaries_file_contents is None:
             binaries_file_contents = {}
@@ -96,9 +94,7 @@ class BinariesManager:
         """
 
         if self._binaries_file_contents is None:
-            self._binaries_file_contents = (
-                self.get_binaries_file_contents_with_default()
-            )
+            self._binaries_file_contents = self.get_binaries_file_contents_with_default()
 
         return self._binaries_file_contents
 

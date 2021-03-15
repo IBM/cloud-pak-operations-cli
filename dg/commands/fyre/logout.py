@@ -12,18 +12,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import click
-
 import dg.config
 import dg.lib.click
 
+from dg.utils.logging import loglevel_command
 
-@click.command()
+
+@loglevel_command()
 def logout():
     """Log out from FYRE"""
 
     credentials_to_be_stored = {"fyre_api_key": "", "fyre_user_name": ""}
 
-    dg.config.data_gate_configuration_manager.store_credentials(
-        credentials_to_be_stored
-    )
+    dg.config.data_gate_configuration_manager.store_credentials(credentials_to_be_stored)

@@ -12,13 +12,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import logging
 import pathlib
-import sys
 
 from typing import Union
 
 import asyncssh
+import click
 import colorama
+
+from dg.lib.error import DataGateCLIException
+
+asyncssh.set_log_level(logging.WARNING)
 
 
 class RemoteClient:
@@ -70,8 +75,10 @@ class RemoteClient:
             shall be printed to stdout and stderr
         """
 
+        logging.info(f"Executing command on {self._hostname}: {command}")
+
         if self._connection is None:
-            raise Exception("Not connected to " + self._hostname)
+            raise DataGateCLIException("Not connected to " + self._hostname)
 
         channel, session = await self._connection.create_session(
             create_remote_client_ssh_session(print_output), command
@@ -92,7 +99,7 @@ class RemoteClient:
         """
 
         if self._connection is None:
-            raise Exception("Not connected to " + self._hostname)
+            raise DataGateCLIException("Not connected to " + self._hostname)
 
         await asyncssh.scp(str(path), self._connection)
 
@@ -163,16 +170,16 @@ def create_remote_client_ssh_session(
                 self._received_data += data
 
                 if print_output:
-                    print(
+                    click.echo(
                         colorama.Fore.RED + data + colorama.Fore.RESET,
-                        end="",
-                        file=sys.stderr,
+                        err=True,
+                        nl=False,
                     )
             else:
                 self._received_data += data
 
                 if print_output:
-                    print(data, end="")
+                    click.echo(data, nl=False)
 
         def get_received_data(self) -> str:
             """see asyncssh.SSHClientSession.get_received_data()"""

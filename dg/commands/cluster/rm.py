@@ -16,12 +16,12 @@ import click
 
 import dg.config.cluster_credentials_manager
 
+from dg.utils.logging import loglevel_command
 
-@click.command()
+
+@loglevel_command()
 @click.argument("alias_or_server")
 def rm(alias_or_server: str):
     """Remove a registered OpenShift cluster"""
 
-    dg.config.cluster_credentials_manager.cluster_credentials_manager.remove_cluster(
-        alias_or_server
-    )
+    dg.config.cluster_credentials_manager.cluster_credentials_manager.remove_cluster(alias_or_server)

@@ -16,8 +16,10 @@ import click
 
 import dg.config.cluster_credentials_manager
 
+from dg.utils.logging import loglevel_command
 
-@click.command()
+
+@loglevel_command()
 @click.argument("alias_or_server")
 @click.option("--alias", help="Alias")
 @click.option("--password", help="kubeadmin password")
@@ -30,9 +32,7 @@ def edit(alias_or_server: str, alias: str, password: str):
     if all(value is None for value in metadata_to_be_edited.values()):
         return
 
-    metadata_to_be_edited = dict(
-        filter(lambda pair: pair[1] is not None, metadata_to_be_edited.items())
-    )
+    metadata_to_be_edited = dict(filter(lambda pair: pair[1] is not None, metadata_to_be_edited.items()))
 
     dg.config.cluster_credentials_manager.cluster_credentials_manager.edit_cluster(
         alias_or_server, metadata_to_be_edited

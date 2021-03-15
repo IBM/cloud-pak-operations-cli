@@ -18,11 +18,11 @@ import dg.config.cluster_credentials_manager
 import dg.lib.ibmcloud.cluster
 import dg.lib.ibmcloud.status
 
+from dg.utils.logging import loglevel_command
 
-@click.command()
-@click.option(
-    "--alias", help="Alias used to reference a cluster instead of its server URL"
-)
+
+@loglevel_command()
+@click.option("--alias", help="Alias used to reference a cluster instead of its server URL")
 @click.option(
     "--cluster-name",
     required=True,

@@ -20,16 +20,17 @@ import click
 import requests
 
 import dg.config
-import dg.lib.click
+import dg.lib.click.utils
 import dg.utils.network
 
-IBM_FYRE_DEPLOY_OPENSHIFT_CLUSTER_URL: Final[
-    str
-] = "https://api.fyre.ibm.com/rest/v1/?operation=deployopenshiftcluster"
+from dg.lib.error import DataGateCLIException
+from dg.utils.logging import loglevel_command
+
+IBM_FYRE_DEPLOY_OPENSHIFT_CLUSTER_URL: Final[str] = "https://api.fyre.ibm.com/rest/v1/?operation=deployopenshiftcluster"
 
 
-@click.command(
-    context_settings=dg.lib.click.create_default_map_from_json_file(
+@loglevel_command(
+    context_settings=dg.lib.click.utils.create_default_map_from_json_file(
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
@@ -38,8 +39,8 @@ IBM_FYRE_DEPLOY_OPENSHIFT_CLUSTER_URL: Final[
     required=True,
     help="Name of the OpenShift cluster to be deployed",
 )
-@click.option("--fyre-user-name", required=True, help="Fyre API user name")
-@click.option("--fyre-api-key", required=True, help="Fyre API key")
+@click.option("--fyre-user-name", required=True, help="FYRE API user name")
+@click.option("--fyre-api-key", required=True, help="FYRE API key")
 def create(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
     """Create a new OpenShift cluster on FYRE"""
 
@@ -69,12 +70,6 @@ def create(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
         status = json_response["status"]
 
         if status != "submitted":
-            raise Exception(
-                "Failed to deploy FYRE cluster ({})".format(json_response["details"])
-            )
+            raise DataGateCLIException("Failed to deploy FYRE cluster ({})".format(json_response["details"]))
     else:
-        raise Exception(
-            "Failed to deploy FYRE cluster (HTTP status code: {})".format(
-                response.status_code
-            )
-        )
+        raise DataGateCLIException("Failed to deploy FYRE cluster (HTTP status code: {})".format(response.status_code))

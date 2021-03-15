@@ -14,7 +14,7 @@
 
 import os
 import pathlib
-import re
+import re as regex
 import tarfile
 import zipfile
 
@@ -26,9 +26,7 @@ MemberIdentificationFunc = Callable[[str, dg.utils.file.FileType], bool]
 PostExtractionFunc = Callable[[pathlib.Path], None]
 
 
-def execute_post_extraction_func_if_exists(
-    extracted_file_path: pathlib.Path, **kwargs: Any
-):
+def execute_post_extraction_func_if_exists(extracted_file_path: pathlib.Path, **kwargs: Any):
     """Calls an optional function to perform post-extraction actions
 
     Parameters
@@ -45,9 +43,7 @@ def execute_post_extraction_func_if_exists(
         kwargs["postExtractionFunc"](extracted_file_path)
 
 
-def extract_archive(
-    archive_path: pathlib.Path, target_directory_path: pathlib.Path, **kwargs: Any
-):
+def extract_archive(archive_path: pathlib.Path, target_directory_path: pathlib.Path, **kwargs: Any):
     """Extracts a tar.gz, tgz, or zip archive
 
     Parameters
@@ -77,13 +73,8 @@ def extract_archive(
             for member in tar_file:
                 if is_member_to_be_extracted(member.name, member.isdir(), **kwargs):
                     if "directoryPathToStartExtraction" in kwargs:
-                        directory_path_to_start_extraction = kwargs[
-                            "directoryPathToStartExtraction"
-                        ]
-
-                        search_result = re.search(
-                            f"({directory_path_to_start_extraction}/).*", member.name
-                        )
+                        directory_path_to_start_extraction = kwargs["directoryPathToStartExtraction"]
+                        search_result = regex.search(f"({directory_path_to_start_extraction}/).*", member.name)
 
                         if search_result is None:
                             continue
@@ -94,23 +85,17 @@ def extract_archive(
                         member.name = os.path.basename(member.name)
 
                     tar_file.extract(member, target_directory_path)
-                    execute_post_extraction_func_if_exists(
-                        target_directory_path / member.name, **kwargs
-                    )
+                    execute_post_extraction_func_if_exists(target_directory_path / member.name, **kwargs)
 
     elif archive_path.suffix == ".zip":
         with zipfile.ZipFile(archive_path) as zip_file:
             for member in zip_file.infolist():
-                if is_member_to_be_extracted(
-                    member.filename, member.is_dir(), **kwargs
-                ):
+                if is_member_to_be_extracted(member.filename, member.is_dir(), **kwargs):
                     if is_directory_structure_to_be_ignored(**kwargs):
                         member.filename = os.path.basename(member.filename)
 
                     zip_file.extract(member, str(target_directory_path))
-                    execute_post_extraction_func_if_exists(
-                        target_directory_path / member.filename, **kwargs
-                    )
+                    execute_post_extraction_func_if_exists(target_directory_path / member.filename, **kwargs)
 
 
 def is_directory_structure_to_be_ignored(**kwargs: Any) -> bool:
@@ -131,9 +116,7 @@ def is_directory_structure_to_be_ignored(**kwargs: Any) -> bool:
         true, if the directory structure within an archive shall be ignored
     """
 
-    return ("ignoreDirectoryStructure" in kwargs) and (
-        kwargs["ignoreDirectoryStructure"]
-    )
+    return ("ignoreDirectoryStructure" in kwargs) and (kwargs["ignoreDirectoryStructure"])
 
 
 def is_member_to_be_extracted(member_name: str, is_dir: bool, **kwargs: Any) -> bool:
@@ -160,8 +143,6 @@ def is_member_to_be_extracted(member_name: str, is_dir: bool, **kwargs: Any) -> 
         ("memberIdentificationFunc" in kwargs)
         and kwargs["memberIdentificationFunc"](
             member_name,
-            dg.utils.file.FileType.Directory
-            if is_dir
-            else dg.utils.file.FileType.RegularFile,
+            dg.utils.file.FileType.Directory if is_dir else dg.utils.file.FileType.RegularFile,
         )
     )

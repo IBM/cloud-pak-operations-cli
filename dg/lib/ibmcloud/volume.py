@@ -12,13 +12,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import json
 import logging
 import time
 
 from typing import Any, Final
 
-import dg.commands.ibmcloud.common
 import dg.lib.openshift
+
+from dg.lib.error import DataGateCLIException
+from dg.lib.ibmcloud import execute_ibmcloud_command
 
 MAX_NUM_MODIFICATION_CHECKS: Final[int] = 30
 NUM_SECONDS_TO_WAIT_BETWEEN_ITERATIONS: Final[int] = 10
@@ -46,31 +49,24 @@ def increase_openshift_image_registry_volume_capacity(
         "openshift-image-registry", "image-registry-storage"
     )
 
-    volume_id = dg.lib.openshift.get_persistent_volume_id(
-        "openshift-image-registry", persistent_volume_name
-    )
-
-    volume_details = dg.commands.ibmcloud.common.get_volume_details(volume_id)
+    volume_id = dg.lib.openshift.get_persistent_volume_id("openshift-image-registry", persistent_volume_name)
+    volume_details = _get_volume_details(volume_id)
     volume_capacity = _get_volume_capacity(volume_details)
 
     if volume_capacity < required_volume_capacity:
-        dg.commands.ibmcloud.common.modify_volume_capacity(
-            volume_id, required_volume_capacity
-        )
+        _modify_volume_capacity(volume_id, required_volume_capacity)
 
         for i in range(max_num_modification_checks):
-            volume_details = dg.commands.ibmcloud.common.get_volume_details(volume_id)
+            volume_details = _get_volume_details(volume_id)
             volume_capacity = _get_volume_capacity(volume_details)
 
             if volume_capacity == required_volume_capacity:
-                logging.info(
-                    "OpenShift image registry volume capacity change succeeded"
-                )
+                logging.info("OpenShift image registry volume capacity change succeeded")
 
                 break
             else:
                 if i == max_num_modification_checks - 1:
-                    raise Exception(
+                    raise DataGateCLIException(
                         f"OpenShift image registry volume capacity change was not applied yet – timeout was reached "
                         f"after {max_num_modification_checks * num_seconds_to_wait_between_iterations} seconds"
                     )
@@ -92,3 +88,24 @@ def _get_volume_capacity(volume_details: dict[str, Any]):
     assert "capacityGb" in volume_details
 
     return volume_details["capacityGb"]
+
+
+def _get_volume_details(volume_id: str):
+    args = ["sl", "file", "volume-detail", "--output", "json", volume_id]
+    result = execute_ibmcloud_command(args, capture_output=True)
+
+    return json.loads(result.stdout)
+
+
+def _modify_volume_capacity(volume_id: str, new_capacity: int):
+    args = [
+        "sl",
+        "file",
+        "volume-modify",
+        volume_id,
+        "--new-size",
+        str(new_capacity),
+        "--force",
+    ]
+
+    execute_ibmcloud_command(args)

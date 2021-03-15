@@ -17,13 +17,14 @@ from typing import Union
 import click
 
 import dg.config.cluster_credentials_manager
-import dg.lib.click
+import dg.lib.click.utils
 
 from dg.lib.fyre.cluster.fyre_cluster_factory import fyre_cluster_factory
+from dg.utils.logging import loglevel_command
 
 
-@click.command(
-    context_settings=dg.lib.click.create_default_map_from_dict(
+@loglevel_command(
+    context_settings=dg.lib.click.utils.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
@@ -39,8 +40,5 @@ def login(
 ):
     """Log in to an OpenShift cluster"""
 
-    cluster = fyre_cluster_factory.create_cluster_using_cluster_name(
-        cluster_name, locals().copy()
-    )
-
+    cluster = fyre_cluster_factory.create_cluster_using_cluster_name(cluster_name, locals().copy())
     cluster.login()
