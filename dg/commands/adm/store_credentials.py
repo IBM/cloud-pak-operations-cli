@@ -18,8 +18,10 @@ import click
 
 import dg.config
 
+from dg.utils.logging import loglevel_command
 
-@click.command()
+
+@loglevel_command()
 @click.option("--artifactory-api-key", help="Artifactory API key")
 @click.option("--artifactory-user-name", help="Artifactory user name")
 @click.option("--ibm-cloud-api-key", help="IBM Cloud API key")
@@ -39,6 +41,4 @@ def store_credentials(
 
     credentials_to_be_stored = locals().copy()
 
-    dg.config.data_gate_configuration_manager.store_credentials(
-        credentials_to_be_stored
-    )
+    dg.config.data_gate_configuration_manager.store_credentials(credentials_to_be_stored)

@@ -12,6 +12,10 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import ipaddress
+import socket
+
+import netifaces
 import requests
 
 
@@ -22,6 +26,71 @@ def disable_insecure_request_warning():
     # InsecureRequestWarning: Unverified HTTPS request is being made to host
     # '…'. Adding certificate verification is strongly advised. See:
     # https://urllib3.readthedocs.io/en/latest/advanced-usage.html#ssl-warnings
-    requests.packages.urllib3.disable_warnings(
-        category=requests.packages.urllib3.exceptions.InsecureRequestWarning
-    )
+    requests.packages.urllib3.disable_warnings(category=requests.packages.urllib3.exceptions.InsecureRequestWarning)
+
+
+def get_local_ipv4_addresses() -> list[ipaddress.IPv4Address]:
+    """Returns all IPv4 addresses bound to local network interfaces
+
+    Returns
+    -------
+    list[ipaddress.IPv4Address]
+        all IPv4 addresses bound to local network interfaces
+    """
+
+    result: list[ipaddress.IPv4Address] = []
+
+    for interface in netifaces.interfaces():
+        ifaddresses = netifaces.ifaddresses(interface)
+
+        if netifaces.AF_INET in ifaddresses:
+            # IPv4 address is bound to NIC
+            ifaddress = ifaddresses[netifaces.AF_INET][0]
+
+            result.append(ipaddress.ip_address(ifaddress["addr"]))
+
+    result.sort()
+
+    return result
+
+
+def is_hostname_localhost(hostname: str) -> bool:
+    """Returns whether the IPv4 address associated with the given hostname
+    is bound to one of the local network interfaces
+
+    Parameters
+    ----------
+    hostname
+        hostname to be checked
+
+    Returns
+    -------
+    bool
+        true, if the IPv4 address associated with the given hostname is bound to
+        one of the local network interfaces
+    """
+
+    ipv4_address = ipaddress.ip_address(socket.gethostbyname(hostname))
+    local_ipv4_addresses = get_local_ipv4_addresses()
+
+    return ipv4_address in local_ipv4_addresses
+
+
+def parse_hostname_result(hostname_result: str) -> list[ipaddress.IPv4Address]:
+    """Parses the output of the hostname command (Linux)
+
+    Parameters
+    ----------
+    hostname_result
+        output of the hostname command (Linux)
+
+    Returns
+    -------
+    list[ipaddress.IPv4Address]
+        all IPv4 addresses bound to local network interfaces
+    """
+
+    hostname_result_list = hostname_result.rstrip().split(" ")
+    ipv4_addresses: list[ipaddress.IPv4Address] = list(map(lambda str: ipaddress.ip_address(str), hostname_result_list))
+
+    return ipv4_addresses

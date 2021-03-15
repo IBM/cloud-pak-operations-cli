@@ -14,6 +14,7 @@
 
 from typing import Any, Union
 
+from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
 from dg.lib.ibmcloud.login import is_logged_in
 
@@ -22,9 +23,7 @@ def list_existing_clusters(json: bool) -> Union[str, Any]:
     """List all available clusters"""
 
     if not is_logged_in():
-        raise Exception(
-            "Not logged in to IBM Cloud. Please run 'dg ibmcloud login' to log in."
-        )
+        raise DataGateCLIException("Not logged in to IBM Cloud. Please run 'dg ibmcloud login' to log in.")
 
     command = ["oc", "cluster", "ls"]
     if json:
@@ -33,6 +32,6 @@ def list_existing_clusters(json: bool) -> Union[str, Any]:
     result = execute_ibmcloud_command_without_check(command, capture_output=True)
 
     if result.return_code != 0 and "ibmcloud login" in result.stderr:
-        raise Exception("Please use 'dg ibmcloud login' before running this command.")
+        raise DataGateCLIException("Please use 'dg ibmcloud login' before running this command.")
 
     return result.stdout

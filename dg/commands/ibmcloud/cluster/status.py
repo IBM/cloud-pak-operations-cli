@@ -16,8 +16,10 @@ import click
 
 import dg.lib.ibmcloud.status
 
+from dg.utils.logging import loglevel_command
 
-@click.command()
+
+@loglevel_command(default_log_level="WARNING")
 @click.option("--cluster-name", required=True, help="cluster name")
 @click.option(
     "--json",

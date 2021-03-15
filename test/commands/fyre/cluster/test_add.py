@@ -86,11 +86,7 @@ class TestAddClusterCommands(unittest.TestCase):
 
         self.assertEqual(result.exit_code, 0)
         self.assertEqual(
-            len(
-                cluster_credentials_manager.get_clusters_file_contents_with_default()[
-                    "clusters"
-                ]
-            ),
+            len(cluster_credentials_manager.get_clusters_file_contents_with_default()["clusters"]),
             num_expected_cluster,
         )
 
@@ -149,8 +145,6 @@ class TestAddClusterCommands(unittest.TestCase):
         )
 
         self.assertEqual(returned_cluster_data["password"], cluster_data["password"])
-        self.assertEqual(
-            returned_cluster_data["type"], dg.lib.fyre.cluster.CLUSTER_TYPE
-        )
+        self.assertEqual(returned_cluster_data["type"], dg.lib.fyre.cluster.CLUSTER_TYPE)
 
         self.assertEqual(returned_cluster_data["username"], "kubeadmin")

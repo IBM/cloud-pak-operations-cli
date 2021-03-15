@@ -12,21 +12,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import pathlib
+import sys
 
 import click
 
-import dg.lib.click as dgclick
+from dg.lib.click.lazy_loading_multi_command import create_click_multi_command_class
 
 
-def get_click_multi_command_class() -> type[click.Command]:
-    return dgclick.create_click_multi_command_class(
-        dgclick.import_packages_and_modules(__name__, pathlib.Path(__file__).parent)
-    )
-
-
-@click.command(cls=get_click_multi_command_class())
+@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
 def config():
-    """Modify the dg configuration"""
+    """Modify the Data Gate CLI configuration"""
 
     pass

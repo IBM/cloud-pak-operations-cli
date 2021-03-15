@@ -17,17 +17,17 @@ import subprocess
 import click
 
 import dg.config.cluster_credentials_manager
-import dg.lib.click
+import dg.lib.click.utils
+
+from dg.utils.logging import loglevel_command
 
 
-@click.command(
-    context_settings=dg.lib.click.create_default_map_from_dict(
+@loglevel_command(
+    context_settings=dg.lib.click.utils.create_default_map_from_dict(
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option(
-    "--infrastructure-node-hostname", required=True, help="Infrastructure node hostname"
-)
+@click.option("--infrastructure-node-hostname", required=True, help="Infrastructure node hostname")
 def copy_ssh_key(infrastructure_node_hostname: str):
     """Copy the current user's public SSH key to the infrastructure node"""
 
@@ -38,6 +38,4 @@ def copy_ssh_key(infrastructure_node_hostname: str):
         "root@{}".format(infrastructure_node_hostname),
     ]
 
-    subprocess.run(
-        args, check=True, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL
-    )
+    subprocess.run(args, check=True, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)

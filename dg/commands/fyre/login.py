@@ -20,12 +20,13 @@ import requests
 import dg.config
 import dg.utils.network
 
-IBM_FYRE_SHOW_CLUSTERS_URL: Final[
-    str
-] = "https://api.fyre.ibm.com/rest/v1/?operation=query&request=showclusters"
+from dg.lib.error import DataGateCLIException
+from dg.utils.logging import loglevel_command
+
+IBM_FYRE_SHOW_CLUSTERS_URL: Final[str] = "https://api.fyre.ibm.com/rest/v1/?operation=query&request=showclusters"
 
 
-@click.command()
+@loglevel_command()
 @click.option("--fyre-api-key", required=True, help="FYRE API key")
 @click.option("--fyre-user-name", required=True, help="FYRE user name")
 def login(
@@ -45,12 +46,6 @@ def login(
     )
 
     if not response.ok:
-        raise Exception(
-            "Failed to log in to FYRE (HTTP status code: {})".format(
-                response.status_code
-            )
-        )
+        raise DataGateCLIException("Failed to log in to FYRE (HTTP status code: {})".format(response.status_code))
 
-    dg.config.data_gate_configuration_manager.store_credentials(
-        credentials_to_be_stored
-    )
+    dg.config.data_gate_configuration_manager.store_credentials(credentials_to_be_stored)

@@ -16,8 +16,10 @@ import click
 
 import dg.config
 
+from dg.utils.logging import loglevel_command
 
-@click.command()
+
+@loglevel_command()
 @click.option(
     "--key",
     required=True,

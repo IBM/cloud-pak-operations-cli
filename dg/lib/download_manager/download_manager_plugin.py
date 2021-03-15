@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 import json
-import re
+import re as regex
 
 from abc import ABC, abstractmethod
 from typing import Union
@@ -74,9 +74,7 @@ class AbstractDownloadManagerPlugIn(ABC):
 
         pass
 
-    def _get_latest_binary_version_on_github(
-        self, owner: str, repo: str
-    ) -> Union[semver.VersionInfo, None]:
+    def _get_latest_binary_version_on_github(self, owner: str, repo: str) -> Union[semver.VersionInfo, None]:
         """Returns the latest version of a dependency on GitHub
 
         This method parses the "name" key of the JSON document returned by the
@@ -137,7 +135,7 @@ class AbstractDownloadManagerPlugIn(ABC):
         result: Union[semver.VersionInfo, None] = None
 
         for release in response_json:
-            search_result = re.search(
+            search_result = regex.search(
                 "v(\\d+\\.\\d+\\.\\d+)$",
                 release["name"],
             )

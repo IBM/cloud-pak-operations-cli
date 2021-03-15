@@ -16,12 +16,14 @@ import click
 
 import dg.lib.ibmcloud.status
 
+from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud.cluster.ibmcloud_cluster_factory import (
     ibm_cloud_cluster_factory,
 )
+from dg.utils.logging import loglevel_command
 
 
-@click.command()
+@loglevel_command()
 @click.option("--cluster-name", required=True, help="cluster name")
 def login(cluster_name: str):
     """Log in to an OpenShift cluster"""
@@ -29,12 +31,9 @@ def login(cluster_name: str):
     cluster_status = dg.lib.ibmcloud.status.get_cluster_status(cluster_name)
 
     if cluster_status.is_ready():
-        cluster = ibm_cloud_cluster_factory.create_cluster(
-            cluster_status.get_server_url(), {}
-        )
-
+        cluster = ibm_cloud_cluster_factory.create_cluster(cluster_status.get_server_url(), {})
         cluster.login()
     else:
-        raise Exception(
+        raise DataGateCLIException(
             f"The cluster {cluster_name} is not ready yet, hence, it is not possible to log in to it."
         )

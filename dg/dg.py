@@ -12,7 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import logging
 import sys
 
 import click
@@ -20,13 +19,13 @@ import pkg_resources
 
 import dg.commands
 import dg.utils.debugger
+import dg.utils.logging
 
-logging.basicConfig(
-    datefmt="%Y-%m-%dT%H:%M:%S%z",
-    format="%(asctime)s [%(levelname)s]: %(message)s",
-    level=logging.WARNING,
+from dg.lib.click.lazy_loading_multi_command import (
+    create_click_multi_command_class,
 )
 
+dg.utils.logging.init_root_logger()
 
 if dg.utils.debugger.is_debugpy_running() and (len(sys.argv) == 2):
     if sys.argv[1] == "":
@@ -41,11 +40,10 @@ if dg.utils.debugger.is_debugpy_running() and (len(sys.argv) == 2):
 
 
 @click.group(
-    cls=dg.commands.get_click_multi_command_class(), invoke_without_command=True
+    cls=create_click_multi_command_class(dg.commands),
+    invoke_without_command=True,
 )
-@click.option(
-    "--version", is_flag=True, help="Show the version number of the Data Gate CLI"
-)
+@click.option("--version", is_flag=True, help="Show the version number of the Data Gate CLI")
 @click.pass_context
 def cli(ctx: click.Context, version: bool):
     if ctx.invoked_subcommand is None:

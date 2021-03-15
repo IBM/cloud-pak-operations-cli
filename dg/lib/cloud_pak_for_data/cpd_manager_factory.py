@@ -21,6 +21,7 @@ import dg.lib.cloud_pak_for_data.cpd_manager
 from dg.lib.cloud_pak_for_data.cpd_manager import (
     AbstractCloudPakForDataManager,
 )
+from dg.lib.error import DataGateCLIException
 
 
 class CloudPakForDataManagerFactory:
@@ -47,26 +48,12 @@ class CloudPakForDataManagerFactory:
             subclass of AbstractCloudPakForDataManager
         """
 
-        if (
-            cloud_pak_for_data_version
-            not in CloudPakForDataManagerFactory._cloud_pak_for_data_managers
-        ):
-            raise Exception(
-                f"Unknown Cloud Pak for Data version ({str(cloud_pak_for_data_version)})"
-            )
+        if cloud_pak_for_data_version not in CloudPakForDataManagerFactory._cloud_pak_for_data_managers:
+            raise DataGateCLIException(f"Unknown Cloud Pak for Data version ({str(cloud_pak_for_data_version)})")
 
-        return CloudPakForDataManagerFactory._cloud_pak_for_data_managers[
-            cloud_pak_for_data_version
-        ]
+        return CloudPakForDataManagerFactory._cloud_pak_for_data_managers[cloud_pak_for_data_version]
 
-    _cloud_pak_for_data_managers: dict[
-        semver.VersionInfo,
-        type[AbstractCloudPakForDataManager],
-    ] = {
-        semver.VersionInfo.parse(
-            "3.0.1"
-        ): dg.lib.cloud_pak_for_data.cpd_3_0_1.cpd_manager.CloudPakForDataManager,
-        semver.VersionInfo.parse(
-            "3.5.0"
-        ): dg.lib.cloud_pak_for_data.cpd_3_5_0.cpd_manager.CloudPakForDataManager,
+    _cloud_pak_for_data_managers: dict[semver.VersionInfo, type[AbstractCloudPakForDataManager]] = {
+        semver.VersionInfo.parse("3.0.1"): dg.lib.cloud_pak_for_data.cpd_3_0_1.cpd_manager.CloudPakForDataManager,
+        semver.VersionInfo.parse("3.5.0"): dg.lib.cloud_pak_for_data.cpd_3_5_0.cpd_manager.CloudPakForDataManager,
     }

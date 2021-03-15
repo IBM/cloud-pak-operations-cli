@@ -20,6 +20,8 @@ from typing import Callable, Optional
 
 import click
 
+from dg.lib.error import DataGateCLIException
+
 
 class ProcessResult:
     def __init__(self, return_code: int, stderr: str, stdout: str):
@@ -71,12 +73,8 @@ def execute_command(
             _create_subprocess_and_capture_output(
                 program,
                 args,
-                lambda line: _process_stdout_output(
-                    line, stdout_buffer, print_captured_output
-                ),
-                lambda line: _process_stderr_output(
-                    line, stderr_buffer, print_captured_output
-                ),
+                lambda line: _process_stdout_output(line, stdout_buffer, print_captured_output),
+                lambda line: _process_stderr_output(line, stderr_buffer, print_captured_output),
             )
         )
     else:
@@ -94,13 +92,9 @@ def execute_command(
         if len(stderr_buffer) != 0:
             error_output = f" ({stderr_buffer})"
 
-        raise Exception(
-            f"Command '{command_string}' failed with return code {return_code}{error_output}"
-        )
+        raise DataGateCLIException(f"Command '{command_string}' failed with return code {return_code}{error_output}.")
 
-    return ProcessResult(
-        return_code, "\n".join(stderr_buffer), "\n".join(stdout_buffer)
-    )
+    return ProcessResult(return_code, "\n".join(stderr_buffer), "\n".join(stdout_buffer))
 
 
 def execute_command_without_check(
@@ -211,9 +205,7 @@ def _process_stdout_output(line: str, buffer: list[str], print_captured_output: 
     buffer.append(line.rstrip())
 
 
-async def _read_stream(
-    stream: Optional[asyncio.StreamReader], callback: Callable[[str], None]
-):
+async def _read_stream(stream: Optional[asyncio.StreamReader], callback: Callable[[str], None]):
     if stream is not None:
         while True:
             if len(line := await stream.readline()) != 0:
