@@ -1,4 +1,9 @@
 {
+	"[python]": {
+		"editor.codeActionsOnSave": {
+			"source.organizeImports": true
+		}
+	},
 	"files.exclude": {
 		"**/__pycache__": true,
 		".vscode/.ropeproject": true,
@@ -6,7 +11,8 @@
 	},
 	"python.analysis.typeCheckingMode": "basic",
 	"python.formatting.blackArgs": [
-		"--line-length=120"
+		"--line-length",
+		"120"
 	],
 	"python.formatting.provider": "black",
 	"python.linting.enabled": true,
