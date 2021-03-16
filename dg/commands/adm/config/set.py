@@ -33,4 +33,4 @@ from dg.utils.logging import loglevel_command
 def set(key: str, value: str):
     """Set configuration value"""
 
-    dg.config.data_gate_configuration_manager.set_dg_bool_config_value(key, value)
+    dg.config.data_gate_configuration_manager.set_bool_config_value(key, value)
