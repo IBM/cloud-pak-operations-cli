@@ -17,7 +17,10 @@ import sys
 import click
 
 import dg.config
-from dg.lib.click.lazy_loading_multi_command import create_click_multi_command_class
+
+from dg.lib.click.lazy_loading_multi_command import (
+    create_click_multi_command_class,
+)
 
 
 @click.command(
