@@ -21,7 +21,7 @@ setup(
         "semver",
         "tabulate",
         "tqdm",
-        "urllib3 < 1.26.0",
+        "urllib3",
     ],
     entry_points={"console_scripts": ["dg=dg.dg:cli"]},
     python_requires=">=3.9.0",
