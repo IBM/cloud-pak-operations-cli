@@ -14,8 +14,8 @@
 
 import os
 import pathlib
-import unittest
 import tempfile
+import unittest
 
 from unittest.mock import patch
 
@@ -40,14 +40,9 @@ class TestDownloadDependencies(unittest.TestCase):
 
         return executable_name
 
-    def check_executable_exists(
-        self, dg_bin_directory_path: pathlib.Path, executable_name: str
-    ):
+    def check_executable_exists(self, dg_bin_directory_path: pathlib.Path, executable_name: str):
         self.assertTrue(
-            (
-                pathlib.Path(dg_bin_directory_path)
-                / self.add_os_specific_executable_extension(executable_name)
-            ).exists()
+            (pathlib.Path(dg_bin_directory_path) / self.add_os_specific_executable_extension(executable_name)).exists()
         )
 
     @patch(
@@ -58,13 +53,8 @@ class TestDownloadDependencies(unittest.TestCase):
         """Tests that dg adm download-dependencies downloads
         dependencies"""
 
-        dg_bin_directory_path = (
-            dg.config.data_gate_configuration_manager.get_dg_bin_directory_path()
-        )
-
-        terraform_plugins_directory_path = (
-            IBMCloudTerraformProviderPlugIn().get_terraform_plugins_directory_path()
-        )
+        dg_bin_directory_path = dg.config.data_gate_configuration_manager.get_dg_bin_directory_path()
+        terraform_plugins_directory_path = IBMCloudTerraformProviderPlugIn().get_terraform_plugins_directory_path()
 
         for entry in dg_bin_directory_path.glob("*"):
             if entry.is_file():

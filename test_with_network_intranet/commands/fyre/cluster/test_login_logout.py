@@ -51,9 +51,7 @@ class TestVersionCommand(unittest.TestCase):
         )
 
         self.assertEqual(result.exit_code, 1)
-        self.assertEqual(
-            result.output, "Error: Failed to log in to FYRE (failed authentication)\n"
-        )
+        self.assertEqual(result.output, "Error: Failed to log in to FYRE (failed authentication)\n")
 
 
 if __name__ == "__main__":
