@@ -133,12 +133,13 @@ class ClusterCredentialsManager:
 
         for server, cluster_data in self._get_clusters().items():
             alias = cluster_data["alias"] if "alias" in cluster_data else ""
+            cluster_factory = dg.lib.cluster.cluster_factories[cluster_data["type"]]
 
             cluster_list_element: list[str] = [
                 "*" if (server == server_of_current_cluster) else "",
                 server,
                 alias,
-                cluster_data["type"],
+                cluster_factory.get_cluster_type_name(),
             ]
 
             cluster_list.append(cluster_list_element)

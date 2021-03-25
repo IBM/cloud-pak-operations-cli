@@ -12,17 +12,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import sys
+from typing import Final
 
 import click
 
-from dg.lib.click.lazy_loading_multi_command import (
-    create_click_multi_command_class,
-)
+import dg.lib.ibmcloud.volume
+
+from dg.utils.logging import loglevel_command
+
+REQUIRED_OPENSHIFT_IMAGE_REGISTRY_VOLUME_CAPACITY_IN_GB: Final[int] = 200
 
 
-@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
-def cluster():
-    """Manage a RedHat OpenShift cluster"""
+@loglevel_command()
+@click.option("--name", required=True, help="cluster name")
+def increase_ir_volume_capacity(name: str):
+    """Increase capacity of volume in openshift-image-registry namespace"""
 
-    pass
+    dg.lib.ibmcloud.volume.increase_openshift_image_registry_volume_capacity(
+        REQUIRED_OPENSHIFT_IMAGE_REGISTRY_VOLUME_CAPACITY_IN_GB, 30
+    )

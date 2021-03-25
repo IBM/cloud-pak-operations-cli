@@ -12,23 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Final
-
-import click
-
-import dg.commands.ibmcloud.cluster.login
-import dg.lib.ibmcloud.volume
-
-from dg.utils.logging import loglevel_command
-
-REQUIRED_OPENSHIFT_IMAGE_REGISTRY_VOLUME_CAPACITY_IN_GB: Final[int] = 200
+from dg.lib.cluster.cluster import AbstractCluster
+from dg.lib.cluster.cluster_factory import AbstractClusterFactory, ClusterData
+from dg.lib.ibmcloud.oc.cluster.roks_cluster import ROKSCluster
 
 
-@loglevel_command()
-@click.option("--name", required=True, help="cluster name")
-def increase_ir_volume_capacity(name: str):
-    """Increase capacity of volume in openshift-image-registry namespace"""
+class ROKSClusterFactory(AbstractClusterFactory):
+    def create_cluster(self, server: str, cluster_data: ClusterData) -> AbstractCluster:
+        return ROKSCluster(server, cluster_data)
 
-    dg.lib.ibmcloud.volume.increase_openshift_image_registry_volume_capacity(
-        REQUIRED_OPENSHIFT_IMAGE_REGISTRY_VOLUME_CAPACITY_IN_GB, 30
-    )
+    def get_cluster_type_name(self) -> str:
+        return "IBM Cloud (Red Hat OpenShift on IBM Cloud)"
+
+
+roks_cluster_factory = ROKSClusterFactory()

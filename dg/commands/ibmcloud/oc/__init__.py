@@ -12,22 +12,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import sys
+
 import click
 
-from dg.lib.ibmcloud.cluster.rm import delete_ibmcloud_cluster
-from dg.utils.logging import loglevel_command
+from dg.lib.click.lazy_loading_multi_command import create_click_multi_command_class
 
 
-@loglevel_command()
-@click.option("-c", "--cluster-name", required=True, help="cluster name")
-@click.option(
-    "--force",
-    "force_deletion",
-    required=False,
-    help="Force deletion of the cluster",
-    is_flag=True,
-)
-def rm(cluster_name: str, force_deletion: bool):
-    """Delete an existing OpenShift cluster on IBM Cloud"""
+@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
+def oc():
+    """Manage Red Hat OpenShift on IBM Cloud"""
 
-    delete_ibmcloud_cluster(cluster_name, force_deletion)
+    pass

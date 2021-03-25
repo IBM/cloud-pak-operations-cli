@@ -18,11 +18,11 @@ import click
 
 from dg.lib.error import IBMCloudException
 from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
-from dg.lib.ibmcloud.cluster.rm import delete_ibmcloud_cluster
 from dg.lib.ibmcloud.install import install_cp4d_with_preinstall
 from dg.lib.ibmcloud.login import is_logged_in
 from dg.lib.ibmcloud.login import login as login_to_ibm_cloud
-from dg.lib.ibmcloud.oc import get_latest_supported_openshift_version
+from dg.lib.ibmcloud.oc.cluster.rm import delete_ibmcloud_cluster
+from dg.lib.ibmcloud.openshift import get_latest_supported_openshift_version
 from dg.lib.ibmcloud.status import (
     cluster_exists,
     wait_for_cluster_deletion,

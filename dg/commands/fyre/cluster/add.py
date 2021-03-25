@@ -34,7 +34,7 @@ def add(cluster_name: str, alias: str, password: str):
     dg.config.cluster_credentials_manager.cluster_credentials_manager.add_cluster(
         alias if (alias is not None) else "",
         "https://api.{}.os.fyre.ibm.com:6443".format(cluster_name),
-        dg.lib.fyre.cluster.CLUSTER_TYPE,
+        dg.lib.fyre.cluster.CLUSTER_TYPE_ID,
         {
             "cluster_name": cluster_name,
             "infrastructure_node_hostname": "{}-inf.fyre.ibm.com".format(cluster_name),
