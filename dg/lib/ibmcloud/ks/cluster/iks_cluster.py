@@ -12,17 +12,25 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import sys
-
-import click
-
-from dg.lib.click.lazy_loading_multi_command import (
-    create_click_multi_command_class,
-)
+from dg.lib.cluster.cluster import AbstractCluster, ClusterData
+from dg.lib.ibmcloud import execute_ibmcloud_command
 
 
-@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
-def oc():
-    """Manage Red Hat OpenShift on IBM Cloud"""
+class IKSCluster(AbstractCluster):
+    def __init__(self, server: str, cluster_data: ClusterData):
+        super().__init__(server, cluster_data)
 
-    pass
+    def get_cluster_access_token(self) -> str:
+        # TODO implement
+        return ""
+
+    def login(self):
+        args = [
+            "ks",
+            "cluster",
+            "config",
+            "--cluster",
+            self.get_cluster_data()["cluster_name"],
+        ]
+
+        execute_ibmcloud_command(args)

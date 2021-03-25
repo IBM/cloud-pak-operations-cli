@@ -22,7 +22,7 @@ from dg.lib.click.lazy_loading_multi_command import (
 
 
 @click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
-def oc():
-    """Manage Red Hat OpenShift on IBM Cloud"""
+def cluster():
+    """Manage an IBM Cloud Kubernetes Service cluster"""
 
     pass
