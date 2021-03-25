@@ -21,6 +21,7 @@ from dg.utils.logging import loglevel_command
 @loglevel_command()
 @click.option("-c", "--cluster-name", required=True, help="cluster name")
 def install(cluster_name: str):
-    """Install Cloud Pak for Data, including Db2 Warehouse and Db2 Data Gate, on the given IBM Cloud cluster"""
+    """Install Cloud Pak for Data, including Db2 Warehouse and Db2 Data
+    Gate, on a Red Hat OpenShift on IBM Cloud cluster"""
 
     install_cp4d_with_preinstall(cluster_name)

@@ -12,20 +12,25 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import click
-
-from dg.lib.ibmcloud.oc.cluster.ls import list_existing_clusters
-from dg.utils.logging import loglevel_command
+from dg.lib.cluster.cluster import AbstractCluster, ClusterData
+from dg.lib.ibmcloud import execute_ibmcloud_command
 
 
-@loglevel_command(default_log_level="WARNING")
-@click.option(
-    "--json",
-    required=False,
-    help="Prints the command output in JSON format.",
-    is_flag=True,
-)
-def ls(json: bool):
-    """List Red Hat OpenShift on IBM Cloud clusters"""
+class IKSCluster(AbstractCluster):
+    def __init__(self, server: str, cluster_data: ClusterData):
+        super().__init__(server, cluster_data)
 
-    click.echo(list_existing_clusters(json))
+    def get_cluster_access_token(self) -> str:
+        # TODO implement
+        return ""
+
+    def login(self):
+        args = [
+            "ks",
+            "cluster",
+            "config",
+            "--cluster",
+            self.get_cluster_data()["cluster_name"],
+        ]
+
+        execute_ibmcloud_command(args)

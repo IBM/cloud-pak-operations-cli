@@ -28,6 +28,6 @@ from dg.utils.logging import loglevel_command
     is_flag=True,
 )
 def rm(cluster_name: str, force_deletion: bool):
-    """Delete an existing OpenShift cluster on IBM Cloud"""
+    """Delete a Red Hat OpenShift on IBM Cloud cluster"""
 
     delete_ibmcloud_cluster(cluster_name, force_deletion)

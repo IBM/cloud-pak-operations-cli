@@ -21,6 +21,8 @@ from typing import Any
 import click
 import requests
 
+from tqdm import tqdm
+
 import dg.config
 import dg.utils.logging
 
@@ -48,10 +50,10 @@ def _get_cp4d_version_locator(cp4d_version: str) -> str:
             "catalog",
             "search",
             cp4d_identifier,
-            "--type",
-            "software",
             "--output",
             "json",
+            "--type",
+            "software",
         ],
         capture_output=True,
     )
@@ -85,12 +87,12 @@ def execute_preinstall(cluster_id: str):
             "catalog",
             "offering",
             "preinstall",
-            "--version-locator",
-            version_locator,
             "--cluster",
             cluster_id,
             "--namespace",
             "zen",
+            "--version-locator",
+            version_locator,
         ]
     )
 
@@ -163,7 +165,7 @@ def execute_install(cluster_id: str, api_key: str) -> Any:
     response = requests.post(url, headers=headers, json=data)
 
     if response.ok:
-        logging.info("Installation request submitted successfully.")
+        logging.info("Installation request submitted successfully")
     else:
         raise DataGateCLIException(
             f"Failed to start Cloud Pak for Data installation on cluster {cluster_id}:\n"
@@ -237,16 +239,19 @@ def wait_until_preinstallation_is_finished(interval: int, timeout: int) -> None:
     working correctly.
     """
 
+    progress_bar = tqdm(
+        bar_format="{l_bar}{bar}| {n_fmt}/{total_fmt} [{elapsed}<{remaining}]",
+        total=timeout,
+    )
+
     time_passed = 0
 
     while time_passed < timeout:
-        # overwrite the current line with the latest status
-        click.echo(
-            f"Time spent / timeout ({str(time_passed).rjust(4, ' ')}s / {str(timeout).rjust(4, ' ')}s)\r",
-            nl=False,
-        )
         sleep(interval)
         time_passed += interval
+        progress_bar.update(interval)
+
+    progress_bar.close()
 
 
 def get_installation_log(install_details: Any) -> str:
@@ -341,7 +346,13 @@ def install_cp4d_with_preinstall(cluster_name: str):
     execute_preinstall(cluster_name)
 
     # TODO Use proper endpoint to obtain preinstall status (Current function in ibmcloud CLI is not working)
-    logging.info(f"Waiting for preinstallation on cluster {cluster_name} to finish:")
+    logging.info(
+        click.style(
+            f"Waiting for preinstallation on cluster {cluster_name} to finish:",
+            bold=True,
+        )
+    )
+
     wait_until_preinstallation_is_finished(1, 300)
 
     logging.info(f"Executing Cloud Pak for Data installation on cluster {cluster_name}")

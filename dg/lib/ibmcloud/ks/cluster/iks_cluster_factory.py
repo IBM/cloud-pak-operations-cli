@@ -12,20 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import click
+from dg.lib.cluster.cluster import AbstractCluster
+from dg.lib.cluster.cluster_factory import AbstractClusterFactory, ClusterData
+from dg.lib.ibmcloud.ks.cluster.iks_cluster import IKSCluster
 
-from dg.lib.ibmcloud.oc.cluster.ls import list_existing_clusters
-from dg.utils.logging import loglevel_command
+
+class IKSClusterFactory(AbstractClusterFactory):
+    def create_cluster(self, server: str, cluster_data: ClusterData) -> AbstractCluster:
+        return IKSCluster(server, cluster_data)
+
+    def get_cluster_type_name(self) -> str:
+        return "IBM Cloud (IBM Cloud Kubernetes Service)"
 
 
-@loglevel_command(default_log_level="WARNING")
-@click.option(
-    "--json",
-    required=False,
-    help="Prints the command output in JSON format.",
-    is_flag=True,
-)
-def ls(json: bool):
-    """List Red Hat OpenShift on IBM Cloud clusters"""
-
-    click.echo(list_existing_clusters(json))
+iks_cluster_factory = IKSClusterFactory()
