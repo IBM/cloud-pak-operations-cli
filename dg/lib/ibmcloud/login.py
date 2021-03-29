@@ -15,6 +15,7 @@
 import click
 
 import dg.config
+import dg.lib.ibmcloud.plugin_manager
 
 from dg.lib.error import DataGateCLIException, IBMCloudException
 from dg.lib.ibmcloud import (
@@ -23,12 +24,6 @@ from dg.lib.ibmcloud import (
     execute_ibmcloud_command_without_check,
 )
 from dg.lib.ibmcloud.iam import generate_api_key
-from dg.lib.ibmcloud.plugin import (
-    install_catalogs_management_plugin,
-    install_container_service_plugin,
-    is_catalogs_management_plugin_installed,
-    is_container_service_plugin_installed,
-)
 from dg.lib.ibmcloud.target import get_ibmcloud_account_target_information
 
 
@@ -64,11 +59,7 @@ def login():
         _login_interactively()
         generate_and_save_api_key()
 
-    if not is_catalogs_management_plugin_installed():
-        install_catalogs_management_plugin()
-
-    if not is_container_service_plugin_installed():
-        install_container_service_plugin()
+    dg.lib.ibmcloud.plugin_manager.PlugInManager().install_required_plug_ins()
 
 
 def _login_using_api_key(apikey: str):
