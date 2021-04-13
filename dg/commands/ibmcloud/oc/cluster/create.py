@@ -39,6 +39,7 @@ from dg.lib.ibmcloud.status import (
     wait_for_cluster_readiness,
 )
 from dg.lib.ibmcloud.vlan_manager import VLANManager
+from dg.lib.openshift import execute_oc_command
 from dg.utils.logging import loglevel_command
 
 logger = logging.getLogger(__name__)
@@ -83,6 +84,13 @@ def validate_ocp_version(ctx, param, value) -> Optional[semver.VersionInfo]:
     help="Delete any existing cluster with the given name before creating a new one.",
     is_flag=True,
 )
+@click.option(
+    "-w",
+    "--workaround",
+    required=False,
+    help="Restart openshift-dns pods after cluster creation (workaround)",
+    is_flag=True,
+)
 def create(
     alias: Optional[str],
     cluster_name: str,
@@ -90,6 +98,7 @@ def create(
     full_installation: bool,
     openshift_version: Optional[semver.VersionInfo],
     remove_existing: bool,
+    workaround: bool,
 ):
     """Create a new Red Hat OpenShift on IBM Cloud cluster"""
 
@@ -142,10 +151,10 @@ def create(
         "--name",
         cluster_name,
         "--private-vlan",
-        vlan_manager.get_default_private_vlan(),
+        vlan_manager.default_private_vlan,
         "--public-service-endpoint",
         "--public-vlan",
-        vlan_manager.get_default_public_vlan(),
+        vlan_manager.default_public_vlan,
         "--version",
         full_openshift_version,
         "--workers",
@@ -188,6 +197,17 @@ def create(
             "cluster_name": cluster_name,
         },
     )
+
+    if workaround:
+        # workaround START - TODO remove when "no such host" issue is fixed
+        # (see IBM Cloud support case CS2206770)
+        logging.info("Restarting openshift-dns pods")
+        cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_cluster(server)
+        cluster.login()
+
+        execute_oc_command(["project", "openshift-dns"])
+        execute_oc_command(["delete", "pods", "--all"])
+        # workaround END
 
     if full_installation:
         logging.info(

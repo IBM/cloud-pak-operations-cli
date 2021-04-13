@@ -35,10 +35,12 @@ class VLANManager:
             zone,
         )
 
-    def get_default_private_vlan(self) -> str:
+    @property
+    def default_private_vlan(self) -> str:
         return self._default_private_vlan
 
-    def get_default_public_vlan(self) -> str:
+    @property
+    def default_public_vlan(self) -> str:
         return self._default_public_vlan
 
     def _get_default_vlan_id(

@@ -61,7 +61,7 @@ class TestIBMCloudCommon(unittest.TestCase):
     def test_get_default_public_vlan(self, test_mock):
         vlan_manager = VLANManager("sjc03")
 
-        self.assertEqual("2734440", vlan_manager.get_default_public_vlan())
+        self.assertEqual("2734440", vlan_manager.default_public_vlan)
 
     @patch(
         "dg.lib.ibmcloud.vlan_manager.execute_ibmcloud_command",
@@ -74,7 +74,7 @@ class TestIBMCloudCommon(unittest.TestCase):
     def test_get_default_private_vlan(self, test_mock):
         vlan_manager = VLANManager("sjc03")
 
-        self.assertEqual("2734442", vlan_manager.get_default_private_vlan())
+        self.assertEqual("2734442", vlan_manager.default_private_vlan)
 
     @patch(
         "dg.lib.ibmcloud.status.execute_ibmcloud_command",
