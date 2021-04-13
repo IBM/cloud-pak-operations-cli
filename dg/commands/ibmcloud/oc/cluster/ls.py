@@ -26,6 +26,6 @@ from dg.utils.logging import loglevel_command
     is_flag=True,
 )
 def ls(json: bool):
-    """List all available clusters"""
+    """List Red Hat OpenShift on IBM Cloud clusters"""
 
     click.echo(list_existing_clusters(json))

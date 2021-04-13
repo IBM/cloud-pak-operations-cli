@@ -28,7 +28,7 @@ from dg.utils.logging import loglevel_command
     is_flag=True,
 )
 def status(cluster_name: str, json: bool):
-    """Display the status of a given cluster"""
+    """Display the status of a Red Hat OpenShift on IBM Cloud cluster"""
 
     cluster_status = dg.lib.ibmcloud.status.get_cluster_status(cluster_name)
     status_output = cluster_status.get_json() if json else str(cluster_status)

@@ -14,6 +14,9 @@
 
 import click
 
+import dg.lib.ibmcloud.status
+
+from dg.config.cluster_credentials_manager import cluster_credentials_manager
 from dg.lib.error import IBMCloudException
 from dg.lib.ibmcloud import (
     execute_ibmcloud_command_interactively,
@@ -24,21 +27,27 @@ from dg.lib.ibmcloud import (
 def delete_ibmcloud_cluster(name: str, force_deletion: bool):
     """Delete an existing OpenShift cluster on IBM Cloud"""
 
-    command = ["oc", "cluster", "rm", "--cluster", name]
+    ibmcloud_oc_cluster_rm_args = ["oc", "cluster", "rm", "--cluster", name]
     return_code = 0
+    server = dg.lib.ibmcloud.status.get_cluster_status(name).get_server_url()
 
     if force_deletion:
-        command.append("--force-delete-storage")
-        command.append("-f")
-        result = execute_ibmcloud_command_without_check(command, capture_output=True)
+        ibmcloud_oc_cluster_rm_args.append("--force-delete-storage")
+        ibmcloud_oc_cluster_rm_args.append("-f")
+        ibmcloud_oc_cluster_rm_result = execute_ibmcloud_command_without_check(
+            ibmcloud_oc_cluster_rm_args, capture_output=True
+        )
 
-        if result.return_code != 0:
-            raise IBMCloudException("An error occurred while deleting the cluster", result.stderr)
-        else:
-            return_code = result.return_code
-            click.echo(result.stdout)
+        if ibmcloud_oc_cluster_rm_result.return_code != 0:
+            raise IBMCloudException(
+                "An error occurred while deleting the cluster", ibmcloud_oc_cluster_rm_result.stderr
+            )
+
+        return_code = ibmcloud_oc_cluster_rm_result.return_code
+
+        click.echo(ibmcloud_oc_cluster_rm_result.stdout)
     else:
-        return_code = execute_ibmcloud_command_interactively(command)
+        return_code = execute_ibmcloud_command_interactively(ibmcloud_oc_cluster_rm_args)
 
     if return_code == 0:
         click.echo(
@@ -46,3 +55,8 @@ def delete_ibmcloud_cluster(name: str, force_deletion: bool):
             f"while until the cluster status changes. You can check the status using 'dg ibmcloud cluster status "
             f"--name {name}'"
         )
+
+    cluster = cluster_credentials_manager.get_cluster(server)
+
+    if cluster is not None:
+        cluster_credentials_manager.remove_cluster(server)

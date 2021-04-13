@@ -14,31 +14,59 @@
 
 import logging
 
-import click
+from typing import Optional
 
+import click
+import semver
+
+import dg.config.cluster_credentials_manager
+import dg.lib.ibmcloud.oc.cluster
+import dg.lib.ibmcloud.status
+
+from dg.config.cluster_credentials_manager import cluster_credentials_manager
 from dg.lib.error import IBMCloudException
 from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
 from dg.lib.ibmcloud.install import install_cp4d_with_preinstall
-from dg.lib.ibmcloud.login import is_logged_in
 from dg.lib.ibmcloud.login import login as login_to_ibm_cloud
 from dg.lib.ibmcloud.oc.cluster.rm import delete_ibmcloud_cluster
-from dg.lib.ibmcloud.openshift import get_latest_supported_openshift_version
+from dg.lib.ibmcloud.openshift import (
+    get_full_openshift_version,
+    get_latest_supported_openshift_version,
+)
 from dg.lib.ibmcloud.status import (
     cluster_exists,
     wait_for_cluster_deletion,
     wait_for_cluster_readiness,
 )
-from dg.lib.ibmcloud.vlan import (
-    get_default_private_vlan,
-    get_default_public_vlan,
-)
+from dg.lib.ibmcloud.vlan_manager import VLANManager
+from dg.lib.openshift import execute_oc_command
 from dg.utils.logging import loglevel_command
 
 logger = logging.getLogger(__name__)
 
 
+def validate_ocp_version(ctx, param, value) -> Optional[semver.VersionInfo]:
+    result: Optional[semver.VersionInfo] = None
+
+    if value is not None:
+        try:
+            result = semver.VersionInfo.parse(value)
+        except ValueError:
+            raise click.BadParameter("Invalid string format")
+
+    return result
+
+
 @loglevel_command()
+@click.option("-a", "--alias", help="Alias used to reference a cluster instead of its server URL")
 @click.option("-c", "--cluster-name", required=True, help="cluster name")
+@click.option(
+    "-f",
+    "--force",
+    required=False,
+    help="Remove any prompts during cluster creation.",
+    is_flag=True,
+)
 @click.option(
     "-i",
     "--full-install",
@@ -47,6 +75,7 @@ logger = logging.getLogger(__name__)
     help="Perform a full installation of Cloud Pak for Data after the cluster is provisioned.",
     is_flag=True,
 )
+@click.option("-o", "--openshift-version", callback=validate_ocp_version, help="OpenShift version")
 @click.option(
     "-r",
     "--rm",
@@ -56,17 +85,27 @@ logger = logging.getLogger(__name__)
     is_flag=True,
 )
 @click.option(
-    "-f",
-    "--force",
+    "-w",
+    "--workaround",
     required=False,
-    help="Remove any prompts during cluster creation.",
+    help="Restart openshift-dns pods after cluster creation (workaround)",
     is_flag=True,
 )
-def create(cluster_name: str, full_installation: bool, remove_existing: bool, force: bool):
-    """Create a new OpenShift cluster on IBM Cloud"""
+def create(
+    alias: Optional[str],
+    cluster_name: str,
+    force: bool,
+    full_installation: bool,
+    openshift_version: Optional[semver.VersionInfo],
+    remove_existing: bool,
+    workaround: bool,
+):
+    """Create a new Red Hat OpenShift on IBM Cloud cluster"""
 
-    if not is_logged_in():
-        login_to_ibm_cloud()
+    if alias is not None:
+        cluster_credentials_manager.raise_if_alias_exists(alias)
+
+    login_to_ibm_cloud()
 
     if remove_existing:
         logger.info(
@@ -80,21 +119,25 @@ def create(cluster_name: str, full_installation: bool, remove_existing: bool, fo
             delete_ibmcloud_cluster(cluster_name, force)
             wait_for_cluster_deletion(cluster_name)
         else:
-            logging.info(f"Skipping deletion, as cluster '{cluster_name}' could not be found.")
+            logging.info(f"Skipping deletion, as cluster '{cluster_name}' could not be found")
 
     logging.info(
         click.style(
-            f"Creating OpenShift cluster with name '{cluster_name}' in IBM Cloud.",
+            f"Creating cluster with name '{cluster_name}' in IBM Cloud",
             bold=True,
         )
     )
 
-    openshift_version = get_latest_supported_openshift_version()
-    zone = "sjc03"
-    private_vlan = get_default_private_vlan(zone)
-    public_vlan = get_default_public_vlan(zone)
+    full_openshift_version: Optional[str] = None
 
-    command = [
+    if openshift_version is None:
+        full_openshift_version = get_latest_supported_openshift_version()
+    else:
+        full_openshift_version = get_full_openshift_version(openshift_version)
+
+    zone = "sjc03"
+    vlan_manager = VLANManager(zone)
+    ibmcloud_oc_cluster_create_classic_args = [
         "oc",
         "cluster",
         "create",
@@ -107,46 +150,69 @@ def create(cluster_name: str, full_installation: bool, remove_existing: bool, fo
         "dedicated",
         "--name",
         cluster_name,
-        "--public-vlan",
-        public_vlan,
-        "--public-service-endpoint",
         "--private-vlan",
-        private_vlan,
+        vlan_manager.default_private_vlan,
+        "--public-service-endpoint",
+        "--public-vlan",
+        vlan_manager.default_public_vlan,
         "--version",
-        openshift_version,
+        full_openshift_version,
         "--workers",
         "3",
         "--zone",
         zone,
     ]
 
-    result = execute_ibmcloud_command_without_check(command, capture_output=True)
+    ibmcloud_oc_cluster_create_classic_result = execute_ibmcloud_command_without_check(
+        ibmcloud_oc_cluster_create_classic_args, capture_output=True
+    )
 
-    if result.return_code != 0:
-        if "E0007" in result.stderr:
+    if ibmcloud_oc_cluster_create_classic_result.return_code != 0:
+        if "E0007" in ibmcloud_oc_cluster_create_classic_result.stderr:
             # a cluster with the same name already exists
-            raise IBMCloudException(result.stderr)
+            raise IBMCloudException(ibmcloud_oc_cluster_create_classic_result.stderr)
         else:
             if cluster_exists(cluster_name):
                 # There was an error, but the cluster was created nonetheless, print a warning
-
                 logging.warning(
                     f"An error occurred while creating the cluster, but 'ibmcloud oc cluster ls' shows a cluster with "
                     f"the name '{cluster_name}' – error details:\n"
-                    f"{IBMCloudException.get_parsed_error_message(result.stderr)}"
+                    f"{IBMCloudException.get_parsed_error_message(ibmcloud_oc_cluster_create_classic_result.stderr)}"
                 )
             else:
-                raise IBMCloudException(result.stderr)
+                raise IBMCloudException(ibmcloud_oc_cluster_create_classic_result.stderr)
     else:
-        click.echo(result.stdout)
+        click.echo(ibmcloud_oc_cluster_create_classic_result.stdout)
+
+    logging.info(f"Waiting for creation of cluster '{cluster_name}' to complete:")
+    wait_for_cluster_readiness(cluster_name)
+
+    server = dg.lib.ibmcloud.status.get_cluster_status(cluster_name).get_server_url()
+
+    cluster_credentials_manager.add_cluster(
+        alias if (alias is not None) else "",
+        server,
+        dg.lib.ibmcloud.oc.cluster.CLUSTER_TYPE_ID,
+        {
+            "cluster_name": cluster_name,
+        },
+    )
+
+    if workaround:
+        # workaround START - TODO remove when "no such host" issue is fixed
+        # (see IBM Cloud support case CS2206770)
+        logging.info("Restarting openshift-dns pods")
+        cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_cluster(server)
+        cluster.login()
+
+        execute_oc_command(["project", "openshift-dns"])
+        execute_oc_command(["delete", "pods", "--all"])
+        # workaround END
 
     if full_installation:
-        logging.info(f"Waiting for creation of cluster '{cluster_name}' to complete.")
-        wait_for_cluster_readiness(cluster_name)
-
         logging.info(
             click.style(
-                f"Installing Cloud Pak for Data on cluster '{cluster_name}'.",
+                f"Installing Cloud Pak for Data on cluster '{cluster_name}'",
                 bold=True,
             )
         )

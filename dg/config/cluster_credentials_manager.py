@@ -243,6 +243,22 @@ class ClusterCredentialsManager:
 
         return data_gate_configuration_manager.get_dg_directory_path() / "clusters.json"
 
+    def raise_if_alias_exists(self, alias_to_be_searched: str):
+        """Raises an exception if the given alias is already associated with a
+        registered OpenShift cluster
+
+        Parameters
+        ----------
+        alias_to_be_searched
+            alias to be searched
+        """
+
+        clusters = self._get_clusters()
+
+        for server, cluster_data in clusters.items():
+            if ("alias" in cluster_data) and (cluster_data["alias"] == alias_to_be_searched):
+                raise DataGateCLIException("Alias already exists")
+
     def reload(self):
         """Reloads the clusters file"""
 
