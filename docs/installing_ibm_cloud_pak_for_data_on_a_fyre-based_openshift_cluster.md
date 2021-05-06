@@ -21,13 +21,14 @@ To create a FYRE cluster using the following command, your FYRE memory quota mus
 ## Infrastructure node:
 
 - [Enable SSH access to GitHub](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh)
-- Compile and install Python 3.9:
+- Compile and install Python 3.8 or higher:
 
   ```bash
   yum install gcc libffi-devel openssl-devel zlib-devel
-  wget https://www.python.org/ftp/python/3.9.2/Python-3.9.2.tgz
-  tar -xf Python-3.9.2.tgz
-  cd Python-3.9.2
+  export PYTHON_VERSION="3.{minor version}.{patch version}"
+  wget "https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz"
+  tar -xf "Python-$PYTHON_VERSION.tgz"
+  cd "Python-$PYTHON_VERSION"
   ./configure
   make
   make install

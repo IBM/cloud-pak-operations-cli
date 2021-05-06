@@ -16,7 +16,7 @@ import asyncio
 import logging
 import pathlib
 
-from typing import Callable, Optional
+from typing import Callable, List, Optional
 
 import click
 
@@ -32,7 +32,7 @@ class ProcessResult:
 
 def execute_command(
     program: pathlib.Path,
-    args: list[str],
+    args: List[str],
     capture_output=False,
     check=True,
     print_captured_output=False,
@@ -65,8 +65,8 @@ def execute_command(
     logging.info(f"Executing command: {' '.join(command)}")
 
     return_code: Optional[int] = None
-    stderr_buffer: list[str] = []
-    stdout_buffer: list[str] = []
+    stderr_buffer: List[str] = []
+    stdout_buffer: List[str] = []
 
     if capture_output:
         return_code = asyncio.run(
@@ -99,7 +99,7 @@ def execute_command(
 
 def execute_command_without_check(
     program: pathlib.Path,
-    args: list[str],
+    args: List[str],
     capture_output=True,
     print_captured_output=False,
 ) -> ProcessResult:
@@ -132,7 +132,7 @@ def execute_command_without_check(
     )
 
 
-async def _create_subprocess(program: pathlib.Path, args: list[str]) -> int:
+async def _create_subprocess(program: pathlib.Path, args: List[str]) -> int:
     """Executes a process
 
     Parameters
@@ -154,7 +154,7 @@ async def _create_subprocess(program: pathlib.Path, args: list[str]) -> int:
 
 
 async def _create_subprocess_and_capture_output(
-    program: pathlib.Path, args: list[str], stdout_callback, stderr_callback
+    program: pathlib.Path, args: List[str], stdout_callback, stderr_callback
 ) -> int:
     """Executes a process and captures its output to stdout/stderr
 
@@ -191,14 +191,14 @@ async def _create_subprocess_and_capture_output(
     return await process.wait()
 
 
-def _process_stderr_output(line: str, buffer: list[str], print_captured_output: bool):
+def _process_stderr_output(line: str, buffer: List[str], print_captured_output: bool):
     if print_captured_output:
         click.echo(click.style(line, fg="red"), err=True, nl=False)
 
     buffer.append(line.rstrip())
 
 
-def _process_stdout_output(line: str, buffer: list[str], print_captured_output: bool):
+def _process_stdout_output(line: str, buffer: List[str], print_captured_output: bool):
     if print_captured_output:
         click.echo(line, nl=False)
 

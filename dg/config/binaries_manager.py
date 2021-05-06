@@ -15,18 +15,18 @@
 import json
 import pathlib
 
-from typing import Union
+from typing import Dict, Union
 
 from dg.config import data_gate_configuration_manager
 
-BinariesFileContents = dict[str, str]
+BinariesFileContents = Dict[str, str]
 
 
 class BinariesManager:
     """Manages downloaded binaries"""
 
     def __init__(self):
-        self._binaries_file_contents: Union[dict[str, str], None] = None
+        self._binaries_file_contents: Union[Dict[str, str], None] = None
 
     def get_binaries_file_contents(self) -> Union[BinariesFileContents, None]:
         """Returns the contents of the binaries file
@@ -84,7 +84,7 @@ class BinariesManager:
         binary_versions[binary_alias] = version
         self._save_binaries_file()
 
-    def _get_binary_versions(self) -> dict[str, str]:
+    def _get_binary_versions(self) -> Dict[str, str]:
         """Returns versions of downloaded binaries
 
         Returns

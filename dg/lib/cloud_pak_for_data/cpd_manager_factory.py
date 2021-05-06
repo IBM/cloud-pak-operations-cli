@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from typing import Dict, Type
+
 import semver
 
 import dg.lib.cloud_pak_for_data.cpd_3_0_1.cpd_manager
@@ -32,7 +34,7 @@ class CloudPakForDataManagerFactory:
     @staticmethod
     def get_cloud_pak_for_data_manager(
         cloud_pak_for_data_version: semver.VersionInfo,
-    ) -> type[AbstractCloudPakForDataManager]:
+    ) -> Type[AbstractCloudPakForDataManager]:
         """Returns a subclass of AbstractCloudPakForDataManager for a given IBM
         Cloud Pak for Data version
 
@@ -53,7 +55,7 @@ class CloudPakForDataManagerFactory:
 
         return CloudPakForDataManagerFactory._cloud_pak_for_data_managers[cloud_pak_for_data_version]
 
-    _cloud_pak_for_data_managers: dict[semver.VersionInfo, type[AbstractCloudPakForDataManager]] = {
+    _cloud_pak_for_data_managers: Dict[semver.VersionInfo, Type[AbstractCloudPakForDataManager]] = {
         semver.VersionInfo.parse("3.0.1"): dg.lib.cloud_pak_for_data.cpd_3_0_1.cpd_manager.CloudPakForDataManager,
         semver.VersionInfo.parse("3.5.0"): dg.lib.cloud_pak_for_data.cpd_3_5_0.cpd_manager.CloudPakForDataManager,
     }

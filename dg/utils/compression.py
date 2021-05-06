@@ -22,6 +22,8 @@ from typing import Any, Callable
 
 import dg.utils.file
 
+from dg.utils.string import removeprefix
+
 MemberIdentificationFunc = Callable[[str, dg.utils.file.FileType], bool]
 PostExtractionFunc = Callable[[pathlib.Path], None]
 
@@ -79,7 +81,7 @@ def extract_archive(archive_path: pathlib.Path, target_directory_path: pathlib.P
                         if search_result is None:
                             continue
 
-                        member.name = member.name.removeprefix(search_result.group(1))
+                        member.name = removeprefix(member.name, search_result.group(1))
 
                     if is_directory_structure_to_be_ignored(**kwargs):
                         member.name = os.path.basename(member.name)

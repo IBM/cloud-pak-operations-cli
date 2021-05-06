@@ -17,7 +17,7 @@ import logging
 import pathlib
 
 from types import ModuleType
-from typing import Optional
+from typing import Dict, List, Optional, Type
 
 import click
 
@@ -25,14 +25,14 @@ logger = logging.getLogger(__name__)
 
 
 class CommandData:
-    def __init__(self, command_names: list[str], commands: dict[str, click.Command]):
+    def __init__(self, command_names: List[str], commands: Dict[str, click.Command]):
         super().__init__()
 
         self.command_names = command_names
         self.commands = commands
 
 
-def create_click_multi_command_class(package: ModuleType) -> type[click.Command]:
+def create_click_multi_command_class(package: ModuleType) -> Type[click.Command]:
     """Creates a definition of a subclass of click.MultiCommand
 
     This method creates a definition of a subclass of click.MultiCommand
@@ -75,12 +75,12 @@ def create_click_multi_command_class(package: ModuleType) -> type[click.Command]
 
             return self._command_data.commands[cmd_name]
 
-        def list_commands(self, ctx: click.Context) -> list[str]:
+        def list_commands(self, ctx: click.Context) -> List[str]:
             self._initialize_commands_if_required()
 
             return self._command_data.command_names if self._command_data is not None else []
 
-        def _get_click_commands(self, module: ModuleType) -> dict[str, click.Command]:
+        def _get_click_commands(self, module: ModuleType) -> Dict[str, click.Command]:
             """Returns Click commands within the given Python module
 
             This method searches the given Python module for Click commands.
@@ -96,7 +96,7 @@ def create_click_multi_command_class(package: ModuleType) -> type[click.Command]
                 dictionary associating Click command names with Click commands
             """
 
-            commands: dict[str, click.Command] = {}
+            commands: Dict[str, click.Command] = {}
 
             for attributeName in dir(module):
                 attribute = getattr(module, attributeName)
@@ -108,7 +108,7 @@ def create_click_multi_command_class(package: ModuleType) -> type[click.Command]
 
             return commands
 
-        def _import_packages_and_modules(self) -> dict[str, ModuleType]:
+        def _import_packages_and_modules(self) -> Dict[str, ModuleType]:
             """Imports all subpackages and submodules within a Python package
 
             Parameters
@@ -124,7 +124,7 @@ def create_click_multi_command_class(package: ModuleType) -> type[click.Command]
                 dictionary associating names of imported modules with imported modules
             """
 
-            modules: dict[str, ModuleType] = {}
+            modules: Dict[str, ModuleType] = {}
 
             for file_path in package_directory_path.iterdir():
                 if file_path.is_dir() and (file_path / "__init__.py").exists():
@@ -160,8 +160,8 @@ def create_click_multi_command_class(package: ModuleType) -> type[click.Command]
             """
 
             if self._command_data is None:
-                commands: dict[str, click.Command] = {}
-                command_names: list[str] = []
+                commands: Dict[str, click.Command] = {}
+                command_names: List[str] = []
                 modules = self._import_packages_and_modules()
 
                 for module_name, module in modules.items():
