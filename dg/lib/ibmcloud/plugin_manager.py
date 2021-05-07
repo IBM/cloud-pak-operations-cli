@@ -1,6 +1,8 @@
 import json
 import logging
 
+from typing import List
+
 from dg.lib.error import IBMCloudException
 from dg.lib.ibmcloud import (
     execute_ibmcloud_command,
@@ -21,14 +23,14 @@ class PlugInManager:
     def refresh(self):
         self._plug_ins = self._get_plug_ins()
 
-    def _get_plug_ins(self) -> list[str]:
+    def _get_plug_ins(self) -> List[str]:
         ibmcloud_plugin_list_command_args = ["plugin", "list", "--output", "json"]
         ibmcloud_plugin_list_command_result = execute_ibmcloud_command(
             ibmcloud_plugin_list_command_args, capture_output=True
         )
 
         ibmcloud_plugin_list_command_result_json = json.loads(ibmcloud_plugin_list_command_result.stdout)
-        plug_ins: list[str] = []
+        plug_ins: List[str] = []
 
         for plugin in ibmcloud_plugin_list_command_result_json:
             if "Name" in plugin:

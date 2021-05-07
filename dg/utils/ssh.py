@@ -15,7 +15,7 @@
 import logging
 import pathlib
 
-from typing import Union
+from typing import Type, Union
 
 import asyncssh
 import click
@@ -106,7 +106,7 @@ class RemoteClient:
 
 def create_remote_client_ssh_session(
     print_output: bool,
-) -> type[asyncssh.SSHClientSession]:
+) -> Type[asyncssh.SSHClientSession]:
     """Returns a parameterized subclass of asyncssh.SSHClientSession that
     may be passed to asyncssh.SSHClientConnection.create_session()
 

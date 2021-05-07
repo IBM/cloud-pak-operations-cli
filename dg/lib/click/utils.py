@@ -15,7 +15,7 @@
 import json
 import pathlib
 
-from typing import Any
+from typing import Any, Dict
 
 import click
 
@@ -30,7 +30,7 @@ from dg.lib.cloud_pak_for_data.cpd_manager import (
 def check_cloud_pak_for_data_options(
     ctx: click.Context,
     build_type: CloudPakForDataAssemblyBuildType,
-    options: dict[str, Any],
+    options: Dict[str, Any],
 ):
     """Checks if values for required Click options were passed to a Click
     command to install an IBM Cloud Pak for Data assembly
@@ -67,7 +67,7 @@ def check_cloud_pak_for_data_options(
             raise click.UsageError("Missing option '--ibm-cloud-pak-for-data-entitlement-key'", ctx)
 
 
-def create_default_map_from_dict(dict: dict[str, Any]):
+def create_default_map_from_dict(dict: Dict[str, Any]):
     default_map_dict = {}
     default_map_dict["default_map"] = dict
 
@@ -86,7 +86,7 @@ def create_default_map_from_json_file(path: pathlib.Path):
     return default_map_dict
 
 
-def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, Any]) -> str:
+def get_oc_login_command_for_remote_host(ctx: click.Context, options: Dict[str, Any]) -> str:
     result: str
 
     if (
@@ -118,7 +118,7 @@ def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, 
     return result
 
 
-def log_in_to_openshift_cluster(ctx: click.Context, options: dict[str, Any]):
+def log_in_to_openshift_cluster(ctx: click.Context, options: Dict[str, Any]):
     if (
         ("username" in options)
         and (options["username"] is not None)

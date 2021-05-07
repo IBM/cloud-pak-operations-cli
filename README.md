@@ -14,13 +14,12 @@
 
 ## Installation & Update
 
-1. Install Python
+1. Install Python 3.8 or higher
 
 - macOS (requires [Homebrew](https://brew.sh/)):
 
 ```bash
-brew install python@3.9
-brew link python@3.9 --force
+brew install python
 ```
 
 - Windows (requires [Chocolatey](https://chocolatey.org/)):
@@ -55,12 +54,12 @@ dg adm update
 . $(pip3 show dg | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-zsh.sh
 ```
 
-## Running from docker
+## Running inside a Docker container
 
-The latest version of the Data Gate CLI on the master branch can also be run inside a Docker container from `quay.io/ibm/data-gate-cli:latest`
+The latest version of the Data Gate CLI on the master branch can also be run inside a Docker container:
 
 ```bash
-docker run -it quay.io/ibm/data-gate-cli:latest /bin/bash
+docker run -it quay.io/ibm/data-gate-cli:latest bash
 ```
 
 ## Development
@@ -104,13 +103,13 @@ pip3 install --editable .
 - Linux/macOS:
 
 ```
-export DG_VENV_PYTHON_PATH=.venv/bin/python3
+export DG_VENV_PYTHON_PATH=.venv/bin/python
 ```
 
 - Windows:
 
 ```
-DG_VENV_PYTHON_PATH=.venv/Scripts/python3
+DG_VENV_PYTHON_PATH=.venv\\Scripts\\python.exe
 ```
 
 ### Extending the Data Gate CLI
@@ -162,7 +161,11 @@ Unable to connect to the server: dial tcp: lookup {OpenShift cluster} on {DNS na
 
 - [GitHub issue](https://github.com/openshift/oc/issues/315)
 - Workaround: Edit `/etc/hosts` and add IP address of OpenShift cluster
-- Example: 9.AA.BBB.CC your.cluster.domain.com
+- Example:
+
+```
+9.AA.BBB.CC your.cluster.domain.com
+```
 
 ## IBM-internal
 

@@ -25,6 +25,7 @@ import dg.utils.network
 import dg.utils.process
 
 from dg.lib.error import DataGateCLIException
+from dg.utils.string import removeprefix, removesuffix
 
 OPENSHIFT_REST_API_VERSION: Final[str] = "v1"
 
@@ -49,7 +50,7 @@ def enable_openshift_image_registry_default_route():
 
 
 def execute_oc_command(
-    args: list[str],
+    args: List[str],
     capture_output=False,
     check=True,
     oc_cli_path=dg.config.data_gate_configuration_manager.get_oc_cli_path(),
@@ -197,8 +198,8 @@ def get_openshift_image_registry_default_route() -> str:
         "jsonpath='{.items[?(@.metadata.name==\"default-route\")].spec.host}'",
     ]
 
-    oc_get_route_command_result = (
-        execute_oc_command(oc_get_route_args, capture_output=True).stdout.removeprefix("'").removesuffix("'")
+    oc_get_route_command_result = removesuffix(
+        removeprefix(execute_oc_command(oc_get_route_args, capture_output=True).stdout, "'"), "'"
     )
 
     return oc_get_route_command_result
@@ -242,8 +243,8 @@ def get_persistent_volume_id(namespace: str, persistent_volume_name: str):
         f"jsonpath='{{.items[?(@.metadata.name==\"{persistent_volume_name}\")].metadata.labels.volumeId}}'",
     ]
 
-    oc_get_pv_command_result = (
-        execute_oc_command(oc_get_pv_args, capture_output=True).stdout.removeprefix("'").removesuffix("'")
+    oc_get_pv_command_result = removesuffix(
+        removeprefix(execute_oc_command(oc_get_pv_args, capture_output=True).stdout, "'"), "'"
     )
 
     if oc_get_pv_command_result == "":

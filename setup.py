@@ -24,5 +24,5 @@ setup(
         "urllib3",
     ],
     entry_points={"console_scripts": ["dg=dg.dg:cli"]},
-    python_requires=">=3.9.0",
+    python_requires=">=3.8.0",
 )

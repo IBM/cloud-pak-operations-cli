@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Final
+from typing import Final, List
 
 import click
 import requests
@@ -55,7 +55,7 @@ def ls(fyre_user_name: str, fyre_api_key: str):
     clusters = response.json()["clusters"]
 
     if len(clusters) != 0:
-        cluster_list: list[list[str]] = []
+        cluster_list: List[List[str]] = []
         headers = clusters[0].keys()
 
         for cluster in clusters:

@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Union
+from typing import Dict, List, Tuple, Union
 
 
 class VersionInfo(object):
@@ -40,5 +40,5 @@ class VersionInfo(object):
     def parse(version: str) -> "VersionInfo":
         ...
 
-    def compare(self, other: Union[str, dict, list, tuple, "VersionInfo"]):
+    def compare(self, other: Union[str, Dict, List, Tuple, "VersionInfo"]):
         ...

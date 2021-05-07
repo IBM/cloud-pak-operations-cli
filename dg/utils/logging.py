@@ -1,6 +1,6 @@
 import logging
 
-from typing import Callable
+from typing import Callable, Type
 
 import click
 
@@ -134,7 +134,7 @@ def loglevel_option(default_log_level="INFO") -> Callable:
     )
 
 
-def _getClickCommandWithLogLevelOption(default_log_level: str) -> type[click.Command]:
+def _getClickCommandWithLogLevelOption(default_log_level: str) -> Type[click.Command]:
     """Creates a definition of a subclass of click.Command
 
     This method creates a definition of a subclass of click.Command. Click

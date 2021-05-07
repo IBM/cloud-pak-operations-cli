@@ -15,7 +15,7 @@
 import json
 import pathlib
 
-from typing import Any, TypedDict, Union
+from typing import Any, Dict, List, TypedDict, Union
 
 from tabulate import tabulate
 
@@ -25,11 +25,11 @@ from dg.config import data_gate_configuration_manager
 from dg.lib.cluster.cluster import AbstractCluster, ClusterData
 from dg.lib.error import DataGateCLIException
 
-ContextData = dict[str, Any]
+ContextData = Dict[str, Any]
 
 
 class ClustersFileContents(TypedDict):
-    clusters: dict[str, ClusterData]
+    clusters: Dict[str, ClusterData]
     current_cluster: str
 
 
@@ -128,14 +128,14 @@ class ClusterCredentialsManager:
             metadata of registered OpenShift clusters as a pretty-printed string
         """
 
-        cluster_list: list[list[str]] = []
+        cluster_list: List[List[str]] = []
         server_of_current_cluster = self._get_server_of_current_cluster()
 
         for server, cluster_data in self._get_clusters().items():
             alias = cluster_data["alias"] if "alias" in cluster_data else ""
             cluster_factory = dg.lib.cluster.cluster_factories[cluster_data["type"]]
 
-            cluster_list_element: list[str] = [
+            cluster_list_element: List[str] = [
                 "*" if (server == server_of_current_cluster) else "",
                 server,
                 alias,
@@ -305,7 +305,7 @@ class ClusterCredentialsManager:
         self._clusters_file_contents["current_cluster"] = cluster.get_server()
         self._save_clusters_file()
 
-    def _get_clusters(self) -> dict[str, ClusterData]:
+    def _get_clusters(self) -> Dict[str, ClusterData]:
         """Returns registered OpenShift clusters
 
         Returns

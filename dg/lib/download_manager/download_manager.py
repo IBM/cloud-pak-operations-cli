@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from typing import List, Type
+
 from dg.config.binaries_manager import binaries_manager
 from dg.lib.download_manager.download_manager_plugin import (
     AbstractDownloadManagerPlugIn,
@@ -22,9 +24,9 @@ class DownloadManager:
     """Responsible for downloading dependencies"""
 
     def __init__(self):
-        self._download_manager_plugins: list[AbstractDownloadManagerPlugIn] = []
+        self._download_manager_plugins: List[AbstractDownloadManagerPlugIn] = []
 
-    def register_plugin(self, cls: type[AbstractDownloadManagerPlugIn]):
+    def register_plugin(self, cls: Type[AbstractDownloadManagerPlugIn]):
         """Registers a download manager plug-in responsible for downloading a
         specific dependency
 

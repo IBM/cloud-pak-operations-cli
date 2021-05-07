@@ -16,7 +16,7 @@ import json
 import pathlib
 import sys
 
-from typing import Any, Union
+from typing import Any, Dict, Union
 
 from dg.lib.error import DataGateCLIException
 
@@ -251,7 +251,7 @@ class DataGateConfigurationManager:
 
     def store_credentials(
         self,
-        credentials_to_be_stored: dict[str, Any],
+        credentials_to_be_stored: Dict[str, Any],
     ):
         """Stores credentials in a configuration file
 
@@ -265,7 +265,7 @@ class DataGateConfigurationManager:
         if all(value is None for value in credentials_to_be_stored.values()):
             return
 
-        credentials: Union[dict[Any, Any], None] = None
+        credentials: Union[Dict[Any, Any], None] = None
         dg_credentials_file_path = self.get_dg_credentials_file_path()
 
         if dg_credentials_file_path.exists():

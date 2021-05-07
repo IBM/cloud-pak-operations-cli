@@ -20,7 +20,7 @@ import re as regex
 import stat
 import urllib.parse
 
-from typing import Any, Union
+from typing import Any, Tuple, Union
 
 import requests
 import semver
@@ -295,7 +295,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
     def _get_cpd_installer_latest_release_version(
         self, cloud_pak_for_data_version: CloudPakForDataVersion
-    ) -> tuple[semver.VersionInfo, str]:
+    ) -> Tuple[semver.VersionInfo, str]:
         """Returns the latest release build version of the IBM Cloud Pak for
         Data 3.0.1 installer and the corresponding URL
 
@@ -315,7 +315,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         response.raise_for_status()
 
         response_json = json.loads(response.content)
-        result: Union[tuple[semver.VersionInfo, str], None] = None
+        result: Union[Tuple[semver.VersionInfo, str], None] = None
 
         for release in response_json:
             search_result = regex.search(

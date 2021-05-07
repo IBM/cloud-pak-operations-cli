@@ -15,6 +15,8 @@
 import ipaddress
 import socket
 
+from typing import List
+
 import netifaces
 import requests
 
@@ -29,7 +31,7 @@ def disable_insecure_request_warning():
     requests.packages.urllib3.disable_warnings(category=requests.packages.urllib3.exceptions.InsecureRequestWarning)
 
 
-def get_local_ipv4_addresses() -> list[ipaddress.IPv4Address]:
+def get_local_ipv4_addresses() -> List[ipaddress.IPv4Address]:
     """Returns all IPv4 addresses bound to local network interfaces
 
     Returns
@@ -38,7 +40,7 @@ def get_local_ipv4_addresses() -> list[ipaddress.IPv4Address]:
         all IPv4 addresses bound to local network interfaces
     """
 
-    result: list[ipaddress.IPv4Address] = []
+    result: List[ipaddress.IPv4Address] = []
 
     for interface in netifaces.interfaces():
         ifaddresses = netifaces.ifaddresses(interface)
@@ -76,7 +78,7 @@ def is_hostname_localhost(hostname: str) -> bool:
     return ipv4_address in local_ipv4_addresses
 
 
-def parse_hostname_result(hostname_result: str) -> list[ipaddress.IPv4Address]:
+def parse_hostname_result(hostname_result: str) -> List[ipaddress.IPv4Address]:
     """Parses the output of the hostname command (Linux)
 
     Parameters
@@ -91,6 +93,6 @@ def parse_hostname_result(hostname_result: str) -> list[ipaddress.IPv4Address]:
     """
 
     hostname_result_list = hostname_result.rstrip().split(" ")
-    ipv4_addresses: list[ipaddress.IPv4Address] = list(map(lambda str: ipaddress.ip_address(str), hostname_result_list))
+    ipv4_addresses: List[ipaddress.IPv4Address] = list(map(lambda str: ipaddress.ip_address(str), hostname_result_list))
 
     return ipv4_addresses

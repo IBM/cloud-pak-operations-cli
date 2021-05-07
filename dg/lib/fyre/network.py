@@ -1,13 +1,13 @@
 import ipaddress
 import re
 
-from typing import Union
+from typing import List, Union
 
 from dg.lib.error import DataGateCLIException
 
 
 def get_private_ip_address_of_infrastructure_node(
-    ipv4_addresses: list[ipaddress.IPv4Address],
+    ipv4_addresses: List[ipaddress.IPv4Address],
 ) -> ipaddress.IPv4Address:
     """Returns the private IP address of the infrastructure node
 

@@ -20,7 +20,7 @@ import urllib.parse
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, TypedDict, Union
+from typing import Any, Dict, List, TypedDict, Union
 
 import semver
 import yaml
@@ -41,10 +41,10 @@ class CloudPakForDataAssemblyBuildType(Enum):
 
 
 class CloudPakForDataVersion(TypedDict):
-    development: dict[str, str]
-    release: dict[str, str]
-    cpd_installer_file_name_dict: dict[OperatingSystem, str]
-    required_openshift_version: list[dict[str, str]]
+    development: Dict[str, str]
+    release: Dict[str, str]
+    cpd_installer_file_name_dict: Dict[OperatingSystem, str]
+    required_openshift_version: List[Dict[str, str]]
 
 
 CloudPakForDataVersions = TypedDict(
@@ -218,7 +218,7 @@ class AbstractCloudPakForDataManager(ABC):
         )
 
     @staticmethod
-    def is_openshift_version_in_range(openshift_version: semver.VersionInfo, allowed_ranges: dict):
+    def is_openshift_version_in_range(openshift_version: semver.VersionInfo, allowed_ranges: Dict):
         """Returns whether the given OpenShift version is contained in one of
         the given allowed ranges
 

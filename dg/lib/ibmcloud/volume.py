@@ -16,7 +16,7 @@ import json
 import logging
 import time
 
-from typing import Any, Final
+from typing import Any, Dict, Final
 
 import dg.lib.openshift
 
@@ -84,7 +84,7 @@ def increase_openshift_image_registry_volume_capacity(
         )
 
 
-def _get_volume_capacity(volume_details: dict[str, Any]):
+def _get_volume_capacity(volume_details: Dict[str, Any]):
     assert "capacityGb" in volume_details
 
     return volume_details["capacityGb"]

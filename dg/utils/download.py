@@ -20,7 +20,7 @@ import re as regex
 import tempfile
 import urllib.parse
 
-from typing import Any
+from typing import Any, Dict
 
 import requests
 
@@ -53,7 +53,7 @@ def download_file(url: urllib.parse.SplitResult, **kwargs: Any) -> pathlib.Path:
         Path of the downloaded file
     """
 
-    args: dict[str, Any] = {}
+    args: Dict[str, Any] = {}
 
     if "auth" in kwargs:
         args["auth"] = kwargs["auth"]

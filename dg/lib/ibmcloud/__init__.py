@@ -1,6 +1,6 @@
 import subprocess
 
-from typing import Final
+from typing import Final, List
 
 import dg.utils.process
 
@@ -11,7 +11,7 @@ INTERNAL_IBM_CLOUD_API_KEY_NAME: Final[str] = "ibm_cloud_api_key"
 
 
 def execute_ibmcloud_command(
-    args: list[str],
+    args: List[str],
     capture_output=False,
     check=True,
     print_captured_output=False,
@@ -48,7 +48,7 @@ def execute_ibmcloud_command(
     )
 
 
-def execute_ibmcloud_command_interactively(args: list[str]) -> int:
+def execute_ibmcloud_command_interactively(args: List[str]) -> int:
     proc = subprocess.Popen(
         [
             str(data_gate_configuration_manager.get_ibmcloud_cli_path()),
@@ -62,7 +62,7 @@ def execute_ibmcloud_command_interactively(args: list[str]) -> int:
 
 
 def execute_ibmcloud_command_without_check(
-    args: list[str],
+    args: List[str],
     capture_output=False,
     print_captured_output=False,
 ) -> dg.utils.process.ProcessResult:
