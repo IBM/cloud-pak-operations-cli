@@ -53,21 +53,14 @@ from dg.utils.logging import loglevel_command
         case_sensitive=False,
     ),
 )
-@optgroup.option(
-    "--storage-class",
-    required=True,
-    help="Storage class used for installation",
-)
+@optgroup.option("--storage-class", required=True, help="Storage class used for installation")
 @optgroup.option(
     "--version",
     default=AbstractCloudPakForDataManager.get_default_cloud_pak_for_data_version(),
     help="Cloud Pak for Data version",
 )
 @optgroup.group("Release build options")
-@optgroup.option(
-    "--ibm-cloud-pak-for-data-entitlement-key",
-    help="IBM Cloud Pak for Data entitlement key",
-)
+@optgroup.option("--ibm-cloud-pak-for-data-entitlement-key", "-e", help="IBM Cloud Pak for Data entitlement key")
 @optgroup.group("Development build options")
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")

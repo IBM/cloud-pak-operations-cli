@@ -25,7 +25,7 @@ from dg.utils.logging import loglevel_command
 @click.option("--artifactory-api-key", help="Artifactory API key")
 @click.option("--artifactory-user-name", help="Artifactory user name")
 @click.option("--ibm-cloud-api-key", help="IBM Cloud API key")
-@click.option("--ibm-cloud-pak-for-data-entitlement-key", help="IBM Cloud Pak for Data entitlement key")
+@click.option("--ibm-cloud-pak-for-data-entitlement-key", "-e", help="IBM Cloud Pak for Data entitlement key")
 @click.option("--ibm-github-api-key", help="IBM GitHub API key")
 def store_credentials(
     artifactory_api_key: Optional[str],
