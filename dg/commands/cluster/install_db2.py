@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Union
+from typing import Optional
 
 import click
 import semver
@@ -41,7 +41,7 @@ from dg.utils.logging import loglevel_command
     )
 )
 @optgroup.group("Shared options")
-@optgroup.option("--server", required=True, help="OpenShift server URL")
+@optgroup.option("--server", help="OpenShift server URL", required=True)
 @optgroup.option("--username", help="OpenShift username")
 @optgroup.option("--password", help="OpenShift password")
 @optgroup.option("--token", help="OpenShift OAuth access token")
@@ -54,44 +54,32 @@ from dg.utils.logging import loglevel_command
         case_sensitive=False,
     ),
 )
-@optgroup.option(
-    "--db2-edition",
-    required=True,
-    type=click.Choice(["db2oltp", "db2wh"]),
-    help="Db2 edition",
-)
-@optgroup.option(
-    "--storage-class",
-    required=True,
-    help="Storage class used for installation",
-)
+@optgroup.option("--db2-edition", help="Db2 edition", required=True, type=click.Choice(["db2oltp", "db2wh"]))
+@optgroup.option("--storage-class", help="Storage class used for installation", required=True)
 @optgroup.option(
     "--version",
     default=AbstractCloudPakForDataManager.get_default_cloud_pak_for_data_version(),
     help="Cloud Pak for Data version",
 )
 @optgroup.group("Release build options")
-@optgroup.option(
-    "--ibm-cloud-pak-for-data-entitlement-key",
-    help="IBM Cloud Pak for Data entitlement key",
-)
+@optgroup.option("--ibm-cloud-pak-for-data-entitlement-key", "-e", help="IBM Cloud Pak for Data entitlement key")
 @optgroup.group("Development build options")
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
 @click.pass_context
 def install_db2(
     ctx: click.Context,
-    ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
-    artifactory_user_name: str,
-    artifactory_api_key: str,
     server: str,
-    username: Union[str, None],
-    password: Union[str, None],
-    token: Union[str, None],
+    username: Optional[str],
+    password: Optional[str],
+    token: Optional[str],
     build_type: str,
     db2_edition: str,
     storage_class: str,
     version: str,
+    ibm_cloud_pak_for_data_entitlement_key: Optional[str],
+    artifactory_user_name: str,
+    artifactory_api_key: str,
 ):
     """Install IBM Db2 or IBM Db2 Warehouse"""
 

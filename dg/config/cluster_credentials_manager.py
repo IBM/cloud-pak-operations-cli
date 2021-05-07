@@ -15,7 +15,7 @@
 import json
 import pathlib
 
-from typing import Any, Dict, List, TypedDict, Union
+from typing import Any, Dict, List, Optional, TypedDict
 
 from tabulate import tabulate
 
@@ -52,7 +52,8 @@ class ClusterCredentialsManager:
             additional cluster data
         """
 
-        self._raise_if_alias_or_server_exists(alias, server)
+        if alias != "":
+            self._raise_if_alias_or_server_exists(alias, server)
 
         cluster_data_copy = cluster_data.copy()
         cluster_data_copy["alias"] = alias
@@ -77,7 +78,7 @@ class ClusterCredentialsManager:
         cluster = self.get_cluster(alias_or_server)
 
         if cluster is None:
-            raise DataGateCLIException("Cluster not found ({})".format(alias_or_server))
+            raise DataGateCLIException(f"Cluster not found ({alias_or_server})")
 
         if ("alias" in cluster_data_to_be_added) and ((new_alias := cluster_data_to_be_added["alias"]) != ""):
             self._raise_if_alias_exists(new_alias)
@@ -89,7 +90,7 @@ class ClusterCredentialsManager:
 
         self._save_clusters_file()
 
-    def get_cluster(self, alias_or_server) -> Union[AbstractCluster, None]:
+    def get_cluster(self, alias_or_server) -> Optional[AbstractCluster]:
         """Returns metadata of the registered OpenShift cluster with the given
         alias or server URL
 
@@ -101,12 +102,12 @@ class ClusterCredentialsManager:
 
         Returns
         -------
-        Union[AbstractCluster, None]
+        Optional[AbstractCluster]
             metadata of the registered OpenShift cluster with the given alias or
             server URL or None if no cluster was found
         """
 
-        cluster: Union[AbstractCluster, None] = None
+        cluster: Optional[AbstractCluster] = None
         clusters = self._get_clusters()
 
         for server, cluster_data in clusters.items():
@@ -148,16 +149,16 @@ class ClusterCredentialsManager:
 
         return result
 
-    def get_clusters_file_contents(self) -> Union[ClustersFileContents, None]:
+    def get_clusters_file_contents(self) -> Optional[ClustersFileContents]:
         """Returns the contents of the clusters file
 
         Returns
         -------
-        Union[ClustersFileContents, None]
+        Optional[ClustersFileContents]
             contents of the clusters file or None if it does not exist
         """
 
-        clusters_file_contents: Union[ClustersFileContents, None] = None
+        clusters_file_contents: Optional[ClustersFileContents] = None
         dg_clusters_file_path = self.get_dg_clusters_file_path()
 
         if dg_clusters_file_path.exists():
@@ -175,24 +176,24 @@ class ClusterCredentialsManager:
             contents of the clusters file or a default value if it does not exist
         """
 
-        clusters_file_contents: Union[ClustersFileContents, None] = self.get_clusters_file_contents()
+        clusters_file_contents: Optional[ClustersFileContents] = self.get_clusters_file_contents()
 
         if clusters_file_contents is None:
             clusters_file_contents = {"clusters": {}, "current_cluster": ""}
 
         return clusters_file_contents
 
-    def get_current_cluster(self) -> Union[AbstractCluster, None]:
+    def get_current_cluster(self) -> Optional[AbstractCluster]:
         """Returns metadata of the current registered OpenShift cluster
 
         Returns
         -------
-        Union[AbstractCluster, None]
+        Optional[AbstractCluster]
             metadata of the current registered OpenShift cluster or None if no
             current cluster is set
         """
 
-        cluster: Union[AbstractCluster, None] = None
+        cluster: Optional[AbstractCluster] = None
         server_of_current_cluster = self._get_server_of_current_cluster()
 
         if server_of_current_cluster != "":
@@ -277,7 +278,7 @@ class ClusterCredentialsManager:
         cluster = self.get_cluster(alias_or_server)
 
         if cluster is None:
-            raise DataGateCLIException("Cluster not found ({})".format(alias_or_server))
+            raise DataGateCLIException(f"Cluster not found ({alias_or_server})")
 
         clusters = self._get_clusters()
         clusters.pop(cluster.get_server())
@@ -300,7 +301,7 @@ class ClusterCredentialsManager:
         cluster = self.get_cluster(alias_or_server)
 
         if cluster is None:
-            raise DataGateCLIException("Cluster not found ({})".format(alias_or_server))
+            raise DataGateCLIException(f"Cluster not found ({alias_or_server})")
 
         self._clusters_file_contents["current_cluster"] = cluster.get_server()
         self._save_clusters_file()

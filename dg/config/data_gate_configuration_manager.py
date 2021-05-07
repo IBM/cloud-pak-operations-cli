@@ -16,7 +16,7 @@ import json
 import pathlib
 import sys
 
-from typing import Any, Dict, Union
+from typing import Any, Dict, Optional
 
 from dg.lib.error import DataGateCLIException
 
@@ -173,7 +173,7 @@ class DataGateConfigurationManager:
 
         return pathlib.Path(sys.modules["dg"].__file__).parent
 
-    def get_value_from_credentials_file(self, key: str) -> Union[str, None]:
+    def get_value_from_credentials_file(self, key: str) -> Optional[str]:
         """Returns the value corresponding to the given key stored in the
         credentials file
 
@@ -184,31 +184,30 @@ class DataGateConfigurationManager:
 
         Returns
         -------
-            Union[str, None]
+            Optional[str]
                 value corresponding to the given key or None if the key does not exist
         """
 
         credentials_file_contents = self.read_credentials_file_contents()
-        result: Union[str, None] = None
+        result: Optional[str] = None
 
-        if credentials_file_contents is not None:
-            if key in credentials_file_contents:
-                result = credentials_file_contents[key]
+        if (credentials_file_contents is not None) and (key in credentials_file_contents):
+            result = credentials_file_contents[key]
 
         return result
 
-    def read_credentials_file_contents(self) -> Union[Any, None]:
+    def read_credentials_file_contents(self) -> Optional[Any]:
         """Returns the contents of the credentials file
 
         Returns
         -------
-            Union[str, None]
+            Optional[str]
                 contents of the credentials file or none of the credentials file does
                 not exist or is empty
         """
 
         dg_credentials_file_path = self.get_dg_credentials_file_path()
-        result: Union[str, None] = None
+        result: Optional[str] = None
 
         if dg_credentials_file_path.exists() and (dg_credentials_file_path.stat().st_size != 0):
             with open(dg_credentials_file_path) as json_file:
@@ -247,7 +246,7 @@ class DataGateConfigurationManager:
             settings = {key: value}
 
         with open(self.get_dg_settings_file_path(), "w+") as f:
-            f.write(json.dumps(settings, indent=4))
+            f.write(json.dumps(settings, indent="\t", sort_keys=True))
 
     def store_credentials(
         self,
@@ -265,7 +264,7 @@ class DataGateConfigurationManager:
         if all(value is None for value in credentials_to_be_stored.values()):
             return
 
-        credentials: Union[Dict[Any, Any], None] = None
+        credentials: Optional[Dict[Any, Any]] = None
         dg_credentials_file_path = self.get_dg_credentials_file_path()
 
         if dg_credentials_file_path.exists():
@@ -284,5 +283,5 @@ class DataGateConfigurationManager:
         with open(dg_credentials_file_path, "w") as credentials_file:
             json.dump(credentials, credentials_file, indent="\t", sort_keys=True)
 
-    _supported_false_boolean_values = ["disable", "disabled", "false", "inactive" "no"]
+    _supported_false_boolean_values = ["disable", "disabled", "false", "inactive", "no"]
     _supported_true_boolean_values = ["active", "enable", "enabled", "true", "yes"]

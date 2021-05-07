@@ -31,11 +31,7 @@ class ProcessResult:
 
 
 def execute_command(
-    program: pathlib.Path,
-    args: List[str],
-    capture_output=False,
-    check=True,
-    print_captured_output=False,
+    program: pathlib.Path, args: List[str], capture_output=False, check=True, print_captured_output=False
 ) -> ProcessResult:
     """Executes a process
 
@@ -98,10 +94,7 @@ def execute_command(
 
 
 def execute_command_without_check(
-    program: pathlib.Path,
-    args: List[str],
-    capture_output=True,
-    print_captured_output=False,
+    program: pathlib.Path, args: List[str], capture_output=True, print_captured_output=False
 ) -> ProcessResult:
     """Executes a process without checking its return code
 

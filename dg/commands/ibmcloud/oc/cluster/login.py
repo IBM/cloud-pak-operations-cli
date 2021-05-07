@@ -24,7 +24,7 @@ from dg.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.option("--cluster-name", required=True, help="cluster name")
+@click.option("--cluster-name", help="cluster name", required=True)
 def login(cluster_name: str):
     """Log in to a Red Hat OpenShift on IBM Cloud cluster"""
 

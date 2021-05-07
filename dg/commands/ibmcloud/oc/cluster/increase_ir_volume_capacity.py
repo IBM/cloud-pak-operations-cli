@@ -24,7 +24,7 @@ REQUIRED_OPENSHIFT_IMAGE_REGISTRY_VOLUME_CAPACITY_IN_GB: Final[int] = 200
 
 
 @loglevel_command()
-@click.option("--name", required=True, help="cluster name")
+@click.option("--name", help="cluster name", required=True)
 def increase_ir_volume_capacity(name: str):
     """Increase capacity of volume in openshift-image-registry namespace"""
 

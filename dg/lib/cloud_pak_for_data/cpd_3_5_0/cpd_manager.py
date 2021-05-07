@@ -18,7 +18,7 @@ import pathlib
 import re as regex
 import urllib.parse
 
-from typing import Any, Tuple, Union
+from typing import Any, Optional, Tuple
 
 import requests
 import semver
@@ -280,7 +280,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         cloud_pak_for_data_configuration_data = cloud_pak_for_data_configuration_data_dict[operating_system]
         extension = cloud_pak_for_data_configuration_data["extension"]
         file_name_infix = cloud_pak_for_data_configuration_data["file_name_infix"]
-        file_name = f"cpd-cli-{file_name_infix}-EE-{version.major}.{version.minor}." f"{version.patch}.{extension}"
+        file_name = f"cpd-cli-{file_name_infix}-EE-{version.major}.{version.minor}.{version.patch}.{extension}"
 
         return file_name
 
@@ -336,7 +336,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         response.raise_for_status()
 
         response_json = json.loads(response.content)
-        result: Union[Tuple[semver.VersionInfo, str], None] = None
+        result: Optional[Tuple[semver.VersionInfo, str]] = None
 
         for release in response_json:
             search_result = regex.search(

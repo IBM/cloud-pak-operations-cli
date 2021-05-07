@@ -1,6 +1,6 @@
 import json
 
-from typing import Any, Optional, Union
+from typing import Any, Optional
 
 import semver
 
@@ -42,7 +42,7 @@ def get_full_openshift_version(openshift_version: semver.VersionInfo) -> str:
 
 
 def get_latest_supported_openshift_version() -> str:
-    current_openshift_version: Union[semver.VersionInfo, None] = None
+    current_openshift_version: Optional[semver.VersionInfo] = None
     ibm_cloud_supported_cloud_pak_for_data_version = AbstractCloudPakForDataManager.get_ibm_cloud_supported_version()
     version_command_result_json = _get_oc_versions_as_json()
 
@@ -55,9 +55,8 @@ def get_latest_supported_openshift_version() -> str:
 
             if AbstractCloudPakForDataManager.is_openshift_version_supported(
                 ibm_cloud_supported_cloud_pak_for_data_version, openshift_version
-            ):
-                if (current_openshift_version is None) or (openshift_version.compare(current_openshift_version) == 1):
-                    current_openshift_version = openshift_version
+            ) and ((current_openshift_version is None) or (openshift_version.compare(current_openshift_version) == 1)):
+                current_openshift_version = openshift_version
 
     if current_openshift_version is None:
         raise DataGateCLIException(

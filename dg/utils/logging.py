@@ -107,7 +107,7 @@ def loglevel_command(name=None, default_log_level="INFO", **attrs):
     """
 
     def decorator(f):
-        command = click.command(name, cls=_getClickCommandWithLogLevelOption(default_log_level), **attrs)(f)
+        command = click.command(name, cls=_get_click_command_with_log_level_option(default_log_level), **attrs)(f)
 
         return command
 
@@ -134,7 +134,7 @@ def loglevel_option(default_log_level="INFO") -> Callable:
     )
 
 
-def _getClickCommandWithLogLevelOption(default_log_level: str) -> Type[click.Command]:
+def _get_click_command_with_log_level_option(default_log_level: str) -> Type[click.Command]:
     """Creates a definition of a subclass of click.Command
 
     This method creates a definition of a subclass of click.Command. Click

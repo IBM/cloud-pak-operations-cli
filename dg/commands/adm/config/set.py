@@ -20,16 +20,8 @@ from dg.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.option(
-    "--key",
-    required=True,
-    help="Key name which should be set",
-)
-@click.option(
-    "--value",
-    required=True,
-    help="Value to which key should be set",
-)
+@click.option("--key", help="Key name which should be set", required=True)
+@click.option("--value", help="Value to which key should be set", required=True)
 def set(key: str, value: str):
     """Set configuration value"""
 
