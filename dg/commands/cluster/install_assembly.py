@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Union
+from typing import Optional
 
 import click
 import semver
@@ -40,11 +40,11 @@ from dg.utils.logging import loglevel_command
     )
 )
 @optgroup.group("Shared options")
-@optgroup.option("--server", required=True, help="OpenShift server URL")
+@optgroup.option("--server", help="OpenShift server URL", required=True)
 @optgroup.option("--username", help="OpenShift username")
 @optgroup.option("--password", help="OpenShift password")
 @optgroup.option("--token", help="OpenShift OAuth access token")
-@optgroup.option("--assembly-name", required=True, help="Name of the assembly to be installed")
+@optgroup.option("--assembly-name", help="Name of the assembly to be installed", required=True)
 @optgroup.option(
     "--build-type",
     default=f"{CloudPakForDataAssemblyBuildType.RELEASE.name}",
@@ -54,38 +54,31 @@ from dg.utils.logging import loglevel_command
         case_sensitive=False,
     ),
 )
-@optgroup.option(
-    "--storage-class",
-    required=True,
-    help="Storage class used for installation",
-)
+@optgroup.option("--storage-class", help="Storage class used for installation", required=True)
 @optgroup.option(
     "--version",
     default=AbstractCloudPakForDataManager.get_default_cloud_pak_for_data_version(),
     help="Cloud Pak for Data version",
 )
 @optgroup.group("Release build options")
-@optgroup.option(
-    "--ibm-cloud-pak-for-data-entitlement-key",
-    help="IBM Cloud Pak for Data entitlement key",
-)
+@optgroup.option("--ibm-cloud-pak-for-data-entitlement-key", help="IBM Cloud Pak for Data entitlement key")
 @optgroup.group("Development build options")
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
 @click.pass_context
 def install_assembly(
     ctx: click.Context,
-    ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
-    artifactory_user_name: str,
-    artifactory_api_key: str,
     server: str,
-    username: Union[str, None],
-    password: Union[str, None],
-    token: Union[str, None],
+    username: Optional[str],
+    password: Optional[str],
+    token: Optional[str],
     assembly_name: str,
     build_type: str,
     storage_class: str,
     version: str,
+    ibm_cloud_pak_for_data_entitlement_key: Optional[str],
+    artifactory_user_name: str,
+    artifactory_api_key: str,
 ):
     """Install an IBM Cloud Pak for Data assembly"""
 

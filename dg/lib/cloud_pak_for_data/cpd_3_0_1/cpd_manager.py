@@ -20,7 +20,7 @@ import re as regex
 import stat
 import urllib.parse
 
-from typing import Any, Tuple, Union
+from typing import Any, Optional, Tuple
 
 import requests
 import semver
@@ -315,7 +315,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         response.raise_for_status()
 
         response_json = json.loads(response.content)
-        result: Union[Tuple[semver.VersionInfo, str], None] = None
+        result: Optional[Tuple[semver.VersionInfo, str]] = None
 
         for release in response_json:
             search_result = regex.search(

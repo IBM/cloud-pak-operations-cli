@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 
 
 @loglevel_command()
-@click.option("--zone", required=True, help="Zone to delete deployments in (e.g. sjc03)")
+@click.option("--zone", help="Zone to delete deployments in (e.g. sjc03)", required=True)
 def nuke_storage(zone: str):
     """Immediately cancel ALL classic file storage volumes on IBM Cloud in a given zone"""
 

@@ -30,7 +30,7 @@ class ClusterStatus:
 
     def __str__(self) -> str:
         # TODO improve output
-        return json.dumps(self._status_output, indent=4)
+        return json.dumps(self._status_output, indent="\t", sort_keys=True)
 
     def get_json(self) -> str:
         return self._status_output

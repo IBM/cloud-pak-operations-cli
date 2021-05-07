@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from typing import Optional
+
 import click
 
 import dg.config.cluster_credentials_manager
@@ -23,12 +25,8 @@ from dg.utils.logging import loglevel_command
 
 @loglevel_command()
 @click.option("--alias", help="Alias used to reference a cluster instead of its server URL")
-@click.option(
-    "--cluster-name",
-    required=True,
-    help="Name of the IBM Cloud Kubernetes Service cluster to be registered",
-)
-def add(alias: str, cluster_name: str):
+@click.option("--cluster-name", help="Name of the IBM Cloud Kubernetes Service cluster to be registered", required=True)
+def add(alias: Optional[str], cluster_name: str):
     """Register an existing IBM Cloud Kubernetes Service cluster"""
 
     server = dg.lib.ibmcloud.status.get_cluster_status(cluster_name).get_server_url()

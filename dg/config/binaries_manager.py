@@ -15,7 +15,7 @@
 import json
 import pathlib
 
-from typing import Dict, Union
+from typing import Dict, Optional
 
 from dg.config import data_gate_configuration_manager
 
@@ -26,18 +26,18 @@ class BinariesManager:
     """Manages downloaded binaries"""
 
     def __init__(self):
-        self._binaries_file_contents: Union[Dict[str, str], None] = None
+        self._binaries_file_contents: Optional[Dict[str, str]] = None
 
-    def get_binaries_file_contents(self) -> Union[BinariesFileContents, None]:
+    def get_binaries_file_contents(self) -> Optional[BinariesFileContents]:
         """Returns the contents of the binaries file
 
         Returns
         -------
-        Union[BinariesFileContents, None]
+        Optional[BinariesFileContents]
             contents of the binaries file or None if it does not exist
         """
 
-        binaries_file_contents: Union[BinariesFileContents, None] = None
+        binaries_file_contents: Optional[BinariesFileContents] = None
         dg_binaries_file_path = self.get_dg_binaries_file_path()
 
         if dg_binaries_file_path.exists():
@@ -55,7 +55,7 @@ class BinariesManager:
             contents of the binaries file or a default value if it does not exist
         """
 
-        binaries_file_contents: Union[BinariesFileContents, None] = self.get_binaries_file_contents()
+        binaries_file_contents: Optional[BinariesFileContents] = self.get_binaries_file_contents()
 
         if binaries_file_contents is None:
             binaries_file_contents = {}
@@ -73,7 +73,7 @@ class BinariesManager:
 
         return data_gate_configuration_manager.get_dg_directory_path() / "binaries.json"
 
-    def get_binary_version(self, binary_alias: str) -> Union[str, None]:
+    def get_binary_version(self, binary_alias: str) -> Optional[str]:
         binaries = self._get_binary_versions()
 
         return binaries[binary_alias] if binary_alias in binaries else None

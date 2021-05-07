@@ -113,7 +113,7 @@ def get_cluster_access_token(oauth_server_url: str, username: str, password: str
         oauth_server_url,
         allow_redirects=False,
         auth=(username, password),
-        verify=False,
+        verify=False,  # NOSONAR
     )
 
     if "Location" not in response.headers:
@@ -230,9 +230,9 @@ def get_persistent_volume_name(namespace: str, persistent_volume_claim_name: str
             f"'{persistent_volume_claim_name}''"
         )
 
-    volumeName = oc_get_pvc_command_result["items"][0]["spec"]["volumeName"]
+    volume_name = oc_get_pvc_command_result["items"][0]["spec"]["volumeName"]
 
-    return volumeName
+    return volume_name
 
 
 def get_persistent_volume_id(namespace: str, persistent_volume_name: str):

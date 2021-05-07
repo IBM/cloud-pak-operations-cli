@@ -28,9 +28,7 @@ from dg.lib.cloud_pak_for_data.cpd_manager import (
 
 
 def check_cloud_pak_for_data_options(
-    ctx: click.Context,
-    build_type: CloudPakForDataAssemblyBuildType,
-    options: Dict[str, Any],
+    ctx: click.Context, build_type: CloudPakForDataAssemblyBuildType, options: Dict[str, Any]
 ):
     """Checks if values for required Click options were passed to a Click
     command to install an IBM Cloud Pak for Data assembly

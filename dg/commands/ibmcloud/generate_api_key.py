@@ -31,7 +31,6 @@ from dg.utils.logging import loglevel_command
 @loglevel_command()
 @click.option(
     "--delete-existing-api-key",
-    required=False,
     help=("Delete the API key created for the Data Gate CLI (in IBM Cloud and on disk) prior to generating a new one"),
     is_flag=True,
 )

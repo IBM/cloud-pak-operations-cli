@@ -19,14 +19,8 @@ from dg.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.option("-c", "--cluster-name", required=True, help="cluster name")
-@click.option(
-    "--force",
-    "force_deletion",
-    required=False,
-    help="Force deletion of the cluster",
-    is_flag=True,
-)
+@click.option("-c", "--cluster-name", help="cluster name", required=True)
+@click.option("--force", "force_deletion", help="Force deletion of the cluster", is_flag=True)
 def rm(cluster_name: str, force_deletion: bool):
     """Delete a Red Hat OpenShift on IBM Cloud cluster"""
 

@@ -35,7 +35,6 @@ logger = logging.getLogger(__name__)
 @loglevel_command()
 @click.option(
     "--delete-api-key",
-    required=False,
     help="Delete the API key which was created for the Data Gate CLI (in IBM Cloud and on disk)",
     is_flag=True,
 )

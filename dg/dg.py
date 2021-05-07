@@ -39,10 +39,7 @@ if dg.utils.debugger.is_debugpy_running() and (len(sys.argv) == 2):
         sys.argv = [sys.argv[0]] + sys.argv[1].split()
 
 
-@click.group(
-    cls=create_click_multi_command_class(dg.commands),
-    invoke_without_command=True,
-)
+@click.group(cls=create_click_multi_command_class(dg.commands), invoke_without_command=True)
 @click.option("--version", is_flag=True, help="Show the version number of the Data Gate CLI")
 @click.pass_context
 def cli(ctx: click.Context, version: bool):

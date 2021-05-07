@@ -20,7 +20,7 @@ import urllib.parse
 
 from abc import ABC, abstractmethod
 from enum import Enum
-from typing import Any, Dict, List, TypedDict, Union
+from typing import Any, Dict, List, Optional, TypedDict
 
 import semver
 import yaml
@@ -169,7 +169,7 @@ class AbstractCloudPakForDataManager(ABC):
         self,
         artifactory_user_name: str,
         artifactory_api_key: str,
-        ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
+        ibm_cloud_pak_for_data_entitlement_key: Optional[str],
         assembly_name: str,
         storage_class: str,
         **kwargs: Any,
@@ -293,7 +293,7 @@ class AbstractCloudPakForDataManager(ABC):
         self,
         artifactory_user_name: str,
         artifactory_api_key: str,
-        ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
+        ibm_cloud_pak_for_data_entitlement_key: Optional[str],
         assembly_name: str,
     ) -> pathlib.Path:
         """Prepares a YAML file for installing the assembly with the given name
@@ -396,7 +396,7 @@ class AbstractCloudPakForDataManager(ABC):
 
     def _prepare_yaml_file_for_release_build(
         self,
-        ibm_cloud_pak_for_data_entitlement_key: Union[str, None],
+        ibm_cloud_pak_for_data_entitlement_key: Optional[str],
     ) -> pathlib.Path:
         """Prepares a YAML file for installing a release build of the assembly
         with the given name

@@ -59,19 +59,12 @@ def validate_ocp_version(ctx, param, value) -> Optional[semver.VersionInfo]:
 
 @loglevel_command()
 @click.option("-a", "--alias", help="Alias used to reference a cluster instead of its server URL")
-@click.option("-c", "--cluster-name", required=True, help="cluster name")
-@click.option(
-    "-f",
-    "--force",
-    required=False,
-    help="Remove any prompts during cluster creation.",
-    is_flag=True,
-)
+@click.option("-c", "--cluster-name", help="cluster name", required=True)
+@click.option("-f", "--force", help="Remove any prompts during cluster creation.", is_flag=True)
 @click.option(
     "-i",
     "--full-install",
     "full_installation",
-    required=False,
     help="Perform a full installation of Cloud Pak for Data after the cluster is provisioned.",
     is_flag=True,
 )
@@ -80,17 +73,10 @@ def validate_ocp_version(ctx, param, value) -> Optional[semver.VersionInfo]:
     "-r",
     "--rm",
     "remove_existing",
-    required=False,
     help="Delete any existing cluster with the given name before creating a new one.",
     is_flag=True,
 )
-@click.option(
-    "-w",
-    "--workaround",
-    required=False,
-    help="Restart openshift-dns pods after cluster creation (workaround)",
-    is_flag=True,
-)
+@click.option("-w", "--workaround", help="Restart openshift-dns pods after cluster creation (workaround)", is_flag=True)
 def create(
     alias: Optional[str],
     cluster_name: str,

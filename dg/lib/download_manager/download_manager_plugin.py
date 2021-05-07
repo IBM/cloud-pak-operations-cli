@@ -16,7 +16,7 @@ import json
 import re as regex
 
 from abc import ABC, abstractmethod
-from typing import Union
+from typing import Optional
 
 import requests
 import semver
@@ -74,7 +74,7 @@ class AbstractDownloadManagerPlugIn(ABC):
 
         pass
 
-    def _get_latest_binary_version_on_github(self, owner: str, repo: str) -> Union[semver.VersionInfo, None]:
+    def _get_latest_binary_version_on_github(self, owner: str, repo: str) -> Optional[semver.VersionInfo]:
         """Returns the latest version of a dependency on GitHub
 
         This method parses the "name" key of the JSON document returned by the
@@ -124,7 +124,7 @@ class AbstractDownloadManagerPlugIn(ABC):
 
         Returns
         -------
-        Union[semver.VersionInfo, None]
+        Optional[semver.VersionInfo]
             latest version of a dependency or None if no release was found
         """
 
@@ -132,7 +132,7 @@ class AbstractDownloadManagerPlugIn(ABC):
         response.raise_for_status()
 
         response_json = json.loads(response.content)
-        result: Union[semver.VersionInfo, None] = None
+        result: Optional[semver.VersionInfo] = None
 
         for release in response_json:
             search_result = regex.search(

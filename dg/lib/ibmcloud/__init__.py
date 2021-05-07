@@ -11,10 +11,7 @@ INTERNAL_IBM_CLOUD_API_KEY_NAME: Final[str] = "ibm_cloud_api_key"
 
 
 def execute_ibmcloud_command(
-    args: List[str],
-    capture_output=False,
-    check=True,
-    print_captured_output=False,
+    args: List[str], capture_output=False, check=True, print_captured_output=False
 ) -> dg.utils.process.ProcessResult:
     """Executes the IBM Cloud CLI
 
@@ -62,9 +59,7 @@ def execute_ibmcloud_command_interactively(args: List[str]) -> int:
 
 
 def execute_ibmcloud_command_without_check(
-    args: List[str],
-    capture_output=False,
-    print_captured_output=False,
+    args: List[str], capture_output=False, print_captured_output=False
 ) -> dg.utils.process.ProcessResult:
     """Executes the IBM Cloud CLI without checking its return code
 

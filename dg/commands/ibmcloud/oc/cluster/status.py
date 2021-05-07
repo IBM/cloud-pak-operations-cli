@@ -20,13 +20,8 @@ from dg.utils.logging import loglevel_command
 
 
 @loglevel_command(default_log_level="WARNING")
-@click.option("--cluster-name", required=True, help="cluster name")
-@click.option(
-    "--json",
-    required=False,
-    help="Prints the command output in JSON format.",
-    is_flag=True,
-)
+@click.option("--cluster-name", help="cluster name", required=True)
+@click.option("--json", help="Prints the command output in JSON format", is_flag=True)
 def status(cluster_name: str, json: bool):
     """Display the status of a Red Hat OpenShift on IBM Cloud cluster"""
 

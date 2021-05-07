@@ -79,7 +79,7 @@ def download_file(url: urllib.parse.SplitResult, **kwargs: Any) -> pathlib.Path:
     else:
         file_name = os.path.basename(urllib.parse.urlsplit(response.url).path)
 
-    logger.info("Downloading: {} [{}]".format(response.url, file_name))
+    logger.info(f"Downloading: {response.url} [{file_name}]")
 
     content_length = (
         int(str(response.headers.get("Content-Length"))) if response.headers.get("Content-Length") is not None else 0
@@ -133,7 +133,7 @@ def download_file_into_buffer(url: urllib.parse.SplitResult, output_stream: io.B
         file_name = os.path.basename(urllib.parse.urlsplit(response.url).path)
 
     if ("silent" not in kwargs) or not kwargs["silent"]:
-        logger.info("Downloading: {} [{}]".format(response.url, file_name))
+        logger.info(f"Downloading: {response.url} [{file_name}]")
 
     content_length = (
         int(str(response.headers.get("Content-Length"))) if response.headers.get("Content-Length") is not None else 0

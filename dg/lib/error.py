@@ -1,6 +1,6 @@
 import re as regex
 
-from typing import Union
+from typing import Optional
 
 import colorama
 
@@ -9,8 +9,8 @@ class DataGateCLIException(Exception):
     def __init__(
         self,
         error_message: str,
-        stderr: Union[str, None] = None,
-        stdout: Union[str, None] = None,
+        stderr: Optional[str] = None,
+        stdout: Optional[str] = None,
     ):
         super().__init__(error_message)
         self._error_message = error_message
@@ -47,13 +47,13 @@ class IBMCloudException(DataGateCLIException):
     def __init__(
         self,
         error_message,
-        stderr: Union[str, None] = None,
-        stdout: Union[str, None] = None,
+        stderr: Optional[str] = None,
+        stdout: Optional[str] = None,
     ):
         super().__init__(error_message, stderr, stdout)
 
     def __str__(self):
-        output: Union[str, None] = None
+        output: Optional[str] = None
 
         if self._stderr is None:
             output = self._get_highlighted_str(IBMCloudException.get_parsed_error_message(self._error_message))

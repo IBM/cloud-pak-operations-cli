@@ -95,11 +95,11 @@ def create_click_multi_command_class(package: ModuleType) -> Type[click.Command]
 
             commands: Dict[str, click.Command] = {}
 
-            for attributeName in dir(module):
-                attribute = getattr(module, attributeName)
+            for attribute_name in dir(module):
+                attribute = getattr(module, attribute_name)
 
                 if isinstance(attribute, click.Command):
-                    command_name = attributeName.replace("_", "-")
+                    command_name = attribute_name.replace("_", "-")
 
                     commands[command_name] = attribute
 
@@ -127,16 +127,16 @@ def create_click_multi_command_class(package: ModuleType) -> Type[click.Command]
                 if file_path.is_dir() and (file_path / "__init__.py").exists():
                     package_or_module_name = file_path.name
 
-                    logger.debug("Importing package {}.{}".format(package_name, package_or_module_name))
+                    logger.debug(f"Importing package {package_name}.{package_or_module_name}")
                     modules[package_or_module_name] = importlib.import_module(
-                        "{}.{}".format(package_name, package_or_module_name)
+                        f"{package_name}.{package_or_module_name}"
                     )
                 elif file_path.is_file() and (file_path.suffix == ".py") and (file_path.name != "__init__.py"):
                     package_or_module_name = file_path.name[:-3]
 
-                    logger.debug("Importing module {}.{}".format(package_name, package_or_module_name))
+                    logger.debug(f"Importing module {package_name}.{package_or_module_name}")
                     modules[package_or_module_name] = importlib.import_module(
-                        "{}.{}".format(package_name, package_or_module_name)
+                        f"{package_name}.{package_or_module_name}"
                     )
 
             return modules
