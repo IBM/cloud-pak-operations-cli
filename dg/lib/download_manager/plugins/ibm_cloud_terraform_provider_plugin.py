@@ -34,15 +34,15 @@ class IBMCloudTerraformProviderPlugIn(AbstractDownloadManagerPlugIn):
     def __init__(self):
         self._ibmcloud_terraform_provider_plugin_configuration_data_dict = {
             OperatingSystem.LINUX_X86_64: {
-                "ibm_cloud_terraform_provider_file_name": "linux_amd64.zip",
+                "ibm_cloud_terraform_provider_file_name": "terraform-provider-ibm_{version}_linux_amd64.zip",
                 "terraform_plugins_directory_path": ".terraform.d/plugins",
             },
             OperatingSystem.MAC_OS: {
-                "ibm_cloud_terraform_provider_file_name": "darwin_amd64.zip",
+                "ibm_cloud_terraform_provider_file_name": "terraform-provider-ibm_{version}_darwin_amd64.zip",
                 "terraform_plugins_directory_path": ".terraform.d/plugins",
             },
             OperatingSystem.WINDOWS: {
-                "ibm_cloud_terraform_provider_file_name": "windows_amd64.zip",
+                "ibm_cloud_terraform_provider_file_name": "terraform-provider-ibm_{version}_windows_amd64.zip",
                 "terraform_plugins_directory_path": "AppData/Roaming/terraform.d/plugins",
             },
         }
@@ -52,7 +52,7 @@ class IBMCloudTerraformProviderPlugIn(AbstractDownloadManagerPlugIn):
         operating_system = dg.utils.operating_system.get_operating_system()
         file_name = self._ibmcloud_terraform_provider_plugin_configuration_data_dict[operating_system][
             "ibm_cloud_terraform_provider_file_name"
-        ]
+        ].format(version=str(version))
 
         url = f"https://github.com/IBM-Cloud/terraform-provider-ibm/releases/download/v{str(version)}/{file_name}"
         archive_path = dg.utils.download.download_file(urllib.parse.urlsplit(url))
