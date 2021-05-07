@@ -67,13 +67,10 @@ def create_click_multi_command_class(package: ModuleType) -> Type[click.Command]
 
             self._command_data: Optional[CommandData] = None
 
-        def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command:
+        def get_command(self, ctx: click.Context, cmd_name: str) -> Optional[click.Command]:
             self._initialize_commands_if_required()
 
-            if cmd_name not in self._command_data.commands:
-                raise click.ClickException("Unknown command")
-
-            return self._command_data.commands[cmd_name]
+            return self._command_data.commands[cmd_name] if cmd_name in self._command_data.commands else None
 
         def list_commands(self, ctx: click.Context) -> List[str]:
             self._initialize_commands_if_required()
