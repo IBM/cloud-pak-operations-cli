@@ -12,7 +12,7 @@ setup(
     include_package_data=True,
     install_requires=[
         "asyncssh",
-        "click<=8",
+        "click<8",
         "colorama",
         "click-option-group",
         "netifaces",
