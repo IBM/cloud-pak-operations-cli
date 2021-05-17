@@ -46,6 +46,7 @@ from dg.utils.logging import loglevel_command
 @optgroup.option("--username", help="OpenShift username")
 @optgroup.option("--password", help="OpenShift password")
 @optgroup.option("--token", help="OpenShift OAuth access token")
+@optgroup.option("--accept-all-licenses", help="Accept all licenses", is_flag=True)
 @optgroup.option(
     "--build-type",
     default=f"{CloudPakForDataAssemblyBuildType.RELEASE.name}",
@@ -73,6 +74,7 @@ def install_cloud_pak_for_data(
     username: Optional[str],
     password: Optional[str],
     token: Optional[str],
+    accept_all_licenses: bool,
     build_type: str,
     storage_class: str,
     version: str,
@@ -98,6 +100,7 @@ def install_cloud_pak_for_data(
         artifactory_api_key,
         ibm_cloud_pak_for_data_entitlement_key,
         "lite",
+        accept_all_licenses,
         storage_class,
         override_yaml_file_path=override_yaml_file_path,
     )

@@ -12,61 +12,40 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import json
-
-from typing import Final
+from typing import Optional
 
 import click
-import requests
 
 import dg.config
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
 import dg.utils.network
 
-from dg.lib.error import DataGateCLIException
+from dg.lib.fyre.api_manager import OCPPlusAPIManager
 from dg.utils.logging import loglevel_command
-
-IBM_FYRE_DELETE_CLUSTER_URL: Final[str] = "https://api.fyre.ibm.com/rest/v1/?operation=delete"
 
 
 @loglevel_command(
-    context_settings=dg.lib.click.utils.create_default_map_from_json_file(
-        dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
+    context_settings=dg.lib.click.utils.create_default_map_from_dict(
+        dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option(
-    "--cluster-name",
-    required=True,
-    help="Name of the OpenShift cluster to be deleted",
-)
-@click.option("--fyre-user-name", required=True, help="FYRE API user name")
-@click.option("--fyre-api-key", required=True, help="FYRE API key")
-def rm(cluster_name: str, fyre_user_name: str, fyre_api_key: str):
-    """Delete a cluster on FYRE"""
+@click.option("--fyre-user-name", help="FYRE API user name", required=True)
+@click.option("--fyre-api-key", help="FYRE API key", required=True)
+@click.option("--cluster-name", help="Name of the OCP+ cluster to be deleted", required=True)
+@click.option("--force", "-f", help="Skip confirmation", is_flag=True)
+@click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
+def rm(fyre_user_name: str, fyre_api_key: str, cluster_name: str, force: bool, site: Optional[str]):
+    """Delete an OCP+ cluster"""
 
-    request_specification = {"cluster_name": cluster_name}
+    if not force:
+        click.confirm(f"Do you really want to delete cluster '{cluster_name}'?", abort=True)
 
     dg.utils.network.disable_insecure_request_warning()
+    OCPPlusAPIManager(fyre_user_name, fyre_api_key).rm(cluster_name, site)
 
-    response = requests.post(
-        IBM_FYRE_DELETE_CLUSTER_URL,
-        auth=(fyre_user_name, fyre_api_key),
-        data=json.dumps(request_specification),
-        verify=False,
-    )
+    server = f"https://api.{cluster_name}.cp.fyre.ibm.com:6443"
+    cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_cluster(server)
 
-    if response.ok:
-        json_response = response.json()
-        status = json_response["status"]
-
-        if status != "submitted":
-            raise DataGateCLIException("Failed to delete FYRE cluster ({})".format(json_response["details"]))
-
-        server = "https://api.{}.os.fyre.ibm.com:6443".format(cluster_name)
-        cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_cluster(server)
-
-        if cluster is not None:
-            dg.config.cluster_credentials_manager.cluster_credentials_manager.remove_cluster(server)
-    else:
-        raise DataGateCLIException("Failed to delete FYRE cluster (HTTP status code: {})".format(response.status_code))
+    if cluster is not None:
+        dg.config.cluster_credentials_manager.cluster_credentials_manager.remove_cluster(server)

@@ -102,7 +102,7 @@ class TestAddClusterCommands(unittest.TestCase):
             "alias": "cluster-1-alias",
             "cluster_name": "cluster-1",
             "password": "password",
-            "server": "https://api.cluster-1.os.fyre.ibm.com:6443",
+            "server": "https://api.cluster-1.cp.fyre.ibm.com:6443",
         }
 
         self._add_cluster(cluster_1_data, 1)
@@ -114,7 +114,7 @@ class TestAddClusterCommands(unittest.TestCase):
             "alias": "",
             "cluster_name": "cluster-2",
             "password": "password",
-            "server": "https://api.cluster-2.os.fyre.ibm.com:6443",
+            "server": "https://api.cluster-2.cp.fyre.ibm.com:6443",
         }
 
         self._add_cluster(cluster_2_data, 2)
@@ -126,7 +126,7 @@ class TestAddClusterCommands(unittest.TestCase):
             "alias": "cluster-1-alias",
             "cluster_name": "cluster-3",
             "password": "password",
-            "server": "https://api.cluster-3.os.fyre.ibm.com:6443",
+            "server": "https://api.cluster-3.cp.fyre.ibm.com:6443",
         }
 
         self._add_cluster(cluster_3_data, 1)
@@ -141,7 +141,7 @@ class TestAddClusterCommands(unittest.TestCase):
         self.assertEqual(returned_cluster_data["cluster_name"], cluster_name)
         self.assertEqual(
             returned_cluster_data["infrastructure_node_hostname"],
-            f"{cluster_name}-inf.fyre.ibm.com",
+            f"api.{cluster_name}.cp.fyre.ibm.com",
         )
 
         self.assertEqual(returned_cluster_data["password"], cluster_data["password"])

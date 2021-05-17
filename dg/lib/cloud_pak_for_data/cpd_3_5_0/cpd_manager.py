@@ -96,6 +96,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
     def install_assembly(
         self,
         assembly_name: str,
+        accept_all_licenses: bool,
         yaml_file_path: pathlib.Path,
         storage_class: str,
         **kwargs: Any,
@@ -103,9 +104,12 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         cpd_installer_path = self.get_cloud_pak_for_data_installer_path()
 
         # install as cluster admin to generate (and apply) preinstall YAML files
-        args = [
-            "adm",
-            "--accept-all-licenses",
+        args = ["adm"]
+
+        if accept_all_licenses:
+            args.append("--accept-all-licenses")
+
+        args += [
             "--apply",
             "--assembly",
             assembly_name,
@@ -121,9 +125,12 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
         if self._build_type == CloudPakForDataAssemblyBuildType.DEV:
             # install assembly
-            args = [
-                "install",
-                "--accept-all-licenses",
+            args = ["install"]
+
+            if accept_all_licenses:
+                args.append("--accept-all-licenses")
+
+            args += [
                 "--assembly",
                 assembly_name,
                 "--download-path",
@@ -144,11 +151,12 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             ]
         else:
             # install assembly
-            openshift_image_registry_route = dg.lib.openshift.get_openshift_image_registry_default_route()
-            target_registry_password = dg.lib.openshift.get_current_token()
-            args = [
-                "install",
-                "--accept-all-licenses",
+            args = ["install"]
+
+            if accept_all_licenses:
+                args.append("--accept-all-licenses")
+
+            args += [
                 "--assembly",
                 assembly_name,
                 "--cluster-pull-prefix",
@@ -162,6 +170,9 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
 
             if "override_yaml_file_path" in kwargs:
                 args += ["--override", str(kwargs["override_yaml_file_path"])]
+
+            openshift_image_registry_route = dg.lib.openshift.get_openshift_image_registry_default_route()
+            target_registry_password = dg.lib.openshift.get_current_token()
 
             args += [
                 "--repo",

@@ -143,6 +143,7 @@ class AbstractCloudPakForDataManager(ABC):
     def install_assembly(
         self,
         assembly_name: str,
+        accept_all_licenses: bool,
         yaml_file_path: pathlib.Path,
         storage_class: str,
         **kwargs: Any,
@@ -153,6 +154,8 @@ class AbstractCloudPakForDataManager(ABC):
         ----------
         assembly_name
             name of the assembly to be installed
+        accept_all_licenses
+            flag indicating whether all licenses shall be accepted
         yaml_file_path
             path to the YAML file of the assembly to be installed
         storage_class
@@ -171,6 +174,7 @@ class AbstractCloudPakForDataManager(ABC):
         artifactory_api_key: str,
         ibm_cloud_pak_for_data_entitlement_key: Optional[str],
         assembly_name: str,
+        accept_all_licenses: bool,
         storage_class: str,
         **kwargs: Any,
     ):
@@ -187,6 +191,8 @@ class AbstractCloudPakForDataManager(ABC):
             IBM Cloud Pak for Data entitlement key
         assembly_name
             name of the assembly to be installed
+        accept_all_licenses
+            flag indicating whether all licenses shall be accepted
         storage_class
             storage class to be used for the installation
         **kwargs
@@ -212,6 +218,7 @@ class AbstractCloudPakForDataManager(ABC):
 
         self.install_assembly(
             assembly_name,
+            accept_all_licenses,
             yaml_file_path,
             storage_class,
             **kwargs,

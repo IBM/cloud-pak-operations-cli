@@ -4,18 +4,17 @@
 
 - [IBM Cloud Pak for Data entitlement key](https://myibm.ibm.com/products-services/containerlibrary)
 - IBM GitHub API key
-- Password for `kubeadmin` user of OpenShift cluster (see e-mail from fyre@us.ibm.com: "[FYRE] OpenShift cluster finished building")
 
 ## Linux/macOS/Windows:
-
-To create a FYRE cluster using the following command, your FYRE memory quota must be greater than or equal to 220 GiB and may be adjusted by one of the owners of your FYRE product group.
 
 - Create FYRE cluster:
 
   ```bash
-  dg fyre cluster create --cluster-name {FYRE cluster name}
-  dg fyre cluster copy-ssh-key --infrastructure-node-hostname {FYRE cluster name}-inf.fyre.ibm.com
-  ssh root@{FYRE cluster name}-inf.fyre.ibm.com
+  dg fyre cluster create-for-db2-data-gate --cluster-name {FYRE cluster name}
+  dg fyre cluster add --alias {alias} --cluster-name {FYRE cluster name} --password {kubeadmin password}
+  dg cluster use {alias}
+  dg fyre cluster copy-ssh-key
+  dg fyre cluster ssh
   ```
 
 ## Infrastructure node:
@@ -24,7 +23,7 @@ To create a FYRE cluster using the following command, your FYRE memory quota mus
 - Compile and install Python 3.8 or higher:
 
   ```bash
-  yum install gcc libffi-devel openssl-devel zlib-devel
+  yum install gcc git libffi-devel make openssl-devel zlib-devel
   export PYTHON_VERSION="3.{minor version}.{patch version}"
   wget "https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz"
   tar -xf "Python-$PYTHON_VERSION.tgz"
@@ -40,17 +39,14 @@ To create a FYRE cluster using the following command, your FYRE memory quota mus
   pip3 install git+ssh://git@github.com/IBM/data-gate-cli.git
   ```
 
-- Execute Data Gate CLI commands:
+- Execute the following Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
 
   ```
   dg adm download-dependencies
-  dg fyre cluster add --alias {alias} --cluster-name {FYRE cluster name} --password {kubeadmin password}
-  dg cluster use {alias}
   dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key {IBM Cloud Pak for Data entitlement key}
   dg adm store-credentials --ibm-github-api-key {IBM GitHub API key}
+  dg fyre cluster add --alias {alias} --cluster-name {FYRE cluster name} --password {kubeadmin password}
+  dg cluster use {alias}
   dg fyre cluster install-nfs-storage-class
-  dg cluster install-cloud-pak-for-data --storage-class nfs-client
-  dg cluster install-assembly --assembly-name dmc --storage-class nfs-client
-  dg cluster install-data-gate --storage-class nfs-client
-  dg cluster install-db2 --db2-edition {[db2oltp|db2wh]} --storage-class nfs-client
+  dg cluster install-db2-data-gate-stack --storage-class nfs-client
   ```
