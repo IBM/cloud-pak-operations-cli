@@ -12,9 +12,10 @@ setup(
     include_package_data=True,
     install_requires=[
         "asyncssh",
-        "click<8",
-        "colorama",
+        "click",
         "click-option-group",
+        "colorama",
+        "jsonschema",
         "netifaces",
         "pyyaml",
         "requests",

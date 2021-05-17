@@ -6,17 +6,20 @@ _dg_completion() {
     local -a response
     (( ! $+commands[dg] )) && return 1
 
-    response=("${(@f)$( env COMP_WORDS="${words[*]}" \
-                        COMP_CWORD=$((CURRENT-1)) \
-                        _DG_COMPLETE="complete_zsh" \
-                        dg )}")
+    response=("${(@f)$(env COMP_WORDS="${words[*]}" COMP_CWORD=$((CURRENT-1)) _DG_COMPLETE=zsh_complete dg)}")
 
-    for key descr in ${(kv)response}; do
-      if [[ "$descr" == "_" ]]; then
-          completions+=("$key")
-      else
-          completions_with_descriptions+=("$key":"$descr")
-      fi
+    for type key descr in ${response}; do
+        if [[ "$type" == "plain" ]]; then
+            if [[ "$descr" == "_" ]]; then
+                completions+=("$key")
+            else
+                completions_with_descriptions+=("$key":"$descr")
+            fi
+        elif [[ "$type" == "dir" ]]; then
+            _path_files -/
+        elif [[ "$type" == "file" ]]; then
+            _path_files -f
+        fi
     done
 
     if [ -n "$completions_with_descriptions" ]; then
@@ -26,7 +29,7 @@ _dg_completion() {
     if [ -n "$completions" ]; then
         compadd -U -V unsorted -a completions
     fi
-    compstate[insert]="automenu"
 }
 
 compdef _dg_completion dg;
+
