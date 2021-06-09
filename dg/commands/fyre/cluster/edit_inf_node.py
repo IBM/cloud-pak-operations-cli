@@ -32,7 +32,7 @@ from dg.utils.logging import loglevel_command
     )
 )
 @click.option("--fyre-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key", required=True)
+@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--additional-disk-size", help="Size of additional disk", multiple=True, type=click.IntRange(1, 1000))
 @click.option("--cluster-name", help="Name of the OCP+ cluster to be edited", required=True)
 @click.option("--force", "-f", help="Skip confirmation", is_flag=True)

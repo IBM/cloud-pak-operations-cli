@@ -240,7 +240,7 @@ class OCPPlusAPIManager:
             self._fyre_user_name, self._fyre_api_key, site, cluster_name, node_name, "boot"
         ).execute_request_put_request()
 
-    def check_hostname(self, cluster_name: str, site: Optional[str]) -> CheckHostNameData:
+    def check_cluster_name(self, cluster_name: str, site: Optional[str]) -> CheckHostNameData:
         """Checks if a cluster name is available
 
         Parameters

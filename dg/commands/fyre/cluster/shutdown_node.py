@@ -33,7 +33,7 @@ from dg.utils.logging import loglevel_command
     )
 )
 @click.option("--fyre-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key", required=True)
+@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--cluster-name", help="Name of the OCP+ cluster", required=True)
 @click.option("--force", "-f", help="Skip confirmation", is_flag=True)
 @click.option("--node-name", callback=validate_node_name, help="Name of the node to be shutdown", required=True)

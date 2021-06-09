@@ -10,33 +10,23 @@
 - Create FYRE cluster:
 
   ```bash
-  dg fyre cluster create-for-db2-data-gate --cluster-name {FYRE cluster name}
-  dg fyre cluster add --alias {alias} --cluster-name {FYRE cluster name} --password {kubeadmin password}
+  dg fyre cluster create-for-db2-data-gate --alias {alias} --cluster-name {FYRE cluster name} --ssh-key "$(cat ~/.ssh/id_rsa.pub)"
   dg cluster use {alias}
-  dg fyre cluster copy-ssh-key
   dg fyre cluster ssh
   ```
 
 ## Infrastructure node:
 
-- [Enable SSH access to GitHub](https://docs.github.com/en/github/authenticating-to-github/connecting-to-github-with-ssh)
-- Compile and install Python 3.8 or higher:
+- Install packages:
 
   ```bash
-  yum install gcc git libffi-devel make openssl-devel zlib-devel
-  export PYTHON_VERSION="3.{minor version}.{patch version}"
-  wget "https://www.python.org/ftp/python/$PYTHON_VERSION/Python-$PYTHON_VERSION.tgz"
-  tar -xf "Python-$PYTHON_VERSION.tgz"
-  cd "Python-$PYTHON_VERSION"
-  ./configure
-  make
-  make install
+  yum install --assumeyes git python38
   ```
 
 - Install Data Gate CLI:
 
   ```bash
-  pip3 install git+ssh://git@github.com/IBM/data-gate-cli.git
+  pip3 install git+https://git@github.com/IBM/data-gate-cli.git
   ```
 
 - Execute the following Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
@@ -48,5 +38,5 @@
   dg fyre cluster add --alias {alias} --cluster-name {FYRE cluster name} --password {kubeadmin password}
   dg cluster use {alias}
   dg fyre cluster install-nfs-storage-class
-  dg cluster install-db2-data-gate-stack --storage-class nfs-client
+  dg cluster install-db2-data-gate-stack --accept-all-licenses --storage-class nfs-client
   ```

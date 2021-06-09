@@ -39,7 +39,7 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
     )
 )
 @click.option("--fyre-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key", required=True)
+@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--cluster-name", help="Name of the OCP+ cluster to whom a worker node shall be added", required=True)
 @click.option("--disable-scheduling", help="?", is_flag=True)
 @click.option("--force", "-f", help="Skip confirmation", is_flag=True)

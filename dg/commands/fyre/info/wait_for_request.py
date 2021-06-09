@@ -28,7 +28,7 @@ from dg.utils.logging import loglevel_command
     )
 )
 @click.option("--fyre-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key", required=True)
+@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--request-id", help="Request ID", required=True)
 def wait_for_request(fyre_user_name: str, fyre_api_key: str, request_id: str):
     """Wait for request to complete"""

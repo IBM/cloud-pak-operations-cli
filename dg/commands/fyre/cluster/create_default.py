@@ -30,7 +30,7 @@ from dg.utils.logging import loglevel_command
     )
 )
 @click.option("--fyre-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key", required=True)
+@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--alias", help="Alias used to reference a cluster instead of its server URL")
 @click.option("--platform", help="Platform", required=True, type=click.Choice(["p", "x", "z"]))
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))

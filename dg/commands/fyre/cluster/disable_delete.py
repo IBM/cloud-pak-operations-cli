@@ -31,7 +31,7 @@ from dg.utils.logging import loglevel_command
     )
 )
 @click.option("--fyre-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key", required=True)
+@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--cluster-name", help="Name of the OCP+ cluster whose erasability shall be disabled", required=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
 def disable_delete(fyre_user_name: str, fyre_api_key: str, cluster_name: str, site: Optional[str]):

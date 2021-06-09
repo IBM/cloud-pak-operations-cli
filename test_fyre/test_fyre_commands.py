@@ -162,7 +162,7 @@ class TestFYRECommands(unittest.TestCase):
         assert TestFYRECommands._cluster_name is not None
 
         result = self._invoke_dg_command(
-            ["fyre", "info", "check-hostname", "--cluster-name", TestFYRECommands._cluster_name]
+            ["fyre", "info", "check-cluster-name", "--cluster-name", TestFYRECommands._cluster_name]
         )
 
         self.assertRegex(

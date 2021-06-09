@@ -24,7 +24,7 @@ from dg.utils.logging import loglevel_command
 
 @loglevel_command()
 @click.option("--fyre-user-name", help="FYRE user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key", required=True)
+@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 def login(fyre_user_name: str, fyre_api_key: str):
     """Log in to FYRE"""
 

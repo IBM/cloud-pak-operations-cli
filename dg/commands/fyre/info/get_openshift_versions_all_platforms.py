@@ -30,7 +30,7 @@ from dg.utils.logging import loglevel_command
     )
 )
 @click.option("--fyre-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key", required=True)
+@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
 def get_openshift_versions_all_platforms(fyre_user_name: str, fyre_api_key: str, site: Optional[str]):
     """Get available OpenShift Container Platform versions for all

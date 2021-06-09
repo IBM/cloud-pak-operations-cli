@@ -17,7 +17,9 @@ from typing import Optional
 import click
 
 import dg.config
+import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
+import dg.lib.fyre.cluster
 import dg.utils.network
 
 from dg.lib.fyre.api_manager import OCPPlusAPIManager
@@ -30,12 +32,20 @@ from dg.utils.logging import loglevel_command
     )
 )
 @click.option("--fyre-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key", required=True)
-@click.option("--cluster-name", help="Cluster name to be checked", required=True)
-@click.option("--json", help="Prints the command output in JSON format", is_flag=True)
+@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
+@click.option("--cluster-name", help="Name of the OCP+ cluster to be transferred", required=True)
+@click.option("--comment", help="Comment")
+@click.option("--new-owner", help="User ID, username, or e-mail address of new owner", required=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def check_hostname(fyre_user_name: str, fyre_api_key: str, cluster_name: str, json: bool, site: Optional[str]):
-    """Check if a cluster name is available"""
+def transfer_ownership(
+    fyre_user_name: str,
+    fyre_api_key: str,
+    cluster_name: str,
+    comment: Optional[str],
+    new_owner: str,
+    site: Optional[str],
+):
+    """Transfer ownership of an OCP+ cluster"""
 
     dg.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_user_name, fyre_api_key).check_hostname(cluster_name, site).format(json)
+    OCPPlusAPIManager(fyre_user_name, fyre_api_key).transfer(cluster_name, new_owner, comment, site)

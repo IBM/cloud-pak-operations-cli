@@ -65,7 +65,7 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
 )
 @optgroup.group("Shared options")
 @optgroup.option("--fyre-user-name", help="FYRE API user name", required=True)
-@optgroup.option("--fyre-api-key", help="FYRE API key", required=True)
+@optgroup.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @optgroup.option("--alias", help="Alias used to reference a cluster instead of its server URL")
 @optgroup.option("--cluster-name", help="Name of the OCP+ cluster to be deployed")
 @optgroup.option("--description", help="Cluster description")
@@ -84,12 +84,16 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
 )
 @optgroup.option("--haproxy-timeout-queue", callback=validate_haproxy_timeout_setting, help="HAProxy queue timeout")
 @optgroup.option("--haproxy-timeout-server", callback=validate_haproxy_timeout_setting, help="HAProxy server timeout")
-@optgroup.option("--ocp_version", callback=validate_ocp_version, help="OpenShift version")
+@optgroup.option(
+    "--ocp-version", callback=validate_ocp_version, help='OpenShift version (see "dg fyre info get-openshift-versions")'
+)
 @optgroup.option("--platform", help="Platform", type=click.Choice(["p", "x", "z"]))
 @optgroup.option("--product-group-id", help="FYRE product group ID", type=click.INT)
 @optgroup.option("--pull-secret", help="Pull secret")
 @optgroup.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-@optgroup.option("--ssh-key", help="SSH key")
+@optgroup.option(
+    "--ssh-key", help='Public SSH key to be installed on the infrastructure node (e.g., "$(cat ~/.ssh/id_rsa.pub)")'
+)
 @optgroup.group("Worker node options")
 @optgroup.option(
     "--worker-node-additional-disk-size",
