@@ -27,15 +27,11 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--infrastructure-node-hostname", required=True, help="Infrastructure node hostname")
+@click.option("--infrastructure-node-hostname", help="Infrastructure node hostname", required=True)
 def copy_ssh_key(infrastructure_node_hostname: str):
-    """Copy the current user's public SSH key to the infrastructure node"""
+    """Copy the current user's public SSH key to the infrastructure node of
+    an OCP+ cluster"""
 
-    args = [
-        "ssh-copy-id",
-        "-o",
-        "StrictHostKeyChecking=no",
-        "root@{}".format(infrastructure_node_hostname),
-    ]
+    args = ["ssh-copy-id", "-o", "StrictHostKeyChecking=no", f"root@{infrastructure_node_hostname}"]
 
     subprocess.run(args, check=True, stderr=subprocess.DEVNULL, stdout=subprocess.DEVNULL)

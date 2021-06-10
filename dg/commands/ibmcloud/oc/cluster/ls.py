@@ -18,7 +18,7 @@ from dg.lib.ibmcloud.oc.cluster.ls import list_existing_clusters
 from dg.utils.logging import loglevel_command
 
 
-@loglevel_command(default_log_level="WARNING")
+@loglevel_command()
 @click.option("--json", help="Prints the command output in JSON format", is_flag=True)
 def ls(json: bool):
     """List Red Hat OpenShift on IBM Cloud clusters"""

@@ -12,23 +12,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Final, List
+from typing import Optional
 
 import click
-import requests
-
-from tabulate import tabulate
 
 import dg.config
 import dg.lib.click.utils
 import dg.utils.network
 
-from dg.lib.error import DataGateCLIException
+from dg.lib.fyre.api_manager import OCPPlusAPIManager
 from dg.utils.logging import loglevel_command
-
-IBM_FYRE_SHOW_OPENSHIFT_CLUSTERS_URL: Final[
-    str
-] = "https://api.fyre.ibm.com/rest/v1/?operation=query&request=showclusters"
 
 
 @loglevel_command(
@@ -36,29 +29,12 @@ IBM_FYRE_SHOW_OPENSHIFT_CLUSTERS_URL: Final[
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
-@click.option("--fyre-user-name", required=True, help="FYRE API user name")
-@click.option("--fyre-api-key", required=True, help="FYRE API key")
-def ls(fyre_user_name: str, fyre_api_key: str):
-    """List OpenShift clusters on FYRE"""
+@click.option("--fyre-user-name", help="FYRE API user name", required=True)
+@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
+@click.option("--json", help="Prints the command output in JSON format", is_flag=True)
+@click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
+def ls(fyre_user_name: str, fyre_api_key: str, json: bool, site: Optional[str]):
+    """List OCP+ clusters"""
 
     dg.utils.network.disable_insecure_request_warning()
-
-    response = requests.get(
-        IBM_FYRE_SHOW_OPENSHIFT_CLUSTERS_URL,
-        auth=(fyre_user_name, fyre_api_key),
-        verify=False,
-    )
-
-    if not response.ok:
-        raise DataGateCLIException("Failed to get FYRE clusters (HTTP status code: {})".format(response.status_code))
-
-    clusters = response.json()["clusters"]
-
-    if len(clusters) != 0:
-        cluster_list: List[List[str]] = []
-        headers = clusters[0].keys()
-
-        for cluster in clusters:
-            cluster_list.append(list(cluster.values()))
-
-        click.echo(tabulate(cluster_list, headers=headers))
+    OCPPlusAPIManager(fyre_user_name, fyre_api_key).get_clusters(site).format(json)

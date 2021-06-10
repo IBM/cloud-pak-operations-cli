@@ -44,6 +44,7 @@ from dg.utils.logging import loglevel_command
 @optgroup.option("--username", help="OpenShift username")
 @optgroup.option("--password", help="OpenShift password")
 @optgroup.option("--token", help="OpenShift OAuth access token")
+@optgroup.option("--accept-all-licenses", help="Accept all licenses", is_flag=True)
 @optgroup.option("--assembly-name", help="Name of the assembly to be installed", required=True)
 @optgroup.option(
     "--build-type",
@@ -72,6 +73,7 @@ def install_assembly(
     username: Optional[str],
     password: Optional[str],
     token: Optional[str],
+    accept_all_licenses: bool,
     assembly_name: str,
     build_type: str,
     storage_class: str,
@@ -96,5 +98,6 @@ def install_assembly(
         artifactory_api_key,
         ibm_cloud_pak_for_data_entitlement_key,
         assembly_name,
+        accept_all_licenses,
         storage_class,
     )

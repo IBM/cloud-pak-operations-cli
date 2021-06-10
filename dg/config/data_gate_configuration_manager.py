@@ -280,6 +280,8 @@ class DataGateConfigurationManager:
                 else:
                     credentials.pop(key)
 
+        self.get_dg_directory_path().mkdir(exist_ok=True)
+
         with open(dg_credentials_file_path, "w") as credentials_file:
             json.dump(credentials, credentials_file, indent="\t", sort_keys=True)
 

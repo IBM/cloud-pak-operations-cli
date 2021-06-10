@@ -12,33 +12,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from typing import Optional
+
 import click
 
-import dg.config.cluster_credentials_manager
-import dg.lib.fyre.cluster
-
+from dg.lib.fyre.api_manager import OCPPlusAPIManager
 from dg.utils.logging import loglevel_command
 
 
 @loglevel_command()
 @click.option("--alias", help="Alias used to reference a cluster instead of its server URL")
-@click.option(
-    "--cluster-name",
-    required=True,
-    help="Name of the OpenShift cluster to be registered",
-)
-@click.option("--password", required=True, help="kubeadmin password")
-def add(cluster_name: str, alias: str, password: str):
-    """Register an existing OpenShift cluster on FYRE"""
+@click.option("--cluster-name", help="Name of the OCP+ cluster to be registered", required=True)
+@click.option("--password", help="kubeadmin password", required=True)
+@click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
+def add(alias: Optional[str], cluster_name: str, password: str, site: Optional[str]):
+    """Register an existing OCP+ cluster"""
 
-    dg.config.cluster_credentials_manager.cluster_credentials_manager.add_cluster(
-        alias if (alias is not None) else "",
-        "https://api.{}.os.fyre.ibm.com:6443".format(cluster_name),
-        dg.lib.fyre.cluster.CLUSTER_TYPE_ID,
-        {
-            "cluster_name": cluster_name,
-            "infrastructure_node_hostname": "{}-inf.fyre.ibm.com".format(cluster_name),
-            "password": password,
-            "username": "kubeadmin",
-        },
-    )
+    OCPPlusAPIManager.add_cluster(alias, cluster_name, password, site)

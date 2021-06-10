@@ -14,13 +14,13 @@
 
 import asyncio
 
-from typing import Union
+from typing import Optional
 
 import click
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.lib.fyre.openshift
+import dg.lib.fyre.utils.openshift
 import dg.utils.network
 
 from dg.utils.logging import loglevel_command
@@ -31,27 +31,22 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--infrastructure-node-hostname", required=True, help="Infrastructure node hostname")
-@click.option("--server", required=True, help="OpenShift API server URL")
+@click.option("--infrastructure-node-hostname", help="Infrastructure node hostname", required=True)
+@click.option("--server", help="OpenShift API server URL", required=True)
 @click.option("--username", help="OpenShift username")
 @click.option("--password", help="OpenShift password")
 @click.option("--token", help="OpenShift OAuth access token")
-@click.option("--node", required=True, help="Hostname of the worker node to be initialized")
-@click.option(
-    "--db2-edition",
-    required=True,
-    type=click.Choice(["db2oltp", "db2wh"]),
-    help="Db2 edition",
-)
-@click.option("--use-host-path-storage", is_flag=True, help="Use hostpath storage")
+@click.option("--node", help="Hostname of the worker node to be initialized", required=True)
+@click.option("--db2-edition", help="Db2 edition", required=True, type=click.Choice(["db2oltp", "db2wh"]))
+@click.option("--use-host-path-storage", help="Use hostpath storage", is_flag=True)
 @click.pass_context
 def init_node_for_db2(
     ctx: click.Context,
     infrastructure_node_hostname: str,
     server: str,
-    username: Union[str, None],
-    password: Union[str, None],
-    token: Union[str, None],
+    username: Optional[str],
+    password: Optional[str],
+    token: Optional[str],
     node: str,
     db2_edition: str,
     use_host_path_storage: bool,
@@ -60,12 +55,12 @@ def init_node_for_db2(
 
     if dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
         dg.lib.click.utils.log_in_to_openshift_cluster(ctx, locals().copy())
-        dg.lib.fyre.openshift.init_node_for_db2(node, db2_edition, use_host_path_storage)
+        dg.lib.fyre.utils.openshift.init_node_for_db2(node, db2_edition, use_host_path_storage)
     else:
         oc_login_command_for_remote_host = dg.lib.click.utils.get_oc_login_command_for_remote_host(ctx, locals().copy())
 
         asyncio.get_event_loop().run_until_complete(
-            dg.lib.fyre.openshift.init_node_for_db2_from_remote_host(
+            dg.lib.fyre.utils.openshift.init_node_for_db2_from_remote_host(
                 infrastructure_node_hostname,
                 node,
                 db2_edition,

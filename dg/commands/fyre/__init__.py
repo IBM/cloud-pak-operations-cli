@@ -28,6 +28,6 @@ from dg.lib.click.lazy_loading_multi_command import (
     hidden=dg.config.data_gate_configuration_manager.are_fyre_commands_hidden(),
 )
 def fyre():
-    """FYRE-specific commands"""
+    """FYRE/OCP+-specific commands"""
 
     pass

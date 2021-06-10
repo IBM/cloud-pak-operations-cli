@@ -14,13 +14,13 @@
 
 import asyncio
 
-from typing import Union
+from typing import Optional
 
 import click
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.lib.fyre.nfs
+import dg.lib.fyre.utils.nfs
 import dg.utils.network
 
 from dg.utils.logging import loglevel_command
@@ -31,36 +31,32 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--infrastructure-node-hostname", required=True, help="Infrastructure node hostname")
-@click.option(
-    "--ibm-github-api-key",
-    required=True,
-    help="IBM GitHub API key (https://github.ibm.com/settings/tokens)",
-)
-@click.option("--server", required=True, help="OpenShift API server URL")
+@click.option("--infrastructure-node-hostname", help="Infrastructure node hostname", required=True)
+@click.option("--server", help="OpenShift API server URL", required=True)
 @click.option("--username", help="OpenShift username")
 @click.option("--password", help="OpenShift password")
 @click.option("--token", help="OpenShift OAuth access token")
+@click.option("--ibm-github-api-key", help="IBM GitHub API key (https://github.ibm.com/settings/tokens)", required=True)
 @click.pass_context
 def install_nfs_storage_class(
     ctx: click.Context,
     infrastructure_node_hostname: str,
-    ibm_github_api_key: str,
     server: str,
-    username: Union[str, None],
-    password: Union[str, None],
-    token: Union[str, None],
+    username: Optional[str],
+    password: Optional[str],
+    token: Optional[str],
+    ibm_github_api_key: str,
 ):
     """Install NFS storage class"""
 
     if dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
         dg.lib.click.utils.log_in_to_openshift_cluster(ctx, locals().copy())
-        dg.lib.fyre.nfs.install_nfs_storage_class(ibm_github_api_key)
+        dg.lib.fyre.utils.nfs.install_nfs_storage_class(ibm_github_api_key)
     else:
         oc_login_command_for_remote_host = dg.lib.click.utils.get_oc_login_command_for_remote_host(ctx, locals().copy())
 
         asyncio.get_event_loop().run_until_complete(
-            dg.lib.fyre.nfs.install_nfs_storage_class_on_remote_host(
+            dg.lib.fyre.utils.nfs.install_nfs_storage_class_on_remote_host(
                 infrastructure_node_hostname,
                 ibm_github_api_key,
                 oc_login_command_for_remote_host,
