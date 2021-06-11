@@ -24,7 +24,7 @@ pipeline {
 			steps {
 				script {
 					echo "Running Data Gate CLI FYRE/OCP+ end-to-end test"
-					sh "test_fyre/test.sh"
+					sh "tests/test_fyre/test.sh"
 				}
 			}
 		}

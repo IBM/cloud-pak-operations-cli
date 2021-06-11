@@ -102,7 +102,7 @@ class TestIBMCloudCommon(unittest.TestCase):
         "dg.lib.ibmcloud.install.execute_ibmcloud_command",
         return_value=ProcessResult(
             stderr="",
-            stdout=Path("test/dependencies/ibmcloud_catalog_search_pak.json").read_text(),
+            stdout=Path(Path(__file__).parent / "dependencies/ibmcloud_catalog_search_pak.json").read_text(),
             return_code=0,
         ),
     )
