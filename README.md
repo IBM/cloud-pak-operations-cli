@@ -144,7 +144,7 @@ def {Click group name}():
 Unit tests are based on the `unittest` package and contained in the `test` package. Execute the following command to execute all unit tests within your virtual environment:
 
 ```bash
-python -m unittest discover test
+python -m unittest discover tests.test
 ```
 
 #### References

@@ -15,4 +15,4 @@ echo "Installing Data Gate CLI"
 python3 -m pip install .
 
 echo "Executing tests"
-python3 -m unittest discover test_fyre
+python3 -m unittest discover tests.test_fyre
