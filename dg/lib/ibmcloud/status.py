@@ -56,6 +56,9 @@ class ClusterStatus:
         if (
             ("ingressHostname" in self._status_output)
             and (self._status_output["ingressHostname"] != "")
+            and (self._status_output["masterHealth"] == "normal")
+            and (self._status_output["masterState"] == "deployed")
+            and (self._status_output["masterStatus"] == "Ready")
             and (self._status_output["state"] == "normal")
         ):
             result = True
