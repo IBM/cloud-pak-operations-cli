@@ -131,12 +131,10 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                             "items": {"$ref": "#/$defs/cluster"},
                             "type": "array",
                         },
-                        "location_name": {"type": "string"},
                     },
                     "required": [
                         "cluster_count",
                         "clusters",
-                        "location_name",
                     ],
                     "type": "object",
                 },
