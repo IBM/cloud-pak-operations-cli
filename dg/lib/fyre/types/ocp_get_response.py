@@ -49,8 +49,7 @@ class Cluster(TypedDict):
 
 
 class OCPGetResponse(TypedDict):
-    cluster_count: Optional[int]
-    clusters: Optional[List[Cluster]]
-    details: Optional[str]
-    location_name: Optional[str]
-    status: Optional[str]
+    cluster_count: int
+    clusters: List[Cluster]
+    details: str
+    status: str
