@@ -30,6 +30,7 @@ class OCPPlusCluster(AbstractCluster):
     def __init__(self, server: str, cluster_data: ClusterData):
         super().__init__(server, cluster_data)
 
+    # override
     def get_cluster_access_token(self) -> str:
         token = dg.lib.openshift.get_cluster_access_token(
             OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT.format(cluster_name=self.cluster_data["cluster_name"]),
@@ -39,6 +40,7 @@ class OCPPlusCluster(AbstractCluster):
 
         return token
 
+    # override
     def login(self):
         dg.lib.openshift.log_in_to_openshift_cluster_with_password(
             self.server, self.cluster_data["username"], self.cluster_data["password"]

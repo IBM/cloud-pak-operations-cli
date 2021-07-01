@@ -162,4 +162,4 @@ class OCPPlusClusterSpecification:
         self.worker_node_settings = worker_node_settings
 
     def worker_settings_exist(self) -> bool:
-        return self.worker_node_settings.worker_settings_exist()
+        return self.worker_node_settings is not None and self.worker_node_settings.worker_settings_exist()

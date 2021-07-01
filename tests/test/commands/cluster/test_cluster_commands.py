@@ -40,9 +40,11 @@ class UnitTestCluster(AbstractCluster):
     def __init__(self, server: str, cluster_data: ClusterData):
         super().__init__(server, cluster_data)
 
+    # override
     def get_cluster_access_token(self) -> str:
         return ""
 
+    # override
     def login(self):
         pass
 
@@ -114,6 +116,9 @@ class TestClusterCommands(unittest.TestCase):
         cluster = cluster_credentials_manager.get_cluster(cluster_1_data["server"])
 
         self.assertIsNotNone(cluster)
+
+        if cluster is None:
+            raise TypeError()
 
         cluster_data = cluster.get_cluster_data()
 
