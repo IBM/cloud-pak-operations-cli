@@ -189,6 +189,10 @@ def create(
         # (see IBM Cloud support case CS2206770)
         logging.info("Restarting openshift-dns pods")
         cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_cluster(server)
+
+        if cluster is None:
+            raise TypeError()
+
         cluster.login()
 
         execute_oc_command(["project", "openshift-dns"])

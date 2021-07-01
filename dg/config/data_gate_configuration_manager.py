@@ -270,6 +270,9 @@ class DataGateConfigurationManager:
         if dg_credentials_file_path.exists():
             with open(dg_credentials_file_path) as credentials_file:
                 credentials = json.load(credentials_file)
+
+                if credentials is None:
+                    raise TypeError()
         else:
             credentials = {}
 

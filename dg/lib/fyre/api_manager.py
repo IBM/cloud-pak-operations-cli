@@ -299,9 +299,10 @@ class OCPPlusAPIManager:
                 ],
             )
 
-        if ocp_plus_cluster_settings.worker_settings_exist():
+        if (
+            worker_node_settings := ocp_plus_cluster_settings.worker_node_settings
+        ) is not None and worker_node_settings.worker_settings_exist():
             worker: WorkerData = {}
-            worker_node_settings = ocp_plus_cluster_settings.worker_node_settings
 
             if worker_node_settings.worker_node_additional_disk_size is not None:
                 worker["additional_disk"] = list(

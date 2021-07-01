@@ -204,6 +204,9 @@ class TestFYRECommands(unittest.TestCase):
 
         self.assertIsNotNone(search_result)
 
+        if search_result is None:
+            raise TypeError()
+
         TestFYRECommands._cluster_name = search_result.group(1)
 
     def _edit_inf_node(self):
