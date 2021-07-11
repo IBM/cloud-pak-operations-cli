@@ -19,6 +19,7 @@ OCPTransferPutRequest = TypedDict(
     {
         "comment": str,
         "new_owner": str,
+        "product_group_id": str,
     },
     total=False,
 )

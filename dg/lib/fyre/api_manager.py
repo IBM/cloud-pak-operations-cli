@@ -737,7 +737,14 @@ class OCPPlusAPIManager:
             self._fyre_user_name, self._fyre_api_key, site, cluster_name, node_name, "shutdown"
         ).execute_request_put_request()
 
-    def transfer(self, cluster_name: str, new_owner: str, comment: Optional[str], site: Optional[str]):
+    def transfer(
+        self,
+        cluster_name: str,
+        new_owner: Optional[str],
+        new_product_group: Optional[int],
+        comment: Optional[str],
+        site: Optional[str],
+    ):
         """Transfer an OCP+ cluster
 
         Parameters
@@ -746,16 +753,24 @@ class OCPPlusAPIManager:
             Name of the OCP+ cluster to be transferred
         new_owner
             User ID, username, or e-mail address of new owner
+        new_product_group
+            ID of new FYRE product group
         comment
             Comment
         site
             OCP+ site
         """
 
-        ocp_transfer_put_request: OCPTransferPutRequest = {"new_owner": new_owner}
+        ocp_transfer_put_request: OCPTransferPutRequest = {}
 
         if comment is not None:
             ocp_transfer_put_request["comment"] = comment
+
+        if new_owner is not None:
+            ocp_transfer_put_request["new_owner"] = new_owner
+
+        if new_product_group is not None:
+            ocp_transfer_put_request["product_group_id"] = str(new_product_group)
 
         OCPTransferPutManager(
             self._fyre_user_name,

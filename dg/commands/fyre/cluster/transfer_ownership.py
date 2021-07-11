@@ -35,17 +35,24 @@ from dg.utils.logging import loglevel_command
 @click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--cluster-name", help="Name of the OCP+ cluster to be transferred", required=True)
 @click.option("--comment", help="Comment")
-@click.option("--new-owner", help="User ID, username, or e-mail address of new owner", required=True)
+@click.option("--new-owner", help="User ID, username, or e-mail address of new owner")
+@click.option("--new-product-group-id", help="ID of new FYRE product group", type=click.INT)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
+@click.pass_context
 def transfer_ownership(
+    ctx: click.Context,
     fyre_user_name: str,
     fyre_api_key: str,
     cluster_name: str,
     comment: Optional[str],
-    new_owner: str,
+    new_owner: Optional[str],
+    new_product_group: Optional[int],
     site: Optional[str],
 ):
-    """Transfer ownership of an OCP+ cluster"""
+    """Transfer ownership of an OCP+ cluster to a new user and/or product group"""
+
+    if new_owner is None and new_product_group is None:
+        raise click.UsageError("You must set options '--new-owner' and/or '--new-product-group-id'.", ctx)
 
     dg.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_user_name, fyre_api_key).transfer(cluster_name, new_owner, comment, site)
+    OCPPlusAPIManager(fyre_user_name, fyre_api_key).transfer(cluster_name, new_owner, new_product_group, comment, site)
