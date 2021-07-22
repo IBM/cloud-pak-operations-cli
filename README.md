@@ -98,20 +98,6 @@ pip3 install black flake8 isort
 pip3 install --editable .
 ```
 
-### Set environment variable
-
-- Linux/macOS:
-
-```
-export DG_VENV_PYTHON_PATH=.venv/bin/python
-```
-
-- Windows:
-
-```
-DG_VENV_PYTHON_PATH=.venv\\Scripts\\python.exe
-```
-
 ### Extending the Data Gate CLI
 
 The Data Gate CLI is based on the [Click package](https://palletsprojects.com/p/click/).

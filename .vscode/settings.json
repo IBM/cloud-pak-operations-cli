@@ -10,6 +10,7 @@
 		"dg.egg-info": true
 	},
 	"python.analysis.typeCheckingMode": "basic",
+	"python.defaultInterpreterPath": "${workspaceFolder}/.venv",
 	"python.formatting.blackArgs": [
 		"--line-length",
 		"120"
@@ -18,7 +19,6 @@
 	"python.linting.enabled": true,
 	"python.linting.flake8Enabled": true,
 	"python.linting.pylintEnabled": false,
-	"python.pythonPath": "${env:DG_VENV_PYTHON_PATH}",
 	"python.sortImports.args": [
 		"--lines-between-types",
 		"1",
