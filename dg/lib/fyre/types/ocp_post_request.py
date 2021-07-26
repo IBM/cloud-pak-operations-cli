@@ -30,35 +30,27 @@ HAProxyTimeoutData = TypedDict(
 
 HAProxyData = TypedDict("HAProxyData", {"timeout": HAProxyTimeoutData})
 
-WorkerData = TypedDict(
-    "WorkerData",
-    {
-        "additional_disk": List[str],
-        "count": str,
-        "cpu": str,
-        "memory": str,
-    },
-    total=False,
-)
 
-OCPPostRequest = TypedDict(
-    "ClusterSpecification",
-    {
-        "description": str,
-        "expiration": str,
-        "fips": str,
-        "haproxy": HAProxyData,
-        "name": str,
-        "ocp_version": str,
-        "platform": str,
-        "product_group_id": str,
-        "pull_secret": str,
-        "quota_type": str,
-        "site": str,
-        "size": str,
-        "ssh_key": str,
-        "time_to_live": str,
-        "worker": List[WorkerData],
-    },
-    total=False,
-)
+class WorkerData(TypedDict, total=False):
+    additional_disk: List[str]
+    count: str
+    cpu: str
+    memory: str
+
+
+class OCPPostRequest(TypedDict, total=False):
+    description: str
+    expiration: str
+    fips: str
+    haproxy: HAProxyData
+    name: str
+    ocp_version: str
+    platform: str
+    product_group_id: str
+    pull_secret: str
+    quota_type: str
+    site: str
+    size: str
+    ssh_key: str
+    time_to_live: str
+    worker: List[WorkerData]

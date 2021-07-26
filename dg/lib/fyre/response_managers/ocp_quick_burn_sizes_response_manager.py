@@ -42,10 +42,19 @@ class OCPQuickBurnSizesResponseManager(AbstractJSONResponseManager):
                 "nodeSizeSpecification": {
                     "additionalProperties": False,
                     "properties": {
+                        "additional_disk": {
+                            "type": "string",
+                        },
+                        "additional_disk_size": {
+                            "type": "string",
+                        },
                         "count": {
                             "type": "string",
                         },
                         "cpu": {
+                            "type": "string",
+                        },
+                        "disk_size": {
                             "type": "string",
                         },
                         "memory": {
@@ -53,8 +62,10 @@ class OCPQuickBurnSizesResponseManager(AbstractJSONResponseManager):
                         },
                     },
                     "required": [
+                        "additional_disk",
                         "count",
                         "cpu",
+                        "disk_size",
                         "memory",
                     ],
                 },

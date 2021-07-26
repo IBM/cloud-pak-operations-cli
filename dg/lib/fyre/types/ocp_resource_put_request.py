@@ -14,11 +14,7 @@
 
 from typing import TypedDict
 
-OCPResourcePutRequest = TypedDict(
-    "OCPResourcePutRequest",
-    {
-        "cpu": str,
-        "memory": str,
-    },
-    total=False,
-)
+
+class OCPResourcePutRequest(TypedDict, total=False):
+    cpu: str
+    memory: str

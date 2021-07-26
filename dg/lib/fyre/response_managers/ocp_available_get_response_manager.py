@@ -43,13 +43,11 @@ class OCPAvailableGetResponseManager(AbstractJSONResponseManager):
                 "defaultClusterSizeData": {
                     "additionalProperties": False,
                     "properties": {
-                        "bootstrap": {"$ref": node_size_ref},
                         "inf": {"$ref": node_size_ref},
                         "master": {"$ref": node_size_ref},
                         "worker": {"$ref": node_size_ref},
                     },
                     "required": [
-                        "bootstrap",
                         "inf",
                         "master",
                         "worker",

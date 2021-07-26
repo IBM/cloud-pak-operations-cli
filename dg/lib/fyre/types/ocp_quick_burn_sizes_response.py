@@ -16,8 +16,11 @@ from typing import TypedDict
 
 
 class NodeSizeSpecification(TypedDict):
+    additional_disk: str
+    additional_disk_size: str
     count: str
     cpu: str
+    disk_size: str
     memory: str
 
 

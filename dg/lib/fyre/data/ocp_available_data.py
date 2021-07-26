@@ -35,7 +35,6 @@ class OCPAvailableData:
             click.echo(json.dumps(self._ocp_available_get_response, indent="\t", sort_keys=True))
         else:
             keys_union: List[str] = []
-            keys_union += self._ocp_available_get_response["default_size"]["bootstrap"].keys()
             keys_union += self._ocp_available_get_response["default_size"]["inf"].keys()
             keys_union += self._ocp_available_get_response["default_size"]["master"].keys()
             keys_union += self._ocp_available_get_response["default_size"]["worker"].keys()
@@ -46,12 +45,6 @@ class OCPAvailableData:
 
             for key in keys_union:
                 default_size_list: List[str] = [key]
-
-                default_size_list.append(
-                    self._ocp_available_get_response["default_size"]["bootstrap"][key]
-                    if key in self._ocp_available_get_response["default_size"]["bootstrap"]
-                    else "-"
-                )
 
                 default_size_list.append(
                     self._ocp_available_get_response["default_size"]["inf"][key]
@@ -73,7 +66,7 @@ class OCPAvailableData:
 
                 default_sizes_list.append(default_size_list)
 
-            click.echo(tabulate(default_sizes_list, headers=["default size", "inf", "bootstrap", "master", "worker"]))
+            click.echo(tabulate(default_sizes_list, headers=["default size", "inf", "master", "worker"]))
 
     def format_openshift_versions(self, use_json: bool = False):
         if use_json:
