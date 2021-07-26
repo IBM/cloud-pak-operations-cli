@@ -29,7 +29,6 @@ class NodeSize(TypedDict):
 
 
 class DefaultClusterSizeData(TypedDict):
-    bootstrap: NodeSize
     inf: NodeSize
     master: NodeSize
     worker: NodeSize

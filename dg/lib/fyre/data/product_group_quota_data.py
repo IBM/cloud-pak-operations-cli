@@ -21,6 +21,7 @@ import click
 from tabulate import tabulate
 
 from dg.lib.fyre.types.quota_get_response import (
+    PlatformQuota,
     ProductGroupQuota,
     QuotaGetResponse,
 )
@@ -45,6 +46,19 @@ class ProductGroupQuotaData:
                     click.echo()
                     self._format_product_group_quota(product_group)
 
+    def _add_quota_list_element(self, quota_list: List[List[str]], platform: str, product_group_quota: PlatformQuota):
+        quota_list_element: List[str] = [
+            platform,
+            product_group_quota["cpu"] if "cpu" in product_group_quota else "-",
+            str(product_group_quota["cpu_percent"]) if "cpu" in product_group_quota else "-",
+            product_group_quota["disk"] if "disk" in product_group_quota else "-",
+            str(product_group_quota["disk_percent"]) if "disk" in product_group_quota else "-",
+            product_group_quota["memory"] if "memory" in product_group_quota else "-",
+            str(product_group_quota["memory_percent"]) if "memory" in product_group_quota else "-",
+        ]
+
+        quota_list.append(quota_list_element)
+
     def _format_product_group_quota(self, product_group_quota: ProductGroupQuota):
         click.secho(
             f"Product group: {product_group_quota['product_group_name']} (ID: "
@@ -52,44 +66,22 @@ class ProductGroupQuotaData:
             bold=True,
         )
 
-        product_group_quota_p = product_group_quota["p"]
-        product_group_quota_x = product_group_quota["x"]
-        product_group_quota_z = product_group_quota["z"]
-
-        quota_list_element_p: List[str] = [
-            "p",
-            product_group_quota_p["cpu"] if "cpu" in product_group_quota_p else "-",
-            str(product_group_quota_p["cpu_percent"]) if "cpu" in product_group_quota_p else "-",
-            product_group_quota_p["disk"] if "disk" in product_group_quota_p else "-",
-            str(product_group_quota_p["disk_percent"]) if "disk" in product_group_quota_p else "-",
-            product_group_quota_p["memory"] if "memory" in product_group_quota_p else "-",
-            str(product_group_quota_p["memory_percent"]) if "memory" in product_group_quota_p else "-",
-        ]
-
-        quota_list_element_x: List[str] = [
-            "x",
-            product_group_quota_x["cpu"] if "cpu" in product_group_quota_x else "-",
-            str(product_group_quota_x["cpu_percent"]) if "cpu" in product_group_quota_x else "-",
-            product_group_quota_x["disk"] if "disk" in product_group_quota_x else "-",
-            str(product_group_quota_x["disk_percent"]) if "disk" in product_group_quota_x else "-",
-            product_group_quota_x["memory"] if "memory" in product_group_quota_x else "-",
-            str(product_group_quota_x["memory_percent"]) if "memory" in product_group_quota_x else "-",
-        ]
-
-        quota_list_element_z: List[str] = [
-            "z",
-            product_group_quota_z["cpu"] if "cpu" in product_group_quota_z else "-",
-            str(product_group_quota_z["cpu_percent"]) if "cpu" in product_group_quota_z else "-",
-            product_group_quota_z["disk"] if "disk" in product_group_quota_z else "-",
-            str(product_group_quota_z["disk_percent"]) if "disk" in product_group_quota_z else "-",
-            product_group_quota_z["memory"] if "memory" in product_group_quota_z else "-",
-            str(product_group_quota_z["memory_percent"]) if "memory" in product_group_quota_z else "-",
-        ]
-
         quota_list: List[List[str]] = []
-        quota_list.append(quota_list_element_p)
-        quota_list.append(quota_list_element_x)
-        quota_list.append(quota_list_element_z)
+
+        if "p" in product_group_quota:
+            self._add_quota_list_element(quota_list, "p", product_group_quota["p"])
+        else:
+            quota_list.append(["p", "-", "-", "-", "-", "-", "-"])
+
+        if "x" in product_group_quota:
+            self._add_quota_list_element(quota_list, "x", product_group_quota["x"])
+        else:
+            quota_list.append(["x", "-", "-", "-", "-", "-", "-"])
+
+        if "z" in product_group_quota:
+            self._add_quota_list_element(quota_list, "z", product_group_quota["z"])
+        else:
+            quota_list.append(["z", "-", "-", "-", "-", "-", "-"])
 
         click.echo(
             tabulate(

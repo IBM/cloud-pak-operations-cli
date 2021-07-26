@@ -28,11 +28,11 @@ class PlatformQuota(TypedDict):
 
 
 class ProductGroupQuota(TypedDict):
-    p: PlatformQuota
+    p: PlatformQuota  # optional
     product_group_id: str
     product_group_name: str
-    x: PlatformQuota
-    z: PlatformQuota
+    x: PlatformQuota  # optional
+    z: PlatformQuota  # optional
 
 
 class QuotaGetResponse(TypedDict):

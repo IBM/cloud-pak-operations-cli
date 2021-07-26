@@ -31,6 +31,7 @@ import dg.utils.logging
 
 from dg.config import data_gate_configuration_manager
 from dg.dg import cli
+from dg.lib.error import DataGateCLIException
 
 dg.utils.logging.init_root_logger()
 
@@ -116,7 +117,26 @@ class TestFYRECommands(unittest.TestCase):
         self._node_action("worker3", NodeAction.SHUTDOWN_NODE)
         self._node_action("worker3", NodeAction.BOOT_NODE)
         self._node_action("worker3", NodeAction.REBOOT_NODE)
-        self._node_action("worker3", NodeAction.REDEPLOY_NODE)
+
+        result = self._node_action("worker3", NodeAction.REDEPLOY_NODE, ignore_exception=True)
+
+        if (
+            result.exit_code != 0
+            and result.exception is not None
+            and isinstance(result.exception, DataGateCLIException)
+        ):
+            exception: DataGateCLIException = result.exception
+
+            if (
+                regex.match(
+                    "Failed to redeploy node \\[HTTP status code: 400\\] \\('No space available on any [p|x|z] host to "
+                    "redeploy vm for user id \\d+'\\)",
+                    exception.get_error_message(),
+                )
+                is None
+            ):
+                self._check_result(result)
+
         self._edit_inf_node()
         self._edit_master_node("master0")
         self._edit_worker_node("worker3")
@@ -277,20 +297,21 @@ class TestFYRECommands(unittest.TestCase):
 
         self._invoke_dg_command(args)
 
-    def _invoke_dg_command(self, args: List[str], expected_exit_code=0) -> click.testing.Result:
+    def _invoke_dg_command(self, args: List[str], ignore_exception=False) -> click.testing.Result:
         TestFYRECommands._logger.info(f"Testing: dg {' '.join(args)}")
 
         runner = click.testing.CliRunner()
         result = runner.invoke(cli, args)
 
-        TestFYRECommands._check_result(result)
+        if not ignore_exception:
+            TestFYRECommands._check_result(result)
 
         return result
 
-    def _node_action(self, node_name: str, cluster_action: NodeAction):
+    def _node_action(self, node_name: str, cluster_action: NodeAction, ignore_exception=False) -> click.testing.Result:
         assert TestFYRECommands._cluster_name is not None
 
-        self._invoke_dg_command(
+        return self._invoke_dg_command(
             [
                 "fyre",
                 "cluster",
@@ -300,7 +321,8 @@ class TestFYRECommands(unittest.TestCase):
                 "--force",
                 "--node-name",
                 node_name,
-            ]
+            ],
+            ignore_exception=ignore_exception,
         )
 
     @classmethod

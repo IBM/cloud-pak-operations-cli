@@ -34,7 +34,7 @@
 	"python.testing.pytestEnabled": false,
 	"python.testing.unittestArgs": [
 		"--start-directory",
-		"test",
+		"tests.test"
 	],
 	"python.testing.unittestEnabled": true,
 	"search.exclude": {

@@ -31,6 +31,9 @@ class DataGateCLIException(Exception):
 
         return output
 
+    def get_error_message(self):
+        return self._error_message
+
 
 class IBMCloudException(DataGateCLIException):
     @classmethod

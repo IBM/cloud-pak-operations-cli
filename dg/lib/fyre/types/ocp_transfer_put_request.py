@@ -14,12 +14,8 @@
 
 from typing import TypedDict
 
-OCPTransferPutRequest = TypedDict(
-    "OCPTransferPutRequest",
-    {
-        "comment": str,
-        "new_owner": str,
-        "product_group_id": str,
-    },
-    total=False,
-)
+
+class OCPTransferPutRequest(TypedDict, total=False):
+    comment: str
+    new_owner: str
+    product_group_id: str

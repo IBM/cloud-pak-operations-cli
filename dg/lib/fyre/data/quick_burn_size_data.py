@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import itertools
 import json
 
 from typing import List
@@ -21,6 +22,7 @@ import click
 from tabulate import tabulate
 
 from dg.lib.fyre.types.ocp_quick_burn_sizes_response import (
+    NodeSizeSpecification,
     NodeSizeSpecificationData,
     OCPQuickBurnSizesResponse,
     PlatformQuickBurnSizeSpecificationData,
@@ -38,6 +40,34 @@ class QuickBurnSizeData:
             self._format_platform_quick_burn_size_specification_data("p")
             click.echo()
             self._format_platform_quick_burn_size_specification_data("x")
+
+    def _add_node_size_specification_data_list_element(
+        self,
+        node_size_specification_data_list: List[List[str]],
+        quick_burn_size: str,
+        node: str,
+        node_size_specification: NodeSizeSpecification,
+    ):
+        additional_disks: List[str] = []
+        num_additional_disks = int(node_size_specification["additional_disk"])
+
+        if num_additional_disks != 0:
+            additional_disk_size = node_size_specification["additional_disk_size"]
+
+            for _ in itertools.repeat(None, num_additional_disks):
+                additional_disks.append(additional_disk_size)
+
+        node_size_specification_data_list.append(
+            [
+                quick_burn_size,
+                node,
+                node_size_specification["count"],
+                node_size_specification["cpu"],
+                node_size_specification["memory"],
+                node_size_specification["disk_size"],
+                ", ".join(additional_disks) if len(additional_disks) != 0 else "-",
+            ]
+        )
 
     def _format_platform_quick_burn_size_specification_data(self, platform: str):
         platform_quick_burn_size_specification_data: PlatformQuickBurnSizeSpecificationData = (
@@ -60,44 +90,45 @@ class QuickBurnSizeData:
         click.echo(
             tabulate(
                 node_size_specification_data_list,
-                headers=["quick burn size", "node", "node count", "CPU", "memory"],
+                headers=[
+                    "quick burn size",
+                    "node",
+                    "node count",
+                    "CPUs",
+                    "RAM (GiB)",
+                    "OS disk (GiB)",
+                    "additional disks (GiB)",
+                ],
             )
         )
 
     def _format_node_size_specification_data(
-        self, platform_quick_burn_size_specification_data: PlatformQuickBurnSizeSpecificationData, size: str
+        self, platform_quick_burn_size_specification_data: PlatformQuickBurnSizeSpecificationData, quick_burn_size: str
     ) -> List[List[str]]:
-        node_size_specification_data: NodeSizeSpecificationData = platform_quick_burn_size_specification_data[size]
+        node_size_specification_data: NodeSizeSpecificationData = platform_quick_burn_size_specification_data[
+            quick_burn_size
+        ]
 
         node_size_specification_data_list: List[List[str]] = []
-        node_size_specification_data_list.append(
-            [
-                size,
-                "infrastructure node",
-                node_size_specification_data["inf"]["count"],
-                node_size_specification_data["inf"]["cpu"],
-                node_size_specification_data["inf"]["memory"],
-            ]
+        self._add_node_size_specification_data_list_element(
+            node_size_specification_data_list,
+            quick_burn_size,
+            "infrastructure node",
+            node_size_specification_data["inf"],
         )
 
-        node_size_specification_data_list.append(
-            [
-                size,
-                "master node",
-                node_size_specification_data["master"]["count"],
-                node_size_specification_data["master"]["cpu"],
-                node_size_specification_data["master"]["memory"],
-            ]
+        self._add_node_size_specification_data_list_element(
+            node_size_specification_data_list,
+            quick_burn_size,
+            "master node",
+            node_size_specification_data["master"],
         )
 
-        node_size_specification_data_list.append(
-            [
-                size,
-                "worker node",
-                node_size_specification_data["worker"]["count"],
-                node_size_specification_data["worker"]["cpu"],
-                node_size_specification_data["worker"]["memory"],
-            ]
+        self._add_node_size_specification_data_list_element(
+            node_size_specification_data_list,
+            quick_burn_size,
+            "worker node",
+            node_size_specification_data["worker"],
         )
 
         return node_size_specification_data_list

@@ -14,14 +14,10 @@
 
 from typing import List, TypedDict
 
-OCPAddAdditionalNodesPutRequest = TypedDict(
-    "OCPAddAdditionalNodesPutRequest",
-    {
-        "additional_disk": List[str],
-        "cpu": str,
-        "disable_scheduling": str,
-        "memory": str,
-        "vm_count": str,
-    },
-    total=False,
-)
+
+class OCPAddAdditionalNodesPutRequest(TypedDict, total=False):
+    additional_disk: List[str]
+    cpu: str
+    disable_scheduling: str
+    memory: str
+    vm_count: str
