@@ -75,7 +75,7 @@ class TestFYRECommands(unittest.TestCase):
 
         TestFYRECommands._logger.setLevel("INFO")
         TestFYRECommands._log_in_to_fyre()
-        TestFYRECommands._store_github_api_key()
+        TestFYRECommands._store_ibm_github_personal_access_token()
 
     @classmethod
     def tearDownClass(cls):
@@ -351,7 +351,7 @@ class TestFYRECommands(unittest.TestCase):
                 "login",
                 "--fyre-api-key",
                 fyre_api_key,
-                "--fyre-user-name",
+                "--fyre-api-user-name",
                 fyre_api_user_name,
             ],
         )
@@ -359,10 +359,10 @@ class TestFYRECommands(unittest.TestCase):
         TestFYRECommands._check_result(result)
 
     @classmethod
-    def _store_github_api_key(cls):
-        github_api_key = os.getenv("GITHUB_API_KEY")
+    def _store_ibm_github_personal_access_token(cls):
+        ibm_github_personal_access_token = os.getenv("IBM_GITHUB_PERSONAL_ACCESS_TOKEN")
 
-        assert github_api_key is not None
+        assert ibm_github_personal_access_token is not None
 
         runner = click.testing.CliRunner()
         result = runner.invoke(
@@ -370,8 +370,8 @@ class TestFYRECommands(unittest.TestCase):
             [
                 "adm",
                 "store-credentials",
-                "--ibm-github-api-key",
-                github_api_key,
+                "--ibm-github-personal-access-token",
+                ibm_github_personal_access_token,
             ],
         )
 

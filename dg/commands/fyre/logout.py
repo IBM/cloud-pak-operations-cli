@@ -22,6 +22,6 @@ from dg.utils.logging import loglevel_command
 def logout():
     """Log out from FYRE"""
 
-    credentials_to_be_stored = {"fyre_api_key": "", "fyre_user_name": ""}
+    credentials_to_be_stored = {"fyre_api_key": "", "fyre_api_user_name": ""}
 
     dg.config.data_gate_configuration_manager.store_credentials(credentials_to_be_stored)

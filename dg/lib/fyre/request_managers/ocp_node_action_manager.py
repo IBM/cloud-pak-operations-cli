@@ -15,14 +15,14 @@ from dg.lib.fyre.response_managers.json_response_manager import (
 class OCPNodeActionManager(AbstractJSONRequestManager):
     def __init__(
         self,
-        fyre_user_name: str,
+        fyre_api_user_name: str,
         fyre_api_key: str,
         site: Optional[str],
         cluster_name: str,
         node_name: str,
         action: str,
     ):
-        super().__init__(fyre_user_name, fyre_api_key, site)
+        super().__init__(fyre_api_user_name, fyre_api_key, site)
 
         self._action = action
         self._cluster_name = cluster_name

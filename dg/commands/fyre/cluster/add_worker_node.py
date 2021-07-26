@@ -38,7 +38,7 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--fyre-user-name", help="FYRE API user name", required=True)
+@click.option("--fyre-api-user-name", help="FYRE API user name", required=True)
 @click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--cluster-name", help="Name of the OCP+ cluster to whom a worker node shall be added", required=True)
 @click.option("--disable-scheduling", help="?", is_flag=True)
@@ -55,7 +55,7 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
 @click.option("--worker-node-num-cpus", help="Number of CPUs per worker node", type=click.IntRange(1, 16))
 @click.option("--worker-node-ram-size", help="RAM size per worker node", type=click.IntRange(1, 64))
 def add_worker_node(
-    fyre_user_name: str,
+    fyre_api_user_name: str,
     fyre_api_key: str,
     cluster_name: str,
     disable_scheduling: bool,
@@ -72,7 +72,7 @@ def add_worker_node(
         click.confirm(f"Do you really want to add an additional worker node to cluster '{cluster_name}'?", abort=True)
 
     dg.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_user_name, fyre_api_key).add_node(
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).add_node(
         cluster_name,
         disable_scheduling,
         site,

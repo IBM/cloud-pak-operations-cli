@@ -27,12 +27,12 @@ from dg.utils.logging import loglevel_command
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
-@click.option("--fyre-user-name", help="FYRE API user name", required=True)
+@click.option("--fyre-api-user-name", help="FYRE API user name", required=True)
 @click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--json", help="Prints the command output in JSON format", is_flag=True)
 @click.option("--request-id", help="Request ID", required=True)
-def get_request_status(fyre_user_name: str, fyre_api_key: str, json: bool, request_id: str):
+def get_request_status(fyre_api_user_name: str, fyre_api_key: str, json: bool, request_id: str):
     """Get the status of a request"""
 
     dg.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_user_name, fyre_api_key).get_request_status(request_id).format(json)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).get_request_status(request_id).format(json)

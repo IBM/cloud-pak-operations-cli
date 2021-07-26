@@ -29,13 +29,13 @@ from dg.utils.logging import loglevel_command
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
-@click.option("--fyre-user-name", help="FYRE API user name", required=True)
+@click.option("--fyre-api-user-name", help="FYRE API user name", required=True)
 @click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--cluster-name", help="Cluster name to be checked", required=True)
 @click.option("--json", help="Prints the command output in JSON format", is_flag=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def check_cluster_name(fyre_user_name: str, fyre_api_key: str, cluster_name: str, json: bool, site: Optional[str]):
+def check_cluster_name(fyre_api_user_name: str, fyre_api_key: str, cluster_name: str, json: bool, site: Optional[str]):
     """Check if a cluster name is available"""
 
     dg.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_user_name, fyre_api_key).check_cluster_name(cluster_name, site).format(json)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).check_cluster_name(cluster_name, site).format(json)

@@ -63,7 +63,7 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
     )
 )
 @optgroup.group("Shared options")
-@optgroup.option("--fyre-user-name", help="FYRE API user name", required=True)
+@optgroup.option("--fyre-api-user-name", help="FYRE API user name", required=True)
 @optgroup.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @optgroup.option("--alias", help="Alias used to reference a cluster instead of its server URL")
 @optgroup.option("--cluster-name", help="Name of the OCP+ cluster to be deployed")
@@ -101,7 +101,7 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
 @click.pass_context
 def create_for_db2_data_gate(
     ctx: click.Context,
-    fyre_user_name: str,
+    fyre_api_user_name: str,
     fyre_api_key: str,
     alias: Optional[str],
     cluster_name: Optional[str],
@@ -129,7 +129,7 @@ def create_for_db2_data_gate(
 
     dg.utils.network.disable_insecure_request_warning()
 
-    assigned_cluster_name = OCPPlusAPIManager(fyre_user_name, fyre_api_key).create_cluster(
+    assigned_cluster_name = OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).create_cluster(
         OCPPlusClusterSpecification(
             alias,
             cluster_name,

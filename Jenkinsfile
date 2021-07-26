@@ -17,9 +17,9 @@ pipeline {
 				}
 			}
 			environment {
+				IBM_GITHUB_PERSONAL_ACCESS_TOKEN = credentials("dwabuild-ghe-repo")
 				FYRE_API_KEY = credentials('idaafyreicp-fyre-api-key')
 				FYRE_API_USER_NAME = "idaa.fyreicp"
-				GITHUB_API_KEY = credentials("dwabuild-ghe-repo")
 			}
 			steps {
 				script {

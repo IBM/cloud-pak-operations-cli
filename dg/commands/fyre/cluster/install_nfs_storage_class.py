@@ -36,7 +36,10 @@ from dg.utils.logging import loglevel_command
 @click.option("--username", help="OpenShift username")
 @click.option("--password", help="OpenShift password")
 @click.option("--token", help="OpenShift OAuth access token")
-@click.option("--ibm-github-api-key", help="IBM GitHub API key (https://github.ibm.com/settings/tokens)", required=True)
+@click.option(
+    "--ibm-github-personal-access-token",
+    help="IBM GitHub personal access token (see https://github.ibm.com/settings/tokens)",
+)
 @click.pass_context
 def install_nfs_storage_class(
     ctx: click.Context,
@@ -45,20 +48,20 @@ def install_nfs_storage_class(
     username: Optional[str],
     password: Optional[str],
     token: Optional[str],
-    ibm_github_api_key: str,
+    ibm_github_personal_access_token: str,
 ):
     """Install NFS storage class"""
 
     if dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
         dg.lib.click.utils.log_in_to_openshift_cluster(ctx, locals().copy())
-        dg.lib.fyre.utils.nfs.install_nfs_storage_class(ibm_github_api_key)
+        dg.lib.fyre.utils.nfs.install_nfs_storage_class(ibm_github_personal_access_token)
     else:
         oc_login_command_for_remote_host = dg.lib.click.utils.get_oc_login_command_for_remote_host(ctx, locals().copy())
 
         asyncio.get_event_loop().run_until_complete(
             dg.lib.fyre.utils.nfs.install_nfs_storage_class_on_remote_host(
                 infrastructure_node_hostname,
-                ibm_github_api_key,
+                ibm_github_personal_access_token,
                 oc_login_command_for_remote_host,
             )
         )

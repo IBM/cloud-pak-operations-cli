@@ -29,12 +29,12 @@ from dg.utils.logging import loglevel_command
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
-@click.option("--fyre-user-name", help="FYRE API user name", required=True)
+@click.option("--fyre-api-user-name", help="FYRE API user name", required=True)
 @click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def get_openshift_versions_all_platforms(fyre_user_name: str, fyre_api_key: str, site: Optional[str]):
+def get_openshift_versions_all_platforms(fyre_api_user_name: str, fyre_api_key: str, site: Optional[str]):
     """Get available OpenShift Container Platform versions for all
     platforms"""
 
     dg.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_user_name, fyre_api_key).get_openshift_versions_all_platforms(site).format()
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).get_openshift_versions_all_platforms(site).format()

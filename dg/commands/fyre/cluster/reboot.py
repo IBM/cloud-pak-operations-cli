@@ -31,16 +31,16 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--fyre-user-name", help="FYRE API user name", required=True)
+@click.option("--fyre-api-user-name", help="FYRE API user name", required=True)
 @click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
 @click.option("--cluster-name", help="Name of the OCP+ cluster to be rebooted", required=True)
 @click.option("--force", "-f", help="Skip confirmation", is_flag=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def reboot(fyre_user_name: str, fyre_api_key: str, cluster_name: str, force: bool, site: Optional[str]):
+def reboot(fyre_api_user_name: str, fyre_api_key: str, cluster_name: str, force: bool, site: Optional[str]):
     """Reboot an OCP+ cluster"""
 
     if not force:
         click.confirm(f"Do you really want to reboot cluster '{cluster_name}'?", abort=True)
 
     dg.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_user_name, fyre_api_key).reboot(cluster_name, site)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).reboot(cluster_name, site)

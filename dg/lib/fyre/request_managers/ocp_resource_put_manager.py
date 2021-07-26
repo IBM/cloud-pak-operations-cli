@@ -15,13 +15,13 @@ from dg.lib.fyre.response_managers.json_response_manager import (
 class OCPResourcePutManager(AbstractJSONRequestManager):
     def __init__(
         self,
-        fyre_user_name: str,
+        fyre_api_user_name: str,
         fyre_api_key: str,
         site: Optional[str],
         cluster_name: str,
         node_name: str,
     ):
-        super().__init__(fyre_user_name, fyre_api_key, site)
+        super().__init__(fyre_api_user_name, fyre_api_key, site)
 
         self._cluster_name = cluster_name
         self._node_name = node_name

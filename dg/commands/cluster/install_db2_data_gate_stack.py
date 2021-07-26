@@ -62,7 +62,10 @@ from dg.utils.logging import loglevel_command
     help="Cloud Pak for Data version",
 )
 @optgroup.group("Release build options")
-@optgroup.option("--ibm-cloud-pak-for-data-entitlement-key", help="IBM Cloud Pak for Data entitlement key")
+@optgroup.option(
+    "--ibm-cloud-pak-for-data-entitlement-key",
+    help="IBM Cloud Pak for Data entitlement key (see https://myibm.ibm.com/products-services/containerlibrary)",
+)
 @optgroup.group("Development build options")
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
