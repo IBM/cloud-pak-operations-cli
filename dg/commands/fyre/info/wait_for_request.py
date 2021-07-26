@@ -19,6 +19,7 @@ import dg.lib.click.utils
 import dg.utils.network
 
 from dg.lib.fyre.api_manager import OCPPlusAPIManager
+from dg.lib.fyre.utils.click import fyre_command_options
 from dg.utils.logging import loglevel_command
 
 
@@ -27,8 +28,7 @@ from dg.utils.logging import loglevel_command
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
-@click.option("--fyre-api-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
+@fyre_command_options
 @click.option("--request-id", help="Request ID", required=True)
 def wait_for_request(fyre_api_user_name: str, fyre_api_key: str, request_id: str):
     """Wait for request to complete"""

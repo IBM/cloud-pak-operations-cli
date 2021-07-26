@@ -25,6 +25,7 @@ import dg.lib.fyre.cluster
 import dg.utils.network
 
 from dg.lib.fyre.api_manager import OCPPlusAPIManager
+from dg.lib.fyre.utils.click import fyre_command_options
 from dg.utils.logging import loglevel_command
 
 
@@ -40,8 +41,7 @@ def validate_node_name(ctx, param, value) -> Optional[str]:
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--fyre-api-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
+@fyre_command_options
 @click.option("--additional-disk-size", help="Size of additional disk", multiple=True, type=click.IntRange(1, 1000))
 @click.option("--cluster-name", help="Name of the OCP+ cluster to be edited", required=True)
 @click.option("--force", "-f", help="Skip confirmation", is_flag=True)

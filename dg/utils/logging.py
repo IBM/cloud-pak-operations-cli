@@ -1,6 +1,6 @@
 import logging
 
-from typing import Callable, Type
+from typing import Any, Callable, Type
 
 import click
 
@@ -95,7 +95,7 @@ def init_root_logger():
     logging.getLogger().handlers = [click_logging_handler]
 
 
-def loglevel_command(name=None, default_log_level="INFO", **attrs):
+def loglevel_command(name=None, default_log_level="INFO", **attrs) -> Callable[..., click.Command]:
     """Decorator creating a click.Command object with a --loglevel option
 
     Parameters
@@ -106,7 +106,7 @@ def loglevel_command(name=None, default_log_level="INFO", **attrs):
         default log level
     """
 
-    def decorator(f):
+    def decorator(f: Callable[..., Any]) -> click.Command:
         command = click.command(name, cls=_get_click_command_with_log_level_option(default_log_level), **attrs)(f)
 
         return command

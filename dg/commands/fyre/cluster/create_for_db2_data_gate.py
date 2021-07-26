@@ -30,6 +30,7 @@ from dg.lib.fyre.data.ocpplus_cluster_specification import (
     OCPPlusClusterSpecification,
     WorkerNodeSettings,
 )
+from dg.lib.fyre.utils.click import fyre_command_optgroup_options
 from dg.utils.logging import loglevel_command
 
 
@@ -63,8 +64,7 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
     )
 )
 @optgroup.group("Shared options")
-@optgroup.option("--fyre-api-user-name", help="FYRE API user name", required=True)
-@optgroup.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
+@fyre_command_optgroup_options
 @optgroup.option("--alias", help="Alias used to reference a cluster instead of its server URL")
 @optgroup.option("--cluster-name", help="Name of the OCP+ cluster to be deployed")
 @optgroup.option("--description", help="Cluster description")

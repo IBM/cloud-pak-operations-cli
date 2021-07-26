@@ -21,6 +21,7 @@ import dg.lib.click.utils
 import dg.utils.network
 
 from dg.lib.fyre.api_manager import OCPPlusAPIManager
+from dg.lib.fyre.utils.click import fyre_command_options
 from dg.utils.logging import loglevel_command
 
 
@@ -29,8 +30,7 @@ from dg.utils.logging import loglevel_command
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
-@click.option("--fyre-api-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
+@fyre_command_options
 @click.option("--json", help="Prints the command output in JSON format", is_flag=True)
 @click.option("--platform", help="Platform", required=True, type=click.Choice(["p", "x", "z"]))
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))

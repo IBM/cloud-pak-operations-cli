@@ -23,6 +23,7 @@ import dg.lib.fyre.cluster
 import dg.utils.network
 
 from dg.lib.fyre.api_manager import OCPPlusAPIManager
+from dg.lib.fyre.utils.click import fyre_command_options
 from dg.utils.logging import loglevel_command
 
 
@@ -31,8 +32,7 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--fyre-api-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
+@fyre_command_options
 @click.option("--cluster-name", help="Name of the OCP+ cluster whose details shall be listed", required=True)
 @click.option("--json", help="Prints the command output in JSON format", is_flag=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
