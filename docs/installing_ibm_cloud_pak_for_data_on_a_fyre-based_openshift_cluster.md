@@ -3,7 +3,7 @@
 ## Required Credentials
 
 - [IBM Cloud Pak for Data entitlement key](https://myibm.ibm.com/products-services/containerlibrary)
-- IBM GitHub API key
+- IBM GitHub personal access token
 
 ## Linux/macOS/Windows:
 
@@ -34,7 +34,7 @@
   ```
   dg adm download-dependencies
   dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key {IBM Cloud Pak for Data entitlement key}
-  dg adm store-credentials --ibm-github-api-key {IBM GitHub API key}
+  dg adm store-credentials --ibm-github-personal-access-token {IBM GitHub personal access token}
   dg fyre cluster add --alias {alias} --cluster-name {FYRE cluster name} --password {kubeadmin password}
   dg cluster use {alias}
   dg fyre cluster install-nfs-storage-class

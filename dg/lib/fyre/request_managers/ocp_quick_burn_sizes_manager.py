@@ -14,8 +14,8 @@ from dg.lib.fyre.response_managers.ocp_quick_burn_sizes_response_manager import 
 
 
 class OCPQuickBurnSizesManager(AbstractJSONRequestManager):
-    def __init__(self, fyre_user_name: str, fyre_api_key: str, site: Optional[str]):
-        super().__init__(fyre_user_name, fyre_api_key, site)
+    def __init__(self, fyre_api_user_name: str, fyre_api_key: str, site: Optional[str]):
+        super().__init__(fyre_api_user_name, fyre_api_key, site)
 
     def execute_get_request(
         self,

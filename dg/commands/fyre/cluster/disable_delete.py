@@ -22,6 +22,7 @@ import dg.lib.click.utils
 import dg.utils.network
 
 from dg.lib.fyre.api_manager import OCPPlusAPIManager
+from dg.lib.fyre.utils.click import fyre_command_options
 from dg.utils.logging import loglevel_command
 
 
@@ -30,12 +31,11 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--fyre-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
+@fyre_command_options
 @click.option("--cluster-name", help="Name of the OCP+ cluster whose erasability shall be disabled", required=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def disable_delete(fyre_user_name: str, fyre_api_key: str, cluster_name: str, site: Optional[str]):
+def disable_delete(fyre_api_user_name: str, fyre_api_key: str, cluster_name: str, site: Optional[str]):
     """Disable erasability of an OCP+ cluster"""
 
     dg.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_user_name, fyre_api_key).disable_delete(cluster_name, site)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).disable_delete(cluster_name, site)

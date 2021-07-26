@@ -25,14 +25,21 @@ from dg.utils.logging import loglevel_command
 @click.option("--artifactory-api-key", help="Artifactory API key")
 @click.option("--artifactory-user-name", help="Artifactory user name")
 @click.option("--ibm-cloud-api-key", help="IBM Cloud API key")
-@click.option("--ibm-cloud-pak-for-data-entitlement-key", "-e", help="IBM Cloud Pak for Data entitlement key")
-@click.option("--ibm-github-api-key", help="IBM GitHub API key")
+@click.option(
+    "--ibm-cloud-pak-for-data-entitlement-key",
+    "-e",
+    help="IBM Cloud Pak for Data entitlement key (see https://myibm.ibm.com/products-services/containerlibrary)",
+)
+@click.option(
+    "--ibm-github-personal-access-token",
+    help="IBM GitHub personal access token (see https://github.ibm.com/settings/tokens)",
+)
 def store_credentials(
     artifactory_api_key: Optional[str],
     artifactory_user_name: Optional[str],
     ibm_cloud_api_key: Optional[str],
     ibm_cloud_pak_for_data_entitlement_key: Optional[str],
-    ibm_github_api_key: Optional[str],
+    ibm_github_personal_access_token: Optional[str],
 ):
     """Store credentials in a configuration file"""
 

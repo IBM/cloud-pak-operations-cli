@@ -12,20 +12,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import click
-
 import dg.config
 import dg.utils.network
 
 from dg.lib.error import DataGateCLIException
 from dg.lib.fyre.api_manager import OCPPlusAPIManager
+from dg.lib.fyre.utils.click import fyre_command_options
 from dg.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.option("--fyre-user-name", help="FYRE user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
-def login(fyre_user_name: str, fyre_api_key: str):
+@fyre_command_options
+def login(fyre_api_user_name: str, fyre_api_key: str):
     """Log in to FYRE"""
 
     credentials_to_be_stored = locals().copy()
@@ -33,7 +31,7 @@ def login(fyre_user_name: str, fyre_api_key: str):
     dg.utils.network.disable_insecure_request_warning()
 
     try:
-        OCPPlusAPIManager(fyre_user_name, fyre_api_key).get_quota(None)
+        OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).get_quota(None)
     except DataGateCLIException as exception:
         if "failed authentication" in exception._error_message:
             raise DataGateCLIException("Failed to log in to FYRE due to invalid credentials")

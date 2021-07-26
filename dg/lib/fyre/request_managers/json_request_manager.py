@@ -38,9 +38,9 @@ logger = logging.getLogger(__name__)
 class AbstractJSONRequestManager(ABC):
     """Base class of all JSON request managers"""
 
-    def __init__(self, fyre_user_name: str, fyre_api_key: str, site: Optional[str] = None):
+    def __init__(self, fyre_api_user_name: str, fyre_api_key: str, site: Optional[str] = None):
         self._fyre_api_key = fyre_api_key
-        self._fyre_user_name = fyre_user_name
+        self._fyre_api_user_name = fyre_api_user_name
         self._site = site
 
     def get_default_request_schema(self) -> Any:
@@ -180,7 +180,7 @@ class AbstractJSONRequestManager(ABC):
             FYRE/OCP+ API JSON response
         """
 
-        auth = (self._fyre_user_name, self._fyre_api_key)
+        auth = (self._fyre_api_user_name, self._fyre_api_key)
         response: Optional[requests.Response]
 
         if self._site is not None:
@@ -234,15 +234,15 @@ class AbstractJSONRequestManager(ABC):
             object containing the status of a request
         """
 
-        return OCPRequestManager(self._fyre_user_name, self._fyre_api_key, request_id).execute_get_request()
+        return OCPRequestManager(self._fyre_api_user_name, self._fyre_api_key, request_id).execute_get_request()
 
     _IBM_OCPPLUS_OCP_REQUEST_ERROR_MESSAGE: Final[str] = "Failed to get request status"
     _IBM_OCPPLUS_OCP_REQUEST_GET_URL: Final[str] = "https://ocpapi.svl.ibm.com/v1/ocp/request/{request_id}"
 
 
 class OCPRequestManager(AbstractJSONRequestManager):
-    def __init__(self, fyre_user_name: str, fyre_api_key: str, request_id: str):
-        super().__init__(fyre_user_name, fyre_api_key)
+    def __init__(self, fyre_api_user_name: str, fyre_api_key: str, request_id: str):
+        super().__init__(fyre_api_user_name, fyre_api_key)
 
         self._request_id = request_id
 

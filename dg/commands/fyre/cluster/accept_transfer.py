@@ -23,6 +23,7 @@ import dg.lib.fyre.cluster
 import dg.utils.network
 
 from dg.lib.fyre.api_manager import OCPPlusAPIManager
+from dg.lib.fyre.utils.click import fyre_command_options
 from dg.utils.logging import loglevel_command
 
 
@@ -31,14 +32,13 @@ from dg.utils.logging import loglevel_command
         dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
     )
 )
-@click.option("--fyre-user-name", help="FYRE API user name", required=True)
-@click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True)
+@fyre_command_options
 @click.option(
     "--cluster-name", help="Name of the OCP+ cluster whose incoming transfer shall be accepted", required=True
 )
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def accept_transfer(fyre_user_name: str, fyre_api_key: str, cluster_name: str, site: Optional[str]):
+def accept_transfer(fyre_api_user_name: str, fyre_api_key: str, cluster_name: str, site: Optional[str]):
     """Accept an incoming OCP+ cluster transfer"""
 
     dg.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_user_name, fyre_api_key).accept_transfer(cluster_name, site)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).accept_transfer(cluster_name, site)

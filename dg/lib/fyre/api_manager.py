@@ -137,9 +137,9 @@ class OCPPlusAPIManager:
             cluster_data,
         )
 
-    def __init__(self, fyre_user_name: str, fyre_api_key: str):
+    def __init__(self, fyre_api_user_name: str, fyre_api_key: str):
         self._fyre_api_key = fyre_api_key
-        self._fyre_user_name = fyre_user_name
+        self._fyre_api_user_name = fyre_api_user_name
 
     def accept_transfer(self, cluster_name: str, site: Optional[str]):
         """Accepts an incoming OCP+ cluster transfer
@@ -152,7 +152,9 @@ class OCPPlusAPIManager:
             OCP+ site
         """
 
-        OCPAcceptTransferPutManager(self._fyre_user_name, self._fyre_api_key, site, cluster_name).execute_put_request()
+        OCPAcceptTransferPutManager(
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name
+        ).execute_put_request()
 
     def add_node(
         self,
@@ -205,7 +207,7 @@ class OCPPlusAPIManager:
             ocp_add_additional_nodes_put_request["vm_count"] = str(worker_node_count)
 
         OCPAddAdditionalNodesPutManager(
-            self._fyre_user_name, self._fyre_api_key, site, cluster_name
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name
         ).execute_request_put_request(ocp_add_additional_nodes_put_request)
 
     def boot(self, cluster_name: str, site: Optional[str]):
@@ -220,7 +222,7 @@ class OCPPlusAPIManager:
         """
 
         OCPClusterActionManager(
-            self._fyre_user_name, self._fyre_api_key, site, cluster_name, "boot"
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name, "boot"
         ).execute_request_put_request()
 
     def boot_node(self, cluster_name: str, node_name: str, site: Optional[str]):
@@ -237,7 +239,7 @@ class OCPPlusAPIManager:
         """
 
         OCPNodeActionManager(
-            self._fyre_user_name, self._fyre_api_key, site, cluster_name, node_name, "boot"
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name, node_name, "boot"
         ).execute_request_put_request()
 
     def check_cluster_name(self, cluster_name: str, site: Optional[str]) -> CheckHostNameData:
@@ -251,7 +253,9 @@ class OCPPlusAPIManager:
             OCP+ site
         """
 
-        return CheckHostnameManager(self._fyre_user_name, self._fyre_api_key, site, cluster_name).execute_get_request()
+        return CheckHostnameManager(
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name
+        ).execute_get_request()
 
     def create_cluster(self, ocp_plus_cluster_settings: OCPPlusClusterSpecification, site: Optional[str]) -> str:
         """Creates a new OCP+ cluster
@@ -325,7 +329,7 @@ class OCPPlusAPIManager:
 
             ocp_post_request["worker"] = [worker]
 
-        ocp_post_response = OCPPostManager(self._fyre_user_name, self._fyre_api_key, site).execute_post_request(
+        ocp_post_response = OCPPostManager(self._fyre_api_user_name, self._fyre_api_key, site).execute_post_request(
             ocp_post_request
         )
 
@@ -352,7 +356,7 @@ class OCPPlusAPIManager:
         """
 
         ocp_post_response = OCPDefaultPostManager(
-            self._fyre_user_name, self._fyre_api_key, site, platform
+            self._fyre_api_user_name, self._fyre_api_key, site, platform
         ).execute_post_request()
 
         self._add_cluster(alias, site, ocp_post_response)
@@ -370,7 +374,7 @@ class OCPPlusAPIManager:
             OCP+ site
         """
 
-        OCPDisableDeleteManager(self._fyre_user_name, self._fyre_api_key, site, cluster_name).execute_put_request()
+        OCPDisableDeleteManager(self._fyre_api_user_name, self._fyre_api_key, site, cluster_name).execute_put_request()
 
     def edit_inf_node(self, cluster_name: str, additional_disk_sizes: List[int], site: Optional[str]):
         """Edits the infrastructure node of an OCP+ cluster
@@ -451,7 +455,7 @@ class OCPPlusAPIManager:
             OCP+ site
         """
 
-        OCPEnableDeleteManager(self._fyre_user_name, self._fyre_api_key, site, cluster_name).execute_put_request()
+        OCPEnableDeleteManager(self._fyre_api_user_name, self._fyre_api_key, site, cluster_name).execute_put_request()
 
     def get_cluster_details(self, cluster_name: str, site: Optional[str]) -> OCPPlusCluster:
         """Returns details of an OCP+ cluster
@@ -470,7 +474,7 @@ class OCPPlusAPIManager:
         """
 
         return OCPGetManagerForSingleCluster(
-            self._fyre_user_name, self._fyre_api_key, site, cluster_name
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name
         ).execute_get_request()
 
     def get_cluster_status(self, cluster_name: str, site: Optional[str]) -> OCPPlusClusterStatus:
@@ -489,7 +493,7 @@ class OCPPlusAPIManager:
             object containing the status of an OCP+ cluster
         """
 
-        return OCPStatusManager(self._fyre_user_name, self._fyre_api_key, site, cluster_name).execute_get_request()
+        return OCPStatusManager(self._fyre_api_user_name, self._fyre_api_key, site, cluster_name).execute_get_request()
 
     def get_clusters(self, site: Optional[str]) -> OCPPlusClusterData:
         """Returns OCP+ clusters
@@ -505,7 +509,7 @@ class OCPPlusAPIManager:
             object containing OCP+ clusters
         """
 
-        return OCPGetManager(self._fyre_user_name, self._fyre_api_key, site).execute_get_request()
+        return OCPGetManager(self._fyre_api_user_name, self._fyre_api_key, site).execute_get_request()
 
     def get_default_sizes(self, platform: str, site: Optional[str]) -> OCPAvailableData:
         """Returns default node sizes
@@ -523,7 +527,7 @@ class OCPPlusAPIManager:
             object containing available OpenShift versions/default node sizes
         """
 
-        return OCPAvailableManager(self._fyre_user_name, self._fyre_api_key, site, platform).execute_get_request()
+        return OCPAvailableManager(self._fyre_api_user_name, self._fyre_api_key, site, platform).execute_get_request()
 
     def get_openshift_versions(self, platform: str, site: Optional[str]) -> OCPAvailableData:
         """Returns available OpenShift Container Platform versions
@@ -541,7 +545,7 @@ class OCPPlusAPIManager:
             object containing available OpenShift versions/default node sizes
         """
 
-        return OCPAvailableManager(self._fyre_user_name, self._fyre_api_key, site, platform).execute_get_request()
+        return OCPAvailableManager(self._fyre_api_user_name, self._fyre_api_key, site, platform).execute_get_request()
 
     def get_openshift_versions_all_platforms(self, site: Optional[str]) -> OpenShiftVersionData:
         """Returns available OpenShift Container Platform versions for all
@@ -559,19 +563,19 @@ class OCPPlusAPIManager:
         """
 
         openshift_versions_p = (
-            OCPAvailableManager(self._fyre_user_name, self._fyre_api_key, site, "p")
+            OCPAvailableManager(self._fyre_api_user_name, self._fyre_api_key, site, "p")
             .execute_get_request()
             .get_openshift_versions()
         )
 
         openshift_versions_x = (
-            OCPAvailableManager(self._fyre_user_name, self._fyre_api_key, site, "x")
+            OCPAvailableManager(self._fyre_api_user_name, self._fyre_api_key, site, "x")
             .execute_get_request()
             .get_openshift_versions()
         )
 
         openshift_versions_z = (
-            OCPAvailableManager(self._fyre_user_name, self._fyre_api_key, site, "z")
+            OCPAvailableManager(self._fyre_api_user_name, self._fyre_api_key, site, "z")
             .execute_get_request()
             .get_openshift_versions()
         )
@@ -592,7 +596,7 @@ class OCPPlusAPIManager:
             object containing maxmimum hours for a quick burn deployment
         """
 
-        return OCPQuickBurnMaxHoursManager(self._fyre_user_name, self._fyre_api_key, site).execute_get_request()
+        return OCPQuickBurnMaxHoursManager(self._fyre_api_user_name, self._fyre_api_key, site).execute_get_request()
 
     def get_quickburn_sizes(self, site: Optional[str]) -> QuickBurnSizeData:
         """Returns available sizes for a quick burn deployment
@@ -608,7 +612,7 @@ class OCPPlusAPIManager:
             object containing available sizes for a quick burn deployment
         """
 
-        return OCPQuickBurnSizesManager(self._fyre_user_name, self._fyre_api_key, site).execute_get_request()
+        return OCPQuickBurnSizesManager(self._fyre_api_user_name, self._fyre_api_key, site).execute_get_request()
 
     def get_quota(self, site: Optional[str]) -> ProductGroupQuotaData:
         """Returns quotas for product groups the given FYRE user is part of
@@ -625,7 +629,7 @@ class OCPPlusAPIManager:
             of
         """
 
-        return QuotaRequestManager(self._fyre_user_name, self._fyre_api_key, site).execute_get_request()
+        return QuotaRequestManager(self._fyre_api_user_name, self._fyre_api_key, site).execute_get_request()
 
     def get_request_status(self, request_id: str) -> RequestStatusData:
         """Get the status of a request
@@ -641,7 +645,7 @@ class OCPPlusAPIManager:
             object containing the status of a request
         """
 
-        return OCPRequestManager(self._fyre_user_name, self._fyre_api_key, request_id).execute_get_request()
+        return OCPRequestManager(self._fyre_api_user_name, self._fyre_api_key, request_id).execute_get_request()
 
     def reboot(self, cluster_name: str, site: Optional[str]):
         """Reboots an OCP+ cluster
@@ -655,7 +659,7 @@ class OCPPlusAPIManager:
         """
 
         OCPClusterActionManager(
-            self._fyre_user_name, self._fyre_api_key, site, cluster_name, "reboot"
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name, "reboot"
         ).execute_request_put_request()
 
     def reboot_node(self, cluster_name: str, node_name: str, site: Optional[str]):
@@ -672,7 +676,7 @@ class OCPPlusAPIManager:
         """
 
         OCPNodeActionManager(
-            self._fyre_user_name, self._fyre_api_key, site, cluster_name, node_name, "reboot"
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name, node_name, "reboot"
         ).execute_request_put_request()
 
     def redeploy_node(self, cluster_name: str, node_name: str, site: Optional[str]):
@@ -689,7 +693,7 @@ class OCPPlusAPIManager:
         """
 
         OCPNodeActionManager(
-            self._fyre_user_name, self._fyre_api_key, site, cluster_name, node_name, "redeploy"
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name, node_name, "redeploy"
         ).execute_request_put_request()
 
     def rm(self, cluster_name, site: Optional[str]):
@@ -703,7 +707,7 @@ class OCPPlusAPIManager:
             OCP+ site
         """
 
-        OCPDeleteManager(self._fyre_user_name, self._fyre_api_key, site, cluster_name).execute_delete_request()
+        OCPDeleteManager(self._fyre_api_user_name, self._fyre_api_key, site, cluster_name).execute_delete_request()
 
     def shutdown(self, cluster_name: str, site: Optional[str]):
         """Shuts down an OCP+ cluster
@@ -717,7 +721,7 @@ class OCPPlusAPIManager:
         """
 
         OCPClusterActionManager(
-            self._fyre_user_name, self._fyre_api_key, site, cluster_name, "shutdown"
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name, "shutdown"
         ).execute_request_put_request()
 
     def shutdown_node(self, cluster_name: str, node_name: str, site: Optional[str]):
@@ -734,7 +738,7 @@ class OCPPlusAPIManager:
         """
 
         OCPNodeActionManager(
-            self._fyre_user_name, self._fyre_api_key, site, cluster_name, node_name, "shutdown"
+            self._fyre_api_user_name, self._fyre_api_key, site, cluster_name, node_name, "shutdown"
         ).execute_request_put_request()
 
     def transfer(
@@ -773,7 +777,7 @@ class OCPPlusAPIManager:
             ocp_transfer_put_request["product_group_id"] = str(new_product_group)
 
         OCPTransferPutManager(
-            self._fyre_user_name,
+            self._fyre_api_user_name,
             self._fyre_api_key,
             site,
             cluster_name,
@@ -806,7 +810,7 @@ class OCPPlusAPIManager:
             }
 
             OCPDiskPutManager(
-                self._fyre_user_name, self._fyre_api_key, site, cluster_name, node_name
+                self._fyre_api_user_name, self._fyre_api_key, site, cluster_name, node_name
             ).execute_request_put_request(ocp_disk_put_request)
 
     def _add_cluster(self, alias: Optional[str], site: Optional[str], ocp_post_response: OCPPostResponse):
@@ -872,5 +876,5 @@ class OCPPlusAPIManager:
             logger.info("Changing node resources")
 
             OCPResourcePutManager(
-                self._fyre_user_name, self._fyre_api_key, site, cluster_name, node_name
+                self._fyre_api_user_name, self._fyre_api_key, site, cluster_name, node_name
             ).execute_request_put_request(ocp_resource_put_request)
