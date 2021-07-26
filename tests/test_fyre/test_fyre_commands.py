@@ -116,7 +116,20 @@ class TestFYRECommands(unittest.TestCase):
         self._node_action("worker3", NodeAction.SHUTDOWN_NODE)
         self._node_action("worker3", NodeAction.BOOT_NODE)
         self._node_action("worker3", NodeAction.REBOOT_NODE)
-        self._node_action("worker3", NodeAction.REDEPLOY_NODE)
+
+        try:
+            self._node_action("worker3", NodeAction.REDEPLOY_NODE)
+        except Exception as exception:
+            if (
+                regex.search(
+                    "Error: Failed to redeploy node \\[HTTP status code: 400\\] \\('No space available on any [p|x|z] "
+                    "host to redeploy vm for user id \\d+'\\)",
+                    str(exception),
+                )
+                is None
+            ):
+                raise exception
+
         self._edit_inf_node()
         self._edit_master_node("master0")
         self._edit_worker_node("worker3")

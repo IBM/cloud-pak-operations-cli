@@ -73,11 +73,8 @@ class QuotaGetResponseManager(AbstractJSONResponseManager):
                         },
                     },
                     "required": [
-                        "p",
                         "product_group_id",
                         "product_group_name",
-                        "x",
-                        "z",
                     ],
                     "type": "object",
                 },

@@ -52,44 +52,55 @@ class ProductGroupQuotaData:
             bold=True,
         )
 
-        product_group_quota_p = product_group_quota["p"]
-        product_group_quota_x = product_group_quota["x"]
-        product_group_quota_z = product_group_quota["z"]
-
-        quota_list_element_p: List[str] = [
-            "p",
-            product_group_quota_p["cpu"] if "cpu" in product_group_quota_p else "-",
-            str(product_group_quota_p["cpu_percent"]) if "cpu" in product_group_quota_p else "-",
-            product_group_quota_p["disk"] if "disk" in product_group_quota_p else "-",
-            str(product_group_quota_p["disk_percent"]) if "disk" in product_group_quota_p else "-",
-            product_group_quota_p["memory"] if "memory" in product_group_quota_p else "-",
-            str(product_group_quota_p["memory_percent"]) if "memory" in product_group_quota_p else "-",
-        ]
-
-        quota_list_element_x: List[str] = [
-            "x",
-            product_group_quota_x["cpu"] if "cpu" in product_group_quota_x else "-",
-            str(product_group_quota_x["cpu_percent"]) if "cpu" in product_group_quota_x else "-",
-            product_group_quota_x["disk"] if "disk" in product_group_quota_x else "-",
-            str(product_group_quota_x["disk_percent"]) if "disk" in product_group_quota_x else "-",
-            product_group_quota_x["memory"] if "memory" in product_group_quota_x else "-",
-            str(product_group_quota_x["memory_percent"]) if "memory" in product_group_quota_x else "-",
-        ]
-
-        quota_list_element_z: List[str] = [
-            "z",
-            product_group_quota_z["cpu"] if "cpu" in product_group_quota_z else "-",
-            str(product_group_quota_z["cpu_percent"]) if "cpu" in product_group_quota_z else "-",
-            product_group_quota_z["disk"] if "disk" in product_group_quota_z else "-",
-            str(product_group_quota_z["disk_percent"]) if "disk" in product_group_quota_z else "-",
-            product_group_quota_z["memory"] if "memory" in product_group_quota_z else "-",
-            str(product_group_quota_z["memory_percent"]) if "memory" in product_group_quota_z else "-",
-        ]
-
         quota_list: List[List[str]] = []
-        quota_list.append(quota_list_element_p)
-        quota_list.append(quota_list_element_x)
-        quota_list.append(quota_list_element_z)
+
+        if "p" in product_group_quota:
+            product_group_quota_p = product_group_quota["p"]
+            quota_list_element_p: List[str] = [
+                "p",
+                product_group_quota_p["cpu"] if "cpu" in product_group_quota_p else "-",
+                str(product_group_quota_p["cpu_percent"]) if "cpu" in product_group_quota_p else "-",
+                product_group_quota_p["disk"] if "disk" in product_group_quota_p else "-",
+                str(product_group_quota_p["disk_percent"]) if "disk" in product_group_quota_p else "-",
+                product_group_quota_p["memory"] if "memory" in product_group_quota_p else "-",
+                str(product_group_quota_p["memory_percent"]) if "memory" in product_group_quota_p else "-",
+            ]
+
+            quota_list.append(quota_list_element_p)
+        else:
+            quota_list.append(["p", "-", "-", "-", "-", "-", "-"])
+
+        if "x" in product_group_quota:
+            product_group_quota_x = product_group_quota["x"]
+            quota_list_element_x: List[str] = [
+                "x",
+                product_group_quota_x["cpu"] if "cpu" in product_group_quota_x else "-",
+                str(product_group_quota_x["cpu_percent"]) if "cpu" in product_group_quota_x else "-",
+                product_group_quota_x["disk"] if "disk" in product_group_quota_x else "-",
+                str(product_group_quota_x["disk_percent"]) if "disk" in product_group_quota_x else "-",
+                product_group_quota_x["memory"] if "memory" in product_group_quota_x else "-",
+                str(product_group_quota_x["memory_percent"]) if "memory" in product_group_quota_x else "-",
+            ]
+
+            quota_list.append(quota_list_element_x)
+        else:
+            quota_list.append(["x", "-", "-", "-", "-", "-", "-"])
+
+        if "z" in product_group_quota:
+            product_group_quota_z = product_group_quota["z"]
+            quota_list_element_z: List[str] = [
+                "z",
+                product_group_quota_z["cpu"] if "cpu" in product_group_quota_z else "-",
+                str(product_group_quota_z["cpu_percent"]) if "cpu" in product_group_quota_z else "-",
+                product_group_quota_z["disk"] if "disk" in product_group_quota_z else "-",
+                str(product_group_quota_z["disk_percent"]) if "disk" in product_group_quota_z else "-",
+                product_group_quota_z["memory"] if "memory" in product_group_quota_z else "-",
+                str(product_group_quota_z["memory_percent"]) if "memory" in product_group_quota_z else "-",
+            ]
+
+            quota_list.append(quota_list_element_z)
+        else:
+            quota_list.append(["z", "-", "-", "-", "-", "-", "-"])
 
         click.echo(
             tabulate(
