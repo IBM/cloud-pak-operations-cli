@@ -268,3 +268,29 @@ def log_in_to_openshift_cluster_with_token(server: str, token: str):
     oc_login_args = get_oc_login_args_with_token(server, token)
 
     execute_oc_command(oc_login_args)
+
+
+def get_deployment_name(search_string: str) -> List[str]:
+    """Returns the available Openshift deployment(s) for a given search string"""
+
+    oc_get_deployments_args = ["get", "deployments"]
+
+    oc_get_deployments_result = execute_oc_command(oc_get_deployments_args, capture_output=True).stdout
+
+    result = []
+    for line in oc_get_deployments_result.splitlines():
+        if search_string in line:
+            result.append(line.split()[0].strip())
+
+    if not result:
+        raise DataGateCLIException(f"Deployment(s) containing the string '{search_string}' could not be found")
+
+    return result
+
+
+def scale_deployment(deployment_name: str, scale_factor: int):
+    """Scale a given Openshift deployment to a given scale factor"""
+
+    oc_scale_deployment_args = ["scale", "deploy", deployment_name, "--replicas", str(scale_factor)]
+
+    execute_oc_command(oc_scale_deployment_args)
