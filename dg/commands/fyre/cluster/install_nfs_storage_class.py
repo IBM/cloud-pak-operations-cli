@@ -32,7 +32,7 @@ from dg.utils.logging import loglevel_command
     )
 )
 @click.option("--infrastructure-node-hostname", help="Infrastructure node hostname", required=True)
-@click.option("--server", help="OpenShift API server URL", required=True)
+@click.option("--server", help="OpenShift server URL", required=True)
 @click.option("--username", help="OpenShift username")
 @click.option("--password", help="OpenShift password")
 @click.option("--token", help="OpenShift OAuth access token")

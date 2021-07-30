@@ -273,6 +273,11 @@ class OCPPlusAPIManager:
             cluster name
         """
 
+        if ocp_plus_cluster_settings.alias is not None:
+            dg.config.cluster_credentials_manager.cluster_credentials_manager.raise_if_alias_exists(
+                ocp_plus_cluster_settings.alias
+            )
+
         ocp_post_request: OCPPostRequest = {}
 
         self._add_keys(
@@ -354,6 +359,9 @@ class OCPPlusAPIManager:
         str
             cluster name
         """
+
+        if alias is not None:
+            dg.config.cluster_credentials_manager.cluster_credentials_manager.raise_if_alias_exists(alias)
 
         ocp_post_response = OCPDefaultPostManager(
             self._fyre_api_user_name, self._fyre_api_key, site, platform
