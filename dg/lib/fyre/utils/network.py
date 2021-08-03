@@ -1,5 +1,5 @@
 import ipaddress
-import re
+import re as regex
 
 from typing import List, Optional
 
@@ -24,7 +24,7 @@ def get_private_ip_address_of_infrastructure_node(ipv4_addresses: List[ipaddress
     result: Optional[ipaddress.IPv4Address] = None
 
     for ipv4_address in ipv4_addresses:
-        search_result = re.match("(10\\.\\d+\\.\\d+\\.\\d+)", str(ipv4_address))
+        search_result = regex.match("(10\\.\\d+\\.\\d+\\.\\d+)", str(ipv4_address))
 
         if search_result is not None:
             result = ipv4_address

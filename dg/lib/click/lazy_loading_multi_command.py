@@ -21,6 +21,8 @@ from typing import Dict, List, Optional, Type
 
 import click
 
+import dg.utils.debugger
+
 logger = logging.getLogger(__name__)
 
 
@@ -60,7 +62,11 @@ def create_click_multi_command_class(package: ModuleType) -> Type[click.Command]
             try:
                 return self.main(*args, **kwargs)
             except Exception as exception:
-                click.ClickException(str(exception)).show()
+                if dg.utils.debugger.is_debugpy_running():
+                    # print stack trace
+                    raise exception
+                else:
+                    click.ClickException(str(exception)).show()
 
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
@@ -70,7 +76,12 @@ def create_click_multi_command_class(package: ModuleType) -> Type[click.Command]
         def get_command(self, ctx: click.Context, cmd_name: str) -> Optional[click.Command]:
             self._initialize_commands_if_required()
 
-            return self._command_data.commands[cmd_name] if cmd_name in self._command_data.commands else None
+            command: Optional[click.Command] = None
+
+            if self._command_data is not None:
+                command = self._command_data.commands[cmd_name] if cmd_name in self._command_data.commands else None
+
+            return command
 
         def list_commands(self, ctx: click.Context) -> List[str]:
             self._initialize_commands_if_required()

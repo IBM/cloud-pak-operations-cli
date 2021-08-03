@@ -16,7 +16,7 @@ from typing import Optional
 
 import click
 
-from dg.lib.fyre.api_manager import OCPPlusAPIManager
+from dg.lib.fyre.ocp_plus_api_manager import OCPPlusAPIManager
 from dg.utils.logging import loglevel_command
 
 

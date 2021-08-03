@@ -3,7 +3,6 @@ from typing import Any, Final, Optional
 from dg.lib.fyre.data.ocpplus_cluster_data import OCPPlusClusterData
 from dg.lib.fyre.request_managers.json_request_manager import (
     AbstractJSONRequestManager,
-    HTTPMethod,
 )
 from dg.lib.fyre.response_managers.json_response_manager import (
     AbstractJSONResponseManager,
@@ -11,6 +10,7 @@ from dg.lib.fyre.response_managers.json_response_manager import (
 from dg.lib.fyre.response_managers.ocp_get_response_manager import (
     OCPGetResponseManager,
 )
+from dg.utils.http_method import HTTPMethod
 
 
 class OCPGetManager(AbstractJSONRequestManager):

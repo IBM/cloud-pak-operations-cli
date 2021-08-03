@@ -17,7 +17,6 @@ from typing import Any, Final, Optional
 from dg.lib.fyre.data.check_hostname_data import CheckHostNameData
 from dg.lib.fyre.request_managers.json_request_manager import (
     AbstractJSONRequestManager,
-    HTTPMethod,
 )
 from dg.lib.fyre.response_managers.check_hostname_get_response_manager import (
     CheckHostnameGetResponseManager,
@@ -25,6 +24,7 @@ from dg.lib.fyre.response_managers.check_hostname_get_response_manager import (
 from dg.lib.fyre.response_managers.json_response_manager import (
     AbstractJSONResponseManager,
 )
+from dg.utils.http_method import HTTPMethod
 
 
 class CheckHostnameManager(AbstractJSONRequestManager):
