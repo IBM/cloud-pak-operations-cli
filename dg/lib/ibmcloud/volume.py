@@ -18,7 +18,7 @@ import time
 
 from typing import Any, Dict, Final
 
-import dg.lib.openshift
+import dg.lib.openshift.oc
 
 from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud import execute_ibmcloud_command
@@ -45,11 +45,11 @@ def increase_openshift_image_registry_volume_capacity(
         number of seconds to wait between checks
     """
 
-    persistent_volume_name = dg.lib.openshift.get_persistent_volume_name(
+    persistent_volume_name = dg.lib.openshift.oc.get_persistent_volume_name(
         "openshift-image-registry", "image-registry-storage"
     )
 
-    volume_id = dg.lib.openshift.get_persistent_volume_id("openshift-image-registry", persistent_volume_name)
+    volume_id = dg.lib.openshift.oc.get_persistent_volume_id("openshift-image-registry", persistent_volume_name)
     volume_details = _get_volume_details(volume_id)
     volume_capacity = _get_volume_capacity(volume_details)
 

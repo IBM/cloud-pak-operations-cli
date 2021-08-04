@@ -12,31 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from abc import ABC, abstractmethod
-from typing import Any, Dict
+import sys
 
-ClusterData = Dict[str, Any]
+import click
+
+from dg.lib.click.lazy_loading_multi_command import (
+    create_click_multi_command_class,
+)
 
 
-class AbstractCluster(ABC):
-    def __init__(self, server: str, cluster_data: ClusterData):
-        self.cluster_data = cluster_data
-        self.server = server
+@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
+def cpd3():
+    """IBM Cloud Pak for Data 3.x commands"""
 
-    def get_cluster_data(self) -> ClusterData:
-        return self.cluster_data
-
-    @abstractmethod
-    def get_password(self) -> str:
-        pass
-
-    def get_server(self) -> str:
-        return self.server
-
-    @abstractmethod
-    def get_username(self) -> str:
-        pass
-
-    @abstractmethod
-    def login(self):
-        pass
+    pass

@@ -19,17 +19,14 @@ import semver
 
 from click_option_group import optgroup
 
-import dg.config
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.lib.openshift
-import dg.utils.download
 
-from dg.lib.cloud_pak_for_data.cpd_manager import (
+from dg.lib.cloud_pak_for_data.cpd3_manager import (
     AbstractCloudPakForDataManager,
     CloudPakForDataAssemblyBuildType,
 )
-from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
+from dg.lib.cloud_pak_for_data.cpd3_manager_factory import (
     CloudPakForDataManagerFactory,
 )
 from dg.utils.logging import loglevel_command
@@ -46,6 +43,7 @@ from dg.utils.logging import loglevel_command
 @optgroup.option("--password", help="OpenShift password")
 @optgroup.option("--token", help="OpenShift OAuth access token")
 @optgroup.option("--accept-all-licenses", help="Accept all licenses", is_flag=True)
+@optgroup.option("--assembly-name", help="Name of the assembly to be installed", required=True)
 @optgroup.option(
     "--build-type",
     default=f"{CloudPakForDataAssemblyBuildType.RELEASE.name}",
@@ -64,19 +62,21 @@ from dg.utils.logging import loglevel_command
 @optgroup.group("Release build options")
 @optgroup.option(
     "--ibm-cloud-pak-for-data-entitlement-key",
+    "-e",
     help="IBM Cloud Pak for Data entitlement key (see https://myibm.ibm.com/products-services/containerlibrary)",
 )
 @optgroup.group("Development build options")
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
 @click.pass_context
-def install_db2_data_gate_stack(
+def install_assembly(
     ctx: click.Context,
     server: str,
     username: Optional[str],
     password: Optional[str],
     token: Optional[str],
     accept_all_licenses: bool,
+    assembly_name: str,
     build_type: str,
     storage_class: str,
     version: str,
@@ -84,62 +84,22 @@ def install_db2_data_gate_stack(
     artifactory_user_name: str,
     artifactory_api_key: str,
 ):
-    """Install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2
-    Data Management Console, and IBM Db2 for z/OS Data Gate"""
+    """Install an IBM Cloud Pak for Data assembly"""
 
     cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[build_type.upper()]
 
     dg.lib.click.utils.check_cloud_pak_for_data_options(ctx, cloud_pak_for_data_assembly_build_type, locals().copy())
     dg.lib.click.utils.log_in_to_openshift_cluster(ctx, locals().copy())
 
-    override_yaml_file_path = dg.config.data_gate_configuration_manager.get_deps_directory_path() / "override.yaml"
     cloud_pak_for_data_manager = CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(
         semver.VersionInfo.parse(version)
     )(cloud_pak_for_data_assembly_build_type)
 
-    cloud_pak_for_data_manager.check_openshift_version()
     cloud_pak_for_data_manager.install_assembly_with_prerequisites(
         artifactory_user_name,
         artifactory_api_key,
         ibm_cloud_pak_for_data_entitlement_key,
-        "lite",
-        accept_all_licenses,
-        storage_class,
-        override_yaml_file_path=override_yaml_file_path,
-    )
-
-    cloud_pak_for_data_manager.install_assembly_with_prerequisites(
-        artifactory_user_name,
-        artifactory_api_key,
-        ibm_cloud_pak_for_data_entitlement_key,
-        "db2oltp",
-        accept_all_licenses,
-        storage_class,
-    )
-
-    cloud_pak_for_data_manager.install_assembly_with_prerequisites(
-        artifactory_user_name,
-        artifactory_api_key,
-        ibm_cloud_pak_for_data_entitlement_key,
-        "db2wh",
-        accept_all_licenses,
-        storage_class,
-    )
-
-    cloud_pak_for_data_manager.install_assembly_with_prerequisites(
-        artifactory_user_name,
-        artifactory_api_key,
-        ibm_cloud_pak_for_data_entitlement_key,
-        "dmc",
-        accept_all_licenses,
-        storage_class,
-    )
-
-    cloud_pak_for_data_manager.install_assembly_with_prerequisites(
-        artifactory_user_name,
-        artifactory_api_key,
-        ibm_cloud_pak_for_data_entitlement_key,
-        "datagate",
+        assembly_name,
         accept_all_licenses,
         storage_class,
     )

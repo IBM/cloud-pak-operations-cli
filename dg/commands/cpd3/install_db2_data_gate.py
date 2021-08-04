@@ -21,15 +21,12 @@ from click_option_group import optgroup
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.lib.cloud_pak_for_data.cpd_manager_factory
-import dg.lib.openshift
-import dg.utils.download
 
-from dg.lib.cloud_pak_for_data.cpd_manager import (
+from dg.lib.cloud_pak_for_data.cpd3_manager import (
     AbstractCloudPakForDataManager,
     CloudPakForDataAssemblyBuildType,
 )
-from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
+from dg.lib.cloud_pak_for_data.cpd3_manager_factory import (
     CloudPakForDataManagerFactory,
 )
 from dg.utils.logging import loglevel_command
@@ -55,7 +52,6 @@ from dg.utils.logging import loglevel_command
         case_sensitive=False,
     ),
 )
-@optgroup.option("--db2-edition", help="Db2 edition", required=True, type=click.Choice(["db2oltp", "db2wh"]))
 @optgroup.option("--storage-class", help="Storage class used for installation", required=True)
 @optgroup.option(
     "--version",
@@ -72,7 +68,7 @@ from dg.utils.logging import loglevel_command
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
 @click.pass_context
-def install_db2(
+def install_db2_data_gate(
     ctx: click.Context,
     server: str,
     username: Optional[str],
@@ -80,14 +76,13 @@ def install_db2(
     token: Optional[str],
     accept_all_licenses: bool,
     build_type: str,
-    db2_edition: str,
     storage_class: str,
     version: str,
     ibm_cloud_pak_for_data_entitlement_key: Optional[str],
     artifactory_user_name: str,
     artifactory_api_key: str,
 ):
-    """Install IBM Db2 or IBM Db2 Warehouse"""
+    """Install IBM Db2 for z/OS Data Gate"""
 
     cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[build_type.upper()]
 
@@ -102,7 +97,7 @@ def install_db2(
         artifactory_user_name,
         artifactory_api_key,
         ibm_cloud_pak_for_data_entitlement_key,
-        db2_edition,
+        "datagate",
         accept_all_licenses,
         storage_class,
     )

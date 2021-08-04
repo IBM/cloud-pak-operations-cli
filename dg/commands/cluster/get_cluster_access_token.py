@@ -12,36 +12,40 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from typing import Optional
+
 import click
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
+import dg.utils.network
 
-from dg.lib.fyre.cluster.ocpplus_cluster_factory import ocpplus_cluster_factory
 from dg.utils.logging import loglevel_command
 
 
-@loglevel_command(
-    context_settings=dg.lib.click.utils.create_default_map_from_dict(
-        dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
-    )
-)
-@click.option("--cluster-name", help="Name of the OpenShift cluster", required=True)
-@click.option("--username", help="OpenShift cluster username", required=True)
-@click.option("--password", help="OpenShift cluster password", required=True)
+@loglevel_command()
+@click.option("--server", help="OpenShift server URL")
+@click.option("--username", help="OpenShift cluster username")
+@click.option("--password", help="OpenShift cluster password")
 @click.option(
     "--print-login-command", help="Print oc login command instead of just the OAuth access token", is_flag=True
 )
 @click.pass_context
 def get_cluster_access_token(
-    ctx: click.Context, cluster_name: str, username: str, password: str, print_login_command: bool
+    ctx: click.Context,
+    server: Optional[str],
+    username: Optional[str],
+    password: Optional[str],
+    print_login_command: bool,
 ):
     """Obtain an OAuth access token for an OpenShift cluster"""
 
-    cluster = ocpplus_cluster_factory.create_cluster_using_cluster_name(cluster_name, locals().copy())
-    access_token = cluster.get_cluster_access_token()
+    dg.utils.network.disable_insecure_request_warning()
+
+    credentials = dg.lib.click.utils.get_cluster_credentials(ctx, locals().copy())
+    access_token = credentials.get_access_token(force_refresh_if_possible=True)
 
     if not print_login_command:
         click.echo(access_token)
     else:
-        click.echo(f"oc login --insecure-skip-tls-verify --server={cluster.get_server()} --token={access_token}")
+        click.echo(f"oc login --insecure-skip-tls-verify --server={credentials.get_server()} --token={access_token}")

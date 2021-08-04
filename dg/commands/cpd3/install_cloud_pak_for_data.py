@@ -19,16 +19,15 @@ import semver
 
 from click_option_group import optgroup
 
+import dg.config
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.lib.openshift
-import dg.utils.download
 
-from dg.lib.cloud_pak_for_data.cpd_manager import (
+from dg.lib.cloud_pak_for_data.cpd3_manager import (
     AbstractCloudPakForDataManager,
     CloudPakForDataAssemblyBuildType,
 )
-from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
+from dg.lib.cloud_pak_for_data.cpd3_manager_factory import (
     CloudPakForDataManagerFactory,
 )
 from dg.utils.logging import loglevel_command
@@ -70,7 +69,7 @@ from dg.utils.logging import loglevel_command
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
 @click.pass_context
-def install_db2_data_gate(
+def install_cloud_pak_for_data(
     ctx: click.Context,
     server: str,
     username: Optional[str],
@@ -84,22 +83,25 @@ def install_db2_data_gate(
     artifactory_user_name: str,
     artifactory_api_key: str,
 ):
-    """Install IBM Db2 for z/OS Data Gate"""
+    """Install IBM Cloud Pak for Data"""
 
     cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[build_type.upper()]
 
     dg.lib.click.utils.check_cloud_pak_for_data_options(ctx, cloud_pak_for_data_assembly_build_type, locals().copy())
     dg.lib.click.utils.log_in_to_openshift_cluster(ctx, locals().copy())
 
+    override_yaml_file_path = dg.config.data_gate_configuration_manager.get_deps_directory_path() / "override.yaml"
     cloud_pak_for_data_manager = CloudPakForDataManagerFactory.get_cloud_pak_for_data_manager(
         semver.VersionInfo.parse(version)
     )(cloud_pak_for_data_assembly_build_type)
 
+    cloud_pak_for_data_manager.check_openshift_version()
     cloud_pak_for_data_manager.install_assembly_with_prerequisites(
         artifactory_user_name,
         artifactory_api_key,
         ibm_cloud_pak_for_data_entitlement_key,
-        "datagate",
+        "lite",
         accept_all_licenses,
         storage_class,
+        override_yaml_file_path=override_yaml_file_path,
     )

@@ -1,8 +1,10 @@
 import logging
 
-from typing import Any, Callable, Type
+from typing import Any, Callable, Optional, Type
 
 import click
+
+from halo import Halo
 
 
 class ClickLoggingFormatter(logging.Formatter):
@@ -55,6 +57,10 @@ class ClickLoggingFormatter(logging.Formatter):
 class ClickLoggingHandler(logging.Handler):
     """Click-based log handler"""
 
+    def __init__(self):
+        super().__init__()
+        self._spinner: Optional[Halo] = None
+
     def emit(self, record: logging.LogRecord):
         """Prints the given log record using click.echo()
 
@@ -64,7 +70,21 @@ class ClickLoggingHandler(logging.Handler):
             log record
         """
 
+        spinner_was_running = self._spinner is not None and self._spinner.spinner_id is not None
+
+        if self._spinner is not None:
+            self._spinner.stop()
+
         click.echo(self.format(record))
+
+        if self._spinner is not None and spinner_was_running:
+            self._spinner.start()
+
+    def reset_spinner(self):
+        self._spinner = None
+
+    def set_spinner(self, spinner: Halo):
+        self._spinner = spinner
 
 
 class ScopedLoggingDisabler:
@@ -84,7 +104,22 @@ class ScopedLoggingDisabler:
             logging.getLogger().disabled = self._previous_value
 
 
-def init_root_logger():
+class ScopedSpinnerDisabler:
+    def __init__(self, click_logging_handler: ClickLoggingHandler, spinner: Halo):
+        self._click_logging_handler = click_logging_handler
+        self._spinner = spinner
+
+    def __enter__(self):
+        self._click_logging_handler.set_spinner(self._spinner)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        self.reset_spinner()
+
+    def reset_spinner(self):
+        self._click_logging_handler.reset_spinner()
+
+
+def init_root_logger() -> ClickLoggingHandler:
     """Initializes the root logger to use an instance of
     ClickLoggingFormatter as a formatter and an instance of
     ClickLoggingHandler as a handler"""
@@ -93,6 +128,8 @@ def init_root_logger():
     click_logging_handler.formatter = ClickLoggingFormatter()
 
     logging.getLogger().handlers = [click_logging_handler]
+
+    return click_logging_handler
 
 
 def loglevel_command(name=None, default_log_level="INFO", **attrs) -> Callable[..., click.Command]:

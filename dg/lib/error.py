@@ -6,14 +6,9 @@ import colorama
 
 
 class DataGateCLIException(Exception):
-    def __init__(
-        self,
-        error_message: str,
-        stderr: Optional[str] = None,
-        stdout: Optional[str] = None,
-    ):
+    def __init__(self, error_message: str, stderr: Optional[str] = None, stdout: Optional[str] = None):
         super().__init__(error_message)
-        self._error_message = error_message
+        self._error_message = error_message[7:] if error_message.startswith("Error: ") else error_message
         self._stderr = stderr
         self._stdout = stdout
 
@@ -47,12 +42,7 @@ class IBMCloudException(DataGateCLIException):
 
         return output
 
-    def __init__(
-        self,
-        error_message,
-        stderr: Optional[str] = None,
-        stdout: Optional[str] = None,
-    ):
+    def __init__(self, error_message, stderr: Optional[str] = None, stdout: Optional[str] = None):
         super().__init__(error_message, stderr, stdout)
 
     def __str__(self):
@@ -76,3 +66,13 @@ class IBMCloudException(DataGateCLIException):
 
     def _get_highlighted_str(self, str: str) -> str:
         return f"{colorama.Style.BRIGHT}{str}{colorama.Style.RESET_ALL}"
+
+
+class JmespathPathExpressionNotFoundException(DataGateCLIException):
+    def __init__(self, expresion):
+        super().__init__(f"Jmespath expression not found ({expresion})")
+
+
+class UnexpectedTypeException(DataGateCLIException):
+    def __init__(self, value):
+        super().__init__(f"Unexpected type ({type(value)})")

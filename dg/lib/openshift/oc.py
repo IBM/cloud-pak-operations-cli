@@ -13,11 +13,9 @@
 #  limitations under the License.
 
 import json
-import urllib.parse
 
 from typing import Final, List
 
-import requests
 import semver
 
 import dg.config
@@ -86,47 +84,6 @@ def execute_oc_command(
         check=check,
         print_captured_output=print_captured_output,
     )
-
-
-def get_cluster_access_token(oauth_server_url: str, username: str, password: str) -> str:
-    """Obtains an OAuth access token from the given OpenShift server
-
-    Parameters
-    ----------
-    oauth_server_url
-        URL of the OpenShift server that the OAuth access token shall be
-        obtained from
-    username
-        username used to authenticate with the OpenShift server
-    password
-        password used to authenticate with the OpenShift server
-
-    Returns
-    -------
-    str
-        OAuth access token obtained from the given OpenShift server
-    """
-
-    dg.utils.network.disable_insecure_request_warning()
-
-    response = requests.get(
-        oauth_server_url,
-        allow_redirects=False,
-        auth=(username, password),
-        verify=False,  # NOSONAR
-    )
-
-    if "Location" not in response.headers:
-        raise DataGateCLIException("HTTP Location header not found")
-
-    fragment = urllib.parse.parse_qs(urllib.parse.urlparse(response.headers["Location"]).fragment)
-
-    if "access_token" not in fragment:
-        raise DataGateCLIException("access_token key not found in URL fragment")
-
-    access_token = fragment["access_token"][0]
-
-    return access_token
 
 
 def get_current_token() -> str:

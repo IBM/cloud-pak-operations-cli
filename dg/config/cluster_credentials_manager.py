@@ -64,7 +64,7 @@ class ClusterCredentialsManager:
 
         self._save_clusters_file()
 
-    def edit_cluster(self, alias_or_server, cluster_data_to_be_added: ClusterData):
+    def edit_cluster(self, alias_or_server, cluster_data_to_be_added: ClusterData) -> AbstractCluster:
         """Edits metadata of a registered OpenShift cluster
 
         Parameters
@@ -73,6 +73,12 @@ class ClusterCredentialsManager:
             alias or server URL of the registered OpenShift cluster to be edited
         cluster_data_to_be_added
             cluster data to be added to existing cluster data
+
+        Returns
+        -------
+        AbstractCluster
+            metadata of the registered OpenShift cluster with the given alias or
+            server URL
         """
 
         cluster = self.get_cluster(alias_or_server)
@@ -89,6 +95,8 @@ class ClusterCredentialsManager:
             cluster_data[key] = value
 
         self._save_clusters_file()
+
+        return cluster
 
     def get_cluster(self, alias_or_server) -> Optional[AbstractCluster]:
         """Returns metadata of the registered OpenShift cluster with the given
@@ -116,6 +124,29 @@ class ClusterCredentialsManager:
             ):
                 cluster_factory = dg.lib.cluster.cluster_factories[cluster_data["type"]]
                 cluster = cluster_factory.create_cluster(server, cluster_data)
+
+        return cluster
+
+    def get_cluster_or_raise_exception(self, alias_or_server) -> AbstractCluster:
+        """Returns metadata of the registered OpenShift cluster with the given
+        alias or server URL
+
+        Parameters
+        ----------
+        alias_or_server
+            alias or server URL of the registered OpenShift cluster for which
+            metadata shall be returned
+
+        Returns
+        -------
+        AbstractCluster
+            metadata of the registered OpenShift cluster with the given alias
+        """
+
+        cluster = self.get_cluster(alias_or_server)
+
+        if cluster is None:
+            raise DataGateCLIException(f"Cluster not found ({alias_or_server})")
 
         return cluster
 

@@ -16,7 +16,7 @@ import pathlib
 
 from typing import Final, List
 
-import dg.lib.openshift
+import dg.lib.openshift.oc
 import dg.utils.process
 import dg.utils.ssh
 
@@ -36,8 +36,8 @@ def init_node_for_db2(node: str, db2_edition: str, use_host_path_storage: bool):
         flag indicating whether hostpath storage shall be used
     """
 
-    dg.lib.openshift.execute_oc_command(_get_oc_adm_taint_node_command(node, db2_edition))
-    dg.lib.openshift.execute_oc_command(_get_oc_label_node_command(node, db2_edition))
+    dg.lib.openshift.oc.execute_oc_command(_get_oc_adm_taint_node_command(node, db2_edition))
+    dg.lib.openshift.oc.execute_oc_command(_get_oc_label_node_command(node, db2_edition))
     dg.utils.process.execute_command(pathlib.Path("ssh"), _get_ssh_setsebool_container_manage_cgroup_command(node))
 
     if use_host_path_storage:

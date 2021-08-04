@@ -22,15 +22,12 @@ from click_option_group import optgroup
 import dg.config
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.lib.cluster
-import dg.lib.openshift
-import dg.utils.download
 
-from dg.lib.cloud_pak_for_data.cpd_manager import (
+from dg.lib.cloud_pak_for_data.cpd3_manager import (
     AbstractCloudPakForDataManager,
     CloudPakForDataAssemblyBuildType,
 )
-from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
+from dg.lib.cloud_pak_for_data.cpd3_manager_factory import (
     CloudPakForDataManagerFactory,
 )
 from dg.utils.logging import loglevel_command
@@ -65,14 +62,13 @@ from dg.utils.logging import loglevel_command
 @optgroup.group("Release build options")
 @optgroup.option(
     "--ibm-cloud-pak-for-data-entitlement-key",
-    "-e",
     help="IBM Cloud Pak for Data entitlement key (see https://myibm.ibm.com/products-services/containerlibrary)",
 )
 @optgroup.group("Development build options")
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
 @click.pass_context
-def install_cloud_pak_for_data(
+def install_db2_data_gate_stack(
     ctx: click.Context,
     server: str,
     username: Optional[str],
@@ -86,7 +82,8 @@ def install_cloud_pak_for_data(
     artifactory_user_name: str,
     artifactory_api_key: str,
 ):
-    """Install IBM Cloud Pak for Data"""
+    """Install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2
+    Data Management Console, and IBM Db2 for z/OS Data Gate"""
 
     cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[build_type.upper()]
 
@@ -107,4 +104,40 @@ def install_cloud_pak_for_data(
         accept_all_licenses,
         storage_class,
         override_yaml_file_path=override_yaml_file_path,
+    )
+
+    cloud_pak_for_data_manager.install_assembly_with_prerequisites(
+        artifactory_user_name,
+        artifactory_api_key,
+        ibm_cloud_pak_for_data_entitlement_key,
+        "db2oltp",
+        accept_all_licenses,
+        storage_class,
+    )
+
+    cloud_pak_for_data_manager.install_assembly_with_prerequisites(
+        artifactory_user_name,
+        artifactory_api_key,
+        ibm_cloud_pak_for_data_entitlement_key,
+        "db2wh",
+        accept_all_licenses,
+        storage_class,
+    )
+
+    cloud_pak_for_data_manager.install_assembly_with_prerequisites(
+        artifactory_user_name,
+        artifactory_api_key,
+        ibm_cloud_pak_for_data_entitlement_key,
+        "dmc",
+        accept_all_licenses,
+        storage_class,
+    )
+
+    cloud_pak_for_data_manager.install_assembly_with_prerequisites(
+        artifactory_user_name,
+        artifactory_api_key,
+        ibm_cloud_pak_for_data_entitlement_key,
+        "datagate",
+        accept_all_licenses,
+        storage_class,
     )

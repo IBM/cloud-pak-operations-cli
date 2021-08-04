@@ -25,7 +25,7 @@ from dg.lib.click.lazy_loading_multi_command import (
     create_click_multi_command_class,
 )
 
-dg.utils.logging.init_root_logger()
+click_logging_handler = dg.utils.logging.init_root_logger()
 
 if dg.utils.debugger.is_debugpy_running() and (len(sys.argv) == 2):
     if sys.argv[1] == "":
