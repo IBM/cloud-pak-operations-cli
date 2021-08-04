@@ -64,6 +64,38 @@ Unit tests are based on the `unittest` package and contained in the `tests.test`
 python -m unittest discover tests.test
 ```
 
+## Profiling using FunctionTrace (Linux/macOS)
+
+Use [FunctionTrace](https://functiontrace.com/) to profile a Data Gate CLI command as follows:
+
+- [Install Rust and Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html#install-rust-and-cargo)
+
+- Install the FunctionTrace server:
+
+  ```bash
+  cargo install functiontrace-server
+  ```
+
+- Install the Python client in your virtual environment:
+
+  ```bash
+  pip3 install functiontrace
+  ```
+
+- Execute the following command to profile a Data Gate CLI command:
+
+  ```bash
+  python3 -m functiontrace $(which dg) {command}
+  ```
+
+- After having executed the Data Gate CLI, the FunctionTrace server prints the location of the profiling data file:
+
+  ```bash
+  [FunctionTrace] Wrote profile data to …
+  ```
+
+- Use [Firefox Profiler](https://profiler.firefox.com/) to analyze the profiling data file.
+
 ## Releasing a new version using semantic versioning
 
 - Create a new branch, commit the code leading to a new release, and tag the commit with a semantic version:
