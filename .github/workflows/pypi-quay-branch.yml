@@ -1,0 +1,55 @@
+name: TestPyPI/Quay
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  build:
+    if: ${{ github.event.base_ref != 'refs/heads/master' }}
+    name: Build Python 🐍 distribution
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        # https://github.com/actions/checkout
+        with:
+          fetch-depth: 0
+          # https://github.com/actions/checkout/issues/299
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        # https://github.com/actions/setup-python
+        with:
+          python-version: 3.8
+      - name: Install pypa/build
+        run: >-
+          python -m
+          pip install
+          build
+          --user
+      - name: Build wheel
+        run: >-
+          python -m
+          build
+      - uses: actions/upload-artifact@v2
+        # https://github.com/actions/upload-artifact
+        with:
+          name: workspace
+          path: |
+            dist
+            Dockerfile
+  pypi:
+    name: Publish distribution 📦 to TestPyPI
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v2
+        # https://github.com/actions/download-artifact
+        with:
+          name: workspace
+      - uses: pypa/gh-action-pypi-publish@master
+        # https://github.com/pypa/gh-action-pypi-publish
+        with:
+          password: ${{ secrets.TEST_PYPI_API_TOKEN }}
+          repository_url: https://test.pypi.org/legacy/

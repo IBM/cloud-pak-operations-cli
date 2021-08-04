@@ -7,7 +7,9 @@
 	"files.exclude": {
 		"**/__pycache__": true,
 		".vscode/.ropeproject": true,
-		"dg.egg-info": true
+		"build": true,
+		"data_gate_cli.egg-info": true,
+		"dist": true
 	},
 	"python.analysis.typeCheckingMode": "basic",
 	"python.defaultInterpreterPath": "${workspaceFolder}/.venv",
