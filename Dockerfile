@@ -1,8 +1,9 @@
-FROM python:3.9 AS builder
-COPY . /workspace
-WORKDIR /workspace
-RUN python setup.py sdist
-
-FROM python:3.9
-COPY --from=builder /workspace/dist/dg-0.1.0.tar.gz /root/
-RUN pip3 install /root/dg-0.1.0.tar.gz
+FROM python:3.8
+COPY dist/*.whl /root
+RUN pip install /root/*.whl
+RUN useradd --create-home --gid 0 --no-log-init dg
+# https://docs.openshift.com/container-platform/latest/openshift_images/create-images.html#use-uid_create-images
+RUN chmod g=u /home/dg
+ENV HOME /home/dg
+WORKDIR /home/dg
+USER dg

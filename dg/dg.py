@@ -45,7 +45,7 @@ if dg.utils.debugger.is_debugpy_running() and (len(sys.argv) == 2):
 def cli(ctx: click.Context, version: bool):
     if ctx.invoked_subcommand is None:
         if version:
-            click.echo("Data Gate CLI " + pkg_resources.require("dg")[0].version)
+            click.echo("Data Gate CLI " + pkg_resources.require("data-gate-cli")[0].version)
         else:
             click.echo(ctx.get_help())
 

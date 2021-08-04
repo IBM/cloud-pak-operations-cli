@@ -26,7 +26,7 @@
 - Install Data Gate CLI:
 
   ```bash
-  pip3 install git+https://git@github.com/IBM/data-gate-cli.git
+  pip3 install data-gate-cli
   ```
 
 - Execute the following Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:

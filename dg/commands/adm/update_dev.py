@@ -17,18 +17,27 @@ import subprocess
 
 from importlib import metadata
 
+import pkg_resources
+
+from dg.lib.error import DataGateCLIException
 from dg.utils.logging import loglevel_command
 
 
 @loglevel_command()
-def update():
-    """Update the Data Gate CLI to the latest version"""
+def update_dev():
+    """Update the Data Gate CLI to the latest development version"""
 
-    search_result = regex.search("https://(.*)", metadata.metadata("dg")["Download-URL"])
+    if pkg_resources.require("data-gate-cli")[0].version != "0.0.1":
+        raise DataGateCLIException(
+            "Current version is not a development version (use 'pip3 install --upgrade data-gate-cli' to upgrade a "
+            "release version)"
+        )
+
+    search_result = regex.search("https://(.*)", metadata.metadata("data-gate-cli")["Download-URL"])
 
     if search_result is not None:
         git_hub_url_without_scheme = search_result.group(1)
-        git_hub_url = "git+ssh://git@" + git_hub_url_without_scheme + ".git"
+        git_hub_url = "git+https://git@" + git_hub_url_without_scheme + ".git"
         args = ["pip3", "install", "--upgrade", git_hub_url]
 
         subprocess.check_call(args)
