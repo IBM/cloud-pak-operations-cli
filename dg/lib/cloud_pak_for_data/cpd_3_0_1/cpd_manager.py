@@ -149,7 +149,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             if "override_yaml_file_path" in kwargs:
                 args += ["--override", str(kwargs["override_yaml_file_path"])]
 
-            openshift_image_registry_route = dg.lib.openshift.get_openshift_image_registry_default_route()
+            image_registry_hostname = dg.lib.openshift.get_image_registry_hostname()
             target_registry_password = dg.lib.openshift.get_current_token()
 
             args += [
@@ -162,7 +162,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 "--target-registry-username",
                 "kubeadmin",
                 "--transfer-image-to",
-                f"{openshift_image_registry_route}/zen",
+                f"{image_registry_hostname}/zen",
                 "--verbose",
             ]
 
