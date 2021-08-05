@@ -12,44 +12,33 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Dict, Optional, TypedDict
+from typing import Optional
 
 import click
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.utils.network
 
 from dg.lib.openshift.openshift_api_manager import OpenShiftAPIManager
+from dg.lib.openshift.utils.click import openshift_server_options
 from dg.utils.logging import loglevel_command
 
 
-class AuthDict(TypedDict):
-    auth: str
-
-
-class AuthsDict(TypedDict):
-    auths: Dict[str, AuthDict]
-
-
-@loglevel_command(default_log_level="WARNING")
-@click.option("--server", help="OpenShift server URL")
-@click.option("--username", help="OpenShift username")
-@click.option("--password", help="OpenShift password")
-@click.option("--token", help="OpenShift OAuth access token")
+@loglevel_command()
+@openshift_server_options
 @click.option("--registry-location", help="Container registry location", required=True)
 @click.pass_context
 def rm(
     ctx: click.Context,
-    server: str,
+    server: Optional[str],
     username: Optional[str],
     password: Optional[str],
     token: Optional[str],
+    insecure_skip_tls_verify: Optional[bool],
     registry_location: str,
 ):
     """Remove registry credentials from the global pull secret"""
 
-    dg.utils.network.disable_insecure_request_warning()
     OpenShiftAPIManager(dg.lib.click.utils.get_cluster_credentials(ctx, locals().copy())).delete_credentials(
         registry_location
     )

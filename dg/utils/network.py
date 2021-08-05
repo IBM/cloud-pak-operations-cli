@@ -14,6 +14,7 @@
 
 import ipaddress
 import socket
+import warnings
 
 from typing import List
 
@@ -28,7 +29,13 @@ def disable_insecure_request_warning():
     # InsecureRequestWarning: Unverified HTTPS request is being made to host
     # '…'. Adding certificate verification is strongly advised. See:
     # https://urllib3.readthedocs.io/en/latest/advanced-usage.html#ssl-warnings
-    urllib3.disable_warnings(category=urllib3.exceptions.InsecureRequestWarning)
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+
+def enable_insecure_request_warning():
+    """Ensables InsecureRequestWarning"""
+
+    warnings.simplefilter("always", urllib3.exceptions.InsecureRequestWarning)
 
 
 def get_local_ipv4_addresses() -> List[ipaddress.IPv4Address]:

@@ -18,6 +18,8 @@ from typing import Any, Callable
 
 from kubernetes import client, config
 
+import dg.utils.network
+
 from dg.lib.error import DataGateCLIException
 from dg.lib.openshift.credentials.credentials import AbstractCredentials
 from dg.lib.openshift.data.global_pull_secret_data import GlobalPullSecretData
@@ -69,11 +71,17 @@ class OpenShiftAPIManager:
             registry location for which credentials shall be deleted
         """
 
-        self.execute_kubernetes_client(self._delete_credentials, registry_location=registry_location)
+        global_pull_secret_data = self.get_global_pull_secret_data()
+        global_pull_secret_data.delete_credentials(registry_location)
+
+        self.execute_kubernetes_client(self._patch_credentials, global_pull_secret_data=global_pull_secret_data)
 
     def execute_kubernetes_client(self, method: Callable[..., Any], **kwargs) -> Any:
         if not self._kube_config_initialized:
             self._set_kube_config()
+
+        if self._credentials.insecure_skip_tls_verify:
+            dg.utils.network.disable_insecure_request_warning()
 
         result: Any = None
 
@@ -89,6 +97,8 @@ class OpenShiftAPIManager:
                 result = method(**kwargs)
             else:
                 raise exception
+        finally:
+            dg.utils.network.enable_insecure_request_warning()
 
         return result
 
@@ -132,13 +142,6 @@ class OpenShiftAPIManager:
 
         self.patch_credentials(global_pull_secret_data)
 
-    def _delete_credentials(self, registry_location: str):
-        global_pull_secret_data = self.get_global_pull_secret_data()
-        global_pull_secret_data.delete_credentials(registry_location)
-
-        core_v1_api = client.CoreV1Api()
-        core_v1_api.patch_namespaced_secret("pull-secret", "openshift-config", global_pull_secret_data.get_json_patch())
-
     def _get_credentials(self) -> GlobalPullSecretData:
         core_v1_api = client.CoreV1Api()
         core_v1_api_result: Any = core_v1_api.read_namespaced_secret("pull-secret", "openshift-config")
@@ -157,8 +160,8 @@ class OpenShiftAPIManager:
                 "clusters": [
                     {
                         "cluster": {
-                            "insecure-skip-tls-verify": "true",
-                            "server": self._credentials.get_server(),
+                            "insecure-skip-tls-verify": self._credentials.insecure_skip_tls_verify,
+                            "server": self._credentials.server,
                         },
                         "name": "cluster",
                     }

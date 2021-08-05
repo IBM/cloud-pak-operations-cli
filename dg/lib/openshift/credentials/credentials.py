@@ -16,15 +16,19 @@ from abc import ABC, abstractmethod
 
 
 class AbstractCredentials(ABC):
-    def __init__(self, server: str):
+    def __init__(self, server: str, insecure_skip_tls_verify: bool):
         """Manages OpenShift access tokens
 
         Parameters
         ----------
         server
             URL of the OpenShift server for which OAuth access tokens are managed
+        insecure_skip_tls_verify
+            flag indicating whether the server's certificate shall be checked for
+            validity
         """
 
+        self._insecure_skip_tls_verify = insecure_skip_tls_verify
         self._server = server
 
     @abstractmethod
@@ -45,17 +49,9 @@ class AbstractCredentials(ABC):
 
         pass
 
-    def get_server(self) -> str:
-        """Returns the URL of the OpenShift server for which OAuth access tokens
-        are managed
-
-        Returns
-        -------
-        str
-            URL of the OpenShift server for which OAuth access tokens are managed
-        """
-
-        return self._server
+    @property
+    def insecure_skip_tls_verify(self) -> bool:
+        return self._insecure_skip_tls_verify
 
     @abstractmethod
     def is_refreshable(self) -> bool:
@@ -79,3 +75,7 @@ class AbstractCredentials(ABC):
         """Refreshes the current OAuth access token if possible"""
 
         pass
+
+    @property
+    def server(self) -> str:
+        return self._server

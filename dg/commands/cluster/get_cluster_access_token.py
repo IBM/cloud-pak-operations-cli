@@ -48,4 +48,4 @@ def get_cluster_access_token(
     if not print_login_command:
         click.echo(access_token)
     else:
-        click.echo(f"oc login --insecure-skip-tls-verify --server={credentials.get_server()} --token={access_token}")
+        click.echo(f"oc login --insecure-skip-tls-verify --server={credentials.server} --token={access_token}")

@@ -12,14 +12,23 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from typing import Optional
+
 from dg.config.cluster_credentials_manager import cluster_credentials_manager
 from dg.lib.cluster.cluster import AbstractCluster
 from dg.lib.openshift.credentials.user_credentials import UserCredentials
 
 
 class ClusterBasedUserCredentials(UserCredentials):
-    def __init__(self, cluster: AbstractCluster):
-        super().__init__(cluster.get_server(), cluster.get_username(), cluster.get_password())
+    def __init__(self, cluster: AbstractCluster, insecure_skip_tls_verify: Optional[bool]):
+        super().__init__(
+            cluster.get_server(),
+            cluster.get_username(),
+            cluster.get_password(),
+            insecure_skip_tls_verify
+            if insecure_skip_tls_verify is not None
+            else self._get_insecure_skip_tls_verify_from_cluster_data(cluster),
+        )
 
         self._cluster = cluster
 
@@ -33,3 +42,8 @@ class ClusterBasedUserCredentials(UserCredentials):
     # override
     def persist_access_token(self, token: str):
         self._cluster = cluster_credentials_manager.edit_cluster(self._cluster.get_server(), {"token": token})
+
+    def _get_insecure_skip_tls_verify_from_cluster_data(self, cluster: AbstractCluster) -> bool:
+        cluster_data = cluster.get_cluster_data()
+
+        return cluster_data["insecure_skip_tls_verify"] if "insecure_skip_tls_verify" in cluster_data else False

@@ -19,6 +19,10 @@ from typing import Final, Optional
 
 import requests
 
+from requests.models import Response
+
+import dg.utils.network
+
 from dg.lib.error import DataGateCLIException
 from dg.lib.openshift.credentials.credentials import AbstractCredentials
 
@@ -28,8 +32,8 @@ class UserCredentials(AbstractCredentials):
         str
     ] = "{authorization_endpoint}?client_id=openshift-challenging-client&response_type=token"
 
-    def __init__(self, server: str, username: str, password: str):
-        super().__init__(server)
+    def __init__(self, server: str, username: str, password: str, insecure_skip_tls_verify: bool):
+        super().__init__(server, insecure_skip_tls_verify)
         self._password = password
         self._token: Optional[str] = None
         self._username = username
@@ -54,14 +58,23 @@ class UserCredentials(AbstractCredentials):
     # override
     def refresh_access_token(self):
         authorization_endpoint = self._get_authorization_endpoint()
-        response = requests.get(
-            UserCredentials.OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT.format(
-                authorization_endpoint=authorization_endpoint
-            ),
-            allow_redirects=False,
-            auth=(self._username, self._password),
-            verify=False,  # NOSONAR
-        )
+
+        if self._insecure_skip_tls_verify:
+            dg.utils.network.disable_insecure_request_warning()
+
+        response: Optional[Response] = None
+
+        try:
+            response = requests.get(
+                UserCredentials.OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT.format(
+                    authorization_endpoint=authorization_endpoint
+                ),
+                allow_redirects=False,
+                auth=(self._username, self._password),
+                verify=not self._insecure_skip_tls_verify,
+            )
+        finally:
+            dg.utils.network.enable_insecure_request_warning()
 
         if not response.ok:
             if response.content is not None:
@@ -88,10 +101,18 @@ class UserCredentials(AbstractCredentials):
             OAuth authorization endpoint returned by the OAuth server
         """
 
-        response = requests.get(
-            f"{self._server}/.well-known/oauth-authorization-server",
-            verify=False,  # NOSONAR
-        )
+        if self._insecure_skip_tls_verify:
+            dg.utils.network.disable_insecure_request_warning()
+
+        response: Optional[Response] = None
+
+        try:
+            response = requests.get(
+                f"{self._server}/.well-known/oauth-authorization-server",
+                verify=not self._insecure_skip_tls_verify,
+            )
+        finally:
+            dg.utils.network.enable_insecure_request_warning()
 
         if not response.ok:
             if response.content is not None:

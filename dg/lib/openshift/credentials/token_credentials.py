@@ -17,8 +17,8 @@ from dg.lib.openshift.credentials.credentials import AbstractCredentials
 
 
 class TokenCredentials(AbstractCredentials):
-    def __init__(self, server: str, token: str):
-        super().__init__(server)
+    def __init__(self, server: str, token: str, insecure_skip_tls_verify: bool):
+        super().__init__(server, insecure_skip_tls_verify)
         self._token = token
 
     # override

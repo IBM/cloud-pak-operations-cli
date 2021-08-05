@@ -127,6 +127,7 @@ def init_root_logger() -> ClickLoggingHandler:
     click_logging_handler = ClickLoggingHandler()
     click_logging_handler.formatter = ClickLoggingFormatter()
 
+    logging.captureWarnings(True)
     logging.getLogger().handlers = [click_logging_handler]
 
     return click_logging_handler
