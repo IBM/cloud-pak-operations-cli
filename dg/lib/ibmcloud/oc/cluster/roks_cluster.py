@@ -14,19 +14,31 @@
 
 import dg.config
 import dg.lib.ibmcloud
-import dg.lib.openshift
+import dg.lib.openshift.oc
 
 from dg.lib.cluster.cluster import AbstractCluster, ClusterData
 from dg.lib.error import DataGateCLIException
+from dg.lib.ibmcloud import INTERNAL_IBM_CLOUD_API_KEY_NAME
 
 
 class ROKSCluster(AbstractCluster):
     def __init__(self, server: str, cluster_data: ClusterData):
         super().__init__(server, cluster_data)
 
-    def get_cluster_access_token(self) -> str:
-        # TODO implement
-        return ""
+    def get_password(self) -> str:
+        api_key = dg.config.data_gate_configuration_manager.get_value_from_credentials_file(
+            INTERNAL_IBM_CLOUD_API_KEY_NAME
+        )
+
+        if api_key is None:
+            credentials_file_path = dg.config.data_gate_configuration_manager.get_dg_credentials_file_path()
+
+            raise DataGateCLIException(f"IBM Cloud API key not found in {credentials_file_path}")
+
+        return api_key
+
+    def get_username(self) -> str:
+        return "apikey"
 
     def login(self):
         api_key = dg.config.data_gate_configuration_manager.get_value_from_credentials_file(
@@ -36,4 +48,4 @@ class ROKSCluster(AbstractCluster):
         if api_key is None:
             raise DataGateCLIException("IBM Cloud API key not found in stored credentials")
 
-        dg.lib.openshift.log_in_to_openshift_cluster_with_password(self.server, "apikey", api_key)
+        dg.lib.openshift.oc.log_in_to_openshift_cluster_with_password(self.server, "apikey", api_key)

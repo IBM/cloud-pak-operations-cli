@@ -26,7 +26,7 @@ import semver
 import yaml
 
 import dg.config
-import dg.lib.openshift
+import dg.lib.openshift.oc
 import dg.utils.download
 import dg.utils.operating_system
 import dg.utils.process
@@ -66,7 +66,7 @@ class AbstractCloudPakForDataManager(ABC):
 
     def check_openshift_version(self):
         cloud_pak_for_data_version = self._get_cloud_pak_for_data_version()
-        openshift_version = dg.lib.openshift.get_openshift_version()
+        openshift_version = dg.lib.openshift.oc.get_openshift_version()
 
         if not AbstractCloudPakForDataManager.is_openshift_version_supported(
             cloud_pak_for_data_version, openshift_version
@@ -211,10 +211,10 @@ class AbstractCloudPakForDataManager(ABC):
         )
 
         if self._build_type == CloudPakForDataAssemblyBuildType.RELEASE:
-            image_registry_hostname = dg.lib.openshift.get_image_registry_hostname()
+            image_registry_hostname = dg.lib.openshift.oc.get_image_registry_hostname()
 
             if image_registry_hostname == "":
-                dg.lib.openshift.enable_image_registry_default_route()
+                dg.lib.openshift.oc.enable_image_registry_default_route()
 
         self.install_assembly(
             assembly_name,

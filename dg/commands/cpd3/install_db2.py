@@ -21,14 +21,12 @@ from click_option_group import optgroup
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.lib.openshift
-import dg.utils.download
 
-from dg.lib.cloud_pak_for_data.cpd_manager import (
+from dg.lib.cloud_pak_for_data.cpd3_manager import (
     AbstractCloudPakForDataManager,
     CloudPakForDataAssemblyBuildType,
 )
-from dg.lib.cloud_pak_for_data.cpd_manager_factory import (
+from dg.lib.cloud_pak_for_data.cpd3_manager_factory import (
     CloudPakForDataManagerFactory,
 )
 from dg.utils.logging import loglevel_command
@@ -45,7 +43,6 @@ from dg.utils.logging import loglevel_command
 @optgroup.option("--password", help="OpenShift password")
 @optgroup.option("--token", help="OpenShift OAuth access token")
 @optgroup.option("--accept-all-licenses", help="Accept all licenses", is_flag=True)
-@optgroup.option("--assembly-name", help="Name of the assembly to be installed", required=True)
 @optgroup.option(
     "--build-type",
     default=f"{CloudPakForDataAssemblyBuildType.RELEASE.name}",
@@ -55,6 +52,7 @@ from dg.utils.logging import loglevel_command
         case_sensitive=False,
     ),
 )
+@optgroup.option("--db2-edition", help="Db2 edition", required=True, type=click.Choice(["db2oltp", "db2wh"]))
 @optgroup.option("--storage-class", help="Storage class used for installation", required=True)
 @optgroup.option(
     "--version",
@@ -71,22 +69,22 @@ from dg.utils.logging import loglevel_command
 @optgroup.option("--artifactory-user-name", help="Artifactory user name")
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
 @click.pass_context
-def install_assembly(
+def install_db2(
     ctx: click.Context,
     server: str,
     username: Optional[str],
     password: Optional[str],
     token: Optional[str],
     accept_all_licenses: bool,
-    assembly_name: str,
     build_type: str,
+    db2_edition: str,
     storage_class: str,
     version: str,
     ibm_cloud_pak_for_data_entitlement_key: Optional[str],
     artifactory_user_name: str,
     artifactory_api_key: str,
 ):
-    """Install an IBM Cloud Pak for Data assembly"""
+    """Install IBM Db2 or IBM Db2 Warehouse"""
 
     cloud_pak_for_data_assembly_build_type = CloudPakForDataAssemblyBuildType[build_type.upper()]
 
@@ -101,7 +99,7 @@ def install_assembly(
         artifactory_user_name,
         artifactory_api_key,
         ibm_cloud_pak_for_data_entitlement_key,
-        assembly_name,
+        db2_edition,
         accept_all_licenses,
         storage_class,
     )

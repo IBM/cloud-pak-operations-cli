@@ -26,15 +26,15 @@ import requests
 import semver
 
 import dg.config
-import dg.lib.cloud_pak_for_data.cpd_manager
-import dg.lib.openshift
+import dg.lib.cloud_pak_for_data.cpd3_manager
+import dg.lib.openshift.oc
 import dg.utils.compression
 import dg.utils.download
 import dg.utils.file
 import dg.utils.operating_system
 
 from dg.config.binaries_manager import binaries_manager
-from dg.lib.cloud_pak_for_data.cpd_manager import (
+from dg.lib.cloud_pak_for_data.cpd3_manager import (
     AbstractCloudPakForDataManager,
     CloudPakForDataAssemblyBuildType,
     CloudPakForDataVersion,
@@ -149,8 +149,8 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
             if "override_yaml_file_path" in kwargs:
                 args += ["--override", str(kwargs["override_yaml_file_path"])]
 
-            image_registry_hostname = dg.lib.openshift.get_image_registry_hostname()
-            target_registry_password = dg.lib.openshift.get_current_token()
+            image_registry_hostname = dg.lib.openshift.oc.get_image_registry_hostname()
+            target_registry_password = dg.lib.openshift.oc.get_current_token()
 
             args += [
                 "--repo",

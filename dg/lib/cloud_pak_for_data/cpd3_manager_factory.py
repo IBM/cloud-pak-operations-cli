@@ -16,11 +16,11 @@ from typing import Dict, Type
 
 import semver
 
+import dg.lib.cloud_pak_for_data.cpd3_manager
 import dg.lib.cloud_pak_for_data.cpd_3_0_1.cpd_manager
 import dg.lib.cloud_pak_for_data.cpd_3_5_0.cpd_manager
-import dg.lib.cloud_pak_for_data.cpd_manager
 
-from dg.lib.cloud_pak_for_data.cpd_manager import (
+from dg.lib.cloud_pak_for_data.cpd3_manager import (
     AbstractCloudPakForDataManager,
 )
 from dg.lib.error import DataGateCLIException

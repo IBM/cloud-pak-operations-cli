@@ -21,7 +21,12 @@ class IKSCluster(AbstractCluster):
         super().__init__(server, cluster_data)
 
     # override
-    def get_cluster_access_token(self) -> str:
+    def get_password(self) -> str:
+        # TODO implement
+        return ""
+
+    # override
+    def get_username(self) -> str:
         # TODO implement
         return ""
 

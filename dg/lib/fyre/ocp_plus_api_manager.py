@@ -123,6 +123,7 @@ class OCPPlusAPIManager:
         cluster_data = {
             "cluster_name": cluster_name,
             "infrastructure_node_hostname": f"api.{cluster_name}.cp.fyre.ibm.com",
+            "insecure_skip_tls_verify": True,
             "password": password,
             "username": "kubeadmin",
         }

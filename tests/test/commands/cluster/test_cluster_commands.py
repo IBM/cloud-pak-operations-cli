@@ -41,7 +41,11 @@ class UnitTestCluster(AbstractCluster):
         super().__init__(server, cluster_data)
 
     # override
-    def get_cluster_access_token(self) -> str:
+    def get_password(self) -> str:
+        return ""
+
+    # override
+    def get_username(self) -> str:
         return ""
 
     # override
@@ -117,6 +121,7 @@ class TestClusterCommands(unittest.TestCase):
 
         self.assertIsNotNone(cluster)
 
+        # prevent Pylance error ("get_cluster_data" is not a known member of "None")
         if cluster is None:
             raise TypeError()
 
