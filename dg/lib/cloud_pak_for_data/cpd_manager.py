@@ -211,10 +211,10 @@ class AbstractCloudPakForDataManager(ABC):
         )
 
         if self._build_type == CloudPakForDataAssemblyBuildType.RELEASE:
-            openshift_image_registry_route = dg.lib.openshift.get_openshift_image_registry_default_route()
+            image_registry_hostname = dg.lib.openshift.get_image_registry_hostname()
 
-            if openshift_image_registry_route == "":
-                dg.lib.openshift.enable_openshift_image_registry_default_route()
+            if image_registry_hostname == "":
+                dg.lib.openshift.enable_image_registry_default_route()
 
         self.install_assembly(
             assembly_name,

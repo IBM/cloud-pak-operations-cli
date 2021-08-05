@@ -30,7 +30,7 @@ from dg.utils.string import removeprefix, removesuffix
 OPENSHIFT_REST_API_VERSION: Final[str] = "v1"
 
 
-def enable_openshift_image_registry_default_route():
+def enable_image_registry_default_route():
     """Enables the Image Registry default route with the Custom Resource
     Definition
 
@@ -180,13 +180,18 @@ def get_oc_login_command_with_token_for_remote_host(server: str, token: str) -> 
     return " ".join(["oc"] + get_oc_login_args_with_token(server, token))
 
 
-def get_openshift_image_registry_default_route() -> str:
-    """Returns the Image Registry default route
+def get_image_registry_hostname(route_name: str = "default-route") -> str:
+    """Returns the Image Registry hostname for the given route name
+
+    Parameters
+    ----------
+    route_name
+        route name
 
     Returns
     -------
     str
-        Image Registry default route
+        Image Registry hostname for the given route name
     """
 
     oc_get_route_args = [
@@ -195,12 +200,15 @@ def get_openshift_image_registry_default_route() -> str:
         "--namespace",
         "openshift-image-registry",
         "--output",
-        "jsonpath='{.items[?(@.metadata.name==\"default-route\")].spec.host}'",
+        "jsonpath='{.items[?(@.metadata.name==\"" + route_name + "\")].spec.host}'",
     ]
 
     oc_get_route_command_result = removesuffix(
         removeprefix(execute_oc_command(oc_get_route_args, capture_output=True).stdout, "'"), "'"
     )
+
+    if oc_get_route_command_result == "":
+        raise DataGateCLIException(f"Route with name '{route_name}' not found in openshift-image-registry namespace")
 
     return oc_get_route_command_result
 
