@@ -112,8 +112,11 @@ class OCPQuickBurnSizesResponseManager(AbstractJSONResponseManager):
                 "x": {
                     "$ref": "#/$defs/platformQuickBurnSizeSpecificationData",
                 },
+                "z": {
+                    "$ref": "#/$defs/platformQuickBurnSizeSpecificationData",
+                },
             },
-            "required": ["p", "x"],
+            "required": ["p", "x", "z"],
             "type": "object",
         }
 

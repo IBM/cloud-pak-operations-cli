@@ -107,7 +107,10 @@ def get_cluster_credentials(ctx: click.Context, options: Dict[str, Any]) -> Abst
         cluster credentials
     """
 
-    insecure_skip_tls_verify: Optional[bool] = options["insecure_skip_tls_verify"]
+    insecure_skip_tls_verify: Optional[bool] = (
+        options["insecure_skip_tls_verify"] if "insecure_skip_tls_verify" in options else None
+    )
+
     result: Optional[AbstractCredentials] = None
 
     if (

@@ -40,6 +40,8 @@ class QuickBurnSizeData:
             self._format_platform_quick_burn_size_specification_data("p")
             click.echo()
             self._format_platform_quick_burn_size_specification_data("x")
+            click.echo()
+            self._format_platform_quick_burn_size_specification_data("z")
 
     def _add_node_size_specification_data_list_element(
         self,

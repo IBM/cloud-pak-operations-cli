@@ -12,7 +12,8 @@
   ```bash
   dg fyre cluster create-for-db2-data-gate --alias {alias} --cluster-name {FYRE cluster name} --ssh-key "$(cat ~/.ssh/id_rsa.pub)"
   dg cluster use {alias}
-  dg fyre cluster ssh
+  dg fyre cluster install-nfs-storage-class
+  dg fyre cluster ssh --disable-strict-host-key-checking
   ```
 
 ## Infrastructure node:
@@ -34,9 +35,7 @@
   ```
   dg adm download-dependencies
   dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key {IBM Cloud Pak for Data entitlement key}
-  dg adm store-credentials --ibm-github-personal-access-token {IBM GitHub personal access token}
   dg fyre cluster add --alias {alias} --cluster-name {FYRE cluster name} --password {kubeadmin password}
   dg cluster use {alias}
-  dg fyre cluster install-nfs-storage-class
-  dg cluster install-db2-data-gate-stack --accept-all-licenses --storage-class nfs-client
+  dg cluster install-db2-data-gate-stack --accept-all-licenses --storage-class managed-nfs-storage
   ```
