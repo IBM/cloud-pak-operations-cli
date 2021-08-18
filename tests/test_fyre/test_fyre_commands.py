@@ -48,7 +48,6 @@ class ClusterActionWithoutForce(Enum):
     DISABLE_DELETE = auto()
     ENABLE_DELETE = auto()
     GET_CLUSTER_ACCESS_TOKEN = auto()
-    INSTALL_NFS_STORAGE_CLASS = auto()
     STATUS = auto()
 
 
@@ -105,7 +104,6 @@ class TestFYRECommands(unittest.TestCase):
 
         # 1.1 Test dg.commands.fyre.cluster package (R/O)
         self._cluster_action_without_force(ClusterActionWithoutForce.DETAILS)
-        # self._cluster_action_without_force(ClusterActionWithoutForce.GET_CLUSTER_ACCESS_TOKEN)
         self._cluster_action_without_force(ClusterActionWithoutForce.STATUS)
 
         # 1.2 Test dg.commands.fyre.cluster package (R/W)
@@ -146,11 +144,7 @@ class TestFYRECommands(unittest.TestCase):
         self._cluster_action_without_force(ClusterActionWithoutForce.DISABLE_DELETE)
         self._cluster_action_without_force(ClusterActionWithoutForce.ENABLE_DELETE)
 
-        # 1.3 Install Db2 for z/OS Data Gate stack
-        # self._cluster_action_without_force(ClusterActionWithoutForce.INSTALL_NFS_STORAGE_CLASS)
-        # self._install_db2_data_gate_stack()
-
-        # 2. Test dg.commands.fyre.info package
+        # 1.3 Test dg.commands.fyre.info package
         self._check_hostname()
         self._get_default_size()
         self._invoke_dg_command(["fyre", "info", "get-openshift-versions-all-platforms"])
