@@ -1,7 +1,5 @@
 # Db2 Data Gate CLI (dg)
 
-![Banner](./resources/banner.svg)
-
 <div align="center">
     <p>
         <a href="https://github.com/IBM/data-gate-cli/blob/master/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/IBM/data-gate-cli?style=for-the-badge"></a>
@@ -12,7 +10,7 @@
     </p>
 </div>
 
-The Db2 Data Gate CLI allows the user-friendly installation of IBM Cloud Pak for Data, Db2 (Warehouse), and IBM Db2 for z/OS Data Gate on OpenShift clusters. It also allows the one-click deployment of a Red Hat OpenShift on IBM Cloud cluster including the installation of IBM Cloud Pak for Data, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software.
+The Db2 Data Gate CLI allows the user-friendly installation of IBM Cloud Pak for Data 3.5.0/4.0.0, Db2 (Warehouse), the IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate on OpenShift clusters. It also allows the one-click deployment of a Red Hat OpenShift on IBM Cloud cluster including the installation of IBM Cloud Pak for Data, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software.
 
 For IBM-internal users, the Db2 Data Gate CLI additionally supports managing OpenShift clusters on FYRE.
 
@@ -36,10 +34,7 @@ For IBM-internal users, the Db2 Data Gate CLI additionally supports managing Ope
 
 #### Db2 Data Gate CLI installation and update (latest release build)
 
-| Operation    | Command                                              |
-| ------------ | ---------------------------------------------------- |
-| Installation | `pip3 install data-gate-cli` (provides `dg` command) |
-| Update       | `pip3 install --upgrade data-gate-cli`               |
+TBA [September 2021]
 
 #### Db2 Data Gate CLI installation and update (latest development code)
 
@@ -82,33 +77,34 @@ docker run -it quay.io/ibm/data-gate-cli:latest bash
 
 ## Usage
 
-### Installation of IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate
+### Installation of IBM Cloud Pak for Data 3.5.0/4.0.0, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate
 
 - Register cluster:
 
   ```bash
-  dg cluster add --alias {alias} --server {server} --username {username} --password {password}
+  dg cluster add --alias *ALIAS* --server *SERVER* --username *USERNAME* --password *PASSWORD*
   ```
 
 - Use cluster:
 
   ```bash
-  dg cluster use {alias}
+  dg cluster use *ALIAS*
   ```
 
 - Store your [IBM Cloud Pak for Data entitlement key](https://myibm.ibm.com/products-services/containerlibrary):
 
   ```bash
-  dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key {ibm-cloud-pak-for-data-entitlement-key}
+  dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key *IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY*
   ```
 
 - Install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
 
-  ```bash
-  dg cluster install-db2-data-gate-stack --storage-class {storage class}
-  ```
+| Version | Command                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3.5.0   | <code>dg cpd3 install-db2-data-gate-stack --storage-class _STORAGE_CLASS_</code>                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 4.0.0   | <code>dg cpd4 install --storage-class _STORAGE_CLASS_</code><br /><code>dg cpd4 service install --service-name db2oltp --license _[ADVANCED\|COMMUNITY\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name db2wh --license _[ENTERPRISE\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name dmc --license _[ENTERPRISE\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name datagate --license _[ENTERPRISE\|STANDARD]_</code> |
 
-### Installation of IBM Cloud Pak for Data, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software on IBM Cloud
+### Installation of IBM Cloud Pak for Data 3.5.0, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software on IBM Cloud
 
 - Log in to IBM Cloud:
 
@@ -118,10 +114,10 @@ docker run -it quay.io/ibm/data-gate-cli:latest bash
 
 - Install IBM Cloud Pak for Data, IBM Db2 Warehouse, and IBM Db2 for z/OS Data Gate:
 
-| Action                                   | Command                                                                                      |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------- |
-| Installation with an existing cluster    | `dg ibmcloud oc cluster install --cluster-name {cluster name}`                               |
-| Installation without an existing cluster | `dg ibmcloud oc cluster create --alias {alias} --cluster-name {cluster name} --full-install` |
+| Action                        | Command                                                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Inst. w/ an existing cluster  | <code>dg ibmcloud oc cluster install --cluster-name _CLUSTER_NAME_</code>                               |
+| Inst. w/o an existing cluster | <code>dg ibmcloud oc cluster create --alias _ALIAS_ --cluster-name _CLUSTER_NAME_ --full-install</code> |
 
 ### IBM-internal
 
@@ -135,8 +131,8 @@ docker run -it quay.io/ibm/data-gate-cli:latest bash
 
 ### OpenShift Client CLI (macOS)
 
-```
-Unable to connect to the server: dial tcp: lookup {OpenShift cluster} on {DNS name server}:53: no such host
+```bash
+Unable to connect to the server: dial tcp: lookup *OPENSHIFT_CLUSTER* on *DNS_NAME_SERVER*:53: no such host
 ```
 
 - [GitHub issue](https://github.com/openshift/oc/issues/315)

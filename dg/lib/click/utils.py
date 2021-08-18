@@ -183,10 +183,8 @@ def get_oc_login_command_for_remote_host(ctx: click.Context, options: Dict[str, 
     elif (
         current_cluster := dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
     ) is not None:
-        cluster_data = current_cluster.get_cluster_data()
-
         result = dg.lib.openshift.oc.get_oc_login_command_with_password_for_remote_host(
-            cluster_data["server"], cluster_data["username"], cluster_data["password"]
+            current_cluster.get_server(), current_cluster.get_username(), current_cluster.get_password()
         )
     else:
         raise click.UsageError(

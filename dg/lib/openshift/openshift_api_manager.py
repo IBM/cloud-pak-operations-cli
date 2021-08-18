@@ -16,19 +16,25 @@ import logging
 
 from typing import Any, Callable, Dict, List
 
+import semver
+
 from kubernetes import client, config
 
+import dg.lib.jmespath
 import dg.utils.network
 
 from dg.lib.error import DataGateCLIException
 from dg.lib.openshift.credentials.credentials import AbstractCredentials
 from dg.lib.openshift.data.global_pull_secret_data import GlobalPullSecretData
+from dg.lib.openshift.types.catalog_source import CatalogSource
 from dg.lib.openshift.types.kind_metadata import KindMetadata
 from dg.lib.openshift.types.object_meta import ObjectMeta
+from dg.lib.openshift.types.operator_group import OperatorGroup
 from dg.lib.openshift.types.role import Role
 from dg.lib.openshift.types.role_binding import RoleBinding
 from dg.lib.openshift.types.role_rule import RoleRule
 from dg.lib.openshift.types.service_account import ServiceAccount
+from dg.lib.openshift.types.subscription import Subscription
 
 logger = logging.getLogger(__name__)
 
@@ -87,6 +93,19 @@ class OpenShiftAPIManager:
             name=name,
         )
 
+    def create_catalog_source(self, project: str, catalog_source: CatalogSource):
+        """Creates an OpenShift catalog source
+
+        Parameters
+        ----------
+        project
+            project in which the catalog source shall be created
+        catalog_source
+            catalog source specification
+        """
+
+        self.execute_kubernetes_client(self._create_catalog_source, catalog_source=catalog_source, project=project)
+
     def create_cluster_role(self, name: str, rules: List[RoleRule]):
         """Creates a cluster role
 
@@ -142,6 +161,30 @@ class OpenShiftAPIManager:
 
         self.execute_kubernetes_client(self._create_deployment, deployment=deployment, project=project)
 
+    def create_operator_group(self, project: str, name: str):
+        """Creates an OpenShift operator group
+
+        Parameters
+        ----------
+        project
+            project in which the operator group shall be created
+        name
+            operator group name
+        """
+
+        self.execute_kubernetes_client(self._create_operator_group, name=name, project=project)
+
+    def create_project(self, name: str):
+        """Creates an OpenShift project
+
+        Parameters
+        ----------
+        name
+            name of the project to be created
+        """
+
+        self.execute_kubernetes_client(self._create_project, name=name)
+
     def create_role(self, project: str, name: str, rules: List[RoleRule]):
         """Creates a role
 
@@ -196,6 +239,19 @@ class OpenShiftAPIManager:
             parameters=parameters,
             provisioner=provisioner,
         )
+
+    def create_subscription(self, project: str, subscription: Subscription):
+        """Creates an OpenShift subscription
+
+        Parameters
+        ----------
+        project
+            project in which the subscription shall be created
+        name
+            subscription specification
+        """
+
+        self.execute_kubernetes_client(self._create_subscription, project=project, subscription=subscription)
 
     def create_system_cluster_role(self, name: str, rules: List[RoleRule]):
         """Creates a system cluster role
@@ -274,6 +330,32 @@ class OpenShiftAPIManager:
 
         return global_pull_secret_data.contains(registry_location)
 
+    def delete_catalog_source(self, project: str, name: str):
+        """Deletes an OpenShift catalog source
+
+        Parameters
+        ----------
+        project
+            project in which the catalog source shall be deleted
+        name
+            catalog source name
+        """
+
+        self.execute_kubernetes_client(self._delete_catalog_source, name=name, project=project)
+
+    def delete_cluster_service_version(self, project: str, name: str):
+        """Deletes an OpenShift cluster service version
+
+        Parameters
+        ----------
+        project
+            project in which the cluster service version shall be deleted
+        name
+            cluster service version name
+        """
+
+        self.execute_kubernetes_client(self._delete_cluster_service_version, name=name, project=project)
+
     def delete_credentials(self, registry_location: str):
         """Deletes credentials for the given registry location from the global
         pull secret
@@ -288,6 +370,50 @@ class OpenShiftAPIManager:
         global_pull_secret_data.delete_credentials(registry_location)
 
         self.execute_kubernetes_client(self._patch_credentials, global_pull_secret_data=global_pull_secret_data)
+
+    def delete_custom_resource_definition(self, name: str):
+        """Deletes a custom resource definition
+
+        Parameters
+        ----------
+        name
+            custom resource definition name
+        """
+
+        self.execute_kubernetes_client(self._delete_custom_resource_definition, name=name)
+
+    def delete_operator(self, name: str):
+        """Deletes an OpenShift operator
+
+        Parameters
+        ----------
+        name
+            operator name
+        """
+
+        self.execute_kubernetes_client(self._delete_operator, name=name)
+
+    def delete_project(self, name: str):
+        """Deletes an OpenShift project
+
+        Parameters
+        ----------
+        name
+            project name
+        """
+
+        self.execute_kubernetes_client(self._delete_project, name=name)
+
+    def delete_subscription(self, project: str, name: str):
+        """Deletes an OpenShift subscription
+
+        Parameters
+        ----------
+        name
+            subscription name
+        """
+
+        self.execute_kubernetes_client(self._delete_subscription, name=name, project=project)
 
     def deployment_exists(self, project: str, name: str) -> bool:
         """Returns whether the deployment with the given name exists in the
@@ -313,7 +439,48 @@ class OpenShiftAPIManager:
             project=project,
         )
 
+    def namespaced_custom_object_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> bool:
+        """Returns whether the custom object with the given name in the given
+        project of the given kind exists
+
+        Parameters
+        ----------
+        project
+            project to be searched for custom objects
+        name
+            custom object name
+        kind_metadata
+            kind metadata associated with the kind of the custom object
+
+        Returns
+        -------
+        bool
+            true, if the custom object exists
+        """
+
+        return self.execute_kubernetes_client(
+            self._namespaced_custom_object_exists, kind_metadata=kind_metadata, name=name, project=project
+        )
+
     def execute_kubernetes_client(self, method: Callable[..., Any], **kwargs) -> Any:
+        """Executes the given method in the context of the Kubernetes Python
+        client
+
+        If the execution of the given method fails due to an expired OAuth
+        access token, the OAuth access token is refreshed (if possible) and the
+        method is executed again.
+
+        Parameters
+        ----------
+        method
+            method to be executed
+
+        Result
+        ------
+        Any
+            method result
+        """
+
         if not self._kube_config_initialized:
             self._set_kube_config()
 
@@ -339,6 +506,33 @@ class OpenShiftAPIManager:
 
         return result
 
+    def get_catalog_sources(self, project: str) -> Any:
+        """Return OpenShift catalog sources in the given project
+
+        Parameters
+        ----------
+        project
+            project to be searched for catalog sources
+
+        Returns
+        -------
+        Any
+            catalog sources
+        """
+
+        return self.execute_kubernetes_client(self._get_catalog_sources, project=project)
+
+    def get_custom_resource_definitions(self) -> Any:
+        """Return OpenShift custom resource definitions
+
+        Returns
+        -------
+        Any
+            custom resource definitions
+        """
+
+        return self.execute_kubernetes_client(self._get_custom_resource_definitions)
+
     def get_global_pull_secret_data(self) -> GlobalPullSecretData:
         """Returns the global pull secret as a data object
 
@@ -350,6 +544,60 @@ class OpenShiftAPIManager:
 
         return self.execute_kubernetes_client(self._get_credentials)
 
+    def get_subscription(self, project: str, name: str) -> Any:
+        """Return OpenShift subscription with the given name in the given
+        project
+
+        Parameters
+        ----------
+        project
+            project to be searched for subscriptions
+        name
+            name of the subscription to be returned
+
+        Returns
+        -------
+        Any
+            subscription
+        """
+
+        return self.execute_kubernetes_client(self._get_subscription, name=name, project=project)
+
+    def get_version(self) -> semver.VersionInfo:
+        """Returns the OpenShift server version
+
+        Returns
+        -------
+        semver.VersionInfo:
+            OpenShift server version
+        """
+
+        return self.execute_kubernetes_client(self._get_version)
+
+    def operator_group_exists(self, project: str, name: str) -> bool:
+        """Returns whether the OpenShift operator group with the given name in
+        the given project exists
+
+        Parameters
+        ----------
+        project
+            project to be searched for operator groups
+        name
+            operator group name
+
+        Returns
+        -------
+        bool
+            true, if the operator group exists
+        """
+
+        return self.execute_kubernetes_client(
+            self._namespaced_custom_object_exists,
+            kind_metadata=KindMetadata("operators.coreos.com", "OperatorGroup", "operatorgroups", "v1alpha2"),
+            name=name,
+            project=project,
+        )
+
     def patch_credentials(self, global_pull_secret_data: GlobalPullSecretData):
         """Patches the global pull secret based on the given data object
 
@@ -360,6 +608,22 @@ class OpenShiftAPIManager:
         """
 
         self.execute_kubernetes_client(self._patch_credentials, global_pull_secret_data=global_pull_secret_data)
+
+    def project_exists(self, name: str) -> bool:
+        """Returns whether the OpenShift project with the given name exists
+
+        Parameters
+        ----------
+        name
+            project name
+
+        Returns
+        -------
+        bool
+            true, if the project exists
+        """
+
+        return self.execute_kubernetes_client(self._project_exists, name=name)
 
     def role_binding_exists(self, project: str, name: str) -> bool:
         """Returns whether the role binding with the given name exists in the
@@ -468,6 +732,36 @@ class OpenShiftAPIManager:
             name=name,
         )
 
+    def subscription_exists(self, project: str, name: str) -> bool:
+        """Returns whether the OpenShift subscription with the given name in the
+        given project exists
+
+        Parameters
+        ----------
+        project
+            project to be searched for subscriptions
+        name
+            subscription name
+
+        Returns
+        -------
+        bool
+            true, if the subscription exists
+        """
+
+        return self.execute_kubernetes_client(
+            self._namespaced_custom_object_exists,
+            kind_metadata=KindMetadata("operators.coreos.com", "Subscription", "subscriptions", "v1alpha1"),
+            name=name,
+            project=project,
+        )
+
+    def _create_catalog_source(self, project: str, catalog_source: CatalogSource):
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.create_namespaced_custom_object(
+            "operators.coreos.com", "v1alpha1", project, "catalogsources", catalog_source
+        )
+
     def _create_cluster_role(self, metadata: ObjectMeta, rules: List[RoleRule]):
         cluster_role: Role = {
             "kind": "ClusterRole",
@@ -509,6 +803,42 @@ class OpenShiftAPIManager:
     def _create_deployment(self, project: str, deployment: Any):
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api.create_namespaced_custom_object("apps", "v1", project, "deployments", deployment)
+
+    def _create_operator_group(self, project: str, name: str):
+        operator_group: OperatorGroup = {
+            "apiVersion": "operators.coreos.com/v1alpha2",
+            "kind": "OperatorGroup",
+            "metadata": {
+                "name": name,
+                "namespace": project,
+            },
+            "spec": {
+                "targetNamespaces": [
+                    project,
+                ],
+            },
+        }
+
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.create_namespaced_custom_object(
+            "operators.coreos.com",
+            "v1alpha2",
+            project,
+            "operatorgroups",
+            operator_group,
+        )
+
+    def _create_project(self, name: str):
+        core_v1_api = client.CoreV1Api()
+        core_v1_api.create_namespace(
+            {
+                "apiVersion": "v1",
+                "kind": "Namespace",
+                "metadata": {
+                    "name": name,
+                },
+            }
+        )
 
     def _create_role(self, project: str, name: str, rules: List[RoleRule]):
         role: Role = {
@@ -582,6 +912,12 @@ class OpenShiftAPIManager:
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api.create_cluster_custom_object("storage.k8s.io", "v1", "storageclasses", storage_class)
 
+    def _create_subscription(self, project: str, subscription: Subscription):
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.create_namespaced_custom_object(
+            "operators.coreos.com", "v1alpha1", project, "subscriptions", subscription
+        )
+
     def _custom_object_exists(self, name: str, kind_metadata: KindMetadata) -> bool:
         custom_objects_api = client.CustomObjectsApi()
         result = True
@@ -598,11 +934,72 @@ class OpenShiftAPIManager:
 
         return result
 
+    def _delete_catalog_source(self, project: str, name: str):
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.delete_namespaced_custom_object(
+            "operators.coreos.com", "v1alpha1", project, "catalogsources", name
+        )
+
+    def _delete_cluster_service_version(self, project: str, name: str):
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.delete_namespaced_custom_object(
+            "operators.coreos.com", "v1alpha1", project, "clusterserviceversions", name
+        )
+
+    def _delete_custom_resource_definition(self, name: str):
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.delete_cluster_custom_object("apiextensions.k8s.io", "v1", "customresourcedefinitions", name)
+
+    def _delete_operator(self, name: str):
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.delete_cluster_custom_object("operators.coreos.com", "v1", "operators", name)
+
+    def _delete_project(self, name: str):
+        core_v1_api = client.CoreV1Api()
+        core_v1_api.delete_namespace(name)
+
+    def _delete_subscription(self, project: str, name: str):
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.delete_namespaced_custom_object(
+            "operators.coreos.com", "v1alpha1", project, "subscriptions", name
+        )
+
+    def _get_catalog_sources(self, project: str) -> Any:
+        custom_objects_api = client.CustomObjectsApi()
+
+        return custom_objects_api.list_namespaced_custom_object(
+            "operators.coreos.com", "v1alpha1", project, "catalogsources"
+        )
+
     def _get_credentials(self) -> GlobalPullSecretData:
         core_v1_api = client.CoreV1Api()
         core_v1_api_result: Any = core_v1_api.read_namespaced_secret("pull-secret", "openshift-config")
 
         return GlobalPullSecretData(core_v1_api_result.data)
+
+    def _get_custom_resource_definitions(self) -> Any:
+        custom_objects_api = client.CustomObjectsApi()
+
+        return custom_objects_api.list_cluster_custom_object("apiextensions.k8s.io", "v1", "customresourcedefinitions")
+
+    def _get_subscription(self, project: str, name: str) -> Any:
+        custom_objects_api = client.CustomObjectsApi()
+
+        return custom_objects_api.get_namespaced_custom_object(
+            "operators.coreos.com", "v1alpha1", project, "subscriptions", name
+        )
+
+    def _get_version(self) -> semver.VersionInfo:
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api_result = custom_objects_api.get_cluster_custom_object(
+            "config.openshift.io", "v1", "clusteroperators", "openshift-apiserver"
+        )
+
+        path = dg.lib.jmespath.get_jmespath_list_of_strings(
+            "status.versions[?name=='openshift-apiserver'].version", custom_objects_api_result
+        )
+
+        return semver.VersionInfo.parse(path[0])
 
     def _namespaced_custom_object_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> bool:
         custom_objects_api = client.CustomObjectsApi()
@@ -623,6 +1020,20 @@ class OpenShiftAPIManager:
     def _patch_credentials(self, global_pull_secret_data: GlobalPullSecretData):
         core_v1_api = client.CoreV1Api()
         core_v1_api.patch_namespaced_secret("pull-secret", "openshift-config", global_pull_secret_data.get_json_patch())
+
+    def _project_exists(self, name: str) -> bool:
+        core_v1_api = client.CoreV1Api()
+        result = True
+
+        try:
+            core_v1_api.read_namespace(name)
+        except client.ApiException as exception:
+            if exception.status == 404:
+                result = False
+            else:
+                raise exception
+
+        return result
 
     def _service_account_exists(self, project: str, name: str) -> bool:
         core_v1_api = client.CoreV1Api()

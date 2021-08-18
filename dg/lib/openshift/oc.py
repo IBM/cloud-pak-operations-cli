@@ -164,9 +164,6 @@ def get_image_registry_hostname(route_name: str = "default-route") -> str:
         removeprefix(execute_oc_command(oc_get_route_args, capture_output=True).stdout, "'"), "'"
     )
 
-    if oc_get_route_command_result == "":
-        raise DataGateCLIException(f"Route with name '{route_name}' not found in openshift-image-registry namespace")
-
     return oc_get_route_command_result
 
 

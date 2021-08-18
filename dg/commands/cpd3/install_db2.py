@@ -29,6 +29,9 @@ from dg.lib.cloud_pak_for_data.cpd3_manager import (
 from dg.lib.cloud_pak_for_data.cpd3_manager_factory import (
     CloudPakForDataManagerFactory,
 )
+from dg.lib.openshift.utils.click import (
+    openshift_server_command_optgroup_options,
+)
 from dg.utils.logging import loglevel_command
 
 
@@ -38,10 +41,7 @@ from dg.utils.logging import loglevel_command
     )
 )
 @optgroup.group("Shared options")
-@optgroup.option("--server", help="OpenShift server URL", required=True)
-@optgroup.option("--username", help="OpenShift username")
-@optgroup.option("--password", help="OpenShift password")
-@optgroup.option("--token", help="OpenShift OAuth access token")
+@openshift_server_command_optgroup_options
 @optgroup.option("--accept-all-licenses", help="Accept all licenses", is_flag=True)
 @optgroup.option(
     "--build-type",
@@ -71,10 +71,11 @@ from dg.utils.logging import loglevel_command
 @click.pass_context
 def install_db2(
     ctx: click.Context,
-    server: str,
+    server: Optional[str],
     username: Optional[str],
     password: Optional[str],
     token: Optional[str],
+    insecure_skip_tls_verify: Optional[bool],
     accept_all_licenses: bool,
     build_type: str,
     db2_edition: str,
