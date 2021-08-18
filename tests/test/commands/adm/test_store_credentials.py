@@ -53,8 +53,6 @@ class TestStoreCredentialsCommand(unittest.TestCase):
                 "artifactory_user_name",
                 "--ibm-cloud-api-key",
                 "ibm_cloud_api_key",
-                "--ibm-github-personal-access-token",
-                "ibm_github_personal_access_token",
             ],
         )
 
@@ -63,11 +61,9 @@ class TestStoreCredentialsCommand(unittest.TestCase):
         self.assertIn("artifactory_api_key", default_map)
         self.assertIn("artifactory_user_name", default_map)
         self.assertIn("ibm_cloud_api_key", default_map)
-        self.assertIn("ibm_github_personal_access_token", default_map)
         self.assertEqual(default_map["artifactory_api_key"], "artifactory_api_key")
         self.assertEqual(default_map["artifactory_user_name"], "artifactory_user_name")
         self.assertEqual(default_map["ibm_cloud_api_key"], "ibm_cloud_api_key")
-        self.assertEqual(default_map["ibm_github_personal_access_token"], "ibm_github_personal_access_token")
 
         # check that key-value pairs were removed from credentials.json
         runner = click.testing.CliRunner()
@@ -82,8 +78,6 @@ class TestStoreCredentialsCommand(unittest.TestCase):
                 "",
                 "--ibm-cloud-api-key",
                 "",
-                "--ibm-github-personal-access-token",
-                "",
             ],
         )
 
@@ -92,7 +86,6 @@ class TestStoreCredentialsCommand(unittest.TestCase):
         self.assertNotIn("artifactory_api_key", default_map)
         self.assertNotIn("artifactory_user_name", default_map)
         self.assertNotIn("ibm_cloud_api_key", default_map)
-        self.assertNotIn("ibm_github_personal_access_token", default_map)
 
     def _load_credentials_file(self, dg_credentials_file_path: pathlib.Path):
         json = dg.lib.click.utils.create_default_map_from_json_file(dg_credentials_file_path)

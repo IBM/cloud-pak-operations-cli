@@ -194,7 +194,7 @@ class AbstractJSONRequestManager(ABC):
 
         if not response.ok:
             json_response_manager.raise_error_if_error_response(
-                json_response, f"{error_message} [HTTP status code: {response.status_code}]"
+                json_response, f"{error_message} (HTTP status code: {response.status_code})"
             )
 
         json_response_manager.check_response(json_response, error_message)

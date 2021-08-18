@@ -26,7 +26,11 @@ class Details(TypedDict):
     errors: List[Union[Error, str]]
 
 
-class OCPPostErrorResponse(TypedDict):
+class OCPPostErrorResponseOptional(TypedDict, total=False):
+    build_errors: List[str]
+
+
+class OCPPostErrorResponse(OCPPostErrorResponseOptional):
     details: Union[Details, str]
     status: str
 

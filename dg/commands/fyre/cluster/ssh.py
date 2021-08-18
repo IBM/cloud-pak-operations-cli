@@ -18,7 +18,6 @@ import click
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.lib.fyre.utils.nfs
 import dg.utils.network
 
 from dg.utils.logging import loglevel_command
@@ -29,15 +28,23 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
+@click.option("--disable-strict-host-key-checking", help="Disable strict host key checking", is_flag=True)
 @click.option("--infrastructure-node-hostname", help="Infrastructure node hostname", required=True)
 @click.pass_context
 def ssh(
     ctx: click.Context,
+    disable_strict_host_key_checking: bool,
     infrastructure_node_hostname: str,
 ):
     """Connect to the infrastructure node of an OCP+ cluster using SSH"""
 
     if not dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
-        args = ["ssh", f"root@{infrastructure_node_hostname}"]
+        args = ["ssh"]
+
+        if disable_strict_host_key_checking:
+            args.append("-o")
+            args.append("StrictHostKeyChecking=no")
+
+        args.append(f"root@{infrastructure_node_hostname}")
 
         subprocess.check_call(args)

@@ -20,6 +20,7 @@ import click
 
 from tabulate import tabulate
 
+from dg.lib.error import DataGateCLIException
 from dg.lib.fyre.types.ocp_get_response_for_single_cluster import (
     VM,
     OCPGetResponseForSingleCluster,
@@ -49,12 +50,15 @@ class OCPPlusCluster:
             ]
 
             for vm in cluster["vms"]:
+                private_ip_address = self._get_ip_address(vm, "private")
+                public_ip_address = self._get_ip_address(vm, "public")
+
                 vm_list.append(
                     [
                         vm["vm_id"],
                         vm["hostname"],
-                        self._get_ip_address(vm, "public"),
-                        self._get_ip_address(vm, "private"),
+                        public_ip_address if public_ip_address is not None else "-",
+                        private_ip_address if private_ip_address is not None else "-",
                         vm["os_state"],
                         vm["cpu"],
                         vm["memory"],
@@ -65,7 +69,33 @@ class OCPPlusCluster:
 
             click.echo(tabulate(vm_list, headers=headers))
 
-    def _get_ip_address(self, vm: VM, type: str) -> str:
+    def get_private_ip_address_of_infrastructure_node(self) -> str:
+        """Returns the private IP address of the infrastructure node
+
+        Returns
+        -------
+        str
+            private IP address of the infrastructure node
+        """
+
+        cluster = self._ocp_get_response_for_single_cluster["clusters"][0]
+        result: Optional[str] = None
+
+        for vm in cluster["vms"]:
+            private_ip_address = self._get_ip_address(vm, "private")
+            public_ip_address = self._get_ip_address(vm, "public")
+
+            if private_ip_address is not None and public_ip_address is not None:
+                result = private_ip_address
+
+                break
+
+        if result is None:
+            raise DataGateCLIException("Infrastructure node could not be identified")
+
+        return result
+
+    def _get_ip_address(self, vm: VM, type: str) -> Optional[str]:
         result: Optional[str] = None
 
         for ip_address in vm["ips"]:
@@ -73,8 +103,5 @@ class OCPPlusCluster:
                 result = ip_address["address"]
 
                 break
-
-        if result is None:
-            result = "-"
 
         return result
