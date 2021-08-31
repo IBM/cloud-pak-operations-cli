@@ -88,7 +88,11 @@ def execute_command(
         if len(stderr_buffer) != 0:
             error_output = f" ({stderr_buffer})"
 
-        raise DataGateCLIException(f"Command '{command_string}' failed with return code {return_code}{error_output}.")
+        raise DataGateCLIException(
+            f"Command '{command_string}' failed with return code {return_code}{error_output}.",
+            "\n".join(stderr_buffer),
+            "\n".join(stdout_buffer),
+        )
 
     return ProcessResult(return_code, "\n".join(stderr_buffer), "\n".join(stdout_buffer))
 

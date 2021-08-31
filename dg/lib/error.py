@@ -29,14 +29,35 @@ class DataGateCLIException(Exception):
     def get_error_message(self):
         return self._error_message
 
+    @property
+    def stderr(self) -> Optional[str]:
+        return self._stderr
+
+    @property
+    def stdout(self) -> Optional[str]:
+        return self._stdout
+
 
 class IBMCloudException(DataGateCLIException):
     @classmethod
     def get_parsed_error_message(cls, error_message: str) -> str:
+        # use regex.DOTALL to match newline characters
         search_result = regex.search("FAILED\\n(.*)\\n\\n(Incident ID: .*)\\n", error_message, regex.DOTALL)
 
         if search_result is not None:
             output = f"{search_result.group(1)} [{search_result.group(2)}]"
+        else:
+            output = error_message
+
+        return output
+
+    @classmethod
+    def get_parsed_error_message_without_incident_id(cls, error_message: str) -> str:
+        # use regex.DOTALL to match newline characters
+        search_result = regex.search("FAILED\\n(.*)\\n\\n(Incident ID: .*)\\n", error_message, regex.DOTALL)
+
+        if search_result is not None:
+            output = search_result.group(1)
         else:
             output = error_message
 
