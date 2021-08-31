@@ -7,7 +7,7 @@ pipeline {
 		timeout( time: 2, unit: 'HOURS' )
 	}
 	stages {
-		stage('Data Gate CLI FYRE/OCP+ end-to-end test') {
+		stage('Db2 Data Gate CLI FYRE/OCP+ end-to-end test') {
 			agent {
 				kubernetes {
 					cloud 'icp-production'
@@ -23,7 +23,7 @@ pipeline {
 			}
 			steps {
 				script {
-					echo "Running Data Gate CLI FYRE/OCP+ end-to-end test"
+					echo "Running Db2 Data Gate CLI FYRE/OCP+ end-to-end test"
 					sh "tests/test_fyre/test.sh"
 				}
 			}

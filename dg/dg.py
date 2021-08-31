@@ -39,15 +39,13 @@ if dg.utils.debugger.is_debugpy_running() and (len(sys.argv) == 2):
         sys.argv = [sys.argv[0]] + sys.argv[1].split()
 
 
-@click.group(cls=create_click_multi_command_class(dg.commands), invoke_without_command=True)
-@click.option("--version", is_flag=True, help="Show the version number of the Data Gate CLI")
-@click.pass_context
-def cli(ctx: click.Context, version: bool):
-    if ctx.invoked_subcommand is None:
-        if version:
-            click.echo("Data Gate CLI " + pkg_resources.require("data-gate-cli")[0].version)
-        else:
-            click.echo(ctx.get_help())
+@click.group(cls=create_click_multi_command_class(dg.commands))
+@click.version_option(
+    message="Db2 Data Gate CLI %(version)s", version=pkg_resources.require("data-gate-cli")[0].version
+)
+def cli():
+    # main Click command
+    pass
 
 
 if __name__ == "__main__":
