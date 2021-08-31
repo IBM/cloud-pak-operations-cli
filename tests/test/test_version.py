@@ -29,7 +29,7 @@ class TestVersionCommand(unittest.TestCase):
 
         self.assertEqual(result.exit_code, 0)
 
-        search_result = regex.search("Data Gate CLI \\d+\\.\\d+\\.\\d+", result.output)
+        search_result = regex.match("Db2 Data Gate CLI \\d+\\.\\d+\\.\\d+", result.output)
 
         self.assertNotEqual(search_result, None)
 

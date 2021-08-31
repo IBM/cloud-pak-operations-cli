@@ -31,11 +31,13 @@ from dg.utils.logging import loglevel_command
 @loglevel_command()
 @click.option(
     "--delete-existing-api-key",
-    help=("Delete the API key created for the Data Gate CLI (in IBM Cloud and on disk) prior to generating a new one"),
+    help=(
+        "Delete the API key created for the Db2 Data Gate CLI (in IBM Cloud and on disk) prior to generating a new one"
+    ),
     is_flag=True,
 )
 def generate_api_key(delete_existing_api_key: bool) -> str:
-    """Generates an IBM Cloud API key and stores it in the Data Gate CLI
+    """Generates an IBM Cloud API key and stores it in the Db2 Data Gate CLI
     credentials file"""
 
     if delete_existing_api_key:

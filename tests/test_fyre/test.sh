@@ -11,7 +11,7 @@ make
 make install
 cd ..
 
-echo "Installing Data Gate CLI"
+echo "Installing Db2 Data Gate CLI"
 python3 -m pip install .
 
 echo "Executing tests"

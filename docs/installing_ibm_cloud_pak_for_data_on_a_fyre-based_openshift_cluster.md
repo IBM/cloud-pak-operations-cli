@@ -28,13 +28,13 @@
   yum install --assumeyes git python38
   ```
 
-- Install Data Gate CLI:
+- Install Db2 Data Gate CLI:
 
   ```bash
   pip3 install git+https://git@github.com/IBM/data-gate-cli.git
   ```
 
-- Execute the following Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
+- Execute the following Db2 Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
 
   ```bash
   dg adm download-dependencies
@@ -46,7 +46,7 @@
 
 ## IBM Cloud Pak for Data 4.0.0
 
-- Execute the following Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
+- Execute the following Db2 Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
 
   ```bash
   dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key *IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY*

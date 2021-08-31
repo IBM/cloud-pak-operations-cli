@@ -66,7 +66,7 @@ python -m unittest discover tests.test
 
 ## Profiling using FunctionTrace (Linux/macOS)
 
-Use [FunctionTrace](https://functiontrace.com/) to profile a Data Gate CLI command as follows:
+Use [FunctionTrace](https://functiontrace.com/) to profile a Db2 Data Gate CLI command as follows:
 
 - [Install Rust and Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html#install-rust-and-cargo)
 
@@ -82,13 +82,13 @@ Use [FunctionTrace](https://functiontrace.com/) to profile a Data Gate CLI comma
   pip3 install functiontrace
   ```
 
-- Execute the following command to profile a Data Gate CLI command:
+- Execute the following command to profile a Db2 Data Gate CLI command:
 
   ```bash
   python3 -m functiontrace $(which dg) {command}
   ```
 
-- After having executed the Data Gate CLI, the FunctionTrace server prints the location of the profiling data file:
+- After having executed the Db2 Data Gate CLI, the FunctionTrace server prints the location of the profiling data file:
 
   ```bash
   [FunctionTrace] Wrote profile data to …
@@ -133,4 +133,4 @@ pip3 install --extra-index-url https://pypi.org/simple --index-url https://test.
 
 ## References
 
-- [Coding Guidelines](docs/coding_guidelines.md)
+- [Coding Guidelines](coding_guidelines.md)

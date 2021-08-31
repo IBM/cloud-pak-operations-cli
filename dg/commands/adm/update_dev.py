@@ -25,7 +25,7 @@ from dg.utils.logging import loglevel_command
 
 @loglevel_command()
 def update_dev():
-    """Update the Data Gate CLI to the latest development version"""
+    """Update the Db2 Data Gate CLI to the latest development version"""
 
     if pkg_resources.require("data-gate-cli")[0].version != "0.0.1":
         raise DataGateCLIException(

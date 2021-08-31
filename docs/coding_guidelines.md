@@ -1,4 +1,4 @@
-# Data Gate CLI: Coding Guidelines
+# Db2 Data Gate CLI: Coding Guidelines
 
 ## Comments
 
@@ -31,7 +31,7 @@
 
 ## Imports
 
-To avoid circular imports, a module contained in one of the Data Gate CLI packages shown in the table below is only allowed to import other modules of the following categories:
+To avoid circular imports, a module contained in one of the Db2 Data Gate CLI packages shown in the table below is only allowed to import other modules of the following categories:
 
 - modules from the same package or other packages in the same row if no circular import is created
 - modules from other packages in rows below the row containing the package of the module
@@ -86,7 +86,7 @@ Use the following decision criteria when to use which method:
 
 ### Click support
 
-The advantage of the `logging` package is that the log level of the current logger may be changed to suppress log messages. To expose this feature when executing commands of the Data Gate CLI, Click commands should be defined using the `@loglevel_command` decorator, which automatically appends a non-required option named `--loglevel`:
+The advantage of the `logging` package is that the log level of the current logger may be changed to suppress log messages. To expose this feature when executing commands of the Db2 Data Gate CLI, Click commands should be defined using the `@loglevel_command` decorator, which automatically appends a non-required option named `--loglevel`:
 
 ```
 Options:
