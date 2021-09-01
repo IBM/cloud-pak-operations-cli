@@ -13,6 +13,9 @@
 #  limitations under the License.
 
 import json
+import logging
+import re
+import tempfile
 
 from typing import Final, List
 
@@ -250,9 +253,55 @@ def get_deployment_name(search_string: str) -> List[str]:
     return result
 
 
+def infer_custom_resource_id_from_deployment_name(deployment_name: str) -> str:
+    result = ""
+    m = re.match(r"dg-([0-9]+)-data-gate", deployment_name)
+
+    if m.group(1):
+        result = "dg" + m.group(1)
+        logging.debug(f"Custom resource id: {result}")
+    else:
+        raise DataGateCLIException(
+            f"Unable to retrieve custom resource id for Data Gate deployment name '{deployment_name}'"
+        )
+
+    return result
+
+
 def scale_deployment(deployment_name: str, scale_factor: int):
     """Scale a given Openshift deployment to a given scale factor"""
 
     oc_scale_deployment_args = ["scale", "deploy", deployment_name, "--replicas", str(scale_factor)]
 
     execute_oc_command(oc_scale_deployment_args)
+
+
+def get_current_data_gate_instance_service_custom_resource(data_gate_instance_id: str) -> dict:
+    """Get the custom resource for a given data gate instance id"""
+
+    oc_get_custom_resource_args = ["get", "datagateinstanceservice", data_gate_instance_id, "-o", "json"]
+
+    oc_get_custom_resource_result = json.loads(execute_oc_command(oc_get_custom_resource_args, capture_output=True).stdout)
+    return oc_get_custom_resource_result
+
+
+def replace_image_in_data_gate_instance_service_custom_resource(custom_resource_json: dict, component: str, image_tag: str, pull_prefix: str) -> dict:
+    if "image_tags" not in custom_resource_json["spec"]:
+        custom_resource_json["spec"]["image_tags"] = {}
+
+    custom_resource_json["spec"]["image_tags"][component] = image_tag
+
+    if "pull_prefix" not in custom_resource_json["spec"]:
+        custom_resource_json["spec"]["pull_prefix"] = {}
+
+    custom_resource_json["spec"]["pull_prefix"][component] = pull_prefix
+
+
+def set_data_gate_instance_service_custom_resouce(custom_resource_json: dict):
+    with tempfile.NamedTemporaryFile(mode="w+") as tmp:
+        json.dump(custom_resource_json, tmp)
+        tmp.flush()
+
+        oc_set_custom_resource_args = ["replace", "-f", tmp.name]
+
+        execute_oc_command(oc_set_custom_resource_args)
