@@ -2,7 +2,6 @@ import json
 import logging
 
 from abc import ABC, abstractmethod
-from enum import Enum, auto
 from typing import Any, Final, Optional
 
 import jsonschema
@@ -17,20 +16,7 @@ from dg.lib.fyre.response_managers.json_response_manager import (
 from dg.lib.fyre.response_managers.ocp_request_get_response_manager import (
     OCPRequestGetResponseManager,
 )
-
-
-class HTTPMethod(Enum):
-    DELETE = auto()
-    GET = auto()
-    HEAD = auto()
-    OPTIONS = auto()
-    PATCH = auto()
-    POST = auto()
-    PUT = auto()
-
-    def __str__(self):
-        return self.name
-
+from dg.utils.http_method import HTTPMethod
 
 logger = logging.getLogger(__name__)
 
@@ -208,7 +194,7 @@ class AbstractJSONRequestManager(ABC):
 
         if not response.ok:
             json_response_manager.raise_error_if_error_response(
-                json_response, f"{error_message} [HTTP status code: {response.status_code}]"
+                json_response, f"{error_message} (HTTP status code: {response.status_code})"
             )
 
         json_response_manager.check_response(json_response, error_message)

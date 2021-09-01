@@ -26,7 +26,7 @@ from tqdm import tqdm
 import dg.config
 import dg.utils.logging
 
-from dg.lib.cloud_pak_for_data.cpd_manager import (
+from dg.lib.cloud_pak_for_data.cpd3_manager import (
     AbstractCloudPakForDataManager,
 )
 from dg.lib.error import DataGateCLIException, IBMCloudException

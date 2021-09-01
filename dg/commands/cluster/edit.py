@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from typing import Optional
+
 import click
 
 import dg.config.cluster_credentials_manager
@@ -22,8 +24,14 @@ from dg.utils.logging import loglevel_command
 @loglevel_command()
 @click.argument("alias_or_server")
 @click.option("--alias", help="Alias")
+@click.option(
+    "--insecure-skip-tls-verify/--no-insecure-skip-tls-verify",
+    default=None,
+    help="Disables or enables checking the server's certificate for validity",
+    is_flag=True,
+)
 @click.option("--password", help="kubeadmin password")
-def edit(alias_or_server: str, alias: str, password: str):
+def edit(alias_or_server: str, alias: Optional[str], insecure_skip_tls_verify: Optional[bool], password: Optional[str]):
     """Edit metadata of a registered OpenShift cluster"""
 
     metadata_to_be_edited = locals().copy()

@@ -48,7 +48,6 @@ class ClusterActionWithoutForce(Enum):
     DISABLE_DELETE = auto()
     ENABLE_DELETE = auto()
     GET_CLUSTER_ACCESS_TOKEN = auto()
-    INSTALL_NFS_STORAGE_CLASS = auto()
     STATUS = auto()
 
 
@@ -75,7 +74,6 @@ class TestFYRECommands(unittest.TestCase):
 
         TestFYRECommands._logger.setLevel("INFO")
         TestFYRECommands._log_in_to_fyre()
-        TestFYRECommands._store_ibm_github_personal_access_token()
 
     @classmethod
     def tearDownClass(cls):
@@ -106,7 +104,6 @@ class TestFYRECommands(unittest.TestCase):
 
         # 1.1 Test dg.commands.fyre.cluster package (R/O)
         self._cluster_action_without_force(ClusterActionWithoutForce.DETAILS)
-        # self._cluster_action_without_force(ClusterActionWithoutForce.GET_CLUSTER_ACCESS_TOKEN)
         self._cluster_action_without_force(ClusterActionWithoutForce.STATUS)
 
         # 1.2 Test dg.commands.fyre.cluster package (R/W)
@@ -120,34 +117,34 @@ class TestFYRECommands(unittest.TestCase):
 
         result = self._node_action("worker3", NodeAction.REDEPLOY_NODE, ignore_exception=True)
 
-        if (
-            result.exit_code != 0
-            and result.exception is not None
-            and isinstance(result.exception, DataGateCLIException)
-        ):
-            exception: DataGateCLIException = result.exception
+        self._ignore_exception_if_regex_matches(
+            result,
+            "Failed to redeploy node \\(HTTP status code: 400\\) \\['No space available on any [p|x|z] host to "
+            "redeploy vm for user id \\d+'\\]",
+        )
 
-            if (
-                regex.match(
-                    "Failed to redeploy node \\[HTTP status code: 400\\] \\('No space available on any [p|x|z] host to "
-                    "redeploy vm for user id \\d+'\\)",
-                    exception.get_error_message(),
-                )
-                is None
-            ):
-                self._check_result(result)
+        result = self._edit_inf_node(ignore_exception=True)
 
-        self._edit_inf_node()
+        self._ignore_exception_if_regex_matches(
+            result,
+            "Failed to add additional disk \\(HTTP status code: 400\\) \\['product_group disk quota exceeded for "
+            "platform [p|x|z] for site (rtp|svl) for product group id \\d+'\\]",
+        )
+
         self._edit_master_node("master0")
-        self._edit_worker_node("worker3")
+
+        result = self._edit_worker_node("worker3", ignore_exception=True)
+
+        self._ignore_exception_if_regex_matches(
+            result,
+            "Failed to add additional disk \\(HTTP status code: 400\\) \\['product_group disk quota exceeded for "
+            "platform [p|x|z] for site (rtp|svl) for product group id \\d+'\\]",
+        )
+
         self._cluster_action_without_force(ClusterActionWithoutForce.DISABLE_DELETE)
         self._cluster_action_without_force(ClusterActionWithoutForce.ENABLE_DELETE)
 
-        # 1.3 Install Db2 for z/OS Data Gate stack
-        # self._cluster_action_without_force(ClusterActionWithoutForce.INSTALL_NFS_STORAGE_CLASS)
-        # self._install_db2_data_gate_stack()
-
-        # 2. Test dg.commands.fyre.info package
+        # 1.3 Test dg.commands.fyre.info package
         self._check_hostname()
         self._get_default_size()
         self._invoke_dg_command(["fyre", "info", "get-openshift-versions-all-platforms"])
@@ -229,7 +226,7 @@ class TestFYRECommands(unittest.TestCase):
 
         TestFYRECommands._cluster_name = search_result.group(1)
 
-    def _edit_inf_node(self):
+    def _edit_inf_node(self, ignore_exception=False) -> click.testing.Result:
         args = [
             "fyre",
             "cluster",
@@ -243,7 +240,7 @@ class TestFYRECommands(unittest.TestCase):
             "--force",
         ]
 
-        self._invoke_dg_command(args)
+        return self._invoke_dg_command(args, ignore_exception)
 
     def _edit_master_node(self, node_name: str):
         args = [
@@ -263,7 +260,7 @@ class TestFYRECommands(unittest.TestCase):
 
         self._invoke_dg_command(args)
 
-    def _edit_worker_node(self, node_name: str):
+    def _edit_worker_node(self, node_name: str, ignore_exception=False) -> click.testing.Result:
         args = [
             "fyre",
             "cluster",
@@ -285,15 +282,28 @@ class TestFYRECommands(unittest.TestCase):
             "64",
         ]
 
-        self._invoke_dg_command(args)
+        return self._invoke_dg_command(args, ignore_exception)
 
     def _get_default_size(self):
         self._invoke_dg_command(["fyre", "info", "get-default-sizes", "--platform", "p"])
         self._invoke_dg_command(["fyre", "info", "get-default-sizes", "--platform", "x"])
         self._invoke_dg_command(["fyre", "info", "get-default-sizes", "--platform", "z"])
 
+    def _ignore_exception_if_regex_matches(self, result: click.testing.Result, pattern: str):
+        if (
+            result.exit_code != 0
+            and result.exception is not None
+            and isinstance(result.exception, DataGateCLIException)
+        ):
+            exception: DataGateCLIException = result.exception
+
+            if regex.match(pattern, exception.get_error_message()) is None:
+                self._check_result(result)
+            else:
+                TestFYRECommands._logger.info(f"Ignoring exception: {exception.get_error_message()}")
+
     def _install_db2_data_gate_stack(self):
-        args = ["cluster", "install-db2-data-gate-stack", "--storage-class", "nfs-client"]
+        args = ["cluster", "install-db2-data-gate-stack", "--storage-class", "managed-nfs-storage"]
 
         self._invoke_dg_command(args)
 
@@ -353,25 +363,6 @@ class TestFYRECommands(unittest.TestCase):
                 fyre_api_key,
                 "--fyre-api-user-name",
                 fyre_api_user_name,
-            ],
-        )
-
-        TestFYRECommands._check_result(result)
-
-    @classmethod
-    def _store_ibm_github_personal_access_token(cls):
-        ibm_github_personal_access_token = os.getenv("IBM_GITHUB_PERSONAL_ACCESS_TOKEN")
-
-        assert ibm_github_personal_access_token is not None
-
-        runner = click.testing.CliRunner()
-        result = runner.invoke(
-            cli,
-            [
-                "adm",
-                "store-credentials",
-                "--ibm-github-personal-access-token",
-                ibm_github_personal_access_token,
             ],
         )
 

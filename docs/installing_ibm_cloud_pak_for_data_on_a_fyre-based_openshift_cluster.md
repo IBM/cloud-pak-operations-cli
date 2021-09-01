@@ -3,19 +3,24 @@
 ## Required Credentials
 
 - [IBM Cloud Pak for Data entitlement key](https://myibm.ibm.com/products-services/containerlibrary)
-- IBM GitHub personal access token
 
 ## Linux/macOS/Windows:
 
 - Create FYRE cluster:
 
   ```bash
-  dg fyre cluster create-for-db2-data-gate --alias {alias} --cluster-name {FYRE cluster name} --ssh-key "$(cat ~/.ssh/id_rsa.pub)"
-  dg cluster use {alias}
-  dg fyre cluster ssh
+  dg fyre cluster create-for-db2-data-gate --alias *ALIAS* --cluster-name *FYRE_CLUSTER_NAME* --ssh-key "$(cat ~/.ssh/id_rsa.pub)"
+  dg cluster use *ALIAS*
+  dg fyre cluster install-nfs-storage-class
   ```
 
-## Infrastructure node:
+## IBM Cloud Pak for Data 3.5.0
+
+- Log in to infrastructure node:
+
+  ```bash
+  dg fyre cluster ssh --disable-strict-host-key-checking
+  ```
 
 - Install packages:
 
@@ -23,20 +28,31 @@
   yum install --assumeyes git python38
   ```
 
-- Install Data Gate CLI:
+- Install Db2 Data Gate CLI:
 
   ```bash
   pip3 install git+https://git@github.com/IBM/data-gate-cli.git
   ```
 
-- Execute the following Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
+- Execute the following Db2 Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
 
-  ```
+  ```bash
   dg adm download-dependencies
-  dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key {IBM Cloud Pak for Data entitlement key}
-  dg adm store-credentials --ibm-github-personal-access-token {IBM GitHub personal access token}
-  dg fyre cluster add --alias {alias} --cluster-name {FYRE cluster name} --password {kubeadmin password}
-  dg cluster use {alias}
-  dg fyre cluster install-nfs-storage-class
-  dg cluster install-db2-data-gate-stack --accept-all-licenses --storage-class nfs-client
+  dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key *IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY*
+  dg fyre cluster add --alias *ALIAS* --cluster-name *FYRE_CLUSTER_NAME* --password *KUBEADMIN_PASSWORD*
+  dg cluster use *ALIAS*
+  dg cluster install-db2-data-gate-stack --accept-all-licenses --storage-class managed-nfs-storage
+  ```
+
+## IBM Cloud Pak for Data 4.0.0
+
+- Execute the following Db2 Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
+
+  ```bash
+  dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key *IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY*
+  dg cpd4 install --storage-class managed-nfs-storage
+  dg cpd4 service install --service-name db2oltp --license *(ADVANCED|COMMUNITY|STANDARD)*
+  dg cpd4 service install --service-name db2wh --license *(ENTERPRISE|STANDARD)*
+  dg cpd4 service install --service-name dmc --license *(ENTERPRISE|STANDARD)*
+  dg cpd4 service install --service-name datagate --license *(ENTERPRISE|STANDARD)*
   ```

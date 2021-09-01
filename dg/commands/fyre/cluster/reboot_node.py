@@ -22,7 +22,7 @@ import dg.lib.click.utils
 import dg.lib.fyre.cluster
 import dg.utils.network
 
-from dg.lib.fyre.api_manager import OCPPlusAPIManager
+from dg.lib.fyre.ocp_plus_api_manager import OCPPlusAPIManager
 from dg.lib.fyre.utils.click import fyre_command_options
 from dg.lib.fyre.utils.node_name import validate_node_name
 from dg.utils.logging import loglevel_command

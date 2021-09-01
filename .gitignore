@@ -1,8 +1,7 @@
 __pycache__/
-.env
 .idea/
 .venv/
 .vscode/.ropeproject/
 build/
-dg.egg-info/
+data_gate_cli.egg-info/
 dist/

@@ -17,7 +17,6 @@ from typing import Any, Final, Optional
 from dg.lib.fyre.data.ocp_available_data import OCPAvailableData
 from dg.lib.fyre.request_managers.json_request_manager import (
     AbstractJSONRequestManager,
-    HTTPMethod,
 )
 from dg.lib.fyre.response_managers.json_response_manager import (
     AbstractJSONResponseManager,
@@ -25,6 +24,7 @@ from dg.lib.fyre.response_managers.json_response_manager import (
 from dg.lib.fyre.response_managers.ocp_available_get_response_manager import (
     OCPAvailableGetResponseManager,
 )
+from dg.utils.http_method import HTTPMethod
 
 
 class OCPAvailableManager(AbstractJSONRequestManager):

@@ -3,7 +3,6 @@ from typing import Any, Final, Optional
 from dg.lib.fyre.data.quick_burn_max_hours_data import QuickBurnMaxHoursData
 from dg.lib.fyre.request_managers.json_request_manager import (
     AbstractJSONRequestManager,
-    HTTPMethod,
 )
 from dg.lib.fyre.response_managers.json_response_manager import (
     AbstractJSONResponseManager,
@@ -11,6 +10,7 @@ from dg.lib.fyre.response_managers.json_response_manager import (
 from dg.lib.fyre.response_managers.ocp_quick_burn_max_hours_response_manager import (
     OCPQuickBurnMaxHoursResponseManager,
 )
+from dg.utils.http_method import HTTPMethod
 
 
 class OCPQuickBurnMaxHoursManager(AbstractJSONRequestManager):

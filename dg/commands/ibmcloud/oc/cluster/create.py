@@ -25,7 +25,10 @@ import dg.lib.ibmcloud.status
 
 from dg.config.cluster_credentials_manager import cluster_credentials_manager
 from dg.lib.error import IBMCloudException
-from dg.lib.ibmcloud import execute_ibmcloud_command_without_check
+from dg.lib.ibmcloud import (
+    execute_ibmcloud_command,
+    execute_ibmcloud_command_without_check,
+)
 from dg.lib.ibmcloud.install import install_cp4d_with_preinstall
 from dg.lib.ibmcloud.login import login as login_to_ibm_cloud
 from dg.lib.ibmcloud.oc.cluster.rm import delete_ibmcloud_cluster
@@ -39,7 +42,6 @@ from dg.lib.ibmcloud.status import (
     wait_for_cluster_readiness,
 )
 from dg.lib.ibmcloud.vlan_manager import VLANManager
-from dg.lib.openshift import execute_oc_command
 from dg.utils.logging import loglevel_command
 
 logger = logging.getLogger(__name__)
@@ -76,7 +78,6 @@ def validate_ocp_version(ctx, param, value) -> Optional[semver.VersionInfo]:
     help="Delete any existing cluster with the given name before creating a new one.",
     is_flag=True,
 )
-@click.option("-w", "--workaround", help="Restart openshift-dns pods after cluster creation (workaround)", is_flag=True)
 def create(
     alias: Optional[str],
     cluster_name: str,
@@ -84,7 +85,6 @@ def create(
     full_installation: bool,
     openshift_version: Optional[semver.VersionInfo],
     remove_existing: bool,
-    workaround: bool,
 ):
     """Create a new Red Hat OpenShift on IBM Cloud cluster"""
 
@@ -184,20 +184,9 @@ def create(
         },
     )
 
-    if workaround:
-        # workaround START - TODO remove when "no such host" issue is fixed
-        # (see IBM Cloud support case CS2206770)
-        logging.info("Restarting openshift-dns pods")
-        cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_cluster(server)
-
-        if cluster is None:
-            raise TypeError()
-
-        cluster.login()
-
-        execute_oc_command(["project", "openshift-dns"])
-        execute_oc_command(["delete", "pods", "--all"])
-        # workaround END
+    # without this step, "oc login …" fails with the following error:
+    # Error from server (InternalError): Internal error occurred: unexpected response: 500”
+    execute_ibmcloud_command(["oc", "cluster", "config", "--cluster", cluster_name])
 
     if full_installation:
         logging.info(

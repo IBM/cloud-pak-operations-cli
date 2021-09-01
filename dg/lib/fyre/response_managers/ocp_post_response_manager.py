@@ -37,7 +37,12 @@ class OCPPostResponseManager(AbstractJSONResponseManager):
         details = error_response["details"]
 
         if isinstance(details, str):
-            error_messages.append(f"'{details}'")
+            if "build_errors" in error_response:
+                build_errors = "', '".join(error_response["build_errors"])
+
+                error_messages.append(f"'{details}' ('{build_errors}')")
+            else:
+                error_messages.append(f"'{details}'")
         else:
             for error in details["errors"]:
                 if isinstance(error, str):
@@ -54,6 +59,12 @@ class OCPPostResponseManager(AbstractJSONResponseManager):
         return {
             "additionalProperties": False,
             "properties": {
+                "build_errors": {
+                    "items": {
+                        "type": "string",
+                    },
+                    "type": "array",
+                },
                 "details": {
                     "anyOf": [
                         {

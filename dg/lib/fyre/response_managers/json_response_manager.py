@@ -207,4 +207,4 @@ class AbstractJSONResponseManager(ABC):
         if error_response_schema is not None and jsonschema.Draft7Validator(error_response_schema).is_valid(
             json_response
         ):
-            raise DataGateCLIException(f"{error_message} ({self.get_error_message(json_response)})")
+            raise DataGateCLIException(f"{error_message} [{self.get_error_message(json_response)}]")

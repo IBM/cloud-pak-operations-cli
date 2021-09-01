@@ -4,7 +4,7 @@ from typing import Any, Optional
 
 import semver
 
-from dg.lib.cloud_pak_for_data.cpd_manager import (
+from dg.lib.cloud_pak_for_data.cpd3_manager import (
     AbstractCloudPakForDataManager,
 )
 from dg.lib.error import DataGateCLIException

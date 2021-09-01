@@ -6,14 +6,9 @@ import colorama
 
 
 class DataGateCLIException(Exception):
-    def __init__(
-        self,
-        error_message: str,
-        stderr: Optional[str] = None,
-        stdout: Optional[str] = None,
-    ):
+    def __init__(self, error_message: str, stderr: Optional[str] = None, stdout: Optional[str] = None):
         super().__init__(error_message)
-        self._error_message = error_message
+        self._error_message = error_message[7:] if error_message.startswith("Error: ") else error_message
         self._stderr = stderr
         self._stdout = stdout
 
@@ -34,10 +29,19 @@ class DataGateCLIException(Exception):
     def get_error_message(self):
         return self._error_message
 
+    @property
+    def stderr(self) -> Optional[str]:
+        return self._stderr
+
+    @property
+    def stdout(self) -> Optional[str]:
+        return self._stdout
+
 
 class IBMCloudException(DataGateCLIException):
     @classmethod
     def get_parsed_error_message(cls, error_message: str) -> str:
+        # use regex.DOTALL to match newline characters
         search_result = regex.search("FAILED\\n(.*)\\n\\n(Incident ID: .*)\\n", error_message, regex.DOTALL)
 
         if search_result is not None:
@@ -47,12 +51,19 @@ class IBMCloudException(DataGateCLIException):
 
         return output
 
-    def __init__(
-        self,
-        error_message,
-        stderr: Optional[str] = None,
-        stdout: Optional[str] = None,
-    ):
+    @classmethod
+    def get_parsed_error_message_without_incident_id(cls, error_message: str) -> str:
+        # use regex.DOTALL to match newline characters
+        search_result = regex.search("FAILED\\n(.*)\\n\\n(Incident ID: .*)\\n", error_message, regex.DOTALL)
+
+        if search_result is not None:
+            output = search_result.group(1)
+        else:
+            output = error_message
+
+        return output
+
+    def __init__(self, error_message, stderr: Optional[str] = None, stdout: Optional[str] = None):
         super().__init__(error_message, stderr, stdout)
 
     def __str__(self):
@@ -76,3 +87,13 @@ class IBMCloudException(DataGateCLIException):
 
     def _get_highlighted_str(self, str: str) -> str:
         return f"{colorama.Style.BRIGHT}{str}{colorama.Style.RESET_ALL}"
+
+
+class JmespathPathExpressionNotFoundException(DataGateCLIException):
+    def __init__(self, expresion):
+        super().__init__(f"Jmespath expression not found ({expresion})")
+
+
+class UnexpectedTypeException(DataGateCLIException):
+    def __init__(self, value):
+        super().__init__(f"Unexpected type ({type(value)})")

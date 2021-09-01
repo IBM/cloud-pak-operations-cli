@@ -1,6 +1,4 @@
-# Data Gate CLI (dg)
-
-![Banner](./resources/banner.svg)
+# Db2 Data Gate CLI (dg)
 
 <div align="center">
     <p>
@@ -12,147 +10,136 @@
     </p>
 </div>
 
-## Installation & Update
+The Db2 Data Gate CLI allows the user-friendly installation of IBM Cloud Pak for Data 3.5.0/4.0.0, Db2 (Warehouse), the IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate on OpenShift clusters. It also allows the one-click deployment of a Red Hat OpenShift on IBM Cloud cluster including the installation of IBM Cloud Pak for Data, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software.
 
-1. Install Python 3.8 or higher
+For IBM-internal users, the Db2 Data Gate CLI additionally supports managing OpenShift clusters on FYRE.
+
+## Installation & Configuration
+
+### Installation
+
+#### Python installation (3.8 or higher)
 
 - macOS (requires [Homebrew](https://brew.sh/)):
 
-```bash
-brew install python
-```
+  ```bash
+  brew install python
+  ```
 
 - Windows (requires [Chocolatey](https://chocolatey.org/)):
 
-```bash
-choco install python
-```
+  ```bash
+  choco install python
+  ```
 
-2. Install Data Gate CLI Python package (provides `dg` command)
+#### Db2 Data Gate CLI installation and update (latest release build)
 
-```bash
-pip3 install git+https://git@github.com/IBM/data-gate-cli.git
-```
+TBA [September 2021]
 
-Execute the following command to update the Data Gate CLI to the latest version:
+#### Db2 Data Gate CLI installation and update (latest development code)
 
-```bash
-dg adm update
-```
+| Operation    | Command                                                                                 |
+| ------------ | --------------------------------------------------------------------------------------- |
+| Installation | `pip3 install git+https://git@github.com/IBM/data-gate-cli.git` (provides `dg` command) |
+| Update       | `dg adm update-dev`                                                                     |
 
-## Shell completion (Linux/macOS)
+### Configuration
+
+#### Dependency download
+
+- Downloads dependencies (IBM Cloud CLI, IBM Cloud Terraform provider, OpenShift CLI, Terraform CLI)
+
+  ```bash
+  dg adm download-dependencies
+  ```
+
+#### Shell completion (Linux/macOS)
 
 - Bash: Add the following code to `.bashrc`:
 
-```bash
-. $(pip3 show dg | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-bash.sh
-```
+  ```bash
+  . $(pip3 show dg | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-bash.sh
+  ```
 
 - zsh: Add the following code to `.zshrc`:
 
-```bash
-. $(pip3 show dg | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-zsh.sh
-```
+  ```bash
+  . $(pip3 show dg | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-zsh.sh
+  ```
 
 ## Running inside a Docker container
 
-The latest version of the Data Gate CLI on the master branch can also be run inside a Docker container:
+The latest version of the Db2 Data Gate CLI on the master branch can also be run inside a Docker container:
 
 ```bash
 docker run -it quay.io/ibm/data-gate-cli:latest bash
 ```
 
+## Usage
+
+### Installation of IBM Cloud Pak for Data 3.5.0/4.0.0, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate
+
+- Register cluster:
+
+  ```bash
+  dg cluster add --alias *ALIAS* --server *SERVER* --username *USERNAME* --password *PASSWORD*
+  ```
+
+- Use cluster:
+
+  ```bash
+  dg cluster use *ALIAS*
+  ```
+
+- Store your [IBM Cloud Pak for Data entitlement key](https://myibm.ibm.com/products-services/containerlibrary):
+
+  ```bash
+  dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key *IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY*
+  ```
+
+- Install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
+
+| Version | Command                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 3.5.0   | <code>dg cpd3 install-db2-data-gate-stack --storage-class _STORAGE_CLASS_</code>                                                                                                                                                                                                                                                                                                                                                                                                 |
+| 4.0.0   | <code>dg cpd4 install --storage-class _STORAGE_CLASS_</code><br /><code>dg cpd4 service install --service-name db2oltp --license _[ADVANCED\|COMMUNITY\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name db2wh --license _[ENTERPRISE\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name dmc --license _[ENTERPRISE\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name datagate --license _[ENTERPRISE\|STANDARD]_</code> |
+
+### Installation of IBM Cloud Pak for Data 3.5.0, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software on IBM Cloud
+
+- Log in to IBM Cloud:
+
+  ```bash
+  dg ibmcloud login
+  ```
+
+- Install IBM Cloud Pak for Data, IBM Db2 Warehouse, and IBM Db2 for z/OS Data Gate:
+
+| Action                        | Command                                                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Inst. w/ an existing cluster  | <code>dg ibmcloud oc cluster install --cluster-name _CLUSTER_NAME_</code>                               |
+| Inst. w/o an existing cluster | <code>dg ibmcloud oc cluster create --alias _ALIAS_ --cluster-name _CLUSTER_NAME_ --full-install</code> |
+
+### IBM-internal
+
+- [Installing IBM Cloud Pak for Data on a FYRE-based OpenShift cluster](docs/installing_ibm_cloud_pak_for_data_on_a_fyre-based_openshift_cluster.md)
+
 ## Development
 
-### Recommended Visual Studio Code plug-ins
-
-- [Pylance](https://github.com/microsoft/pylance-release) (static type checking)
-
-### Cloning the Data Gate CLI GitHub repository
-
-```bash
-git clone git@github.com:IBM/data-gate-cli.git
-```
-
-### Creating a virtual environment
-
-Execute the following commands to create a [virtual environment](https://virtualenv.pypa.io/en/latest/) within the directory the Data Gate CLI GitHub repository was cloned into.
-
-- Linux/macOS:
-
-```bash
-pip3 install virtualenv
-virtualenv .venv
-. .venv/bin/activate
-pip3 install black flake8 isort
-pip3 install --editable .
-```
-
-- Windows:
-
-```bash
-pip3 install virtualenv
-virtualenv .venv
-.venv/Scripts/activate
-pip3 install black flake8 isort
-pip3 install --editable .
-```
-
-### Extending the Data Gate CLI
-
-The Data Gate CLI is based on the [Click package](https://palletsprojects.com/p/click/).
-
-#### Registering a new Click command
-
-To register a new Click command, add the Python module containing the command to the `commands` directory or one of its subdirectories.
-
-#### Registering a new Click group
-
-To register a new Click group, add a Python package (i.e., a directory containing a file named `__init__.py`) to the `commands` directory or one of its subdirectories. Furthermore, add the following code to `__init__.py` to automatically register Click commands within Python modules contained in the package:
-
-```python
-import sys
-
-import click
-
-from dg.lib.click.lazy_loading_multi_command import (
-    create_click_multi_command_class,
-)
-
-
-@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
-def {Click group name}():
-    pass
-```
-
-#### Running unit tests
-
-Unit tests are based on the `unittest` package and contained in the `test` package. Execute the following command to execute all unit tests within your virtual environment:
-
-```bash
-python -m unittest discover tests.test
-```
-
-#### References
-
-- [Coding Guidelines](docs/coding_guidelines.md)
+- [Development Guide](docs/development_guide.md)
 
 ## Known issues
 
-### macOS
+### OpenShift Client CLI (macOS)
 
-```
-Unable to connect to the server: dial tcp: lookup {OpenShift cluster} on {DNS name server}:53: no such host
+```bash
+Unable to connect to the server: dial tcp: lookup *OPENSHIFT_CLUSTER* on *DNS_NAME_SERVER*:53: no such host
 ```
 
 - [GitHub issue](https://github.com/openshift/oc/issues/315)
 - Workaround: Edit `/etc/hosts` and add IP address of OpenShift cluster
-- Example:
 
-```
-9.AA.BBB.CC your.cluster.domain.com
-```
+  - Example:
 
-## IBM-internal
-
-- [Installing IBM Cloud Pak for Data on a FYRE-based OpenShift cluster](docs/installing_ibm_cloud_pak_for_data_on_a_fyre-based_openshift_cluster.md)
+    ```
+    9.AA.BBB.CC your.cluster.domain.com
+    ```

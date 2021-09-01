@@ -23,15 +23,19 @@ class AbstractCluster(ABC):
         self.cluster_data = cluster_data
         self.server = server
 
-    @abstractmethod
-    def get_cluster_access_token(self) -> str:
-        pass
-
     def get_cluster_data(self) -> ClusterData:
         return self.cluster_data
 
+    @abstractmethod
+    def get_password(self) -> str:
+        pass
+
     def get_server(self) -> str:
         return self.server
+
+    @abstractmethod
+    def get_username(self) -> str:
+        pass
 
     @abstractmethod
     def login(self):

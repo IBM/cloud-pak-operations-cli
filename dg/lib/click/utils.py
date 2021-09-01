@@ -15,16 +15,22 @@
 import json
 import pathlib
 
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 import click
 
 import dg.config.cluster_credentials_manager
-import dg.lib.openshift
+import dg.lib.openshift.oc
 
-from dg.lib.cloud_pak_for_data.cpd_manager import (
+from dg.lib.cloud_pak_for_data.cpd3_manager import (
     CloudPakForDataAssemblyBuildType,
 )
+from dg.lib.openshift.credentials.cluster_based_user_credentials import (
+    ClusterBasedUserCredentials,
+)
+from dg.lib.openshift.credentials.credentials import AbstractCredentials
+from dg.lib.openshift.credentials.token_credentials import TokenCredentials
+from dg.lib.openshift.credentials.user_credentials import UserCredentials
 
 
 def check_cloud_pak_for_data_options(
@@ -84,33 +90,106 @@ def create_default_map_from_json_file(path: pathlib.Path):
     return default_map_dict
 
 
-def get_oc_login_command_for_remote_host(ctx: click.Context, options: Dict[str, Any]) -> str:
-    result: str
+def get_cluster_credentials(ctx: click.Context, options: Dict[str, Any]) -> AbstractCredentials:
+    """Returns cluster credentials based on the options passed to a Click
+    command or the current cluster
+
+    Parameters
+    ----------
+    ctx
+        Click context
+    options
+        options passed to a Click command
+
+    Returns
+    -------
+    AbstractCredentials
+        cluster credentials
+    """
+
+    insecure_skip_tls_verify: Optional[bool] = (
+        options["insecure_skip_tls_verify"] if "insecure_skip_tls_verify" in options else None
+    )
+
+    result: Optional[AbstractCredentials] = None
 
     if (
-        ("username" in options)
+        ("server" in options)
+        and (options["server"] is not None)
+        and ("username" in options)
         and (options["username"] is not None)
         and ("password" in options)
         and (options["password"] is not None)
+        and (("token" not in options) or (options["token"] is None))
     ):
-        result = dg.lib.openshift.get_oc_login_command_with_password_for_remote_host(
+        result = UserCredentials(
+            options["server"],
+            options["username"],
+            options["password"],
+            insecure_skip_tls_verify if insecure_skip_tls_verify is not None else False,
+        )
+    elif (
+        ("server" in options)
+        and (options["server"] is not None)
+        and (("username" not in options) or (options["username"] is None))
+        and (("password" not in options) or (options["password"] is None))
+        and ("token" in options)
+        and (options["token"] is not None)
+    ):
+        result = TokenCredentials(
+            options["server"],
+            options["token"],
+            insecure_skip_tls_verify if insecure_skip_tls_verify is not None else False,
+        )
+    elif (
+        current_cluster := dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
+    ) is not None:
+        result = ClusterBasedUserCredentials(current_cluster, insecure_skip_tls_verify)
+    else:
+        raise click.UsageError(
+            "You must either set options --server/--username/--password, --server/--token, or set a current cluster.",
+            ctx,
+        )
+
+    return result
+
+
+def get_oc_login_command_for_remote_host(ctx: click.Context, options: Dict[str, Any]) -> str:
+    result: Optional[str] = None
+
+    if (
+        ("server" in options)
+        and (options["server"] is not None)
+        and ("username" in options)
+        and (options["username"] is not None)
+        and ("password" in options)
+        and (options["password"] is not None)
+        and (("token" not in options) or (options["token"] is None))
+    ):
+        result = dg.lib.openshift.oc.get_oc_login_command_with_password_for_remote_host(
             options["server"], options["username"], options["password"]
         )
-    elif ("token" in options) and (options["token"] is not None):
-        result = dg.lib.openshift.get_oc_login_command_with_token_for_remote_host(options["server"], options["token"])
+    elif (
+        ("server" in options)
+        and (options["server"] is not None)
+        and (("username" not in options) or (options["username"] is None))
+        and (("password" not in options) or (options["password"] is None))
+        and ("token" in options)
+        and (options["token"] is not None)
+    ):
+        result = dg.lib.openshift.oc.get_oc_login_command_with_token_for_remote_host(
+            options["server"], options["token"]
+        )
+    elif (
+        current_cluster := dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
+    ) is not None:
+        result = dg.lib.openshift.oc.get_oc_login_command_with_password_for_remote_host(
+            current_cluster.get_server(), current_cluster.get_username(), current_cluster.get_password()
+        )
     else:
-        current_cluster = dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
-
-        if current_cluster is None:
-            raise click.UsageError(
-                "You must either set options '--server' and '--password', '--token', or set a current cluster.",
-                ctx,
-            )
-
-        cluster_data = current_cluster.get_cluster_data()
-
-        result = dg.lib.openshift.get_oc_login_command_with_password_for_remote_host(
-            cluster_data["server"], cluster_data["username"], cluster_data["password"]
+        raise click.UsageError(
+            "You must either set options --server/--username/--password, --server/--token, or set a current cluster.",
+            ctx,
         )
 
     return result
@@ -118,18 +197,32 @@ def get_oc_login_command_for_remote_host(ctx: click.Context, options: Dict[str, 
 
 def log_in_to_openshift_cluster(ctx: click.Context, options: Dict[str, Any]):
     if (
-        ("username" in options)
+        ("server" in options)
+        and (options["server"] is not None)
+        and ("username" in options)
         and (options["username"] is not None)
         and ("password" in options)
         and (options["password"] is not None)
+        and (("token" not in options) or (options["token"] is None))
     ):
-        dg.lib.openshift.log_in_to_openshift_cluster_with_password(
+        dg.lib.openshift.oc.log_in_to_openshift_cluster_with_password(
             options["server"], options["username"], options["password"]
         )
-    elif ("token" in options) and (options["token"] is not None):
-        dg.lib.openshift.log_in_to_openshift_cluster_with_token(options["server"], options["token"])
+    elif (
+        ("server" in options)
+        and (options["server"] is not None)
+        and (("username" not in options) or (options["username"] is None))
+        and (("password" not in options) or (options["password"] is None))
+        and ("token" in options)
+        and (options["token"] is not None)
+    ):
+        dg.lib.openshift.oc.log_in_to_openshift_cluster_with_token(options["server"], options["token"])
+    elif (
+        current_cluster := dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
+    ) is not None:
+        current_cluster.login()
     else:
         raise click.UsageError(
-            "You must either set options '--server' and '--password', '--token', or set a current cluster.",
+            "You must either set options --server/--username/--password, --server/--token, or set a current cluster.",
             ctx,
         )

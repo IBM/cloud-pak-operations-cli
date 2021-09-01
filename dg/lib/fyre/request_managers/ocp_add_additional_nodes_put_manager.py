@@ -2,7 +2,6 @@ from typing import Any, Final, Optional
 
 from dg.lib.fyre.request_managers.json_request_manager import (
     AbstractJSONRequestManager,
-    HTTPMethod,
 )
 from dg.lib.fyre.response_managers.default_response_manager import (
     DefaultResponseManager,
@@ -10,6 +9,7 @@ from dg.lib.fyre.response_managers.default_response_manager import (
 from dg.lib.fyre.response_managers.json_response_manager import (
     AbstractJSONResponseManager,
 )
+from dg.utils.http_method import HTTPMethod
 
 
 class OCPAddAdditionalNodesPutManager(AbstractJSONRequestManager):

@@ -24,12 +24,12 @@ import dg.config
 import dg.lib.click.utils
 import dg.utils.network
 
-from dg.lib.fyre.api_manager import OCPPlusAPIManager
 from dg.lib.fyre.data.ocpplus_cluster_specification import (
     HAProxyTimoutSettings,
     OCPPlusClusterSpecification,
     WorkerNodeSettings,
 )
+from dg.lib.fyre.ocp_plus_api_manager import OCPPlusAPIManager
 from dg.lib.fyre.utils.click import fyre_command_optgroup_options
 from dg.utils.logging import loglevel_command
 
@@ -83,7 +83,7 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
 )
 @optgroup.option("--haproxy-timeout-queue", callback=validate_haproxy_timeout_setting, help="HAProxy queue timeout")
 @optgroup.option("--haproxy-timeout-server", callback=validate_haproxy_timeout_setting, help="HAProxy server timeout")
-@optgroup.option("--ocp_version", callback=validate_ocp_version, help="OpenShift version")
+@optgroup.option("--ocp-version", callback=validate_ocp_version, help="OpenShift version")
 @optgroup.option("--platform", help="Platform", type=click.Choice(["p", "x", "z"]))
 @optgroup.option("--product-group-id", help="FYRE product group ID", type=click.INT)
 @optgroup.option("--pull-secret", help="Pull secret")

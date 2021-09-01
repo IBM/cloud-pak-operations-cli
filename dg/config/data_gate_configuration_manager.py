@@ -22,7 +22,7 @@ from dg.lib.error import DataGateCLIException
 
 
 class DataGateConfigurationManager:
-    """Manages the Data Gate CLI configuration"""
+    """Manages the Db2 Data Gate CLI configuration"""
 
     def are_fyre_commands_hidden(self) -> bool:
         """Returns whether FYRE options shall be displayed in help texts. The
@@ -116,12 +116,12 @@ class DataGateConfigurationManager:
         return self.get_dg_directory_path() / "credentials.json"
 
     def get_dg_directory_path(self) -> pathlib.Path:
-        """Return the path of the Data Gate CLI directory
+        """Return the path of the Db2 Data Gate CLI directory
 
         Returns
         -------
         pathlib.Path
-            path of the Data Gate CLI directory
+            path of the Db2 Data Gate CLI directory
         """
 
         return self.get_home_directory_path() / ".dg"

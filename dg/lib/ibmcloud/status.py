@@ -18,7 +18,7 @@ from typing import Any
 
 import dg.utils.logging
 
-from dg.lib.error import DataGateCLIException
+from dg.lib.error import DataGateCLIException, IBMCloudException
 from dg.lib.ibmcloud import execute_ibmcloud_command
 from dg.lib.ibmcloud.oc.cluster.ls import list_existing_clusters
 from dg.utils.wait import wait_for
@@ -30,10 +30,10 @@ class ClusterStatus:
 
     def __str__(self) -> str:
         # TODO improve output
-        return json.dumps(self._status_output, indent="\t", sort_keys=True)
+        return self.get_json()
 
     def get_json(self) -> str:
-        return self._status_output
+        return json.dumps(self._status_output, indent="\t", sort_keys=True)
 
     def get_server_url(self) -> str:
         result = ""
@@ -56,6 +56,7 @@ class ClusterStatus:
         if (
             ("ingressHostname" in self._status_output)
             and (self._status_output["ingressHostname"] != "")
+            and (self._status_output["ingressStatus"] == "healthy")
             and (self._status_output["masterHealth"] == "normal")
             and (self._status_output["masterState"] == "deployed")
             and (self._status_output["masterStatus"] == "Ready")
@@ -67,7 +68,7 @@ class ClusterStatus:
 
 
 def get_cluster_status(cluster_name: str) -> ClusterStatus:
-    """Returns the status of the given cluster
+    """Returns the status of the cluster with the given name
 
     Parameters
     ----------
@@ -76,8 +77,8 @@ def get_cluster_status(cluster_name: str) -> ClusterStatus:
 
     Returns
     -------
-    Status
-        status of the given cluster
+    ClusterStatus
+        status of the cluster with the given name
     """
 
     args = ["oc", "cluster", "get", "--cluster", cluster_name, "--json"]
@@ -108,8 +109,16 @@ def _cluster_not_exists(cluster_name: str) -> bool:
     return not cluster_exists(cluster_name)
 
 
-def _is_cluster_ready(cluster_name: str):
-    return get_cluster_status(cluster_name).is_ready()
+def _is_cluster_ready(cluster_name: str) -> bool:
+    result = False
+
+    try:
+        result = get_cluster_status(cluster_name).is_ready()
+    except IBMCloudException as exception:
+        if not _service_is_unavailable(exception):
+            raise exception
+
+    return result
 
 
 def wait_for_cluster_deletion(cluster_name: str):
@@ -123,24 +132,26 @@ def wait_for_cluster_deletion(cluster_name: str):
 
 
 def wait_for_cluster_readiness(cluster_name: str):
-    """Waits for the given cluster to be completely ready. This includes availability of the ingress hostname.
+    """Waits for the cluster with the given name to be ready
 
     Parameters
     ----------
     cluster_name
-        name of the cluster whose status shall be returned
+        name of the cluster whose readiness shall be waited for
     """
 
-    try:
-        with dg.utils.logging.ScopedLoggingDisabler():
-            wait_for(
-                3600,
-                30,
-                f"Cluster creation for cluster {cluster_name}",
-                _is_cluster_ready,
-                cluster_name,
-            )
-    except Exception:
-        raise DataGateCLIException(
-            f"Timeout for cluster creation exceeded, current cluster status:\n{get_cluster_status(cluster_name)}"
+    with dg.utils.logging.ScopedLoggingDisabler():
+        wait_for(
+            5400,
+            30,
+            f"Cluster creation for cluster {cluster_name}",
+            _is_cluster_ready,
+            cluster_name,
         )
+
+
+def _service_is_unavailable(exception: IBMCloudException) -> bool:
+    return (
+        IBMCloudException.get_parsed_error_message_without_incident_id(exception.get_error_message())
+        == "Error response from server. Status code: 503"
+    )

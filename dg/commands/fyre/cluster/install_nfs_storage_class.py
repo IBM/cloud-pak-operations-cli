@@ -12,17 +12,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import asyncio
-
 from typing import Optional
 
 import click
 
 import dg.config.cluster_credentials_manager
 import dg.lib.click.utils
-import dg.lib.fyre.utils.nfs
+import dg.lib.fyre.utils.network
 import dg.utils.network
 
+from dg.lib.fyre.ocp_plus_api_manager import OCPPlusAPIManager
+from dg.lib.fyre.utils.click import fyre_command_options
+from dg.lib.openshift.nfs.nfs_subdir_external_provisioner import (
+    NFSSubdirExternalProvisioner,
+)
 from dg.utils.logging import loglevel_command
 
 
@@ -31,37 +34,36 @@ from dg.utils.logging import loglevel_command
         dg.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.option("--infrastructure-node-hostname", help="Infrastructure node hostname", required=True)
-@click.option("--server", help="OpenShift API server URL", required=True)
-@click.option("--username", help="OpenShift username")
-@click.option("--password", help="OpenShift password")
-@click.option("--token", help="OpenShift OAuth access token")
+@fyre_command_options
 @click.option(
-    "--ibm-github-personal-access-token",
-    help="IBM GitHub personal access token (see https://github.ibm.com/settings/tokens)",
+    "--cluster-name", help="Name of the OCP+ cluster on which the NFS storage class shall be installed", required=True
 )
+@click.option(
+    "--project",
+    default="default",
+    help="Project used to install the Kubernetes NFS Subdir External Provisioner",
+    required=True,
+)
+@click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
 @click.pass_context
 def install_nfs_storage_class(
     ctx: click.Context,
-    infrastructure_node_hostname: str,
-    server: str,
-    username: Optional[str],
-    password: Optional[str],
-    token: Optional[str],
-    ibm_github_personal_access_token: str,
+    fyre_api_user_name: str,
+    fyre_api_key: str,
+    cluster_name: str,
+    project: str,
+    site: Optional[str],
 ):
     """Install NFS storage class"""
 
-    if dg.utils.network.is_hostname_localhost(infrastructure_node_hostname):
-        dg.lib.click.utils.log_in_to_openshift_cluster(ctx, locals().copy())
-        dg.lib.fyre.utils.nfs.install_nfs_storage_class(ibm_github_personal_access_token)
-    else:
-        oc_login_command_for_remote_host = dg.lib.click.utils.get_oc_login_command_for_remote_host(ctx, locals().copy())
+    dg.utils.network.disable_insecure_request_warning()
 
-        asyncio.get_event_loop().run_until_complete(
-            dg.lib.fyre.utils.nfs.install_nfs_storage_class_on_remote_host(
-                infrastructure_node_hostname,
-                ibm_github_personal_access_token,
-                oc_login_command_for_remote_host,
-            )
-        )
+    nfs_server = (
+        OCPPlusAPIManager(fyre_api_user_name, fyre_api_key)
+        .get_cluster_details(cluster_name, site)
+        .get_private_ip_address_of_infrastructure_node()
+    )
+
+    NFSSubdirExternalProvisioner(
+        dg.lib.click.utils.get_cluster_credentials(ctx, locals().copy()), project, nfs_server, "/data"
+    ).install_nfs_subdir_external_provisioner()
