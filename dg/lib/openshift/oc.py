@@ -253,21 +253,6 @@ def get_deployment_name(search_string: str) -> List[str]:
     return result
 
 
-def infer_custom_resource_id_from_deployment_name(deployment_name: str) -> str:
-    result = ""
-    m = re.match(r"dg-([0-9]+)-data-gate", deployment_name)
-
-    if m.group(1):
-        result = "dg" + m.group(1)
-        logging.debug(f"Custom resource id: {result}")
-    else:
-        raise DataGateCLIException(
-            f"Unable to retrieve custom resource id for Data Gate deployment name '{deployment_name}'"
-        )
-
-    return result
-
-
 def scale_deployment(deployment_name: str, scale_factor: int):
     """Scale a given Openshift deployment to a given scale factor"""
 
@@ -276,28 +261,31 @@ def scale_deployment(deployment_name: str, scale_factor: int):
     execute_oc_command(oc_scale_deployment_args)
 
 
-def get_current_data_gate_instance_service_custom_resource(data_gate_instance_id: str) -> dict:
-    """Get the custom resource for a given data gate instance id"""
+def wait_until_deployment_rollout_completes(deployment_name: str, timeout: str):
+    """Wait until a deployment change is rolled out for a particular deployment"""
 
-    oc_get_custom_resource_args = ["get", "datagateinstanceservice", data_gate_instance_id, "-o", "json"]
+    oc_rollout_status_args = ["rollout", "status", "deployment", deployment_name, "--watch"]
+    if timeout:
+        oc_rollout_status_args.extend(["--timeout", timeout])
 
-    oc_get_custom_resource_result = json.loads(execute_oc_command(oc_get_custom_resource_args, capture_output=True).stdout)
+    result = execute_oc_command(oc_rollout_status_args)
+
+    if result.return_code != 0:
+        raise DataGateCLIException(f"Rollout of deployment '{deployment_name}' failed with rc={result.return_code}'")
+
+
+def get_custom_resource(custom_resource_kind: str, custom_resource_id: str) -> dict:
+    """Get the custom resource for a given kind and id"""
+
+    oc_get_custom_resource_args = ["get", custom_resource_kind, custom_resource_id, "-o", "json"]
+
+    oc_get_custom_resource_result = json.loads(
+        execute_oc_command(oc_get_custom_resource_args, capture_output=True).stdout
+    )
     return oc_get_custom_resource_result
 
 
-def replace_image_in_data_gate_instance_service_custom_resource(custom_resource_json: dict, component: str, image_tag: str, pull_prefix: str) -> dict:
-    if "image_tags" not in custom_resource_json["spec"]:
-        custom_resource_json["spec"]["image_tags"] = {}
-
-    custom_resource_json["spec"]["image_tags"][component] = image_tag
-
-    if "pull_prefix" not in custom_resource_json["spec"]:
-        custom_resource_json["spec"]["pull_prefix"] = {}
-
-    custom_resource_json["spec"]["pull_prefix"][component] = pull_prefix
-
-
-def set_data_gate_instance_service_custom_resouce(custom_resource_json: dict):
+def replace_custom_resource(custom_resource_json: dict):
     with tempfile.NamedTemporaryFile(mode="w+") as tmp:
         json.dump(custom_resource_json, tmp)
         tmp.flush()

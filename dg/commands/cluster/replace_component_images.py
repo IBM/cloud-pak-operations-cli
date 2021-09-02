@@ -12,19 +12,26 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List
+import logging
+import re
 
 import click
 
-import dg.config.cluster_credentials_manager
-import dg.lib.openshift.oc
-
+from dg.lib.error import DataGateCLIException
+from dg.lib.openshift import oc
 from dg.utils.logging import loglevel_command
 
 
 @loglevel_command()
 @click.option("--deployment-name", help="OpenShift deployment name")
 @click.option("--pull-prefix", help="Pull prefix of the new component(s)")
+@click.option(
+    "--timeout",
+    help="""
+            Timeout for completing the deployment rollout (cf. oc rollout status)
+            If omitted or specified as 0s, the operation will wait until the rollout completes.
+""",
+)
 @click.option("--container-stunnel", help="container-stunnel image tag")
 @click.option("--container-stunnel-init", help="container-stunnel-init image tag")
 @click.option("--data-gate-apply", help="data-gate-apply image tag")
@@ -35,6 +42,7 @@ from dg.utils.logging import loglevel_command
 def replace_component_images(
     deployment_name: str,
     pull_prefix: str,
+    timeout: str,
     container_stunnel: str,
     container_stunnel_init: str,
     data_gate_apply: str,
@@ -46,10 +54,9 @@ def replace_component_images(
     """Replace a single or multiple specific component(s) of a given deployment.
     The pull prefix has to be the same for all components to be replaced."""
 
-    # if the user didn't specify a deployment name, search for "data-gate" in the available deployments and use the first result
-    deployment_name = (
-        deployment_name if (deployment_name is not None) else dg.lib.openshift.oc.get_deployment_name("data-gate")[0]
-    )
+    # if the user didn't specify a deployment name, search for "data-gate" in
+    # the available deployments and use the first result
+    deployment_name = deployment_name if (deployment_name is not None) else oc.get_deployment_name("data-gate")[0]
 
     components = {}
     if container_stunnel:
@@ -67,16 +74,50 @@ def replace_component_images(
     if data_gate_ui:
         components["datagate_ui"] = data_gate_ui
 
-    dg.lib.openshift.oc.scale_deployment(deployment_name, 0)
+    oc.scale_deployment(deployment_name, 0)
+    oc.wait_until_deployment_rollout_completes(deployment_name, timeout)
 
-    dg_id = dg.lib.openshift.oc.infer_custom_resource_id_from_deployment_name(deployment_name)
-    custom_resource_json = dg.lib.openshift.oc.get_current_data_gate_instance_service_custom_resource(dg_id)
+    dg_id = _infer_custom_resource_id_from_deployment_name(deployment_name)
+    custom_resource_json = oc.get_custom_resource("datagateinstanceservice", dg_id)
 
     for component, image_tag in components.items():
-        dg.lib.openshift.oc.replace_image_in_data_gate_instance_service_custom_resource(
+        _replace_image_in_data_gate_instance_service_custom_resource(
             custom_resource_json, component, image_tag, pull_prefix
         )
 
-    dg.lib.openshift.oc.set_data_gate_instance_service_custom_resouce(custom_resource_json)
+    oc.replace_custom_resource(custom_resource_json)
 
-    dg.lib.openshift.oc.scale_deployment(deployment_name, 1)
+    oc.scale_deployment(deployment_name, 1)
+    oc.wait_until_deployment_rollout_completes(deployment_name, timeout)
+
+
+def _infer_custom_resource_id_from_deployment_name(deployment_name: str) -> str:
+    result = ""
+    m = re.match(r"dg-([0-9]+)-data-gate", deployment_name)
+
+    if m and m.group(1):
+        result = "dg" + m.group(1)
+        logging.debug(f"Custom resource id: {result}")
+    else:
+        raise DataGateCLIException(
+            f"Unable to retrieve custom resource id for Data Gate deployment name '{deployment_name}'"
+        )
+
+    return result
+
+
+def _replace_image_in_data_gate_instance_service_custom_resource(
+    custom_resource_json: dict, component: str, image_tag: str, pull_prefix: str
+) -> dict:
+    if "image_tags" not in custom_resource_json["spec"]:
+        custom_resource_json["spec"]["image_tags"] = {}
+
+    custom_resource_json["spec"]["image_tags"][component] = image_tag
+
+    if pull_prefix:
+        if "pull_prefix" not in custom_resource_json["spec"]:
+            custom_resource_json["spec"]["pull_prefix"] = {}
+
+        custom_resource_json["spec"]["pull_prefix"][component] = pull_prefix
+
+    return custom_resource_json
