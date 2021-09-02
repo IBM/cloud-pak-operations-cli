@@ -40,6 +40,7 @@ from dg.lib.ibmcloud.status import (
     cluster_exists,
     wait_for_cluster_deletion,
     wait_for_cluster_readiness,
+    wait_for_ingress_readiness,
 )
 from dg.lib.ibmcloud.vlan_manager import VLANManager
 from dg.utils.logging import loglevel_command
@@ -172,6 +173,11 @@ def create(
 
     logging.info(f"Waiting for creation of cluster '{cluster_name}' to complete:")
     wait_for_cluster_readiness(cluster_name)
+    # although the /global/v2/getCluster REST endpoint returns the status of
+    # Ingress components, it is only set once the /global/v2/alb/getStatus
+    # REST endpoint was called, which also returns the status of Ingress components
+    logging.info(f"Waiting for Ingress components status of cluster '{cluster_name}' to be healthy:")
+    wait_for_ingress_readiness(cluster_name)
 
     server = dg.lib.ibmcloud.status.get_cluster_status(cluster_name).get_server_url()
 
