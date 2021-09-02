@@ -56,12 +56,24 @@ class ClusterStatus:
         if (
             ("ingressHostname" in self._status_output)
             and (self._status_output["ingressHostname"] != "")
-            and (self._status_output["ingressStatus"] == "healthy")
             and (self._status_output["masterHealth"] == "normal")
             and (self._status_output["masterState"] == "deployed")
             and (self._status_output["masterStatus"] == "Ready")
             and (self._status_output["state"] == "normal")
         ):
+            result = True
+
+        return result
+
+
+class IngressStatus:
+    def __init__(self, status_output: Any):
+        self._status_output = status_output
+
+    def is_ready(self) -> bool:
+        result = False
+
+        if ("status" in self._status_output) and (self._status_output["status"] == "healthy"):
             result = True
 
         return result
@@ -86,6 +98,36 @@ def get_cluster_status(cluster_name: str) -> ClusterStatus:
 
     try:
         status = ClusterStatus(json.loads(command_result.stdout))
+
+        return status
+    except json.JSONDecodeError as exception:
+        command_string = "ibmcloud " + " ".join(args)
+
+        raise DataGateCLIException(
+            f"Invalid JSON received from command {command_string}:\n{command_result.stdout}"
+        ) from exception
+
+
+def get_ingress_status(cluster_name: str) -> IngressStatus:
+    """Returns the status of Ingress components of the cluster with the
+    given name
+
+    Parameters
+    ----------
+    cluster_name
+        name of the cluster whose status of Ingress components shall be returned
+
+    Returns
+    -------
+    IngressStatus
+        status of Ingress components of the cluster with the given name
+    """
+
+    args = ["ks", "ingress", "status", "--cluster", cluster_name, "--json"]
+    command_result = execute_ibmcloud_command(args, capture_output=True)
+
+    try:
+        status = IngressStatus(json.loads(command_result.stdout))
 
         return status
     except json.JSONDecodeError as exception:
@@ -121,6 +163,18 @@ def _is_cluster_ready(cluster_name: str) -> bool:
     return result
 
 
+def _is_ingress_ready(cluster_name: str) -> bool:
+    result = False
+
+    try:
+        result = get_ingress_status(cluster_name).is_ready()
+    except IBMCloudException as exception:
+        if not _service_is_unavailable(exception):
+            raise exception
+
+    return result
+
+
 def wait_for_cluster_deletion(cluster_name: str):
     wait_for(
         1200,
@@ -144,8 +198,29 @@ def wait_for_cluster_readiness(cluster_name: str):
         wait_for(
             5400,
             30,
-            f"Cluster creation for cluster {cluster_name}",
+            f"Waiting for creation of cluster '{cluster_name}'",
             _is_cluster_ready,
+            cluster_name,
+        )
+
+
+def wait_for_ingress_readiness(cluster_name: str):
+    """Waits for the status of Ingress components of the cluster with the
+    given name to be healthy
+
+    Parameters
+    ----------
+    cluster_name
+        name of the cluster whose status of Ingress components shall be waited
+        for
+    """
+
+    with dg.utils.logging.ScopedLoggingDisabler():
+        wait_for(
+            1800,
+            30,
+            f"Waiting for Ingress components status of cluster '{cluster_name}' to be healthy",
+            _is_ingress_ready,
             cluster_name,
         )
 
