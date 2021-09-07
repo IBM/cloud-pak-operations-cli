@@ -127,8 +127,8 @@ class TestFYRECommands(unittest.TestCase):
 
         self._ignore_exception_if_regex_matches(
             result,
-            "Failed to add additional disk \\(HTTP status code: 400\\) \\['product_group disk quota exceeded for "
-            "platform [p|x|z] for site (rtp|svl) for product group id \\d+'\\]",
+            "Failed to .* \\(HTTP status code: 400\\) \\['product_group (disk|memory) quota exceeded for platform "
+            "[p|x|z] for site (rtp|svl) for product group id \\d+'\\]",
         )
 
         self._edit_master_node("master0")
@@ -137,8 +137,8 @@ class TestFYRECommands(unittest.TestCase):
 
         self._ignore_exception_if_regex_matches(
             result,
-            "Failed to add additional disk \\(HTTP status code: 400\\) \\['product_group disk quota exceeded for "
-            "platform [p|x|z] for site (rtp|svl) for product group id \\d+'\\]",
+            "Failed to .* \\(HTTP status code: 400\\) \\['product_group (disk|memory) quota exceeded for platform "
+            "[p|x|z] for site (rtp|svl) for product group id \\d+'\\]",
         )
 
         self._cluster_action_without_force(ClusterActionWithoutForce.DISABLE_DELETE)

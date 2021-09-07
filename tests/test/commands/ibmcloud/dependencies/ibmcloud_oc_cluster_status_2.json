@@ -22,7 +22,7 @@
     "targetVersion": "4.3.31_1536_openshift",
     "ingressHostname": "foo.bar",
     "ingressSecretName": "",
-    "ingressStatus": "healthy",
+    "ingressStatus": "",
     "ingressMessage": "",
     "ownerEmail": "",
     "logOrg": "",

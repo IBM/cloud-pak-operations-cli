@@ -13,7 +13,7 @@ pipeline {
 					cloud 'icp-production'
 					customWorkspace '/home/dwabuild/workspace'
 					slaveConnectTimeout '300'
-					yaml libraryResource('podspecs/centoscppbuild-latest-small-x86.yml')
+					yaml libraryResource('podspecs/centoscppbuild-experimental-small-x86.yml')
 				}
 			}
 			environment {
