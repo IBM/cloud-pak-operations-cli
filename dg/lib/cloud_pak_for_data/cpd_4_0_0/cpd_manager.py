@@ -69,7 +69,7 @@ logger = logging.getLogger(__name__)
 
 
 class CloudPakForDataManager:
-    """IBM Cloud Pak for Data 4.0.0 management class"""
+    """IBM Cloud Pak for Data 4.0.x management class"""
 
     def __init__(self, credentials: AbstractCredentials):
         self._cpd_service_manager = CloudPakForDataServiceManager()
@@ -748,7 +748,9 @@ class CloudPakForDataManager:
                     continue
 
                 self._create_operator_subscription(
-                    project,
+                    subscription_metadata.required_namespace
+                    if subscription_metadata.required_namespace is not None
+                    else project,
                     dependent_operator_name,
                     created_dependent_subscriptions + [dependent_subscription_name],
                 )

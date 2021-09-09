@@ -17,17 +17,23 @@ from typing import TypedDict
 from dg.lib.openshift.types.object_meta import ObjectMeta
 
 
-class SubscriptionSpec(TypedDict, total=False):
-    channel: str
-    config: str
-    installPlanApproval: str
+class SubscriptionSpecRequired(TypedDict):
     name: str
     source: str
     sourceNamespace: str
-    startingCSV: str
 
 
-class Subscription(TypedDict, total=False):
+class SubscriptionSpec(SubscriptionSpecRequired, total=False):
+    channel: str
+    installPlanApproval: str
+
+
+class SubscriptionRequired(TypedDict):
+    metadata: ObjectMeta
+    spec: SubscriptionSpec
+
+
+class Subscription(SubscriptionRequired, total=False):
     """
     Notes
     -----
@@ -36,5 +42,3 @@ class Subscription(TypedDict, total=False):
 
     apiVersion: str
     kind: str
-    metadata: ObjectMeta
-    spec: SubscriptionSpec

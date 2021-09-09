@@ -46,7 +46,7 @@ class CloudPakForDataServiceManager:
                 operator_name="ibm-datagate-operator",
                 spec={
                     "datagate": "yes",
-                    "version": "4.0.0",
+                    "version": "2.0.1",
                 },
                 status_key_name="datagateStatus",
                 storage_option_required=True,
@@ -94,7 +94,7 @@ class CloudPakForDataServiceManager:
                 name="dmc-addon",
                 operator_name="ibm-dmc-operator",
                 spec={
-                    "version": "4.0.0",
+                    "version": "4.0.1",
                 },
                 status_key_name="dmcAddonStatus",
                 storage_option_required=False,
@@ -110,13 +110,18 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-cpd-ae-operator-subscription",
                 },
                 name="ibm-cpd-ae-operator-subscription",
+                required_namespace=None,
                 service=True,
-                spec=SubscriptionMetadataSpec(channel="stable-v1", name="analyticsengine-operator"),
+                spec=SubscriptionMetadataSpec(
+                    channel="stable-v1",
+                    name="analyticsengine-operator",
+                ),
             ),
             "cloud-native-postgresql": SubscriptionMetadata(
                 dependencies=[],
                 labels={},
                 name="cloud-native-postgresql-catalog-subscription",
+                required_namespace="openshift-operators",
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="stable",
@@ -128,16 +133,18 @@ class CloudPakForDataServiceManager:
                 dependencies=[],
                 labels={},
                 name="cpd-operator",
+                required_namespace=None,
                 service=False,
                 spec=SubscriptionMetadataSpec(
-                    channel="stable-v1",
+                    channel="v2.0",
                     name="cpd-platform-operator",
                 ),
             ),
             "db2u-operator": SubscriptionMetadata(
                 dependencies=[],
                 labels={},
-                name="ibm-db2uoperator-catalog-subscription",
+                name="ibm-db2u-operator",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.1",
@@ -145,12 +152,15 @@ class CloudPakForDataServiceManager:
                 ),
             ),
             "ibm-bigsql-operator": SubscriptionMetadata(
-                dependencies=[],
+                dependencies=[
+                    "db2u-operator",
+                ],
                 labels={},
                 name="ibm-bigsql-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
-                    channel="v1.0",
+                    channel="v7.2",
                     name="ibm-bigsql-operator",
                 ),
             ),
@@ -162,9 +172,10 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-ca-operator",
                 },
                 name="ibm-ca-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
-                    channel="v4",
+                    channel="v4.0",
                     name="ibm-ca-operator",
                 ),
             ),
@@ -176,6 +187,7 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-cde-operator-subscription",
                 },
                 name="ibm-cde-operator-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -186,24 +198,11 @@ class CloudPakForDataServiceManager:
                 dependencies=[],
                 labels={},
                 name="ibm-common-service-operator",
+                required_namespace=None,
                 service=False,
                 spec=SubscriptionMetadataSpec(
                     channel="v3",
                     name="ibm-common-service-operator",
-                ),
-            ),
-            "ibm-cpd-datarefinery": SubscriptionMetadata(
-                dependencies=[],
-                labels={
-                    "app.kubernetes.io/instance": "ibm-cpd-datarefinery-operator-catalog-subscription",
-                    "app.kubernetes.io/managed-by": "ibm-cpd-datarefinery-operator",
-                    "app.kubernetes.io/name": "ibm-cpd-datarefinery-operator-catalog-subscription",
-                },
-                name="ibm-cpd-datarefinery-operator-catalog-subscription",
-                service=True,
-                spec=SubscriptionMetadataSpec(
-                    channel="v1.0",
-                    name="ibm-cpd-datarefinery",
                 ),
             ),
             "ibm-cpd-dods": SubscriptionMetadata(
@@ -214,9 +213,10 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-cpd-dods-operator-catalog-subscription",
                 },
                 name="ibm-cpd-dods-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
-                    channel="alpha",
+                    channel="v4.0",
                     name="ibm-cpd-dods",
                 ),
             ),
@@ -226,6 +226,7 @@ class CloudPakForDataServiceManager:
                 ],
                 labels={},
                 name="ibm-cpd-edb-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="stable",
@@ -240,6 +241,7 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-cpd-hadoop-operator-catalog-subscription",
                 },
                 name="ibm-cpd-hadoop-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -252,6 +254,7 @@ class CloudPakForDataServiceManager:
                 ],
                 labels={},
                 name="ibm-cpd-mongodb-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="stable",
@@ -264,6 +267,7 @@ class CloudPakForDataServiceManager:
                 ],
                 labels={},
                 name="ibm-cpd-openpages-operator",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -274,6 +278,7 @@ class CloudPakForDataServiceManager:
                 dependencies=[],
                 labels={},
                 name="ibm-productmaster-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="alpha",
@@ -288,6 +293,7 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-cpd-rstudio-operator-catalog-subscription",
                 },
                 name="ibm-cpd-rstudio-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -302,6 +308,7 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-cpd-spss-operator-catalog-subscription",
                 },
                 name="ibm-cpd-spss-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -309,13 +316,16 @@ class CloudPakForDataServiceManager:
                 ),
             ),
             "ibm-cpd-wkc": SubscriptionMetadata(
-                dependencies=[],
+                dependencies=[
+                    "db2u-operator",
+                ],
                 labels={
                     "app.kubernetes.io/instance": "ibm-cpd-wkc-operator-catalog-subscription",
                     "app.kubernetes.io/managed-by": "ibm-cpd-wkc-operator",
                     "app.kubernetes.io/name": "ibm-cpd-wkc-operator-catalog-subscription",
                 },
                 name="ibm-cpd-wkc-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -326,6 +336,7 @@ class CloudPakForDataServiceManager:
                 dependencies=[],
                 labels={},
                 name="ibm-cpd-wml-accelerator-operator",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="WML-Accelerator-2.3",
@@ -340,9 +351,10 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-cpd-wml-operator-subscription",
                 },
                 name="ibm-cpd-wml-operator-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
-                    channel="alpha",
+                    channel="v1.1",
                     name="ibm-cpd-wml-operator",
                 ),
             ),
@@ -354,9 +366,10 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-watson-openscale-operator-subscription",
                 },
                 name="ibm-watson-openscale-operator-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
-                    channel="alpha",
+                    channel="v1",
                     name="ibm-cpd-wos",
                 ),
             ),
@@ -368,6 +381,7 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-cpd-ws-runtimes-operator",
                 },
                 name="ibm-cpd-ws-runtimes-operator",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -378,6 +392,7 @@ class CloudPakForDataServiceManager:
                 dependencies=[],
                 labels={},
                 name="ibm-cpd-ws-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v2.0",
@@ -392,9 +407,10 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-datagate-operator-subscription",
                 },
                 name="ibm-datagate-operator-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
-                    channel="alpha",
+                    channel="v2.0",
                     name="ibm-datagate-operator",
                 ),
             ),
@@ -402,6 +418,7 @@ class CloudPakForDataServiceManager:
                 dependencies=[],
                 labels={},
                 name="ibm-datastage-operator",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -412,6 +429,7 @@ class CloudPakForDataServiceManager:
                 dependencies=[],
                 labels={},
                 name="ibm-db2aaservice-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -424,6 +442,7 @@ class CloudPakForDataServiceManager:
                 ],
                 labels={},
                 name="ibm-db2oltp-cp4d-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -436,6 +455,7 @@ class CloudPakForDataServiceManager:
                 ],
                 labels={},
                 name="ibm-db2wh-cp4d-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -446,6 +466,7 @@ class CloudPakForDataServiceManager:
                 dependencies=[],
                 labels={},
                 name="ibm-dmc-operator-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
@@ -453,12 +474,15 @@ class CloudPakForDataServiceManager:
                 ),
             ),
             "ibm-dv-operator": SubscriptionMetadata(
-                dependencies=[],
+                dependencies=[
+                    "db2u-operator",
+                ],
                 labels={},
                 name="ibm-dv-operator-catalog-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
-                    channel="v1.0",
+                    channel="v1.7",
                     name="ibm-dv-operator",
                 ),
             ),
@@ -470,9 +494,10 @@ class CloudPakForDataServiceManager:
                     "app.kubernetes.io/name": "ibm-mdm-operator-subscription",
                 },
                 name="ibm-mdm-operator-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
-                    channel="alpha",
+                    channel="v1.1",
                     name="ibm-mdm",
                 ),
             ),
@@ -480,16 +505,66 @@ class CloudPakForDataServiceManager:
                 dependencies=[],
                 labels={},
                 name="ibm-planning-analytics-subscription",
+                required_namespace=None,
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="v1.0",
                     name="ibm-planning-analytics-operator",
                 ),
             ),
+            "ibm-voice-gateway-operator": SubscriptionMetadata(
+                dependencies=[],
+                labels={},
+                name="ibm-voice-gateway-operator-subscription",
+                required_namespace=None,
+                service=True,
+                spec=SubscriptionMetadataSpec(
+                    channel="v1.0",
+                    name="ibm-voice-gateway-operator",
+                ),
+            ),
+            "ibm-watson-assistant-operator": SubscriptionMetadata(
+                dependencies=[],
+                labels={},
+                name="ibm-watson-assistant-operator-subscription",
+                required_namespace=None,
+                service=True,
+                spec=SubscriptionMetadataSpec(
+                    channel="v4.0",
+                    name="ibm-watson-assistant-operator",
+                ),
+            ),
+            "ibm-watson-discovery-operator": SubscriptionMetadata(
+                dependencies=[],
+                labels={
+                    "app.kubernetes.io/instance": "ibm-watson-discovery-operator-subscription",
+                    "app.kubernetes.io/managed-by": "ibm-watson-discovery-operator",
+                    "app.kubernetes.io/name": "ibm-watson-discovery-operator-subscription",
+                },
+                name="ibm-watson-discovery-operator-subscription",
+                required_namespace=None,
+                service=True,
+                spec=SubscriptionMetadataSpec(
+                    channel="v4.0",
+                    name="ibm-watson-discovery-operator",
+                ),
+            ),
+            "ibm-watson-speech-operator": SubscriptionMetadata(
+                dependencies=[],
+                labels={},
+                name="ibm-watson-speech-operator-subscription",
+                required_namespace=None,
+                service=True,
+                spec=SubscriptionMetadataSpec(
+                    channel="v4.0",
+                    name="ibm-watson-speech-operator",
+                ),
+            ),
             "mongodb-enterprise": SubscriptionMetadata(
                 dependencies=[],
                 labels={},
                 name="ibm-mongodb-enterprise-catalog-subscription",
+                required_namespace="openshift-operators",
                 service=True,
                 spec=SubscriptionMetadataSpec(
                     channel="stable",

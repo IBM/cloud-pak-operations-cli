@@ -34,6 +34,7 @@ class SubscriptionMetadata:
     dependencies: List[str]
     labels: Dict[str, str]
     name: str
+    required_namespace: Optional[str]
     service: bool
     spec: SubscriptionMetadataSpec
 
@@ -69,8 +70,6 @@ class SubscriptionMetadata:
         }
 
         if len(self.labels) != 0:
-            assert "metadata" in subscription
-
             subscription["metadata"]["labels"] = self.labels
 
         return subscription
