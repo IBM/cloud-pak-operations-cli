@@ -44,7 +44,7 @@
   dg cluster install-db2-data-gate-stack --accept-all-licenses --storage-class managed-nfs-storage
   ```
 
-## IBM Cloud Pak for Data 4.0.0
+## IBM Cloud Pak for Data 4.0.x
 
 - Execute the following Db2 Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
 

@@ -10,7 +10,7 @@
     </p>
 </div>
 
-The Db2 Data Gate CLI allows the user-friendly installation of IBM Cloud Pak for Data 3.5.0/4.0.0, Db2 (Warehouse), the IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate on OpenShift clusters. It also allows the one-click deployment of a Red Hat OpenShift on IBM Cloud cluster including the installation of IBM Cloud Pak for Data, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software.
+The Db2 Data Gate CLI allows the user-friendly installation of IBM Cloud Pak for Data 3.5.0/4.0.x, Db2 (Warehouse), the IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate on OpenShift clusters. It also allows the one-click deployment of a Red Hat OpenShift on IBM Cloud cluster including the installation of IBM Cloud Pak for Data, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software.
 
 For IBM-internal users, the Db2 Data Gate CLI additionally supports managing OpenShift clusters on FYRE.
 
@@ -77,7 +77,7 @@ docker run -it quay.io/ibm/data-gate-cli:latest bash
 
 ## Usage
 
-### Installation of IBM Cloud Pak for Data 3.5.0/4.0.0, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate
+### Installation of IBM Cloud Pak for Data 3.5.0/4.0.x, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate
 
 - Register cluster:
 
@@ -102,7 +102,7 @@ docker run -it quay.io/ibm/data-gate-cli:latest bash
 | Version | Command                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | ------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 3.5.0   | <code>dg cpd3 install-db2-data-gate-stack --storage-class _STORAGE_CLASS_</code>                                                                                                                                                                                                                                                                                                                                                                                                 |
-| 4.0.0   | <code>dg cpd4 install --storage-class _STORAGE_CLASS_</code><br /><code>dg cpd4 service install --service-name db2oltp --license _[ADVANCED\|COMMUNITY\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name db2wh --license _[ENTERPRISE\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name dmc --license _[ENTERPRISE\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name datagate --license _[ENTERPRISE\|STANDARD]_</code> |
+| 4.0.x   | <code>dg cpd4 install --storage-class _STORAGE_CLASS_</code><br /><code>dg cpd4 service install --service-name db2oltp --license _[ADVANCED\|COMMUNITY\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name db2wh --license _[ENTERPRISE\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name dmc --license _[ENTERPRISE\|STANDARD]_</code><br /><code>dg cpd4 service install --service-name datagate --license _[ENTERPRISE\|STANDARD]_</code> |
 
 ### Installation of IBM Cloud Pak for Data 3.5.0, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software on IBM Cloud
 
