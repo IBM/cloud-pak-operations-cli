@@ -4,7 +4,7 @@
 
 - Clone the Db2 Data Gate CLI GitHub repository:
 
-  ```bash
+  ```shell
   git clone https://github.com/IBM/data-gate-cli.git
   ```
 
@@ -12,7 +12,7 @@
 
   - Linux/macOS:
 
-    ```bash
+    ```shell
     pip3 install virtualenv
     virtualenv .venv
     . .venv/bin/activate
@@ -22,7 +22,7 @@
 
   - Windows:
 
-    ```bash
+    ```shell
     pip3 install virtualenv
     virtualenv .venv
     .venv/Scripts/activate
@@ -40,7 +40,7 @@ To register a new Click command, add the Python module containing the command to
 
 ### Registering a new Click group
 
-To register a new Click group, add a Python package (i.e., a directory containing a file named `__init__.py`) to the `commands` directory or one of its subdirectories. Furthermore, add the following code to `__init__.py` to automatically register Click commands within Python modules contained in the package:
+To register a new Click group (e.g., `click-group-name`), add a Python package (i.e., a directory containing a file named `__init__.py`) to the `commands` directory or one of its subdirectories (e.g., `click_group_name`). Furthermore, add the following code to `__init__.py` to automatically register Click commands within Python modules contained in the package:
 
 ```python
 import sys
@@ -52,7 +52,7 @@ from dg.lib.click.lazy_loading_multi_command import (
 )
 
 @click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
-def {Click group name}():
+def click_group_name():
     pass
 ```
 
@@ -60,7 +60,7 @@ def {Click group name}():
 
 Unit tests are based on the `unittest` package and contained in the `tests.test` package. Execute the following command to execute all unit tests within your virtual environment:
 
-```bash
+```shell
 python -m unittest discover tests.test
 ```
 
@@ -72,25 +72,25 @@ Use [FunctionTrace](https://functiontrace.com/) to profile a Db2 Data Gate CLI c
 
 - Install the FunctionTrace server:
 
-  ```bash
+  ```shell
   cargo install functiontrace-server
   ```
 
 - Install the Python client in your virtual environment:
 
-  ```bash
+  ```shell
   pip3 install functiontrace
   ```
 
 - Execute the following command to profile a Db2 Data Gate CLI command:
 
-  ```bash
-  python3 -m functiontrace $(which dg) {command}
+  ```shell
+  python3 -m functiontrace $(which dg) $COMMAND
   ```
 
 - After having executed the Db2 Data Gate CLI, the FunctionTrace server prints the location of the profiling data file:
 
-  ```bash
+  ```shell
   [FunctionTrace] Wrote profile data to …
   ```
 
@@ -100,14 +100,14 @@ Use [FunctionTrace](https://functiontrace.com/) to profile a Db2 Data Gate CLI c
 
 - Create a new branch, commit the code leading to a new release, and tag the commit with a semantic version:
 
-  ```bash
-  git tag v{major}.{minor}.{patch}
+  ```shell
+  git tag v$MAJOR.$MINOR.$PATCH
   ```
 
 - Push the branch and the tag:
 
-  ```bash
-  git push --atomic origin {branch name} v{major}.{minor}.{patch}
+  ```shell
+  git push --atomic origin $BRANCH_NAME v$MAJOR.$MINOR.$PATCH
   ```
 
 - Create a pull request based on the created branch
@@ -127,8 +127,8 @@ After having merged the pull request, the following actions are performed:
 
 To install a Db2 Data Gate CLI version from TestPyPI, execute the following command:
 
-```bash
-pip3 install --extra-index-url https://pypi.org/simple --index-url https://test.pypi.org/simple/ data-gate-cli=={version}
+```shell
+pip3 install --extra-index-url https://pypi.org/simple --index-url https://test.pypi.org/simple/ data-gate-cli==$VERSION
 ```
 
 ## References

@@ -90,7 +90,7 @@ The advantage of the `logging` package is that the log level of the current logg
 
 ```
 Options:
-[…]
+…
   --loglevel [DEBUG|INFO|WARNING|ERROR|CRITICAL]
                                   Log level
   --help                          Show this message and exit.
@@ -124,7 +124,7 @@ In some cases, it makes sense to set the default log level to `WARNING`. For exa
 When using the `logging` package, output may be styled as follows:
 
 ```python
-logging.info(click.style("[…]", […]))
+logging.info(click.style("…", …))
 ```
 
 As white output is invisible when using a shell theme with a light background, `fg="bright_white"` or `fg="white"` should not be used.
@@ -137,18 +137,18 @@ As white output is invisible when using a shell theme with a light background, `
 
   ```python
   if result is not None:
-      […]
+      …
   if result is None:
-      […]
+      …
   ```
 
   Example (implicit comparison):
 
   ```python
   if result:
-      […]
+      …
   if not result:
-      […]
+      …
   ```
 
 ## Naming
@@ -157,14 +157,14 @@ As white output is invisible when using a shell theme with a light background, `
 
   Example (correct):
 
-  ```bash
-  cpd-cli -n {namespace}
+  ```shell
+  cpd-cli --namespace $NAMESPACE
   ```
 
   Example (wrong):
 
-  ```bash
-  cpd-cli --namespace {namespace}
+  ```shell
+  cpd-cli -n $NAMESPACE
   ```
 
 ## Order
@@ -186,29 +186,29 @@ As white output is invisible when using a shell theme with a light background, `
 
   ```python
   class Example:
-      public_class_variable = […]
+      public_class_variable = …
 
       @classmethod
-      def public_class_method(cls): […]
+      def public_class_method(cls): …
 
       @staticmethod
-      def public_static_method(): […]
+      def public_static_method(): …
 
-      def public_method1(): […]
-      def public_method2(): […]
-      def public_method3(): […]
+      def public_method1(): …
+      def public_method2(): …
+      def public_method3(): …
 
-      _private_class_variable = […]
+      _private_class_variable = …
 
       @classmethod
-      def _private_class_method(cls): […]
+      def _private_class_method(cls): …
 
       @staticmethod
-      def _private_static_method(): […]
+      def _private_static_method(): …
 
-      def _private_method1(): […]
-      def _private_method2(): […]
-      def _private_method3(): […]
+      def _private_method1(): …
+      def _private_method2(): …
+      def _private_method3(): …
   ```
 
 ### Command line options

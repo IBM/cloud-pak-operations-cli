@@ -22,13 +22,13 @@ For IBM-internal users, the Db2 Data Gate CLI additionally supports managing Ope
 
 - macOS (requires [Homebrew](https://brew.sh/)):
 
-  ```bash
+  ```shell
   brew install python
   ```
 
 - Windows (requires [Chocolatey](https://chocolatey.org/)):
 
-  ```bash
+  ```shell
   choco install python
   ```
 
@@ -38,10 +38,36 @@ TBA [September 2021]
 
 #### Db2 Data Gate CLI installation and update (latest development code)
 
-| Operation    | Command                                                                                 |
-| ------------ | --------------------------------------------------------------------------------------- |
-| Installation | `pip3 install git+https://git@github.com/IBM/data-gate-cli.git` (provides `dg` command) |
-| Update       | `dg adm update-dev`                                                                     |
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Installation (provides <code>dg</code> command)</td>
+<td>
+
+```shell
+pip3 install git+https://git@github.com/IBM/data-gate-cli.git
+```
+
+</td>
+</tr>
+<tr>
+<td>Update</td>
+<td>
+
+```shell
+dg adm update-dev
+```
+
+</td>
+</tr>
+</tbody>
+</table>
 
 ### Configuration
 
@@ -49,7 +75,7 @@ TBA [September 2021]
 
 - Downloads dependencies (IBM Cloud CLI, IBM Cloud Terraform provider, OpenShift CLI, Terraform CLI)
 
-  ```bash
+  ```shell
   dg adm download-dependencies
   ```
 
@@ -57,13 +83,13 @@ TBA [September 2021]
 
 - Bash: Add the following code to `.bashrc`:
 
-  ```bash
+  ```shell
   . $(pip3 show dg | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-bash.sh
   ```
 
 - zsh: Add the following code to `.zshrc`:
 
-  ```bash
+  ```shell
   . $(pip3 show dg | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-zsh.sh
   ```
 
@@ -71,7 +97,7 @@ TBA [September 2021]
 
 The latest version of the Db2 Data Gate CLI on the master branch can also be run inside a Docker container:
 
-```bash
+```shell
 docker run -it quay.io/ibm/data-gate-cli:latest bash
 ```
 
@@ -81,43 +107,100 @@ docker run -it quay.io/ibm/data-gate-cli:latest bash
 
 - Register cluster:
 
-  ```bash
-  dg cluster add --alias *ALIAS* --server *SERVER* --username *USERNAME* --password *PASSWORD*
+  ```shell
+  dg cluster add --alias $ALIAS --server $SERVER --username $USERNAME --password $PASSWORD
   ```
 
 - Use cluster:
 
-  ```bash
-  dg cluster use *ALIAS*
+  ```shell
+  dg cluster use $ALIAS
   ```
 
 - Store your [IBM Cloud Pak for Data entitlement key](https://myibm.ibm.com/products-services/containerlibrary):
 
-  ```bash
-  dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key *IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY*
+  ```shell
+  dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key $IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY
   ```
 
 - Install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
 
-| Version | Command                                                                                                                                                                                                                                                                                                                         |
-| ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 3.5.0   | <code>dg cpd3 install-db2-data-gate-stack --storage-class _STORAGE_CLASS_</code>                                                                                                                                                                                                                                                |
-| 4.0.x   | <code>dg cpd4 --accept-license --force --license _[ENTERPRISE\|STANDARD]_ install --storage-class _STORAGE_CLASS_</code><br /><code>dg cpd4 service install-db2-data-gate-stack --accept-all-licenses --db2-license _[ADVANCED\|COMMUNITY\|STANDARD]_ --license _[ENTERPRISE\|STANDARD]_ --storage-class _STORAGE_CLASS_</code> |
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.5.0</td>
+<td>
+
+```shell
+dg cpd3 install-db2-data-gate-stack --storage-class $STORAGE_CLASS
+```
+
+</td>
+</tr>
+<tr>
+<td>4.0.x</td>
+<td>
+
+```shell
+dg cpd4 install --accept-license --force --license (ENTERPRISE|STANDARD) --storage-class $STORAGE_CLASS
+dg cpd4 service install-db2-data-gate-stack
+    --accept-all-licenses
+    --db2-license (ADVANCED|COMMUNITY|STANDARD)
+    --license (ENTERPRISE|STANDARD)
+    --storage-class $STORAGE_CLASS
+```
+
+</td>
+</tr>
+</tbody>
+</table>
 
 ### Installation of IBM Cloud Pak for Data 3.5.0, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software on IBM Cloud
 
 - Log in to IBM Cloud:
 
-  ```bash
+  ```shell
   dg ibmcloud login
   ```
 
 - Install IBM Cloud Pak for Data, IBM Db2 Warehouse, and IBM Db2 for z/OS Data Gate:
 
-| Action                        | Command                                                                                                 |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Inst. w/ an existing cluster  | <code>dg ibmcloud oc cluster install --cluster-name _CLUSTER_NAME_</code>                               |
-| Inst. w/o an existing cluster | <code>dg ibmcloud oc cluster create --alias _ALIAS_ --cluster-name _CLUSTER_NAME_ --full-install</code> |
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Inst. w/ an existing cluster</td>
+<td>
+
+```shell
+dg ibmcloud oc cluster install --cluster-name $CLUSTER_NAME
+```
+
+</td>
+</tr>
+<tr>
+<td>Inst. w/o an existing cluster</td>
+<td>
+
+```shell
+dg ibmcloud oc cluster create --alias $ALIAS --cluster-name $CLUSTER_NAME --full-install
+```
+
+</td>
+</tr>
+</tbody>
+</table>
 
 ### IBM-internal
 
@@ -131,8 +214,8 @@ docker run -it quay.io/ibm/data-gate-cli:latest bash
 
 ### OpenShift Client CLI (macOS)
 
-```bash
-Unable to connect to the server: dial tcp: lookup *OPENSHIFT_CLUSTER* on *DNS_NAME_SERVER*:53: no such host
+```shell
+Unable to connect to the server: dial tcp: lookup … on …:53: no such host
 ```
 
 - [GitHub issue](https://github.com/openshift/oc/issues/315)
