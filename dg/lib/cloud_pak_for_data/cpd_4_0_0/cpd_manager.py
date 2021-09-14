@@ -49,10 +49,14 @@ from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_access_data im
     CloudPakForDataAccessData,
 )
 from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import (
+    CloudPakForDataLicense,
     CloudPakForDataServiceLicense,
 )
 from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_storage_vendor import (
     CloudPakForDataStorageVendor,
+)
+from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.custom_resource_metadata import (
+    CustomResourceMetadata,
 )
 from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.kind import Kind
 from dg.lib.error import (
@@ -148,6 +152,58 @@ class CloudPakForDataManager:
             "ibm-odlm.ibm-common-services",
         ]
 
+    def cloud_pak_for_data_service_installed(
+        self,
+        cpd_instance_project: str,
+        service_name: str,
+    ) -> bool:
+        """Returns whether the Cloud Pak for Data service with the given name is
+        completely installed
+
+        Parameters
+        ----------
+        cpd_instance_project
+            IBM Cloud Pak for Data instance project
+        service_name
+            name of the service to be checked
+
+        Returns
+        -------
+        bool
+            true, if the Cloud Pak for Data service with the given name is
+            completely installed
+        """
+
+        if not self._cpd_service_manager.is_cloud_pak_for_data_service(service_name):
+            raise DataGateCLIException("Unknown IBM Cloud Pak for Data service")
+
+        custom_resource_metadata = self._cpd_service_manager.get_custom_resource_metadata(service_name)
+        custom_resource = self._openshift_manager.get_custom_resource_if_exists(
+            cpd_instance_project, custom_resource_metadata.name, custom_resource_metadata.get_kind_metadata()
+        )
+
+        return (
+            self.custom_resource_status_completed(custom_resource, custom_resource_metadata)
+            if custom_resource is not None
+            else False
+        )
+
+    def custom_resource_status_completed(
+        self, custom_resource: CustomResource, custom_resource_metadata: CustomResourceMetadata
+    ) -> bool:
+        result = False
+
+        try:
+            status = dg.lib.jmespath.get_jmespath_string(
+                f"status.{custom_resource_metadata.status_key_name}", custom_resource
+            )
+
+            result = status == "Completed"
+        except JmespathPathExpressionNotFoundException:
+            pass
+
+        return result
+
     def get_license_types_for_cloud_pak_for_data_service(
         self, service_name: str
     ) -> List[CloudPakForDataServiceLicense]:
@@ -178,6 +234,7 @@ class CloudPakForDataManager:
         cpd_operators_project: str,
         cpd_instance_project: str,
         ibm_cloud_pak_for_data_entitlement_key: str,
+        license: CloudPakForDataLicense,
         storage_class: str,
     ) -> CloudPakForDataAccessData:
         """Installs IBM Cloud Pak for Data
@@ -190,6 +247,8 @@ class CloudPakForDataManager:
             IBM Cloud Pak for Data instance project
         ibm_cloud_pak_for_data_entitlement_key
             IBM Cloud Pak for Data entitlement key
+        license
+            IBM Cloud Pak for Data license
         storage_class
             storage class used for installation
 
@@ -199,7 +258,7 @@ class CloudPakForDataManager:
             IBM Cloud Pak for Data access data
         """
 
-        if self._openshift_manager.namespaced_custom_object_exists(
+        if self._openshift_manager.namespaced_custom_resource_exists(
             cpd_instance_project, "ibmcpd-cr", self._kinds[Kind.Ibmcpd]
         ):
             raise DataGateCLIException(
@@ -209,7 +268,7 @@ class CloudPakForDataManager:
         self.install_cloud_pak_for_data_foundational_services(ibm_cloud_pak_for_data_entitlement_key)
 
         cloud_pak_for_data_access_data = self._install_cloud_pak_for_data(
-            cpd_operators_project, cpd_instance_project, storage_class
+            cpd_operators_project, cpd_instance_project, license, storage_class
         )
 
         return cloud_pak_for_data_access_data
@@ -267,37 +326,39 @@ class CloudPakForDataManager:
             raise DataGateCLIException("Unknown IBM Cloud Pak for Data service")
 
         custom_resource_metadata = self._cpd_service_manager.get_custom_resource_metadata(service_name)
-
-        if self._openshift_manager.namespaced_custom_object_exists(
+        custom_resource = self._openshift_manager.get_custom_resource_if_exists(
             cpd_instance_project, custom_resource_metadata.name, custom_resource_metadata.get_kind_metadata()
-        ):
-            raise DataGateCLIException("IBM Cloud Pak for Data service already installed")
-
-        custom_resource_metadata.check_options(license, storage_option)
-        self._create_operator_subscription(cpd_operators_project, custom_resource_metadata.operator_name)
-
-        custom_resource = custom_resource_metadata.get_custom_resource(
-            cpd_instance_project, license, installation_options, storage_option
         )
 
         kind = custom_resource_metadata.kind
 
-        with Halo(
-            text=f"Waiting for custom resource definition '{kind}' to be created",
-            spinner="dots",
-        ) as spinner, dg.utils.logging.ScopedSpinnerDisabler(dg.dg.click_logging_handler, spinner):
-            self._openshift_manager.execute_kubernetes_client(
-                self._wait_for_custom_resource,
-                encountered_crd_kinds=set(),
-                expected_crd_kinds={kind},
-                kind_metadata=self._kinds[Kind.CustomResourceDefinition],
-                spinner=spinner,
-                success_function=self._custom_resource_definitions_are_created,
+        if custom_resource is not None:
+            if self.custom_resource_status_completed(custom_resource, custom_resource_metadata):
+                raise DataGateCLIException("IBM Cloud Pak for Data service already installed")
+        else:
+            custom_resource_metadata.check_options(license, storage_option)
+            self._create_operator_subscription(cpd_operators_project, custom_resource_metadata.operator_name)
+
+            custom_resource = custom_resource_metadata.get_custom_resource(
+                cpd_instance_project, license, installation_options, storage_option
             )
 
-        self._openshift_manager.execute_kubernetes_client(
-            self._create_custom_resource, custom_resource=custom_resource, project=cpd_instance_project
-        )
+            with Halo(
+                text=f"Waiting for custom resource definition '{kind}' to be created",
+                spinner="dots",
+            ) as spinner, dg.utils.logging.ScopedSpinnerDisabler(dg.dg.click_logging_handler, spinner):
+                self._openshift_manager.execute_kubernetes_client(
+                    self._wait_for_custom_resource,
+                    encountered_crd_kinds=set(),
+                    expected_crd_kinds={kind},
+                    kind_metadata=self._kinds[Kind.CustomResourceDefinition],
+                    spinner=spinner,
+                    success_function=self._custom_resource_definitions_are_created,
+                )
+
+            self._openshift_manager.execute_kubernetes_client(
+                self._create_custom_resource, custom_resource=custom_resource, project=cpd_instance_project
+            )
 
         with Halo(
             text=f"Waiting for custom resource {kind} '{custom_resource_metadata.name}' to be created",
@@ -335,13 +396,15 @@ class CloudPakForDataManager:
             self._delete_custom_resource, kind=Kind.OperandRequest, name="empty-request", project=cpd_instance_project
         )
 
-        ibmcpd_instances = self._openshift_manager.execute_kubernetes_client(self._get_custom_objects, kind=Kind.Ibmcpd)
+        ibmcpd_instances = self._openshift_manager.execute_kubernetes_client(
+            self._get_custom_resources, kind=Kind.Ibmcpd
+        )
 
         if len(ibmcpd_instances) == 0:
             self._uninstall_cloud_pak_for_data_service_operators(cpd_operators_project)
 
             operand_request_names = self._openshift_manager.execute_kubernetes_client(
-                self._get_namespaced_custom_object_names,
+                self._get_namespaced_custom_resource_names,
                 kind=Kind.OperandRequest,
                 project=CloudPakForDataManager._FOUNDATIONAL_SERVICES_PROJECT,
             )
@@ -398,7 +461,7 @@ class CloudPakForDataManager:
         self.uninstall_operator(project, "ibm-common-service-operator")
 
         operand_request_names = self._openshift_manager.execute_kubernetes_client(
-            self._get_namespaced_custom_object_names, kind=Kind.OperandRequest, project=project
+            self._get_namespaced_custom_resource_names, kind=Kind.OperandRequest, project=project
         )
 
         for operand_request_name in operand_request_names:
@@ -407,7 +470,7 @@ class CloudPakForDataManager:
             )
 
         operand_config_names = self._openshift_manager.execute_kubernetes_client(
-            self._get_namespaced_custom_object_names, kind=Kind.OperandConfig, project=project
+            self._get_namespaced_custom_resource_names, kind=Kind.OperandConfig, project=project
         )
 
         for operand_config_name in operand_config_names:
@@ -416,7 +479,7 @@ class CloudPakForDataManager:
             )
 
         operand_registry_names = self._openshift_manager.execute_kubernetes_client(
-            self._get_namespaced_custom_object_names, kind=Kind.OperandRegistry, project=project
+            self._get_namespaced_custom_resource_names, kind=Kind.OperandRegistry, project=project
         )
 
         for operand_registry_name in operand_registry_names:
@@ -425,7 +488,7 @@ class CloudPakForDataManager:
             )
 
         namespace_scope_names = self._openshift_manager.execute_kubernetes_client(
-            self._get_namespaced_custom_object_names, kind=Kind.NamespaceScope, project=project
+            self._get_namespaced_custom_resource_names, kind=Kind.NamespaceScope, project=project
         )
 
         for namespace_scope_name in namespace_scope_names:
@@ -548,7 +611,9 @@ class CloudPakForDataManager:
             else:
                 logging.info(f"Skipping creation of catalog source '{catalog_source_name}'")
 
-    def _create_cloud_pak_for_data_custom_resource(self, cpd_instance_project: str, storage_class: str):
+    def _create_cloud_pak_for_data_custom_resource(
+        self, cpd_instance_project: str, license: CloudPakForDataLicense, storage_class: str
+    ):
         """Creates an Ibmcpd custom resource to install IBM Cloud Pak for Data
 
         Creating an Ibmcpd custom resource (ibmcpd-cr) creates a ZenService
@@ -569,13 +634,15 @@ class CloudPakForDataManager:
         ----------
         cpd_instance_project
             IBM Cloud Pak for Data instance project
+        license
+            IBM Cloud Pak for Data license
         storage_class
             storage class used for installation
         """
 
         self._wait_for_cloud_pak_for_data_custom_resource_definitions()
 
-        if not self._openshift_manager.namespaced_custom_object_exists(
+        if not self._openshift_manager.namespaced_custom_resource_exists(
             cpd_instance_project, "empty-request", self._kinds[Kind.OperandRequest]
         ):
             operand_request: CustomResource = {
@@ -606,7 +673,7 @@ class CloudPakForDataManager:
             "spec": {
                 "license": {
                     "accept": True,
-                    "license": "Enterprise",
+                    "license": license.name,
                 },
                 "storageClass": storage_class,
                 "zenCoreMetadbStorageClass": storage_class,
@@ -637,35 +704,6 @@ class CloudPakForDataManager:
 
         self._create_operator_subscription_if_not_exists(cpd_operators_project, "cpd-platform-operator")
 
-    def _create_custom_resource(self, project: str, custom_resource: CustomResource):
-        """Creates a custom resource
-
-        Parameters
-        ----------
-        project
-            project in which the custom resource shall be created
-        custom_resource
-            specification object for passing to the OpenShift REST API
-        """
-
-        api_version = self._extract_group_and_version_from_api_version(custom_resource["apiVersion"])
-        body_str = json.dumps(custom_resource, indent="\t", sort_keys=True)
-        kind: str = custom_resource["kind"]
-        name: str = custom_resource["metadata"]["name"]
-        plural = kind.lower() + "s"
-
-        logger.info(f"Creating custom resource {kind} '{name}'")
-        logger.debug(f"Sending JSON object:\n{body_str}")
-
-        custom_objects_api = client.CustomObjectsApi()
-        custom_objects_api.create_namespaced_custom_object(
-            api_version.group,
-            api_version.version,
-            project,
-            plural,
-            custom_resource,
-        )
-
     def _create_cloud_pak_foundational_services_operator_subscription(self, project: str):
         """Creates the 'IBM Cloud Pak foundational services' operator
         subscription
@@ -694,6 +732,35 @@ class CloudPakForDataManager:
         """
 
         self._create_operator_subscription_if_not_exists(project, "ibm-common-service-operator")
+
+    def _create_custom_resource(self, project: str, custom_resource: CustomResource):
+        """Creates a custom resource
+
+        Parameters
+        ----------
+        project
+            project in which the custom resource shall be created
+        custom_resource
+            specification object for passing to the OpenShift REST API
+        """
+
+        api_version = self._extract_group_and_version_from_api_version(custom_resource["apiVersion"])
+        body_str = json.dumps(custom_resource, indent="\t", sort_keys=True)
+        kind: str = custom_resource["kind"]
+        name: str = custom_resource["metadata"]["name"]
+        plural = kind.lower() + "s"
+
+        logger.info(f"Creating custom resource {kind} '{name}'")
+        logger.debug(f"Sending JSON object:\n{body_str}")
+
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.create_namespaced_custom_object(
+            api_version.group,
+            api_version.version,
+            project,
+            plural,
+            custom_resource,
+        )
 
     def _create_operator_group(self, project: str):
         """Creates an operator group for the 'ibm-common-services' namespace
@@ -1045,18 +1112,18 @@ class CloudPakForDataManager:
 
         return dg.lib.jmespath.get_jmespath_string("status.url", custom_objects_api_result)
 
-    def _get_custom_objects(self, kind: Kind) -> List[Any]:
-        """Returns custom objects of the given kind
+    def _get_custom_resources(self, kind: Kind) -> List[Any]:
+        """Returns custom resources of the given kind
 
         Parameters
         ----------
         kind
-            kind of custom objects to return
+            kind of custom resources to return
 
         Returns
         -------
         List[Any]
-            custom objects of the given kind
+            custom resources of the given kind
         """
 
         kind_metadata = self._kinds[kind]
@@ -1090,20 +1157,20 @@ class CloudPakForDataManager:
             dg.lib.jmespath.get_jmespath_string("initial_admin_password", core_v1_api_result.data)
         ).decode("utf-8")
 
-    def _get_namespaced_custom_object_names(self, project: str, kind: Kind) -> List[str]:
-        """Returns names of custom objects of the given kind
+    def _get_namespaced_custom_resource_names(self, project: str, kind: Kind) -> List[str]:
+        """Returns names of custom resources of the given kind
 
         Parameters
         ----------
         project
             project to be searched
         kind
-            kind of custom objects to return
+            kind of custom resources to return
 
         Returns
         -------
         List[str]
-            names of custom objects of the given kind
+            names of custom resources of the given kind
         """
 
         kind_metadata = self._kinds[kind]
@@ -1151,7 +1218,7 @@ class CloudPakForDataManager:
         self._suspend_spinner_and_log_debug_message(spinner, "OpenShift API server closed connection")
 
     def _install_cloud_pak_for_data(
-        self, cpd_operators_project: str, cpd_instance_project: str, storage_class: str
+        self, cpd_operators_project: str, cpd_instance_project: str, license: CloudPakForDataLicense, storage_class: str
     ) -> CloudPakForDataAccessData:
         """Installs IBM Cloud Pak for Data
 
@@ -1161,6 +1228,8 @@ class CloudPakForDataManager:
             IBM Cloud Pak for Data operators project
         cpd_instance_project
             IBM Cloud Pak for Data instance project
+        license
+            IBM Cloud Pak for Data license
         storage_class
             storage class used for installation
 
@@ -1178,7 +1247,7 @@ class CloudPakForDataManager:
         self._create_project(cpd_instance_project)
         self._create_catalog_sources(CatalogSourceManager().get_catalog_sources())
         self._create_cloud_pak_for_data_operator_subscription(cpd_operators_project)
-        self._create_cloud_pak_for_data_custom_resource(cpd_instance_project, storage_class)
+        self._create_cloud_pak_for_data_custom_resource(cpd_instance_project, license, storage_class)
         self._wait_for_cloud_pak_for_data_installation_completion(cpd_instance_project)
 
         return self._openshift_manager.execute_kubernetes_client(self._get_access_data)

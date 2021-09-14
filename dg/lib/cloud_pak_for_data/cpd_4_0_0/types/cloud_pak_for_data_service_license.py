@@ -20,3 +20,14 @@ class CloudPakForDataServiceLicense(Enum):
     Community = auto()
     Enterprise = auto()
     Standard = auto()
+
+
+class CloudPakForDataLicense(Enum):
+    Enterprise = auto()
+    Standard = auto()
+
+
+class Db2ServiceLicense(Enum):
+    Advanced = auto()
+    Community = auto()
+    Standard = auto()

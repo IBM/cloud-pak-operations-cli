@@ -27,6 +27,9 @@ import dg.utils.download
 from dg.lib.cloud_pak_for_data.cpd_4_0_0.cpd_manager import (
     CloudPakForDataManager,
 )
+from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import (
+    CloudPakForDataLicense,
+)
 from dg.lib.openshift.utils.click import openshift_server_options
 from dg.utils.logging import loglevel_command
 
@@ -37,12 +40,22 @@ from dg.utils.logging import loglevel_command
     )
 )
 @openshift_server_options
+@click.option("--accept-license", help="Accept IBM Cloud Pak for Data license", is_flag=True)
 @click.option("--force", "-f", help="Skip confirmation", is_flag=True)
 @click.option(
     "--ibm-cloud-pak-for-data-entitlement-key",
     "-e",
     help="IBM Cloud Pak for Data entitlement key (see https://myibm.ibm.com/products-services/containerlibrary)",
     required=True,
+)
+@click.option(
+    "--license",
+    help="IBM Cloud Pak for Data license",
+    required=True,
+    type=click.Choice(
+        list(map(lambda x: x.name.lower(), CloudPakForDataLicense)),
+        case_sensitive=False,
+    ),
 )
 @click.option("--project", default="zen", help="Project where the Cloud Pak for Data control plane is installed")
 @click.option("--storage-class", help="Storage class used for installation", required=True)
@@ -54,12 +67,17 @@ def install(
     password: Optional[str],
     token: Optional[str],
     insecure_skip_tls_verify: Optional[bool],
+    accept_license: bool,
     force: bool,
     ibm_cloud_pak_for_data_entitlement_key: str,
+    license: str,
     project: str,
     storage_class: str,
 ):
     """Install IBM Cloud Pak for Data"""
+
+    if not accept_license:
+        raise click.UsageError("Missing option '--accept-license'", ctx)
 
     if not force:
         click.confirm(
@@ -69,7 +87,13 @@ def install(
 
     cloud_pak_for_data_access_data = CloudPakForDataManager(
         dg.lib.click.utils.get_cluster_credentials(ctx, locals().copy())
-    ).install_cloud_pak_for_data("ibm-common-services", project, ibm_cloud_pak_for_data_entitlement_key, storage_class)
+    ).install_cloud_pak_for_data(
+        "ibm-common-services",
+        project,
+        ibm_cloud_pak_for_data_entitlement_key,
+        CloudPakForDataLicense[license.capitalize()],
+        storage_class,
+    )
 
     click.echo(
         tabulate(

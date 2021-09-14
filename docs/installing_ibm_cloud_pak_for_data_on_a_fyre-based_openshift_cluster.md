@@ -50,9 +50,6 @@
 
   ```bash
   dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key *IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY*
-  dg cpd4 install --storage-class managed-nfs-storage
-  dg cpd4 service install --service-name db2oltp --license *(ADVANCED|COMMUNITY|STANDARD)*
-  dg cpd4 service install --service-name db2wh --license *(ENTERPRISE|STANDARD)*
-  dg cpd4 service install --service-name dmc --license *(ENTERPRISE|STANDARD)*
-  dg cpd4 service install --service-name datagate --license *(ENTERPRISE|STANDARD)*
+  dg cpd4 install --accept-license --force --license *(ENTERPRISE|STANDARD)* --storage-class managed-nfs-storage
+  dg cpd4 service install-db2-data-gate-stack --accept-all-licenses --db2-license *(ADVANCED|COMMUNITY|STANDARD)* --license *(ENTERPRISE|STANDARD)* --storage-class managed-nfs-storage
   ```
