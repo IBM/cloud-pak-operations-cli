@@ -12,7 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List, Optional, Tuple, Union
+import logging
+
+from typing import Optional, Union
 
 import click
 
@@ -22,20 +24,21 @@ import dg.lib.click.utils
 import dg.lib.cluster
 import dg.utils.download
 
-from dg.lib.click.cpd_service_spec_param_type import (
-    CloudPakForDataServiceSpecParamType,
-)
 from dg.lib.cloud_pak_for_data.cpd_4_0_0.cpd_manager import (
     CloudPakForDataManager,
 )
 from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import (
+    CloudPakForDataLicense,
     CloudPakForDataServiceLicense,
+    Db2ServiceLicense,
 )
 from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_storage_vendor import (
     CloudPakForDataStorageVendor,
 )
 from dg.lib.openshift.utils.click import openshift_server_options
 from dg.utils.logging import loglevel_command
+
+logger = logging.getLogger(__name__)
 
 
 @loglevel_command(
@@ -44,23 +47,26 @@ from dg.utils.logging import loglevel_command
     )
 )
 @openshift_server_options
-@click.option("--accept-license", help="Accept IBM Cloud Pak for Data license", is_flag=True)
+@click.option("--accept-all-licenses", help="Accept all licenses", is_flag=True)
 @click.option(
-    "--installation-option",
-    help="Additional installation option",
-    multiple=True,
-    type=(str, CloudPakForDataServiceSpecParamType()),
+    "--db2-license",
+    help="IBM Db2 license",
+    required=True,
+    type=click.Choice(
+        list(map(lambda x: x.name.lower(), Db2ServiceLicense)),
+        case_sensitive=False,
+    ),
 )
 @click.option(
     "--license",
-    help="License",
+    help="IBM Cloud Pak for Data license",
+    required=True,
     type=click.Choice(
-        list(map(lambda x: x.name.lower(), CloudPakForDataServiceLicense)),
+        list(map(lambda x: x.name.lower(), CloudPakForDataLicense)),
         case_sensitive=False,
     ),
 )
 @click.option("--project", default="zen", help="Project where the Cloud Pak for Data control plane is installed")
-@click.option("--service-name", help="IBM Cloud Pak for Data service name", required=True)
 @click.option("--storage-class", help="Storage class used for installation")
 @click.option(
     "--storage-vendor",
@@ -71,41 +77,28 @@ from dg.utils.logging import loglevel_command
     ),
 )
 @click.pass_context
-def install(
+def install_db2_data_gate_stack(
     ctx: click.Context,
     server: Optional[str],
     username: Optional[str],
     password: Optional[str],
     token: str,
     insecure_skip_tls_verify: Optional[bool],
-    accept_license: bool,
-    installation_option: List[Tuple[str, Union[bool, int, str]]],
-    license: Optional[str],
+    accept_all_licenses: bool,
+    db2_license: str,
+    license: str,
     project: str,
-    service_name: str,
     storage_class: Optional[str],
     storage_vendor: Optional[str],
 ):
     """Install IBM Cloud Pak for Data service"""
 
-    if not accept_license:
-        raise click.UsageError("Missing option '--accept-license'", ctx)
+    if not accept_all_licenses:
+        raise click.UsageError("Missing option '--accept-all-licenses'", ctx)
 
     cloud_pak_for_data_manager = CloudPakForDataManager(
         dg.lib.click.utils.get_cluster_credentials(ctx, locals().copy())
     )
-
-    if license is None:
-        license_types = ",\n\t".join(
-            list(
-                map(
-                    lambda x: x.name.lower(),
-                    cloud_pak_for_data_manager.get_license_types_for_cloud_pak_for_data_service(service_name),
-                )
-            )
-        )
-
-        raise click.UsageError(f"Missing option '--license'. Choose from:\n\t{license_types}", ctx)
 
     cloud_pak_for_data_service_license = CloudPakForDataServiceLicense[license.capitalize()]
     cloud_pak_for_data_storage_vendor = (
@@ -119,11 +112,63 @@ def install(
         storage_class if storage_class is not None else cloud_pak_for_data_storage_vendor
     )
 
-    cloud_pak_for_data_manager.install_cloud_pak_for_data_service(
-        "ibm-common-services",
-        project,
-        service_name,
-        cloud_pak_for_data_service_license,
-        installation_option,
-        storage_option,
-    )
+    if storage_option is None:
+        raise click.UsageError(
+            "You must set option '--storage-class' or '--storage_vendor' for the 'datagate' service."
+        )
+
+    if not cloud_pak_for_data_manager.cloud_pak_for_data_service_installed(project, "db2oltp"):
+        logger.info("Installing Db2")
+
+        cloud_pak_for_data_manager.install_cloud_pak_for_data_service(
+            "ibm-common-services",
+            project,
+            "db2oltp",
+            CloudPakForDataServiceLicense[db2_license.capitalize()],
+            [],
+            storage_option,
+        )
+    else:
+        logger.info("Skippig installation of Db2")
+
+    if not cloud_pak_for_data_manager.cloud_pak_for_data_service_installed(project, "db2wh"):
+        logger.info("Installing Db2 Warehouse")
+
+        cloud_pak_for_data_manager.install_cloud_pak_for_data_service(
+            "ibm-common-services",
+            project,
+            "db2wh",
+            cloud_pak_for_data_service_license,
+            [],
+            storage_option,
+        )
+    else:
+        logger.info("Skippig installation of Db2 Warehouse")
+
+    if not cloud_pak_for_data_manager.cloud_pak_for_data_service_installed(project, "dmc"):
+        logger.info("Installing Db2 Data Management Console")
+
+        cloud_pak_for_data_manager.install_cloud_pak_for_data_service(
+            "ibm-common-services",
+            project,
+            "dmc",
+            cloud_pak_for_data_service_license,
+            [],
+            storage_option,
+        )
+    else:
+        logger.info("Skippig installation of Db2 Data Management Console")
+
+    if not cloud_pak_for_data_manager.cloud_pak_for_data_service_installed(project, "datagate"):
+        logger.info("Installing Db2 Data Gate")
+
+        cloud_pak_for_data_manager.install_cloud_pak_for_data_service(
+            "ibm-common-services",
+            project,
+            "datagate",
+            cloud_pak_for_data_service_license,
+            [],
+            storage_option,
+        )
+    else:
+        logger.info("Skippig installation of Db2 Data Gate")

@@ -14,7 +14,7 @@
 
 import logging
 
-from typing import Any, Callable, Dict, List
+from typing import Any, Callable, Dict, List, Optional
 
 import semver
 
@@ -439,23 +439,23 @@ class OpenShiftAPIManager:
             project=project,
         )
 
-    def namespaced_custom_object_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> bool:
-        """Returns whether the custom object with the given name in the given
+    def namespaced_custom_resource_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> bool:
+        """Returns whether the custom resource with the given name in the given
         project of the given kind exists
 
         Parameters
         ----------
         project
-            project to be searched for custom objects
+            project to be searched for custom resources
         name
-            custom object name
+            custom resource name
         kind_metadata
-            kind metadata associated with the kind of the custom object
+            kind metadata associated with the kind of the custom resource
 
         Returns
         -------
         bool
-            true, if the custom object exists
+            true, if the custom resource exists
         """
 
         return self.execute_kubernetes_client(
@@ -507,7 +507,7 @@ class OpenShiftAPIManager:
         return result
 
     def get_catalog_sources(self, project: str) -> Any:
-        """Return OpenShift catalog sources in the given project
+        """Returns OpenShift catalog sources in the given project
 
         Parameters
         ----------
@@ -522,8 +522,30 @@ class OpenShiftAPIManager:
 
         return self.execute_kubernetes_client(self._get_catalog_sources, project=project)
 
+    def get_custom_resource_if_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> Optional[Any]:
+        """Returns custom resource
+
+        Parameters
+        ----------
+        project
+            project to be searched for custom resource
+        name
+            name of the custom resource to be returned
+        kind_metadata
+            kind metadata of the custom resource
+
+        Returns
+        -------
+        Optional[Any]
+            custom resource or None if it does not exist
+        """
+
+        return self.execute_kubernetes_client(
+            self._get_custom_resource_if_exists, kind_metadata=kind_metadata, name=name, project=project
+        )
+
     def get_custom_resource_definitions(self) -> Any:
-        """Return OpenShift custom resource definitions
+        """Returns OpenShift custom resource definitions
 
         Returns
         -------
@@ -545,7 +567,7 @@ class OpenShiftAPIManager:
         return self.execute_kubernetes_client(self._get_credentials)
 
     def get_subscription(self, project: str, name: str) -> Any:
-        """Return OpenShift subscription with the given name in the given
+        """Returns OpenShift subscription with the given name in the given
         project
 
         Parameters
@@ -976,6 +998,20 @@ class OpenShiftAPIManager:
         core_v1_api_result: Any = core_v1_api.read_namespaced_secret("pull-secret", "openshift-config")
 
         return GlobalPullSecretData(core_v1_api_result.data)
+
+    def _get_custom_resource_if_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> Any:
+        custom_objects_api = client.CustomObjectsApi()
+        custom_resource: Optional[Any] = None
+
+        try:
+            custom_resource = custom_objects_api.get_namespaced_custom_object(
+                kind_metadata.group, kind_metadata.version, project, kind_metadata.plural, name
+            )
+        except client.ApiException as exception:
+            if exception.status != 404:
+                raise exception
+
+        return custom_resource
 
     def _get_custom_resource_definitions(self) -> Any:
         custom_objects_api = client.CustomObjectsApi()
