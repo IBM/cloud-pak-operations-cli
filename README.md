@@ -117,13 +117,13 @@ dg adm update-dev
 - Bash: Add the following code to `.bashrc`:
 
   ```shell
-  . $(pip3 show dg | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-bash.sh
+  . $(pip3 show data-gate-cli | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-bash.sh
   ```
 
 - zsh: Add the following code to `.zshrc`:
 
   ```shell
-  . $(pip3 show dg | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-zsh.sh
+  . $(pip3 show data-gate-cli | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-zsh.sh
   ```
 
 ## Running inside a Docker container
