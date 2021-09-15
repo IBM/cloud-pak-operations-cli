@@ -34,7 +34,38 @@ For IBM-internal users, the Db2 Data Gate CLI additionally supports managing Ope
 
 #### Db2 Data Gate CLI installation and update (latest release build)
 
-TBA [September 2021]
+<table>
+<thead>
+<tr>
+<th>Action</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr/>
+<tr>
+<td>Installation (provides <code>dg</code> command)</td>
+<td>
+
+```shell
+pip3 install data-gate-cli
+```
+
+</td>
+</tr>
+<tr/>
+<tr>
+<td>Update</td>
+<td>
+
+```shell
+pip3 install --upgrade data-gate-cli
+```
+
+</td>
+</tr>
+</tbody>
+</table>
 
 #### Db2 Data Gate CLI installation and update (latest development code)
 
@@ -46,6 +77,7 @@ TBA [September 2021]
 </tr>
 </thead>
 <tbody>
+<tr/>
 <tr>
 <td>Installation (provides <code>dg</code> command)</td>
 <td>
@@ -56,6 +88,7 @@ pip3 install git+https://git@github.com/IBM/data-gate-cli.git
 
 </td>
 </tr>
+<tr/>
 <tr>
 <td>Update</td>
 <td>
@@ -120,7 +153,8 @@ docker run -it quay.io/ibm/data-gate-cli:latest bash
 - Store your [IBM Cloud Pak for Data entitlement key](https://myibm.ibm.com/products-services/containerlibrary):
 
   ```shell
-  dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key $IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY
+  dg adm store-credentials \
+      --ibm-cloud-pak-for-data-entitlement-key $IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY
   ```
 
 - Install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
@@ -133,6 +167,7 @@ docker run -it quay.io/ibm/data-gate-cli:latest bash
 </tr>
 </thead>
 <tbody>
+<tr/>
 <tr>
 <td>3.5.0</td>
 <td>
@@ -143,20 +178,34 @@ dg cpd3 install-db2-data-gate-stack --storage-class $STORAGE_CLASS
 
 </td>
 </tr>
+<tr/>
 <tr>
-<td>4.0.x</td>
+<td rowspan="3">4.0.x</td>
 <td>
 
 ```shell
-dg cpd4 install --accept-license --force --license (ENTERPRISE|STANDARD) --storage-class $STORAGE_CLASS
-dg cpd4 service install-db2-data-gate-stack
-    --accept-all-licenses
-    --db2-license (ADVANCED|COMMUNITY|STANDARD)
-    --license (ENTERPRISE|STANDARD)
+dg cpd4 install \
+    --accept-license \
+    --force \
+    --license (ENTERPRISE|STANDARD) \
     --storage-class $STORAGE_CLASS
 ```
 
 </td>
+<tr/>
+<tr>
+<td>
+
+```shell
+dg cpd4 service install-db2-data-gate-stack \
+    --accept-all-licenses \
+    --db2-license (ADVANCED|COMMUNITY|STANDARD) \
+    --license (ENTERPRISE|STANDARD) \
+    --storage-class $STORAGE_CLASS
+```
+
+</td>
+</tr>
 </tr>
 </tbody>
 </table>
@@ -179,8 +228,9 @@ dg cpd4 service install-db2-data-gate-stack
 </tr>
 </thead>
 <tbody>
+<tr/>
 <tr>
-<td>Inst. w/ an existing cluster</td>
+<td>Installation with an existing cluster</td>
 <td>
 
 ```shell
@@ -189,12 +239,16 @@ dg ibmcloud oc cluster install --cluster-name $CLUSTER_NAME
 
 </td>
 </tr>
+<tr/>
 <tr>
-<td>Inst. w/o an existing cluster</td>
+<td>Installation without an existing cluster</td>
 <td>
 
 ```shell
-dg ibmcloud oc cluster create --alias $ALIAS --cluster-name $CLUSTER_NAME --full-install
+dg ibmcloud oc cluster create \
+    --alias $ALIAS \
+    --cluster-name $CLUSTER_NAME \
+    --full-install
 ```
 
 </td>
