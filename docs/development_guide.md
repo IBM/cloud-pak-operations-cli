@@ -96,7 +96,7 @@ Use [FunctionTrace](https://functiontrace.com/) to profile a Db2 Data Gate CLI c
 
 - Use [Firefox Profiler](https://profiler.firefox.com/) to analyze the profiling data file.
 
-## Releasing a new version using semantic versioning
+## Testing the release of a new version using semantic versioning
 
 - Create a new branch, commit the code leading to a new release, and tag the commit with a semantic version:
 
@@ -110,26 +110,54 @@ Use [FunctionTrace](https://functiontrace.com/) to profile a Db2 Data Gate CLI c
   git push --atomic origin $BRANCH_NAME v$MAJOR.$MINOR.$PATCH
   ```
 
-- Create a pull request based on the created branch
-- Merge the reviewed pull request
+- Delete the tag:
+
+  ```shell
+  git tag --delete v$MAJOR.$MINOR.$PATCH
+  ```
+
+- Delete the remote tag:
+
+  ```shell
+  git push --delete origin v$MAJOR.$MINOR.$PATCH
+  ```
 
 After having pushed the branch and the tag, the following actions are performed:
 
 - A Python distribution is built using the tagged version as the package version.
 - The Python distribution is published to [TestPyPI](https://test.pypi.org/).
 
-After having merged the pull request, the following actions are performed:
+To install a specific Db2 Data Gate CLI version from TestPyPI, execute the following command:
+
+```shell
+pip3 install --extra-index-url https://pypi.org/simple --index-url https://test.pypi.org/simple/ data-gate-cli==$VERSION
+```
+
+If you are satistifed with the result and would like to publish the Python distribution to [PyPI](https://pypi.org/), continue as follows:
+
+- Create a pull request based on the created branch
+- Merge the reviewed pull request
+
+## Releasing a new version using semantic versioning
+
+- On the master branch, tag the latest commit with a semantic version:
+
+  ```shell
+  git tag v$MAJOR.$MINOR.$PATCH
+  ```
+
+- Push the tag:
+
+  ```shell
+  git push origin v$MAJOR.$MINOR.$PATCH
+  ```
+
+After having pushed the tag, the following actions are performed:
 
 - A Python distribution is built using the tagged version as the package version.
 - The Python distribution is published to [PyPI](https://pypi.org/).
 - A Docker image containing the installed Python distribution is built and pushed to Quay.
 - A GitHub release draft is created, which must be manually published.
-
-To install a Db2 Data Gate CLI version from TestPyPI, execute the following command:
-
-```shell
-pip3 install --extra-index-url https://pypi.org/simple --index-url https://test.pypi.org/simple/ data-gate-cli==$VERSION
-```
 
 ## References
 
