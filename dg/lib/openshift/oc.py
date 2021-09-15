@@ -293,3 +293,25 @@ def replace_custom_resource(custom_resource_json: dict):
         oc_set_custom_resource_args = ["replace", "-f", tmp.name]
 
         execute_oc_command(oc_set_custom_resource_args)
+
+
+def get_replicasets_for_deployment(deployment_name: str) -> List[str]:
+    oc_get_replicasets_args = [ "get", "replicasets", "-l", f"app={deployment_name}"]
+
+    oc_get_replicasets_result = execute_oc_command(oc_get_replicasets_args, capture_output=True).stdout
+
+    result = []
+    for line in oc_get_replicasets_result.splitlines():
+        if deployment_name in line:
+            result.append(line.split()[0].strip())
+
+    if not result:
+        raise DataGateCLIException(f"Replicaset(s) containing the deployment name '{deployment_name}' could not be found")
+
+    return result
+
+
+def delete_replicaset(replicaset_name: str):
+    oc_delete_replicaset_args = ["delete", "replicaset", replicaset_name]
+
+    execute_oc_command(oc_delete_replicaset_args)

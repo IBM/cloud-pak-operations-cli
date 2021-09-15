@@ -87,18 +87,36 @@ def replace_component_images(
 
     oc.replace_custom_resource(custom_resource_json)
 
+    # remove existing replicasets to prevent spinning up more than one Data Gate pod
+    for replicaset in oc.get_replicasets_for_deployment(_get_app_name_from_deployment_name(deployment_name)):
+        oc.delete_replicaset(replicaset)
+
     oc.scale_deployment(deployment_name, 1)
     oc.wait_until_deployment_rollout_completes(deployment_name, timeout)
 
 
-def _infer_custom_resource_id_from_deployment_name(deployment_name: str) -> str:
+def _get_app_name_from_deployment_name(deployment_name: str) -> str:
     result = ""
-    m = re.match(r"dg-([0-9]+)-data-gate", deployment_name)
+    m = re.match(r"(dg-[0-9]+)-data-gate", deployment_name)
 
     if m and m.group(1):
-        result = "dg" + m.group(1)
-        logging.debug(f"Custom resource id: {result}")
+        result = m.group(1)
+        logging.debug(f"App name: {result}")
     else:
+        raise DataGateCLIException(
+            f"Unable to retrieve app name for Data Gate deployment name '{deployment_name}'"
+        )
+
+    return result
+
+
+def _infer_custom_resource_id_from_deployment_name(deployment_name: str) -> str:
+    result = ""
+
+    try:
+        app_name = _get_app_name_from_deployment_name(deployment_name)
+        result = app_name.replace("-", "")
+    except DataGateCLIException:
         raise DataGateCLIException(
             f"Unable to retrieve custom resource id for Data Gate deployment name '{deployment_name}'"
         )
