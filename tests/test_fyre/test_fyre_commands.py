@@ -303,7 +303,7 @@ class TestFYRECommands(unittest.TestCase):
                 TestFYRECommands._logger.info(f"Ignoring exception: {exception.get_error_message()}")
 
     def _install_db2_data_gate_stack(self):
-        args = ["cluster", "install-db2-data-gate-stack", "--storage-class", "managed-nfs-storage"]
+        args = ["cluster", "install-db2-data-gate-stack", "--storage-vendor", "nfs"]
 
         self._invoke_dg_command(args)
 

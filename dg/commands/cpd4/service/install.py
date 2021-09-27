@@ -113,7 +113,7 @@ def install(
     )
 
     if (storage_class is not None) and (storage_vendor is not None):
-        raise click.UsageError("You must not set options '--storage-class' and '--storage_vendor'.", ctx)
+        raise click.UsageError("You must not set options '--storage-class' and '--storage-vendor'.", ctx)
 
     storage_option: Optional[Union[str, CloudPakForDataStorageVendor]] = (
         storage_class if storage_class is not None else cloud_pak_for_data_storage_vendor

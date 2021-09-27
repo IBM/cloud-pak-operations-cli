@@ -924,9 +924,9 @@ class OpenShiftAPIManager:
             "apiVersion": "storage.k8s.io/v1",
             "kind": "StorageClass",
             "metadata": {
-                "name": "managed-nfs-storage",
+                "name": name,
             },
-            "provisioner": "k8s-sigs.io/nfs-subdir-external-provisioner",
+            "provisioner": provisioner,
         }
 
         storage_class["parameters"] = parameters
