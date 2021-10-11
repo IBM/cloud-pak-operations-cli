@@ -235,7 +235,7 @@ class CloudPakForDataManager:
         cpd_instance_project: str,
         ibm_cloud_pak_for_data_entitlement_key: str,
         license: CloudPakForDataLicense,
-        storage_class: str,
+        storage_option: Union[str, CloudPakForDataStorageVendor],
     ) -> CloudPakForDataAccessData:
         """Installs IBM Cloud Pak for Data
 
@@ -249,8 +249,8 @@ class CloudPakForDataManager:
             IBM Cloud Pak for Data entitlement key
         license
             IBM Cloud Pak for Data license
-        storage_class
-            storage class used for installation
+        storage_option
+            storage class/vendor to be used when creating the custom resource
 
         Returns
         -------
@@ -268,7 +268,7 @@ class CloudPakForDataManager:
         self.install_cloud_pak_for_data_foundational_services(ibm_cloud_pak_for_data_entitlement_key)
 
         cloud_pak_for_data_access_data = self._install_cloud_pak_for_data(
-            cpd_operators_project, cpd_instance_project, license, storage_class
+            cpd_operators_project, cpd_instance_project, license, storage_option
         )
 
         return cloud_pak_for_data_access_data
@@ -612,7 +612,10 @@ class CloudPakForDataManager:
                 logging.info(f"Skipping creation of catalog source '{catalog_source_name}'")
 
     def _create_cloud_pak_for_data_custom_resource(
-        self, cpd_instance_project: str, license: CloudPakForDataLicense, storage_class: str
+        self,
+        cpd_instance_project: str,
+        license: CloudPakForDataLicense,
+        storage_option: Union[str, CloudPakForDataStorageVendor],
     ):
         """Creates an Ibmcpd custom resource to install IBM Cloud Pak for Data
 
@@ -675,11 +678,15 @@ class CloudPakForDataManager:
                     "accept": True,
                     "license": license.name,
                 },
-                "storageClass": storage_class,
-                "zenCoreMetadbStorageClass": storage_class,
                 "version": "4.0.1",
             },
         }
+
+        if isinstance(storage_option, str):
+            ibmcpd["spec"]["storageClass"] = storage_option
+            ibmcpd["spec"]["zenCoreMetadbStorageClass"] = storage_option
+        else:
+            ibmcpd["spec"]["storageVendor"] = storage_option.name
 
         self._openshift_manager.execute_kubernetes_client(
             self._create_custom_resource,
@@ -1218,7 +1225,11 @@ class CloudPakForDataManager:
         self._suspend_spinner_and_log_debug_message(spinner, "OpenShift API server closed connection")
 
     def _install_cloud_pak_for_data(
-        self, cpd_operators_project: str, cpd_instance_project: str, license: CloudPakForDataLicense, storage_class: str
+        self,
+        cpd_operators_project: str,
+        cpd_instance_project: str,
+        license: CloudPakForDataLicense,
+        storage_option: Union[str, CloudPakForDataStorageVendor],
     ) -> CloudPakForDataAccessData:
         """Installs IBM Cloud Pak for Data
 
@@ -1230,8 +1241,8 @@ class CloudPakForDataManager:
             IBM Cloud Pak for Data instance project
         license
             IBM Cloud Pak for Data license
-        storage_class
-            storage class used for installation
+        storage_option
+            storage class/vendor to be used when creating the custom resource
 
         Notes
         -----
@@ -1247,7 +1258,7 @@ class CloudPakForDataManager:
         self._create_project(cpd_instance_project)
         self._create_catalog_sources(CatalogSourceManager().get_catalog_sources())
         self._create_cloud_pak_for_data_operator_subscription(cpd_operators_project)
-        self._create_cloud_pak_for_data_custom_resource(cpd_instance_project, license, storage_class)
+        self._create_cloud_pak_for_data_custom_resource(cpd_instance_project, license, storage_option)
         self._wait_for_cloud_pak_for_data_installation_completion(cpd_instance_project)
 
         return self._openshift_manager.execute_kubernetes_client(self._get_access_data)

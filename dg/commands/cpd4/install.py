@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional
+from typing import Optional, Union
 
 import click
 
@@ -29,6 +29,9 @@ from dg.lib.cloud_pak_for_data.cpd_4_0_0.cpd_manager import (
 )
 from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import (
     CloudPakForDataLicense,
+)
+from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_storage_vendor import (
+    CloudPakForDataStorageVendor,
 )
 from dg.lib.openshift.utils.click import openshift_server_options
 from dg.utils.logging import loglevel_command
@@ -58,7 +61,15 @@ from dg.utils.logging import loglevel_command
     ),
 )
 @click.option("--project", default="zen", help="Project where the Cloud Pak for Data control plane is installed")
-@click.option("--storage-class", help="Storage class used for installation", required=True)
+@click.option("--storage-class", help="Storage class used for installation")
+@click.option(
+    "--storage-vendor",
+    help="Storage type used for installation",
+    type=click.Choice(
+        list(map(lambda x: x.name.lower(), CloudPakForDataStorageVendor)),
+        case_sensitive=False,
+    ),
+)
 @click.pass_context
 def install(
     ctx: click.Context,
@@ -72,7 +83,8 @@ def install(
     ibm_cloud_pak_for_data_entitlement_key: str,
     license: str,
     project: str,
-    storage_class: str,
+    storage_class: Optional[str],
+    storage_vendor: Optional[str],
 ):
     """Install IBM Cloud Pak for Data"""
 
@@ -85,6 +97,20 @@ def install(
             abort=True,
         )
 
+    cloud_pak_for_data_storage_vendor = (
+        CloudPakForDataStorageVendor[storage_vendor.lower()] if storage_vendor is not None else None
+    )
+
+    if (storage_class is not None) and (storage_vendor is not None):
+        raise click.UsageError("You must not set options '--storage-class' and '--storage-vendor'.", ctx)
+
+    storage_option: Optional[Union[str, CloudPakForDataStorageVendor]] = (
+        storage_class if storage_class is not None else cloud_pak_for_data_storage_vendor
+    )
+
+    if storage_option is None:
+        raise click.UsageError("You must set option '--storage-class' or '--storage-vendor'.")
+
     cloud_pak_for_data_access_data = CloudPakForDataManager(
         dg.lib.click.utils.get_cluster_credentials(ctx, locals().copy())
     ).install_cloud_pak_for_data(
@@ -92,7 +118,7 @@ def install(
         project,
         ibm_cloud_pak_for_data_entitlement_key,
         CloudPakForDataLicense[license.capitalize()],
-        storage_class,
+        storage_option,
     )
 
     click.echo(

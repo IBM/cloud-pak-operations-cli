@@ -89,11 +89,11 @@
   - Install IBM Cloud Pak for Data:
 
     ```shell
-    dg cpd4 install --accept-license --force --license (ENTERPRISE|STANDARD) --storage-class managed-nfs-storage
+    dg cpd4 install --accept-license --force --license (ENTERPRISE|STANDARD) --storage-vendor nfs
     ```
 
   - Install IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
 
     ```shell
-    dg cpd4 service install-db2-data-gate-stack --accept-all-licenses --db2-license (ADVANCED|COMMUNITY|STANDARD) --license (ENTERPRISE|STANDARD) --storage-class managed-nfs-storage
+    dg cpd4 service install-db2-data-gate-stack --accept-all-licenses --db2-license (ADVANCED|COMMUNITY|STANDARD) --license (ENTERPRISE|STANDARD) --storage-vendor nfs
     ```

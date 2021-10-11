@@ -106,7 +106,7 @@ def install_db2_data_gate_stack(
     )
 
     if (storage_class is not None) and (storage_vendor is not None):
-        raise click.UsageError("You must not set options '--storage-class' and '--storage_vendor'.", ctx)
+        raise click.UsageError("You must not set options '--storage-class' and '--storage-vendor'.", ctx)
 
     storage_option: Optional[Union[str, CloudPakForDataStorageVendor]] = (
         storage_class if storage_class is not None else cloud_pak_for_data_storage_vendor
@@ -114,7 +114,7 @@ def install_db2_data_gate_stack(
 
     if storage_option is None:
         raise click.UsageError(
-            "You must set option '--storage-class' or '--storage_vendor' for the 'datagate' service."
+            "You must set option '--storage-class' or '--storage-vendor' for the 'datagate' service."
         )
 
     if not cloud_pak_for_data_manager.cloud_pak_for_data_service_installed(project, "db2oltp"):
