@@ -72,7 +72,7 @@ class CustomResourceMetadata:
             )
 
         if storage_option is None and self._storage_option_required:
-            raise DataGateCLIException("You must set option '--storage-class' or '--storage_vendor' for this service.")
+            raise DataGateCLIException("You must set option '--storage-class' or '--storage-vendor' for this service.")
 
     @property
     def description(self) -> str:
