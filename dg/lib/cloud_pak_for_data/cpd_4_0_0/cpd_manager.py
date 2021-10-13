@@ -1325,7 +1325,9 @@ class CloudPakForDataManager:
         """Waits for IBM Cloud Pak for Data custom resource definitions to be
         created"""
 
-        with Halo(text="Waiting for custom resource definitions to be created", spinner="dots") as spinner:
+        with Halo(
+            text="Waiting for custom resource definitions to be created", spinner="dots"
+        ) as spinner, dg.utils.logging.ScopedSpinnerDisabler(dg.dg.click_logging_handler, spinner):
             self._openshift_manager.execute_kubernetes_client(
                 self._wait_for_custom_resource,
                 encountered_crd_kinds=set(),
@@ -1344,7 +1346,9 @@ class CloudPakForDataManager:
             project in which IBM Cloud Pak for Data is installed
         """
 
-        with Halo(text="Waiting for IBM Cloud Pak for Data to be installed", spinner="dots") as spinner:
+        with Halo(
+            text="Waiting for IBM Cloud Pak for Data to be installed", spinner="dots"
+        ) as spinner, dg.utils.logging.ScopedSpinnerDisabler(dg.dg.click_logging_handler, spinner):
             self._openshift_manager.execute_kubernetes_client(
                 self._wait_for_custom_resource,
                 encountered_crd_kinds=set(),
