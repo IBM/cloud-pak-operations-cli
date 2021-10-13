@@ -60,6 +60,25 @@ class QuotaGetResponseManager(AbstractJSONResponseManager):
                 "productGroupQuota": {
                     "additionalProperties": False,
                     "properties": {
+                        "ip": {
+                            "properties": {
+                                "floating": {
+                                    "properties": {
+                                        "quota": {"type": "string"},
+                                        "used": {"type": "string"},
+                                    },
+                                    "required": [
+                                        "quota",
+                                        "used",
+                                    ],
+                                    "type": "object",
+                                }
+                            },
+                            "required": [
+                                "floating",
+                            ],
+                            "type": "object",
+                        },
                         "p": {
                             "$ref": platform_quota_ref,
                         },
