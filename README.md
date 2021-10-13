@@ -10,7 +10,7 @@
     </p>
 </div>
 
-The Db2 Data Gate CLI allows the user-friendly installation of IBM Cloud Pak for Data 3.5.0/4.0.x, Db2 (Warehouse), the IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate on OpenShift clusters. It also allows the one-click deployment of a Red Hat OpenShift on IBM Cloud cluster including the installation of IBM Cloud Pak for Data, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software.
+The Db2 Data Gate CLI allows the user-friendly installation of IBM Cloud Pak for Data 3.5.0/4.0.x, Db2 (Warehouse), the IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate on OpenShift clusters. It also allows the one-click deployment of a Red Hat OpenShift on IBM Cloud cluster including the installation of Cloud Pak for Data, Db2 Warehouse, and Db2 for z/OS Data Gate as software.
 
 For IBM-internal users, the Db2 Data Gate CLI additionally supports managing OpenShift clusters on FYRE.
 
@@ -117,13 +117,13 @@ dg adm update-dev
 - Bash: Add the following code to `.bashrc`:
 
   ```shell
-  . $(pip3 show data-gate-cli | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-bash.sh
+  . $(dg adm get-shell-completion-script-location --shell bash)
   ```
 
 - zsh: Add the following code to `.zshrc`:
 
   ```shell
-  . $(pip3 show data-gate-cli | sed -En 's/Location: (.*)/\1/p')/dg/deps/autocomplete/dg-autocomplete-zsh.sh
+  . $(dg adm get-shell-completion-script-location --shell zsh)
   ```
 
 ## Running inside a Docker container
@@ -257,6 +257,11 @@ dg ibmcloud oc cluster create \
 </table>
 
 ### IBM-internal
+
+- Enable FYRE-specific commands:
+
+  ```shell
+  dg adm config set --key fyre_commands --value true
 
 - [Installing IBM Cloud Pak for Data on a FYRE-based OpenShift cluster](docs/installing_ibm_cloud_pak_for_data_on_a_fyre-based_openshift_cluster.md)
 

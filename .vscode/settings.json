@@ -32,7 +32,6 @@
 		"click",
 		"--trailing-comma"
 	],
-	"python.testing.nosetestsEnabled": false,
 	"python.testing.pytestEnabled": false,
 	"python.testing.unittestArgs": [
 		"--start-directory",
