@@ -1119,3 +1119,5 @@ class OpenShiftAPIManager:
                 ],
             }
         )
+
+        self._kube_config_initialized = True
