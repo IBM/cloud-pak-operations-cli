@@ -46,7 +46,7 @@ class CloudPakForDataServiceManager:
                 operator_name="ibm-datagate-operator",
                 spec={
                     "datagate": "yes",
-                    "version": "2.0.1",
+                    "version": "2.0.2",
                 },
                 status_key_name="datagateStatus",
                 storage_option_required=True,
@@ -94,7 +94,7 @@ class CloudPakForDataServiceManager:
                 name="dmc-addon",
                 operator_name="ibm-dmc-operator",
                 spec={
-                    "version": "4.0.1",
+                    "version": "4.0.2",
                 },
                 status_key_name="dmcAddonStatus",
                 storage_option_required=False,
