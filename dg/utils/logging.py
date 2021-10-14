@@ -88,7 +88,7 @@ class ClickLoggingHandler(logging.Handler):
 
 
 class ScopedLoggingDisabler:
-    """Temprarily disables logging when used as part of a with statement"""
+    """Temporarily disables logging when used as part of a with statement"""
 
     def __init__(self, is_enabled=True) -> None:
         self._is_enabled = is_enabled

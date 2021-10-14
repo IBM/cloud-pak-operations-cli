@@ -21,10 +21,9 @@ import requests
 
 from requests.models import Response
 
-import dg.utils.network
-
 from dg.lib.error import DataGateCLIException
 from dg.lib.openshift.credentials.credentials import AbstractCredentials
+from dg.utils.network import ScopedInsecureRequestWarningDisabler
 
 
 class UserCredentials(AbstractCredentials):
@@ -58,13 +57,9 @@ class UserCredentials(AbstractCredentials):
     # override
     def refresh_access_token(self):
         authorization_endpoint = self._get_authorization_endpoint()
-
-        if self._insecure_skip_tls_verify:
-            dg.utils.network.disable_insecure_request_warning()
-
         response: Optional[Response] = None
 
-        try:
+        with ScopedInsecureRequestWarningDisabler(self._insecure_skip_tls_verify):
             response = requests.get(
                 UserCredentials.OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT.format(
                     authorization_endpoint=authorization_endpoint
@@ -73,8 +68,6 @@ class UserCredentials(AbstractCredentials):
                 auth=(self._username, self._password),
                 verify=not self._insecure_skip_tls_verify,
             )
-        finally:
-            dg.utils.network.enable_insecure_request_warning()
 
         if not response.ok:
             if response.content is not None:
@@ -101,18 +94,13 @@ class UserCredentials(AbstractCredentials):
             OAuth authorization endpoint returned by the OAuth server
         """
 
-        if self._insecure_skip_tls_verify:
-            dg.utils.network.disable_insecure_request_warning()
-
         response: Optional[Response] = None
 
-        try:
+        with ScopedInsecureRequestWarningDisabler(self._insecure_skip_tls_verify):
             response = requests.get(
                 f"{self._server}/.well-known/oauth-authorization-server",
                 verify=not self._insecure_skip_tls_verify,
             )
-        finally:
-            dg.utils.network.enable_insecure_request_warning()
 
         if not response.ok:
             if response.content is not None:

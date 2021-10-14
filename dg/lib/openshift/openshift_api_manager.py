@@ -21,7 +21,6 @@ import semver
 from kubernetes import client, config
 
 import dg.lib.jmespath
-import dg.utils.network
 
 from dg.lib.error import DataGateCLIException
 from dg.lib.openshift.credentials.credentials import AbstractCredentials
@@ -35,6 +34,7 @@ from dg.lib.openshift.types.role_binding import RoleBinding
 from dg.lib.openshift.types.role_rule import RoleRule
 from dg.lib.openshift.types.service_account import ServiceAccount
 from dg.lib.openshift.types.subscription import Subscription
+from dg.utils.network import ScopedInsecureRequestWarningDisabler
 
 logger = logging.getLogger(__name__)
 
@@ -484,25 +484,21 @@ class OpenShiftAPIManager:
         if not self._kube_config_initialized:
             self._set_kube_config()
 
-        if self._credentials.insecure_skip_tls_verify:
-            dg.utils.network.disable_insecure_request_warning()
-
         result: Any = None
 
-        try:
-            result = method(**kwargs)
-        except client.ApiException as exception:
-            if exception.status == 401:
-                if not self._credentials.is_refreshable():
-                    raise DataGateCLIException("OAuth access token expired and cannot be refreshed")
-
-                self._credentials.refresh_access_token()
-                self._set_kube_config()
+        with ScopedInsecureRequestWarningDisabler(self._credentials.insecure_skip_tls_verify):
+            try:
                 result = method(**kwargs)
-            else:
-                raise exception
-        finally:
-            dg.utils.network.enable_insecure_request_warning()
+            except client.ApiException as exception:
+                if exception.status == 401:
+                    if not self._credentials.is_refreshable():
+                        raise DataGateCLIException("OAuth access token expired and cannot be refreshed")
+
+                    self._credentials.refresh_access_token()
+                    self._set_kube_config()
+                    result = method(**kwargs)
+                else:
+                    raise exception
 
         return result
 
