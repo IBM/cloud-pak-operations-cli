@@ -1,0 +1,64 @@
+{
+	"datagate": {
+		"api_version": "datagate.cpd.ibm.com/v1",
+		"description": "Db2 Data Gate",
+		"kind": "DatagateService",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "datagateservice-cr",
+		"operator_name": "ibm-datagate-operator",
+		"spec": {
+			"datagate": "yes",
+			"version": "2.0.2"
+		},
+		"status_key_name": "datagateStatus",
+		"storage_option_required": true
+	},
+	"db2oltp": {
+		"api_version": "databases.cpd.ibm.com/v1",
+		"description": "Db2",
+		"kind": "Db2oltpService",
+		"licenses": [
+			"Advanced",
+			"Community",
+			"Standard"
+		],
+		"name": "db2oltp-cr",
+		"operator_name": "ibm-db2oltp-cp4d-operator",
+		"spec": {},
+		"status_key_name": "db2oltpStatus",
+		"storage_option_required": false
+	},
+	"db2wh": {
+		"api_version": "databases.cpd.ibm.com/v1",
+		"description": "Db2 Warehouse",
+		"kind": "Db2whService",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "db2wh-cr",
+		"operator_name": "ibm-db2wh-cp4d-operator",
+		"spec": {},
+		"status_key_name": "db2whStatus",
+		"storage_option_required": false
+	},
+	"dmc": {
+		"api_version": "dmc.databases.ibm.com/v1",
+		"description": "Db2 Data Management Console",
+		"kind": "Dmcaddon",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "dmc-addon",
+		"operator_name": "ibm-dmc-operator",
+		"spec": {
+			"version": "4.0.2"
+		},
+		"status_key_name": "dmcAddonStatus",
+		"storage_option_required": false
+	}
+}

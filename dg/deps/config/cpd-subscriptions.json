@@ -1,0 +1,496 @@
+{
+	"analyticsengine-operator": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-cpd-ae-operator-subscription",
+			"app.kubernetes.io/managed-by": "ibm-cpd-ae-operator",
+			"app.kubernetes.io/name": "ibm-cpd-ae-operator-subscription"
+		},
+		"name": "ibm-cpd-ae-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "stable-v1",
+			"name": "analyticsengine-operator"
+		}
+	},
+	"cloud-native-postgresql": {
+		"dependencies": [],
+		"labels": {},
+		"name": "cloud-native-postgresql-catalog-subscription",
+		"required_namespace": "openshift-operators",
+		"service": true,
+		"spec": {
+			"channel": "stable",
+			"name": "cloud-native-postgresql"
+		}
+	},
+	"cpd-platform-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "cpd-operator",
+		"required_namespace": null,
+		"service": false,
+		"spec": {
+			"channel": "v2.0",
+			"name": "cpd-platform-operator"
+		}
+	},
+	"db2u-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-db2u-operator",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.1",
+			"name": "db2u-operator"
+		}
+	},
+	"ibm-bigsql-operator": {
+		"dependencies": [
+			"db2u-operator"
+		],
+		"labels": {},
+		"name": "ibm-bigsql-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v7.2",
+			"name": "ibm-bigsql-operator"
+		}
+	},
+	"ibm-ca-operator": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-ca-operator",
+			"app.kubernetes.io/managed-by": "ibm-ca-operator",
+			"app.kubernetes.io/name": "ibm-ca-operator"
+		},
+		"name": "ibm-ca-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v4.0",
+			"name": "ibm-ca-operator"
+		}
+	},
+	"ibm-cde-operator": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-cde-operator-subscription",
+			"app.kubernetes.io/managed-by": "ibm-cde-operator",
+			"app.kubernetes.io/name": "ibm-cde-operator-subscription"
+		},
+		"name": "ibm-cde-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-cde-operator"
+		}
+	},
+	"ibm-common-service-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-common-service-operator",
+		"required_namespace": null,
+		"service": false,
+		"spec": {
+			"channel": "v3",
+			"name": "ibm-common-service-operator"
+		}
+	},
+	"ibm-cpd-datastage-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-cpd-datastage-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-cpd-datastage-operator"
+		}
+	},
+	"ibm-cpd-dods": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-cpd-dods-operator-catalog-subscription",
+			"app.kubernetes.io/managed-by": "ibm-cpd-dods-operator",
+			"app.kubernetes.io/name": "ibm-cpd-dods-operator-catalog-subscription"
+		},
+		"name": "ibm-cpd-dods-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v4.0",
+			"name": "ibm-cpd-dods"
+		}
+	},
+	"ibm-cpd-edb": {
+		"dependencies": [
+			"cloud-native-postgresql"
+		],
+		"labels": {},
+		"name": "ibm-cpd-edb-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v4.0",
+			"name": "ibm-cpd-edb"
+		}
+	},
+	"ibm-cpd-hadoop": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-cpd-hadoop-operator-catalog-subscription",
+			"app.kubernetes.io/managed-by": "ibm-cpd-hadoop-operator",
+			"app.kubernetes.io/name": "ibm-cpd-hadoop-operator-catalog-subscription"
+		},
+		"name": "ibm-cpd-hadoop-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-cpd-hadoop"
+		}
+	},
+	"ibm-cpd-mongodb": {
+		"dependencies": [
+			"mongodb-enterprise"
+		],
+		"labels": {},
+		"name": "ibm-cpd-mongodb-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v4.0",
+			"name": "ibm-cpd-mongodb"
+		}
+	},
+	"ibm-cpd-openpages-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-cpd-openpages-operator",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-cpd-openpages-operator"
+		}
+	},
+	"ibm-cpd-productmaster": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-productmaster-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "alpha",
+			"name": "ibm-cpd-productmaster"
+		}
+	},
+	"ibm-cpd-rstudio": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-cpd-rstudio-operator-catalog-subscription",
+			"app.kubernetes.io/managed-by": "ibm-cpd-rstudio-operator",
+			"app.kubernetes.io/name": "ibm-cpd-rstudio-operator-catalog-subscription"
+		},
+		"name": "ibm-cpd-rstudio-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-cpd-rstudio"
+		}
+	},
+	"ibm-cpd-spss": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-cpd-spss-operator-catalog-subscription",
+			"app.kubernetes.io/managed-by": "ibm-cpd-spss-operator",
+			"app.kubernetes.io/name": "ibm-cpd-spss-operator-catalog-subscription"
+		},
+		"name": "ibm-cpd-spss-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-cpd-spss"
+		}
+	},
+	"ibm-cpd-wkc": {
+		"dependencies": [
+			"db2u-operator"
+		],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-cpd-wkc-operator-catalog-subscription",
+			"app.kubernetes.io/managed-by": "ibm-cpd-wkc-operator",
+			"app.kubernetes.io/name": "ibm-cpd-wkc-operator-catalog-subscription"
+		},
+		"name": "ibm-cpd-wkc-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-cpd-wkc"
+		}
+	},
+	"ibm-cpd-wml-accelerator-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-cpd-wml-accelerator-operator",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "WML-Accelerator-2.3",
+			"name": "ibm-cpd-wml-accelerator-operator"
+		}
+	},
+	"ibm-cpd-wml-operator": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-cpd-wml-operator-subscription",
+			"app.kubernetes.io/managed-by": "ibm-cpd-wml-operator",
+			"app.kubernetes.io/name": "ibm-cpd-wml-operator-subscription"
+		},
+		"name": "ibm-cpd-wml-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.1",
+			"name": "ibm-cpd-wml-operator"
+		}
+	},
+	"ibm-cpd-wos": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-watson-openscale-operator-subscription",
+			"app.kubernetes.io/managed-by": "ibm-watson-openscale-operator",
+			"app.kubernetes.io/name": "ibm-watson-openscale-operator-subscription"
+		},
+		"name": "ibm-watson-openscale-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1",
+			"name": "ibm-cpd-wos"
+		}
+	},
+	"ibm-cpd-ws-runtimes": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-cpd-ws-runtimes-operator-catalog-subscription",
+			"app.kubernetes.io/managed-by": "ibm-cpd-ws-runtimes-operator",
+			"app.kubernetes.io/name": "ibm-cpd-ws-runtimes-operator"
+		},
+		"name": "ibm-cpd-ws-runtimes-operator",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-cpd-ws-runtimes"
+		}
+	},
+	"ibm-cpd-wsl": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-cpd-ws-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v2.0",
+			"name": "ibm-cpd-wsl"
+		}
+	},
+	"ibm-datagate-operator": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-datagate-operator-subscription",
+			"app.kubernetes.io/managed-by": "ibm-datagate-operator",
+			"app.kubernetes.io/name": "ibm-datagate-operator-subscription"
+		},
+		"name": "ibm-datagate-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v2.0",
+			"name": "ibm-datagate-operator"
+		}
+	},
+	"ibm-db2oltp-cp4d-operator": {
+		"dependencies": [
+			"db2u-operator"
+		],
+		"labels": {},
+		"name": "ibm-db2oltp-cp4d-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-db2oltp-cp4d-operator"
+		}
+	},
+	"ibm-db2wh-cp4d-operator": {
+		"dependencies": [
+			"db2u-operator"
+		],
+		"labels": {},
+		"name": "ibm-db2wh-cp4d-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-db2wh-cp4d-operator"
+		}
+	},
+	"ibm-dmc-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-dmc-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-dmc-operator"
+		}
+	},
+	"ibm-dv-operator": {
+		"dependencies": [
+			"db2u-operator"
+		],
+		"labels": {},
+		"name": "ibm-dv-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.7",
+			"name": "ibm-dv-operator"
+		}
+	},
+	"ibm-informix-cp4d-operator": {
+		"dependencies": [
+			"ibm-informix-operator"
+		],
+		"labels": {},
+		"name": "ibm-informix-cp4d-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1",
+			"name": "ibm-informix-cp4d-operator"
+		}
+	},
+	"ibm-informix-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-informix-operator-catalog-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "stable",
+			"name": "ibm-informix-operator"
+		}
+	},
+	"ibm-mdm": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-mdm-operator-subscription",
+			"app.kubernetes.io/managed-by": "ibm-mdm-operator",
+			"app.kubernetes.io/name": "ibm-mdm-operator-subscription"
+		},
+		"name": "ibm-mdm-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.1",
+			"name": "ibm-mdm"
+		}
+	},
+	"ibm-planning-analytics-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-planning-analytics-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v4.0",
+			"name": "ibm-planning-analytics-operator"
+		}
+	},
+	"ibm-voice-gateway-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-voice-gateway-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-voice-gateway-operator"
+		}
+	},
+	"ibm-watson-assistant-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-watson-assistant-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v4.0",
+			"name": "ibm-watson-assistant-operator"
+		}
+	},
+	"ibm-watson-discovery-operator": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-watson-discovery-operator-subscription",
+			"app.kubernetes.io/managed-by": "ibm-watson-discovery-operator",
+			"app.kubernetes.io/name": "ibm-watson-discovery-operator-subscription"
+		},
+		"name": "ibm-watson-discovery-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v4.0",
+			"name": "ibm-watson-discovery-operator"
+		}
+	},
+	"ibm-watson-ks-operator": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-watson-ks-operator-subscription",
+			"app.kubernetes.io/managed-by": "ibm-watson-ks-operator",
+			"app.kubernetes.io/name": "ibm-watson-ks-operator-subscription"
+		},
+		"name": "ibm-watson-ks-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v4.0",
+			"name": "ibm-watson-ks-operator"
+		}
+	},
+	"ibm-watson-speech-operator": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-watson-speech-operator-subscription",
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v4.0",
+			"name": "ibm-watson-speech-operator"
+		}
+	},
+	"mongodb-enterprise": {
+		"dependencies": [],
+		"labels": {},
+		"name": "ibm-mongodb-enterprise-catalog-subscription",
+		"required_namespace": "openshift-operators",
+		"service": true,
+		"spec": {
+			"channel": "stable",
+			"name": "mongodb-enterprise"
+		}
+	}
+}
