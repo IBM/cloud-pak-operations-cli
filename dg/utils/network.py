@@ -22,6 +22,33 @@ import netifaces
 import urllib3
 
 
+class ScopedInsecureRequestWarningDisabler:
+    """Temporarily disables warnings of type InsecureRequestWarning"""
+
+    def __init__(self, enabled=True):
+        self._enabled = enabled
+        self._previously_disabled = False
+
+        if enabled:
+            for filter in warnings.filters:
+                if filter[2] == urllib3.exceptions.InsecureRequestWarning:
+                    self._previously_disabled = filter[0] == "ignore"
+
+                    break
+
+    def __enter__(self):
+        if self._enabled and not self._previously_disabled:
+            # disable warning:
+            # InsecureRequestWarning: Unverified HTTPS request is being made to host
+            # '…'. Adding certificate verification is strongly advised. See:
+            # https://urllib3.readthedocs.io/en/latest/advanced-usage.html#ssl-warnings
+            urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if self._enabled and not self._previously_disabled:
+            warnings.simplefilter("always", urllib3.exceptions.InsecureRequestWarning)
+
+
 def disable_insecure_request_warning():
     """Disables InsecureRequestWarning"""
 
@@ -30,12 +57,6 @@ def disable_insecure_request_warning():
     # '…'. Adding certificate verification is strongly advised. See:
     # https://urllib3.readthedocs.io/en/latest/advanced-usage.html#ssl-warnings
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
-
-
-def enable_insecure_request_warning():
-    """Ensables InsecureRequestWarning"""
-
-    warnings.simplefilter("always", urllib3.exceptions.InsecureRequestWarning)
 
 
 def get_local_ipv4_addresses() -> List[ipaddress.IPv4Address]:
