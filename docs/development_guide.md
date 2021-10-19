@@ -159,6 +159,14 @@ After having pushed the tag, the following actions are performed:
 - A Docker image containing the installed Python distribution is built and pushed to Quay.
 - A GitHub release draft is created, which must be manually published.
 
+## Adding support for a new IBM Cloud Pak for Data 4.0.x release
+
+To add support for a new IBM Cloud Pak for Data 4.0.x release, perform the following steps:
+
+- Update the `_IBM_CLOUD_PAK_FOR_DATA_VERSION` class variable of the [CloudPakForDataManager](dg/lib/cloud_pak_for_data/cpd_4_0_0/cpd_manager.py) class
+- Update version numbers in [cpd-custom-resources.json](/dg/deps/config/cpd-custom-resources.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=integrations-services) (check custom resources providing a version number in the specification for changes)
+- Update [cpd-subscriptions.json](/dg/deps/config/cpd-subscriptions.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=tasks-creating-operator-subscriptions#preinstall-operator-subscriptions__svc-subcriptions) (check custom resources for changes)
+
 ## References
 
 - [Coding Guidelines](coding_guidelines.md)

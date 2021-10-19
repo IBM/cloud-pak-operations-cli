@@ -678,7 +678,7 @@ class CloudPakForDataManager:
                     "accept": True,
                     "license": license.name,
                 },
-                "version": "4.0.1",
+                "version": CloudPakForDataManager._IBM_CLOUD_PAK_FOR_DATA_VERSION,
             },
         }
 
@@ -1467,3 +1467,4 @@ class CloudPakForDataManager:
                 self._handle_protocol_error(exception, spinner)
 
     _FOUNDATIONAL_SERVICES_PROJECT: Final[str] = "ibm-common-services"
+    _IBM_CLOUD_PAK_FOR_DATA_VERSION: Final[str] = "4.0.2"
