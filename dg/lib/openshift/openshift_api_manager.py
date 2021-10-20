@@ -17,8 +17,9 @@ import logging
 from typing import Any, Callable, Dict, List, Optional
 
 import semver
+import urllib3
 
-from kubernetes import client, config
+from kubernetes import client, config, watch
 
 import dg.lib.jmespath
 
@@ -26,6 +27,7 @@ from dg.lib.error import DataGateCLIException
 from dg.lib.openshift.credentials.credentials import AbstractCredentials
 from dg.lib.openshift.data.global_pull_secret_data import GlobalPullSecretData
 from dg.lib.openshift.types.catalog_source import CatalogSource
+from dg.lib.openshift.types.custom_resource import CustomResource
 from dg.lib.openshift.types.kind_metadata import KindMetadata
 from dg.lib.openshift.types.object_meta import ObjectMeta
 from dg.lib.openshift.types.operator_group import OperatorGroup
@@ -147,6 +149,19 @@ class OpenShiftAPIManager:
             role_ref_name=role_ref_name,
             subjects=subjects,
         )
+
+    def create_custom_resource(self, project: str, custom_resource: CustomResource):
+        """Creates a custom resource
+
+        Parameters
+        ----------
+        project
+            project in which the custom resource shall be created
+        custom_resource
+            specification object for passing to the OpenShift REST API
+        """
+
+        self.execute_kubernetes_client(self._create_custom_resource, custom_resource=custom_resource, project=project)
 
     def create_deployment(self, project: str, deployment: Any):
         """Creates a deployment
@@ -371,6 +386,23 @@ class OpenShiftAPIManager:
 
         self.execute_kubernetes_client(self._patch_credentials, global_pull_secret_data=global_pull_secret_data)
 
+    def delete_custom_resource(self, project: str, kind_metadata: KindMetadata, name: str):
+        """Deletes a custom resource
+
+        Parameters
+        ----------
+        project
+            project name
+        kind_metadata
+            kind metadata
+        name
+            custom resource name
+        """
+
+        self.execute_kubernetes_client(
+            self._delete_custom_resource, kind_metadata=kind_metadata, name=name, project=project
+        )
+
     def delete_custom_resource_definition(self, name: str):
         """Deletes a custom resource definition
 
@@ -518,7 +550,9 @@ class OpenShiftAPIManager:
 
         return self.execute_kubernetes_client(self._get_catalog_sources, project=project)
 
-    def get_custom_resource_if_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> Optional[Any]:
+    def get_namespaced_custom_resource_if_exists(
+        self, project: str, name: str, kind_metadata: KindMetadata
+    ) -> Optional[Any]:
         """Returns custom resource
 
         Parameters
@@ -537,7 +571,7 @@ class OpenShiftAPIManager:
         """
 
         return self.execute_kubernetes_client(
-            self._get_custom_resource_if_exists, kind_metadata=kind_metadata, name=name, project=project
+            self._get_namespaced_custom_resource_if_exists, kind_metadata=kind_metadata, name=name, project=project
         )
 
     def get_custom_resource_definitions(self) -> Any:
@@ -550,6 +584,22 @@ class OpenShiftAPIManager:
         """
 
         return self.execute_kubernetes_client(self._get_custom_resource_definitions)
+
+    def get_custom_resources(self, kind_metadata: KindMetadata) -> List[Any]:
+        """Returns custom resources of the given kind
+
+        Parameters
+        ----------
+        kind_metadata
+            kind metadata of custom resources to return
+
+        Returns
+        -------
+        List[Any]
+            custom resources of the given kind
+        """
+
+        return self.execute_kubernetes_client(self._get_custom_resources, kind_metadata=kind_metadata)
 
     def get_global_pull_secret_data(self) -> GlobalPullSecretData:
         """Returns the global pull secret as a data object
@@ -774,6 +824,75 @@ class OpenShiftAPIManager:
             project=project,
         )
 
+    def wait_for_custom_resource(
+        self,
+        kind_metadata: KindMetadata,
+        log_callback: Callable[[str], None],
+        success_callback: Callable[..., bool],
+        **kwargs
+    ):
+        """Waits for a specific custom resource of the given kind to be created
+
+        The passed callback is used for checking wheter a created custom resource
+        of the given kind is the sought-after custom resource.
+
+        Parameters
+        ----------
+        kind_metadata
+            kind metadata of the custom resource
+        log_callback
+            callback for logging debug messages
+        success_callback
+            callback for checking OpenShift watch event
+        **kwargs
+            additional arguments passed to success_callback
+        """
+
+        self.execute_kubernetes_client(
+            self._wait_for_custom_resource,
+            kind_metadata=kind_metadata,
+            log_callback=log_callback,
+            success_callback=success_callback,
+            **kwargs
+        )
+
+    def wait_for_namespaced_custom_resource(
+        self,
+        project: str,
+        kind_metadata: KindMetadata,
+        log_callback: Callable[[str], None],
+        success_callback: Callable[..., bool],
+        **kwargs
+    ):
+        """Waits for a specific custom resource of the given kind to be created in
+        the given project
+
+        The passed callback is used for checking wheter a created custom resource
+        of the given kind is the sought-after custom resource.
+
+        Parameters
+        ----------
+        project
+            project in which the custom resource is created
+        kind_metadata
+            kind metadata of the custom resource
+        log_callback
+            callback for logging debug messages
+        success_callback
+            callback for checking OpenShift watch event
+        **kwargs
+            additional arguments passed to success_callback
+        """
+
+        self.execute_kubernetes_client(
+            self._wait_for_namespaced_custom_resource,
+            kind_metadata=kind_metadata,
+            log_callback=log_callback,
+            project=project,
+            success_callback=success_callback,
+            **kwargs
+        )
+
     def _create_catalog_source(self, project: str, catalog_source: CatalogSource):
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api.create_namespaced_custom_object(
@@ -816,6 +935,28 @@ class OpenShiftAPIManager:
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api.create_cluster_custom_object(
             "rbac.authorization.k8s.io", "v1", "clusterrolebindings", cluster_role_binding
+        )
+
+    def _create_custom_resource(self, project: str, custom_resource: CustomResource):
+        """Creates a custom resource
+
+        Parameters
+        ----------
+        project
+            project in which the custom resource shall be created
+        custom_resource
+            specification object for passing to the OpenShift REST API
+        """
+
+        plural = custom_resource.kind.lower() + "s"
+
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.create_namespaced_custom_object(
+            custom_resource.group,
+            custom_resource.version,
+            project,
+            plural,
+            custom_resource.create_custom_resource_dict(),
         )
 
     def _create_deployment(self, project: str, deployment: Any):
@@ -964,6 +1105,12 @@ class OpenShiftAPIManager:
             "operators.coreos.com", "v1alpha1", project, "clusterserviceversions", name
         )
 
+    def _delete_custom_resource(self, project: str, kind_metadata: KindMetadata, name: str):
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.delete_namespaced_custom_object(
+            kind_metadata.group, kind_metadata.version, project, kind_metadata.plural, name
+        )
+
     def _delete_custom_resource_definition(self, name: str):
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api.delete_cluster_custom_object("apiextensions.k8s.io", "v1", "customresourcedefinitions", name)
@@ -995,7 +1142,18 @@ class OpenShiftAPIManager:
 
         return GlobalPullSecretData(core_v1_api_result.data)
 
-    def _get_custom_resource_if_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> Any:
+    def _get_custom_resources(self, kind_metadata: KindMetadata) -> List[Any]:
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api_result: Any = custom_objects_api.list_cluster_custom_object(
+            kind_metadata.group, kind_metadata.version, kind_metadata.plural
+        )
+
+        assert "items" in custom_objects_api_result
+        assert isinstance(custom_objects_api_result["items"], List)
+
+        return custom_objects_api_result["items"]
+
+    def _get_namespaced_custom_resource_if_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> Any:
         custom_objects_api = client.CustomObjectsApi()
         custom_resource: Optional[Any] = None
 
@@ -1032,6 +1190,39 @@ class OpenShiftAPIManager:
         )
 
         return semver.VersionInfo.parse(path[0])
+
+    def _handle_api_exception(self, exception: client.ApiException, log_callback: Callable[[str], None]):
+        """Handles Kubernetes Python client API exceptions
+
+        Parameters
+        ----------
+        exception
+            Kubernetes Python client API exception to be handled
+        spinner
+            active spinner
+        """
+
+        # ignore "Expired: too old resource version" error
+        if exception.status != 410:
+            raise exception
+
+        log_callback(exception.reason)
+
+    def _handle_protocol_error(self, exception: urllib3.exceptions.ProtocolError, log_callback: Callable[[str], None]):
+        """Handles urllib3 protocol error exceptions
+
+        Parameters
+        ----------
+        exception
+            urllib3 protocol error exception to be handled
+        spinner
+            active spinner
+        """
+
+        if (len(exception.args) < 2) or not isinstance(exception.args[1], urllib3.exceptions.InvalidChunkLength):
+            raise exception
+
+        log_callback("OpenShift API server closed connection")
 
     def _namespaced_custom_object_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> bool:
         custom_objects_api = client.CustomObjectsApi()
@@ -1117,3 +1308,71 @@ class OpenShiftAPIManager:
         )
 
         self._kube_config_initialized = True
+
+    def _wait_for_custom_resource(
+        self,
+        kind_metadata: KindMetadata,
+        log_callback: Callable[[str], None],
+        success_callback: Callable[..., bool],
+        **kwargs
+    ):
+        custom_objects_api = client.CustomObjectsApi()
+        succeeded = False
+
+        while not succeeded:
+            try:
+                resource_version: Optional[str] = None
+                w = watch.Watch()
+
+                for event in w.stream(
+                    custom_objects_api.list_cluster_custom_object,
+                    kind_metadata.group,
+                    kind_metadata.version,
+                    kind_metadata.plural,
+                    resource_version=resource_version,
+                ):
+                    resource_version = dg.lib.jmespath.get_jmespath_string("object.metadata.resourceVersion", event)
+                    succeeded = success_callback(event, kind_metadata=kind_metadata, **kwargs)
+
+                    if succeeded:
+                        w.stop()
+            except client.ApiException as exception:
+                self._handle_api_exception(exception, log_callback)
+                resource_version = None
+            except urllib3.exceptions.ProtocolError as exception:
+                self._handle_protocol_error(exception, log_callback)
+
+    def _wait_for_namespaced_custom_resource(
+        self,
+        project: str,
+        kind_metadata: KindMetadata,
+        log_callback: Callable[[str], None],
+        success_callback: Callable[..., bool],
+        **kwargs
+    ):
+        custom_objects_api = client.CustomObjectsApi()
+        succeeded = False
+
+        while not succeeded:
+            try:
+                resource_version: Optional[str] = None
+                w = watch.Watch()
+
+                for event in w.stream(
+                    custom_objects_api.list_namespaced_custom_object,
+                    kind_metadata.group,
+                    kind_metadata.version,
+                    project,
+                    kind_metadata.plural,
+                    resource_version=resource_version,
+                ):
+                    resource_version = dg.lib.jmespath.get_jmespath_string("object.metadata.resourceVersion", event)
+                    succeeded = success_callback(event, kind_metadata=kind_metadata, **kwargs)
+
+                    if succeeded:
+                        w.stop()
+            except client.ApiException as exception:
+                self._handle_api_exception(exception, log_callback)
+                resource_version = None
+            except urllib3.exceptions.ProtocolError as exception:
+                self._handle_protocol_error(exception, log_callback)

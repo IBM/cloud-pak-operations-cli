@@ -135,8 +135,8 @@ class CloudPakForDataServiceManager:
             ) as json_file:
                 for key, value in json.load(json_file).items():
                     self._custom_resources[key] = CustomResourceMetadata(
-                        api_version=value["api_version"],
                         description=value["description"],
+                        group=value["group"],
                         kind=value["kind"],
                         licenses=list(map(lambda license: CloudPakForDataServiceLicense[license], value["licenses"])),
                         name=value["name"],
@@ -144,6 +144,7 @@ class CloudPakForDataServiceManager:
                         spec=value["spec"],
                         status_key_name=value["status_key_name"],
                         storage_option_required=value["storage_option_required"],
+                        version=value["version"],
                     )
 
     def _initialize_subscriptions_dict_if_required(self):

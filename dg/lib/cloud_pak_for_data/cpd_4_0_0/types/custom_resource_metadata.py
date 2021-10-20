@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.import re as regex
 
-import re as regex
-
 from typing import Dict, List, Optional, Tuple, Union
 
 from dg.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import (
@@ -32,8 +30,8 @@ class CustomResourceMetadata:
 
     def __init__(
         self,
-        api_version: str,
         description: str,
+        group: str,
         kind: str,
         licenses: List[CloudPakForDataServiceLicense],
         name: str,
@@ -41,9 +39,10 @@ class CustomResourceMetadata:
         spec: Dict[str, str],
         status_key_name: str,
         storage_option_required: bool,
+        version: str,
     ):
-        self._api_version = api_version
         self._description = description
+        self._group = group
         self._kind = kind
         self._licenses = licenses
         self._name = name
@@ -51,6 +50,7 @@ class CustomResourceMetadata:
         self._spec = spec
         self._status_key_name = status_key_name
         self._storage_option_required = storage_option_required
+        self._version = version
 
     def check_options(
         self, license: CloudPakForDataServiceLicense, storage_option: Optional[Union[str, CloudPakForDataStorageVendor]]
@@ -107,20 +107,21 @@ class CustomResourceMetadata:
 
         self.check_options(license, storage_option)
 
-        custom_resource: CustomResource = {
-            "apiVersion": self._api_version,
-            "kind": self._kind,
-            "metadata": {
+        custom_resource = CustomResource(
+            group=self._group,
+            kind=self._kind,
+            metadata={
                 "name": self._name,
                 "namespace": project,
             },
-            "spec": {
+            spec={
                 "license": {
                     "accept": True,
                     "license": license.name,
                 }
             },
-        }
+            version=self._version,
+        )
 
         self._process_installation_options(custom_resource, sorted(installation_options, key=lambda pair: pair[0]))
         self._process_spec(custom_resource)
@@ -131,20 +132,13 @@ class CustomResourceMetadata:
     def get_kind_metadata(self) -> KindMetadata:
         """Returns kind metadata
 
-        The KindMetadata object is based on the API version argument passed to
-        the constructor.
-
         Returns
         -------
         KindMetadata
             kind metadata
         """
 
-        search_result = regex.match("(.*)/(.*)", self._api_version)
-
-        assert search_result is not None
-
-        return KindMetadata(search_result.group(1), self._kind, self._kind.lower() + "s", search_result.group(2))
+        return KindMetadata(self._group, self._kind, self._kind.lower() + "s", self._version)
 
     @property
     def kind(self) -> str:
@@ -214,7 +208,7 @@ class CustomResourceMetadata:
         """
 
         for path, value in installation_options:
-            current_object = custom_resource["spec"]
+            current_object = custom_resource.spec
             path_elements = path.split(".")
 
             if (len(path_elements) != 0) and (path_elements[0] == "spec"):
@@ -241,7 +235,7 @@ class CustomResourceMetadata:
         """
 
         for key, value in self._spec.items():
-            custom_resource["spec"][key] = value
+            custom_resource.spec[key] = value
 
     def _process_storage_option(
         self, custom_resource: CustomResource, storage_option: Optional[Union[str, CloudPakForDataStorageVendor]]
@@ -258,6 +252,6 @@ class CustomResourceMetadata:
 
         if storage_option is not None:
             if isinstance(storage_option, str):
-                custom_resource["spec"]["storageClass"] = storage_option
+                custom_resource.spec["storageClass"] = storage_option
             else:
-                custom_resource["spec"]["storageVendor"] = storage_option.name
+                custom_resource.spec["storageVendor"] = storage_option.name
