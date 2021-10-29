@@ -12,13 +12,31 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from dataclasses import dataclass
 from typing import Any, Dict, TypedDict
 
 from dg.lib.openshift.types.object_meta import ObjectMeta
 
 
-class CustomResource(TypedDict):
+class CustomResourceDict(TypedDict):
     apiVersion: str
     kind: str
     metadata: ObjectMeta
     spec: Dict[str, Any]
+
+
+@dataclass
+class CustomResource:
+    group: str
+    kind: str
+    metadata: ObjectMeta
+    spec: Dict[str, Any]
+    version: str
+
+    def create_custom_resource_dict(self) -> CustomResourceDict:
+        return {
+            "apiVersion": f"{self.group}/{self.version}",
+            "kind": self.kind,
+            "metadata": self.metadata,
+            "spec": self.spec,
+        }

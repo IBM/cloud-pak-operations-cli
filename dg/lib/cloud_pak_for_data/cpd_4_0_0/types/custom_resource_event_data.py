@@ -14,8 +14,12 @@
 
 from dataclasses import dataclass
 
+from halo.halo import Halo
+
 
 @dataclass
-class APIVersion:
-    group: str
-    version: str
+class CustomResourceEventData:
+    name: str
+    spinner: Halo
+    status_key: str
+    initial_event = True
