@@ -5,3 +5,5 @@ __pycache__/
 build/
 data_gate_cli.egg-info/
 dist/
+.eggs/
+pip-wheel-metadata/

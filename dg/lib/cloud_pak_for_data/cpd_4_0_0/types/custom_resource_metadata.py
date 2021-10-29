@@ -137,8 +137,9 @@ class CustomResourceMetadata:
         KindMetadata
             kind metadata
         """
+        plural = self._kind.lower() + ('s' if not self._kind.lower().endswith('s') else '')
 
-        return KindMetadata(self._group, self._kind, self._kind.lower() + "s", self._version)
+        return KindMetadata(self._group, self._kind, plural, self._version)
 
     @property
     def kind(self) -> str:

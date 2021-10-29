@@ -64,5 +64,21 @@
 		"status_key_name": "dmcAddonStatus",
 		"storage_option_required": false,
 		"version": "v1"
+	},
+	"ibm-dods": {
+		"group": "dods.cpd.ibm.com",
+		"description": "Decision Optimization",
+		"kind": "DODS",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "dods-cr",
+		"operator_name": "ibm-cpd-dods-operator",
+		"spec": {			
+		},
+		"status_key_name": "dodsStatus",
+		"storage_option_required": false,
+		"version": "v1beta1"
 	}
 }

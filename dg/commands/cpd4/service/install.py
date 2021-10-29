@@ -70,6 +70,9 @@ from dg.utils.logging import loglevel_command
         case_sensitive=False,
     ),
 )
+@click.option(
+    "--catalog-name",
+    help="Name of catalog for the service operator. If not specified, use default catalog for the operator (usually 'ibm-operator-catalog')")
 @click.pass_context
 def install(
     ctx: click.Context,
@@ -85,6 +88,7 @@ def install(
     service_name: str,
     storage_class: Optional[str],
     storage_vendor: Optional[str],
+    catalog_name: Optional[str],
 ):
     """Install IBM Cloud Pak for Data service"""
 
@@ -126,4 +130,5 @@ def install(
         cloud_pak_for_data_service_license,
         installation_option,
         storage_option,
+        catalog_name
     )
