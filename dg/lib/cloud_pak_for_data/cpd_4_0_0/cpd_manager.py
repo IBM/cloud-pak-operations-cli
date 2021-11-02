@@ -365,7 +365,7 @@ class CloudPakForDataManager:
                 self._add_event_indicates_custom_resource_status_is_completed,
                 # passed to _add_event_indicates_custom_resource_status_is_completed
                 custom_resource_event_data=CustomResourceEventData(
-                    custom_resource.metadata["name"], spinner, custom_resource_metadata.status_key_name
+                    custom_resource_metadata.name, spinner, custom_resource_metadata.status_key_name
                 ),
             )
 
