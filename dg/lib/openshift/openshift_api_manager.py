@@ -948,7 +948,7 @@ class OpenShiftAPIManager:
             specification object for passing to the OpenShift REST API
         """
 
-        plural = custom_resource.kind.lower() + "s"
+        plural = custom_resource.kind.lower() + ('s' if not custom_resource.kind.lower().endswith('s') else '')
 
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api.create_namespaced_custom_object(
