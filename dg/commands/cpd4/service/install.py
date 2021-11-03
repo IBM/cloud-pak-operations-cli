@@ -46,6 +46,11 @@ from dg.utils.logging import loglevel_command
 @openshift_server_options
 @click.option("--accept-license", help="Accept IBM Cloud Pak for Data license", is_flag=True)
 @click.option(
+    "--catalog-source",
+    help="Catalog source for the service operator. If not specified, use default catalog for the operator \
+(usually 'ibm-operator-catalog')"
+)
+@click.option(
     "--installation-option",
     help="Additional installation option",
     multiple=True,
@@ -79,6 +84,7 @@ def install(
     token: str,
     insecure_skip_tls_verify: Optional[bool],
     accept_license: bool,
+    catalog_source: Optional[str],
     installation_option: List[Tuple[str, Union[bool, int, str]]],
     license: Optional[str],
     project: str,
@@ -126,4 +132,5 @@ def install(
         cloud_pak_for_data_service_license,
         installation_option,
         storage_option,
+        catalog_source
     )

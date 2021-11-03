@@ -295,6 +295,7 @@ class CloudPakForDataManager:
         license: CloudPakForDataServiceLicense,
         installation_options: List[Tuple[str, Union[bool, int, str]]],
         storage_option: Optional[Union[str, CloudPakForDataStorageVendor]],
+        catalog_source: Optional[str] = None,
     ):
         """Installs an IBM Cloud Pak for Data service
 
@@ -312,6 +313,9 @@ class CloudPakForDataManager:
             additional installation options
         storage_option
             storage class/vendor to be used when creating the custom resource
+        catalog_source
+            catalog to install the operator from. If None (default), use default
+            catalog for the operator (usually 'ibm-operator-catalog')
         """
 
         if not self._cpd_service_manager.is_cloud_pak_for_data_service(service_name):
@@ -329,7 +333,9 @@ class CloudPakForDataManager:
                 raise DataGateCLIException("IBM Cloud Pak for Data service already installed")
         else:
             custom_resource_metadata.check_options(license, storage_option)
-            self._create_operator_subscription(cpd_operators_project, custom_resource_metadata.operator_name)
+            self._create_operator_subscription(
+                cpd_operators_project, custom_resource_metadata.operator_name, catalog_source
+            )
 
             custom_resource = custom_resource_metadata.get_custom_resource(
                 cpd_instance_project, license, installation_options, storage_option
@@ -360,7 +366,7 @@ class CloudPakForDataManager:
                 self._add_event_indicates_custom_resource_status_is_completed,
                 # passed to _add_event_indicates_custom_resource_status_is_completed
                 custom_resource_event_data=CustomResourceEventData(
-                    custom_resource.metadata["name"], spinner, custom_resource_metadata.status_key_name
+                    custom_resource_metadata.name, spinner, custom_resource_metadata.status_key_name
                 ),
             )
 
@@ -748,7 +754,11 @@ class CloudPakForDataManager:
             self._openshift_manager.create_operator_group(project, "operatorgroup")
 
     def _create_operator_subscription(
-        self, project: str, operator_name: str, created_dependent_subscriptions: List[str] = []
+        self,
+        project: str,
+        operator_name: str,
+        catalog_source: Optional[str] = None,
+        created_dependent_subscriptions: List[str] = [],
     ):
         """Creates an operator subscription
 
@@ -758,6 +768,9 @@ class CloudPakForDataManager:
             project in which the operator subscription shall be created
         operator_name
             name of the operator for which a subscription shall be created
+        catalog_source
+            catalog to install the operator from. If None (default), use default
+            catalog for the operator (usually 'ibm-operator-catalog')
         created_dependent_subscriptions
             list of created dependent subscriptions
 
@@ -772,13 +785,18 @@ class CloudPakForDataManager:
 
         if not self._openshift_manager.subscription_exists(project, subscription_metadata.name):
             if len(created_dependent_subscriptions) == 0:
-                logging.info(f"Creating subscription '{subscription_metadata.name}' for operator '{operator_name}'")
+                logging.info(
+                    f"Creating subscription '{subscription_metadata.name}' for operator '{operator_name}' "
+                    f"from catalog '{catalog_source}'"
+                )
             else:
                 logging.info(
                     f"Creating subscription '{subscription_metadata.name}' for dependent operator '{operator_name}'"
                 )
 
-            subscription = self._cpd_service_manager.get_subscription_metadata(operator_name).get_subscription(project)
+            subscription = self._cpd_service_manager.get_subscription_metadata(operator_name).get_subscription(
+                project, catalog_source
+            )
 
             self._openshift_manager.create_subscription(project, subscription)
 
@@ -819,10 +837,13 @@ class CloudPakForDataManager:
                     if subscription_metadata.required_namespace is not None
                     else project,
                     dependent_operator_name,
+                    None,
                     created_dependent_subscriptions + [dependent_subscription_name],
                 )
 
-    def _create_operator_subscription_if_not_exists(self, project: str, operator_name: str):
+    def _create_operator_subscription_if_not_exists(
+        self, project: str, operator_name: str, catalog_source: Optional[str] = None
+    ):
         """Creates an operator subscription if it does not exist
 
         Parameters
@@ -831,12 +852,15 @@ class CloudPakForDataManager:
             project in which the operator subscription shall be created
         operator_name
             name of the operator for which a subscription shall be created
+        catalog_source
+            catalog to install the operator from. If None (default), use default
+            catalog for the operator (usually 'ibm-operator-catalog')
         """
 
         subscription_metadata = self._cpd_service_manager.get_subscription_metadata(operator_name)
 
         if not self._openshift_manager.subscription_exists(project, subscription_metadata.name):
-            self._create_operator_subscription(project, operator_name)
+            self._create_operator_subscription(project, operator_name, catalog_source)
         else:
             logging.info(
                 f"Skipping creation of subscription '{subscription_metadata.name}' for operator '{operator_name}'"
