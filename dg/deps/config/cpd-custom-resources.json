@@ -75,8 +75,7 @@
 		],
 		"name": "dods-cr",
 		"operator_name": "ibm-cpd-dods",
-		"spec": {			
-		},
+		"spec": {},
 		"status_key_name": "dodsStatus",
 		"storage_option_required": false,
 		"version": "v1beta1"
