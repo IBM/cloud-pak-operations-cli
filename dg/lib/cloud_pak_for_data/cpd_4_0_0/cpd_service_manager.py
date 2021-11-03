@@ -164,6 +164,6 @@ class CloudPakForDataServiceManager:
                         spec=SubscriptionMetadataSpec(
                             channel=value["spec"]["channel"],
                             name=value["spec"]["name"],
-                            source=value["spec"].get("source", None)
+                            source=value["spec"].get("source"),
                         ),
                     )

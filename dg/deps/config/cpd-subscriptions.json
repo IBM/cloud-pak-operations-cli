@@ -112,7 +112,7 @@
 			"name": "ibm-cpd-datastage-operator"
 		}
 	},
-	"ibm-cpd-dods-operator": {
+	"ibm-cpd-dods": {
 		"dependencies": [],
 		"labels": {
 			"app.kubernetes.io/instance": "ibm-cpd-dods-operator-catalog-subscription",

@@ -38,7 +38,7 @@ class SubscriptionMetadata:
     service: bool
     spec: SubscriptionMetadataSpec
 
-    def get_subscription(self, project: str, catalog_name: Optional[str] = None) -> Subscription:
+    def get_subscription(self, project: str, catalog_source: Optional[str] = None) -> Subscription:
         """Returns a specification object for passing to the OpenShift REST API
         when creating a subscription
 
@@ -46,7 +46,7 @@ class SubscriptionMetadata:
         ----------
         project
             project in which the subscription shall be created
-        catalog_name
+        catalog_source
             catalog to install the operator from. If None (default), use default
             catalog for the operator (usually 'ibm-operator-catalog')
 
@@ -55,8 +55,8 @@ class SubscriptionMetadata:
         Subscription
             subscription object
         """
-        if catalog_name is not None:
-            source = catalog_name
+        if catalog_source is not None:
+            source = catalog_source
         elif self.spec.source is not None:
             source = self.spec.source
         else:

@@ -65,7 +65,7 @@
 		"storage_option_required": false,
 		"version": "v1"
 	},
-	"ibm-dods": {
+	"dods": {
 		"group": "dods.cpd.ibm.com",
 		"description": "Decision Optimization",
 		"kind": "DODS",
@@ -74,7 +74,7 @@
 			"Standard"
 		],
 		"name": "dods-cr",
-		"operator_name": "ibm-cpd-dods-operator",
+		"operator_name": "ibm-cpd-dods",
 		"spec": {			
 		},
 		"status_key_name": "dodsStatus",
