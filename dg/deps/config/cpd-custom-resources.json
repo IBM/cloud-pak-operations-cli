@@ -79,5 +79,35 @@
 		"status_key_name": "dodsStatus",
 		"storage_option_required": false,
 		"version": "v1beta1"
+	},
+	"ws": {
+		"group": "ws.cpd.ibm.com",
+		"description": "Watson Studio",
+		"kind": "WS",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "ws-cr",
+		"operator_name": "ibm-cpd-wsl",
+		"spec": {},
+		"status_key_name": "wsStatus",
+		"storage_option_required": false,
+		"version": "v1beta1"
+	},
+	"wml": {
+		"group": "wml.cpd.ibm.com",
+		"description": "Watson Machine Learning",
+		"kind": "WmlBase",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "wml-cr",
+		"operator_name": "ibm-cpd-wml-operator",
+		"spec": {},
+		"status_key_name": "wmlStatus",
+		"storage_option_required": false,
+		"version": "v1beta1"
 	}
 }
