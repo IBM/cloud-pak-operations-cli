@@ -68,6 +68,8 @@ def create_click_multi_command_class(package: ModuleType) -> Type[click.Command]
                 else:
                     click.ClickException(str(exception)).show()
 
+                    return 1
+
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
 
