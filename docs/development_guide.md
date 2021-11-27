@@ -40,20 +40,37 @@ To register a new Click command, add the Python module containing the command to
 
 ### Registering a new Click group
 
-To register a new Click group (e.g., `click-group-name`), add a Python package (i.e., a directory containing a file named `__init__.py`) to the `commands` directory or one of its subdirectories (e.g., `click_group_name`). Furthermore, add the following code to `__init__.py` to automatically register Click commands within Python modules contained in the package:
+To register a new Click group (e.g., `click-group-name`), add a Python package (i.e., a directory containing a file named `__init__.py`) to the `commands` directory or one of its subdirectories (e.g., `click_group_name`). For each Python package below the `commands` directory, a new Click group (i.e., an instance of [LazyLoadingMultiCommand](dg/lib/click/lazy_loading_multi_command.py)) is implictly created.
 
-```python
-import sys
+## Writing a Db2 Date Gate CLI plug-in
 
-import click
+The Db2 Data Gate CLI is extensible via plug-ins, which are regular distribution packages managed by `pip`.
 
-from dg.lib.click.lazy_loading_multi_command import (
-    create_click_multi_command_class,
-)
+To add Click commands or command groups to a built-in command group, CLI plug-ins (i.e., distribution packages) must export packages by specifying one or more entry points within the `dg_plugins` group in their configuration file.
 
-@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
-def click_group_name():
-    pass
+To specify the built-in command group, the `__doc__` attribute of the `__init__.py` module of an entry point package must be set to the path of the built-in command group in the command hierarchy. Nested built-in command groups must be separated by slashes. If the `__doc__` attribute is not set, Click commands or command groups are added to the root command group.
+
+### Examples
+
+1. Package structure
+
+```
+package_1
+| __init__.py (__doc__ = "")
+| … (modules and subpackages)
+
+package_2
+| __init__.py (__doc__ = "adm/config")
+| … (modules and subpackages)
+```
+
+2. setup.cfg:
+
+```
+[options.entry_points]
+dg_plugins =
+    entry_point_1 = package_1
+    entry_point_2 = package_2
 ```
 
 ## Running unit tests

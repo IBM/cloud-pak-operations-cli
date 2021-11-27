@@ -12,18 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import importlib.metadata
 import sys
 
 import click
-import pkg_resources
 
 import dg.commands
 import dg.utils.debugger
 import dg.utils.logging
 
-from dg.lib.click.lazy_loading_multi_command import (
-    create_click_multi_command_class,
-)
+from dg import distribution_package_name
+from dg.lib.click.lazy_loading_multi_command import LazyLoadingMultiCommand
 
 click_logging_handler = dg.utils.logging.init_root_logger()
 
@@ -39,12 +38,11 @@ if dg.utils.debugger.is_debugpy_running() and (len(sys.argv) == 2):
         sys.argv = [sys.argv[0]] + sys.argv[1].split()
 
 
-@click.group(cls=create_click_multi_command_class(dg.commands))
+@click.group(cls=LazyLoadingMultiCommand, distribution_package_name=distribution_package_name, package=dg.commands)
 @click.version_option(
-    message="Db2 Data Gate CLI %(version)s", version=pkg_resources.require("data-gate-cli")[0].version
+    message="Db2 Data Gate CLI %(version)s", version=importlib.metadata.version(distribution_package_name)
 )
-def cli():
-    # main Click command
+def cli():  # NOSONAR
     pass
 
 
