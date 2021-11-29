@@ -116,7 +116,7 @@ class DataGateConfigurationManager:
         return self.get_dg_directory_path() / "credentials.json"
 
     def get_dg_directory_path(self) -> pathlib.Path:
-        """Return the path of the Db2 Data Gate CLI directory
+        """Returns the path of the Db2 Data Gate CLI directory
 
         Returns
         -------

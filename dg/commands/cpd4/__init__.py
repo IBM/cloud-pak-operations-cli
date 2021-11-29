@@ -12,17 +12,4 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import sys
-
-import click
-
-from dg.lib.click.lazy_loading_multi_command import (
-    create_click_multi_command_class,
-)
-
-
-@click.command(cls=create_click_multi_command_class(sys.modules[__name__]))
-def cpd4():
-    """IBM Cloud Pak for Data 4.x commands"""
-
-    pass
+__doc__ = "IBM Cloud Pak for Data 4.x commands"

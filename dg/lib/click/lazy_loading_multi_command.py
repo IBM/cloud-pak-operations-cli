@@ -13,176 +13,299 @@
 #  limitations under the License.
 
 import importlib
+import importlib.metadata
+import importlib.util
 import logging
 import pathlib
 
+from dataclasses import dataclass, field
 from types import ModuleType
-from typing import Dict, List, Optional, Type
+from typing import Dict, List, Optional
 
 import click
 
+import dg
 import dg.utils.debugger
+
+from dg import commands_package_path
+from dg.lib.error import DataGateCLIException
+from dg.lib.plugin_manager.package_data import (
+    PackageData,
+    PackageElementDescriptor,
+)
+from dg.lib.plugin_manager.plugin_manager import plugin_manager
+from dg.utils.path import is_relative_to
 
 logger = logging.getLogger(__name__)
 
 
+@dataclass
+class CommandDetails:
+    command: click.Command
+    distribution_package_name: str
+
+
+@dataclass
 class CommandData:
-    def __init__(self, command_names: List[str], commands: Dict[str, click.Command]):
-        super().__init__()
-
-        self.command_names = command_names
-        self.commands = commands
+    command_names: List[str] = field(default_factory=list)
+    commands: Dict[str, CommandDetails] = field(default_factory=dict)
 
 
-def create_click_multi_command_class(package: ModuleType) -> Type[click.Command]:
-    """Creates a definition of a subclass of click.MultiCommand
+class LazyLoadingMultiCommand(click.MultiCommand):
+    """Provides Click commands found within modules of the package passed to
+    the constructor
 
-    This method creates a definition of a subclass of click.MultiCommand
-    providing Click commands found in the Python modules of the given Python
-    package.
-
-    Parameters
-    ----------
-    package
-        Python package
-
-    Returns
-    -------
-    click.Command
-        Definition of a subclass of click.MultiCommand
+    For each found subpackage of the package passed to the constructor, a
+    Click command group is created.
     """
 
-    package_name = package.__name__
-    package_directory_path = pathlib.Path(package.__file__).parent
+    def __call__(self, *args, **kwargs):
+        """Handle exceptions raised by Click commands"""
 
-    class LazyLoadingMultiCommand(click.MultiCommand):
-        def __call__(self, *args, **kwargs):
-            """Handle exceptions raised by Click commands"""
+        try:
+            return self.main(*args, **kwargs)
+        except Exception as exception:
+            if dg.utils.debugger.is_debugpy_running():
+                # print stack trace
+                raise exception
+            else:
+                click.ClickException(str(exception)).show()
 
-            try:
-                return self.main(*args, **kwargs)
-            except Exception as exception:
-                if dg.utils.debugger.is_debugpy_running():
-                    # print stack trace
-                    raise exception
-                else:
-                    click.ClickException(str(exception)).show()
+                return 1
 
-                    return 1
+    def __init__(self, distribution_package_name: str, package: ModuleType, **kwargs):
+        super().__init__(**kwargs)
 
-        def __init__(self, **kwargs):
-            super().__init__(**kwargs)
+        assert package.__file__ is not None
 
-            self._command_data: Optional[CommandData] = None
+        self._command_data: Optional[CommandData] = None
+        self._distribution_package_name = distribution_package_name
+        self._package_directory_path = pathlib.Path(package.__file__).parent
+        self._package_name = package.__name__
 
-        def get_command(self, ctx: click.Context, cmd_name: str) -> Optional[click.Command]:
-            self._initialize_commands_if_required()
+    # override
+    def get_command(self, ctx: click.Context, cmd_name: str) -> Optional[click.Command]:
+        self._initialize_command_data_if_required()
 
-            command: Optional[click.Command] = None
+        command: Optional[click.Command] = None
 
-            if self._command_data is not None:
-                command = self._command_data.commands[cmd_name] if cmd_name in self._command_data.commands else None
+        if self._command_data is not None:
+            command = self._command_data.commands[cmd_name].command if cmd_name in self._command_data.commands else None
 
-            return command
+        return command
 
-        def list_commands(self, ctx: click.Context) -> List[str]:
-            self._initialize_commands_if_required()
+    # override
+    def list_commands(self, ctx: click.Context) -> List[str]:
+        self._initialize_command_data_if_required()
 
-            return self._command_data.command_names if self._command_data is not None else []
+        return self._command_data.command_names if self._command_data is not None else []
 
-        def _get_click_commands(self, module: ModuleType) -> Dict[str, click.Command]:
-            """Returns Click commands within the given Python module
+    def _append_distribution_package_name_to_help_text(
+        self, help_text: Optional[str], distribution_package_name: str
+    ) -> Optional[str]:
+        suffix = f"[{distribution_package_name}]"
 
-            This method searches the given Python module for Click commands.
+        return suffix if (help_text is None) or (help_text == "") else f"{help_text} {suffix}"
 
-            Parameters
-            ----------
-            module
-                Python module
+    def _import_module_from_file_location(self, package_element_descriptor: PackageElementDescriptor) -> ModuleType:
+        """Imports the module corresponding to the given package element
+        descriptor from a file location
 
-            Returns
-            -------
-            dict[str, click.Command]
-                dictionary associating Click command names with Click commands
-            """
+        Parameters
+        ----------
+        package_element_descriptor
+            object describing a module or a subpackage within a package
 
-            commands: Dict[str, click.Command] = {}
+        Returns
+        -------
+        ModuleType
+            imported module
+        """
 
-            for attribute_name in dir(module):
-                attribute = getattr(module, attribute_name)
+        spec = importlib.util.spec_from_file_location(package_element_descriptor.name, package_element_descriptor.path)
 
-                if isinstance(attribute, click.Command):
-                    command_name = attribute_name.replace("_", "-")
+        assert spec is not None
+        assert spec.loader is not None
 
-                    commands[command_name] = attribute
+        module = importlib.util.module_from_spec(spec)
 
-            return commands
+        spec.loader.exec_module(module)
 
-        def _import_packages_and_modules(self) -> Dict[str, ModuleType]:
-            """Imports all subpackages and submodules within a Python package
+        return module
 
-            Parameters
-            ----------
-            package_name
-                name of the Python package (__name__)
-            package_directory_path
-                path of the directory of the Python package (__file__)
+    def _import_modules(self, command_data: CommandData, modules: List[PackageElementDescriptor]):
+        """Imports the given modules and updates the given command data object
 
-            Returns
-            -------
-            dict[str, ModuleType]
-                dictionary associating names of imported modules with imported modules
-            """
+        Parameters
+        ----------
+        command_data
+            object storing Click command names and Click commands
+        modules
+            modules to be imported
+        """
 
-            modules: Dict[str, ModuleType] = {}
+        for package_element_descriptor in modules:
+            logger.debug(f"Importing module {package_element_descriptor.name}")
 
-            for file_path in package_directory_path.iterdir():
-                if file_path.is_dir() and (file_path / "__init__.py").exists():
-                    package_or_module_name = file_path.name
+            module = self._import_module_from_file_location(package_element_descriptor)
+            command_dict = self._search_for_commands(package_element_descriptor, module)
 
-                    logger.debug(f"Importing package {package_name}.{package_or_module_name}")
-                    modules[package_or_module_name] = importlib.import_module(
-                        f"{package_name}.{package_or_module_name}"
+            if len(command_dict) == 0:
+                continue
+
+            for command_name in command_dict:
+                if command_name in command_data.command_names:
+                    self._raise_registration_error(command_name, command_data, package_element_descriptor)
+
+                command_data.command_names.append(command_name)
+
+            command_data.commands.update(command_dict)
+
+    def _import_subpackages(self, command_data: CommandData, subpackages: List[PackageElementDescriptor]):
+        """Imports the given subpackages and updates the given command data
+        object
+
+        Parameters
+        ----------
+        command_data
+            object storing Click command names and Click commands
+        subpackages
+            subpackages to be imported
+        """
+
+        for package_element_descriptor in subpackages:
+            logger.debug(f"Importing package {package_element_descriptor.name}")
+
+            command_name = package_element_descriptor.name.replace("_", "-")
+
+            if command_name in command_data.command_names:
+                self._raise_registration_error(command_name, command_data, package_element_descriptor)
+
+            package = self._import_module_from_file_location(package_element_descriptor)
+
+            command_data.command_names.append(command_name)
+            command_data.commands.update(
+                {
+                    command_name: CommandDetails(
+                        LazyLoadingMultiCommand(
+                            package_element_descriptor.distribution_package_name,
+                            package,
+                            help=package.__doc__
+                            if package_element_descriptor.distribution_package_name == dg.distribution_package_name
+                            else self._append_distribution_package_name_to_help_text(
+                                package.__doc__, package_element_descriptor.distribution_package_name
+                            ),
+                            name=None,
+                        ),
+                        package_element_descriptor.distribution_package_name,
                     )
-                elif file_path.is_file() and (file_path.suffix == ".py") and (file_path.name != "__init__.py"):
-                    package_or_module_name = file_path.name[:-3]
+                }
+            )
 
-                    logger.debug(f"Importing module {package_name}.{package_or_module_name}")
-                    modules[package_or_module_name] = importlib.import_module(
-                        f"{package_name}.{package_or_module_name}"
+    def _initialize_command_data_if_required(self):
+        """Creates a data structure based on modules and subpackges of the
+        package passed to the constructor
+
+        This data structure is used when Click calls the overriden methods
+        get_command() and list_commands().
+        """
+
+        if self._command_data is not None:
+            return
+
+        command_data = CommandData()
+        package_data = PackageData.get_package_data(self._distribution_package_name, None, self._package_directory_path)
+
+        self._import_modules(command_data, package_data.modules)
+        self._import_subpackages(command_data, package_data.subpackages)
+
+        if is_relative_to(self._package_directory_path, commands_package_path):
+            # LazyLoadingMultiCommand instance corresponds to a built-in package
+            # (i.e., not a package provided by a plug-in)
+            relative_path_to_commands_package = self._package_directory_path.relative_to(commands_package_path)
+            command_hierarchy_path = (
+                str(relative_path_to_commands_package) if str(relative_path_to_commands_package) != "." else ""
+            )
+
+            if command_hierarchy_path in plugin_manager.package_data_dict:
+                plugin_package_data = plugin_manager.package_data_dict[command_hierarchy_path]
+
+                self._import_modules(command_data, plugin_package_data.modules)
+                self._import_subpackages(command_data, plugin_package_data.subpackages)
+
+        command_data.command_names.sort()
+
+        self._command_data = command_data
+
+    def _raise_registration_error(
+        self, command_name: str, command_data: CommandData, package_element_descriptor: PackageElementDescriptor
+    ):
+        """Raises an error indicating that the Click command (group) with the
+        given name already exists
+
+        Parameters
+        ----------
+        command_name
+            name of the Click command (group) that already exists
+        command_data
+            object storing Click command names and Click commands
+        package_element_descriptor
+            object describing a module or a subpackage within a package whereas the
+            module or subpackage corresponds to the Click command (group) with the
+            given name
+        """
+
+        command_type_1 = "Command group" if str(package_element_descriptor.path).endswith("__init__.py") else "Command"
+        command_type_2 = (
+            "command group"
+            if isinstance(command_data.commands[command_name].command, click.MultiCommand)
+            else "command"
+        )
+
+        command_hierarchy_path = (
+            f", command hierarchy path: '{package_element_descriptor.command_hierarchy_path}'"
+            if package_element_descriptor.command_hierarchy_path is not None
+            else ""
+        )
+
+        raise DataGateCLIException(
+            f"{command_type_1} '{command_name}' (distribution package: '"
+            f"{package_element_descriptor.distribution_package_name}'{command_hierarchy_path}) cannot be registered as "
+            f"a {command_type_2} with the same name was already provided by distribution package '"
+            f"{command_data.commands[command_name].distribution_package_name}'"
+        )
+
+    def _search_for_commands(
+        self, package_element_descriptor: PackageElementDescriptor, module: ModuleType
+    ) -> Dict[str, CommandDetails]:
+        """Searches the given module for Click commands
+
+        Parameters
+        ----------
+        package_element_descriptor
+            object describing a module or a subpackage within a package
+        module
+            module to be searched for Click commands
+
+        Returns
+        -------
+        dict[str, click.Command]
+            dictionary associating Click command names with Click commands
+        """
+
+        commands: Dict[str, CommandDetails] = {}
+
+        for attribute_name in dir(module):
+            attribute = getattr(module, attribute_name)
+
+            if isinstance(attribute, click.Command):
+                if package_element_descriptor.distribution_package_name != dg.distribution_package_name:
+                    attribute.help = self._append_distribution_package_name_to_help_text(
+                        attribute.help, package_element_descriptor.distribution_package_name
                     )
 
-            return modules
+                command_name = attribute_name.replace("_", "-")
 
-        def _initialize_commands_if_required(self):
-            """Creates click.MultiCommand data structures
+                commands[command_name] = CommandDetails(attribute, package_element_descriptor.distribution_package_name)
 
-            This method creates two data structures based on Click commands within
-            the given Python modules:
-
-            - a list of Click command names
-            - a dictionary associating Click command names with Click commands
-
-            Parameters
-            ----------
-            modules
-                Python modules
-            """
-
-            if self._command_data is None:
-                commands: Dict[str, click.Command] = {}
-                command_names: List[str] = []
-                modules = self._import_packages_and_modules()
-
-                for module_name, module in modules.items():
-                    module_commands = self._get_click_commands(module)
-
-                    if len(module_commands) != 0:
-                        commands.update(module_commands)
-                        command_names.append(module_name.replace("_", "-"))
-
-                command_names.sort()
-
-                self._command_data = CommandData(command_names, commands)
-
-    return LazyLoadingMultiCommand
+        return commands
