@@ -44,7 +44,7 @@ Each source code file must have the following copyright header (`$COMMIT_YEAR_RA
 #  limitations under the License.
 ```
 
-There is a script to automatically correct copyright headers ([Development Guide](docs/development_guide.md)).
+There is a script to automatically correct copyright headers ([Development Guide](development_guide.md)).
 
 ## Errors
 
