@@ -219,7 +219,7 @@ class CopyrightHeaderManager:
         return (len(input_file_lines) != 0) and (input_file_lines[0] == "\n")
 
     def _remove_leading_empty_lines(self, input_file_lines: List[str]):
-        while len(input_file_lines) != 0 and input_file_lines[0] == "\n":
+        while len(input_file_lines) != 0 and (input_file_lines[0].strip() + "\n") == "\n":
             input_file_lines.pop(0)
 
     def _write_output_file(

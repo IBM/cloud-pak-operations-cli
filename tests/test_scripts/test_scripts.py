@@ -17,6 +17,7 @@ import pathlib
 import shutil
 import unittest
 
+from datetime import datetime
 from tempfile import TemporaryDirectory
 
 import click.testing
@@ -39,6 +40,10 @@ class TestScripts(unittest.TestCase):
                     shutil.copy(element, tempdir)
 
                     repo.stage(element.name)
+                elif element.name.endswith(".py_expected"):
+                    with open(element) as input_file, open(pathlib.Path(tempdir) / element.name, "w") as output_file:
+                        for line in input_file:
+                            output_file.write(line.replace("{current_year}", str(datetime.today().year)))
 
             repo.do_commit(b"")
 
@@ -55,7 +60,7 @@ class TestScripts(unittest.TestCase):
             # compare contents of modified files with contents of expected files
             for element in sorted((pathlib.Path(__file__).parent / "dependencies").iterdir()):
                 if element.name.endswith(".py"):
-                    file_1 = pathlib.Path(str(element) + "_expected")
+                    file_1 = pathlib.Path(tempdir) / (element.name + "_expected")
                     file_2 = pathlib.Path(tempdir) / element.name
 
                     self.assertTrue(filecmp.cmp(file_1, file_2, shallow=False), f"{file_1} and {file_2} are not equal")
