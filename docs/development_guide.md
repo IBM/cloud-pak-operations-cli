@@ -16,7 +16,7 @@
     pip3 install virtualenv
     virtualenv .venv
     . .venv/bin/activate
-    pip3 install black flake8 isort
+    pip3 install black flake8
     pip3 install --editable .
     ```
 
@@ -26,7 +26,7 @@
     pip3 install virtualenv
     virtualenv .venv
     .venv/Scripts/activate
-    pip3 install black flake8 isort
+    pip3 install black flake8
     pip3 install --editable .
     ```
 
@@ -113,6 +113,21 @@ Use [FunctionTrace](https://functiontrace.com/) to profile a Db2 Data Gate CLI c
 
 - Use [Firefox Profiler](https://profiler.firefox.com/) to analyze the profiling data file.
 
+## Correcting copyright headers
+
+Execute the following command to automatically correct copyright headers of source code files:
+
+- Install required packages:
+
+  ```shell
+  pip3 install dulwich
+  ```
+
+- Execute the `update-copyright-headers` command:
+
+  ```shell
+  python3 -m scripts.scripts update-copyright-headers $REPO_PATH
+
 ## Testing the release of a new version using semantic versioning
 
 - Create a new branch, commit the code leading to a new release, and tag the commit with a semantic version:
@@ -150,7 +165,7 @@ To install a specific Db2 Data Gate CLI version from TestPyPI, execute the follo
 pip3 install --extra-index-url https://pypi.org/simple --index-url https://test.pypi.org/simple/ data-gate-cli==$VERSION
 ```
 
-If you are satistifed with the result and would like to publish the Python distribution to [PyPI](https://pypi.org/), continue as follows:
+If you are satisfied with the result and would like to publish the Python distribution to [PyPI](https://pypi.org/), continue as follows:
 
 - Create a pull request based on the created branch
 - Merge the reviewed pull request

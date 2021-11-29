@@ -26,6 +26,18 @@
 				"discover",
 				"tests.test"
 			]
+		},
+		{
+			"name": "Python: scripts (update_copyright_headers) ",
+			"type": "python",
+			"request": "launch",
+			"module": "scripts.scripts",
+			"console": "internalConsole",
+			"internalConsoleOptions": "openOnSessionStart",
+			"args": [
+				"update-copyright-headers",
+				"${workspaceFolder}"
+			]
 		}
 	],
 	"inputs": [
