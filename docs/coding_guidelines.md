@@ -24,6 +24,28 @@
 
 - Start comments with lowercase if they are not complete sentences.
 
+## Copyright headers
+
+Each source code file must have the following copyright header (`$COMMIT_YEAR_RANGE` must be matched by the regular expression `(\d\d\d\d)(, (\d\d\d\d))*` and specify the years of creation and last modification according to Git):
+
+```python
+#  Copyright $COMMIT_YEAR_RANGE IBM Corporation
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+```
+
+There is a script to automatically correct copyright headers ([Development Guide](docs/development_guide.md)).
+
 ## Errors
 
 - When raising an Exception, use the `DataGateCLIException` class or `IBMCloudExceptionClass` class.
