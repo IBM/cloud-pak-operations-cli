@@ -128,11 +128,12 @@ class TestPluginManager(unittest.TestCase):
 
         multi_command_1_commands = multi_command_1.list_commands(Mock())
 
-        self.assertEqual(len(multi_command_1_commands), 4)
+        self.assertEqual(len(multi_command_1_commands), 5)
         self.assertEqual(multi_command_1_commands[0], "bi-command-1")
         self.assertEqual(multi_command_1_commands[1], "bi-group-1")
         self.assertEqual(multi_command_1_commands[2], "command-1")
-        self.assertEqual(multi_command_1_commands[3], "group-1")
+        self.assertEqual(multi_command_1_commands[3], "command-in-init-file")
+        self.assertEqual(multi_command_1_commands[4], "group-1")
 
         multi_command_2 = multi_command_1.get_command(Mock(), "bi-group-1")
 

@@ -64,7 +64,7 @@ class PackageData:
                         command_hierarchy_path, distribution_package_name, file_path.name, file_path / "__init__.py"
                     )
                 )
-            elif file_path.is_file() and (file_path.suffix == ".py") and (file_path.name != "__init__.py"):
+            elif file_path.is_file() and (file_path.suffix == ".py"):
                 package_data.modules.append(
                     PackageElementDescriptor(
                         command_hierarchy_path, distribution_package_name, file_path.name[:-3], file_path
