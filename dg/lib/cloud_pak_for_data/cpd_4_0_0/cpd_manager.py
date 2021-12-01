@@ -953,7 +953,7 @@ class CloudPakForDataManager:
         custom_resource_is_deleted = False
 
         if event["type"] == "DELETED":
-            resource_kind = dg.lib.jmespath.get_jmespath_string("object.spec.names.kind", event)
+            resource_kind = dg.lib.jmespath.get_jmespath_string("object.kind", event)
             resource_name = dg.lib.jmespath.get_jmespath_string("object.metadata.name", event)
             custom_resource_is_deleted = (resource_name == name) and (resource_kind == kind_metadata.kind)
 
