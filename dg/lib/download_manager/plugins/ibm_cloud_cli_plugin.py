@@ -36,13 +36,13 @@ class IBMCloudCLIPlugIn(AbstractDownloadManagerPlugIn):
     def download_binary_version(self, version: semver.VersionInfo):
         operating_system = dg.utils.operating_system.get_operating_system()
         operating_system_directory_name_pattern_dict = {
-            OperatingSystem.LINUX_X86_64: "linux64",
-            OperatingSystem.MAC_OS: "osx",
-            OperatingSystem.WINDOWS: "win64",
+            OperatingSystem.LINUX_X86_64: "linux_amd64",
+            OperatingSystem.MAC_OS: "macos",
+            OperatingSystem.WINDOWS: "windows_amd64",
         }
 
-        directory = operating_system_directory_name_pattern_dict[operating_system]
-        url = f"https://clis.cloud.ibm.com/download/bluemix-cli/{str(version)}/{directory}/archive"
+        file_name = f"IBM_Cloud_CLI_{str(version)}_{operating_system_directory_name_pattern_dict[operating_system]}.tgz"
+        url = f"https://download.clis.cloud.ibm.com/ibm-cloud-cli/{str(version)}/binaries/{file_name}"
         archive_path = dg.utils.download.download_file(urllib.parse.urlsplit(url))
 
         self._extract_archive(archive_path)
