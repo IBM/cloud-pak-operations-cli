@@ -53,18 +53,19 @@ class DependencyManager:
         args
             arguments to be passed to the binary
         capture_output
-            flag indicating whether output shall be captured
+            flag indicating whether process output shall be captured
         check
             flag indicating whether an exception shall be thrown if the binary
             returns with a nonzero return code
         print_captured_output
-            flag indicating whether captured output shall also be written to
+            flag indicating whether captured process output shall also be written to
             stdout/stderr
 
         Returns
         -------
         ProcessResult
-            object storing the return code and captured output (if requested)
+            object storing the return code and captured process output (if
+            requested)
         """
 
         plugin = self._download_manager_dict.get(cls)
@@ -86,7 +87,7 @@ class DependencyManager:
         return plugin.execute_binary(args, capture_output, check, print_captured_output)
 
     def get_binary_path(self, cls: Type[AbstractDependencyManagerPlugIn]) -> Optional[pathlib.Path]:
-        """Returns the path of the binary associated with the dependency
+        """Returns the path of the binary provided by the dependency
         corresponding to the dependency manager plug-in of the given type
 
         Returns
@@ -94,7 +95,7 @@ class DependencyManager:
         cls
             dependency manager plug-in type
         Optional[pathlib.Path]
-            path of the binary associated with the dependency corresponding to the
+            path of the binary provided by the dependency corresponding to the
             dependency manager plug-in of the given type or None if the dependency
             does not provide a binary
         """

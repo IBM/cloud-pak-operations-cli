@@ -55,18 +55,19 @@ class AbstractDependencyManagerPlugIn(ABC):
         args
             arguments to be passed to the binary
         capture_output
-            flag indicating whether output shall be captured
+            flag indicating whether process output shall be captured
         check
             flag indicating whether an exception shall be thrown if the binary
             returns with a nonzero return code
         print_captured_output
-            flag indicating whether captured output shall also be written to
+            flag indicating whether captured process output shall also be written to
             stdout/stderr
 
         Returns
         -------
         ProcessResult
-            object storing the return code and captured output (if requested)
+            object storing the return code and captured process output (if
+            requested)
         """
 
         binary_path = self.get_binary_path()

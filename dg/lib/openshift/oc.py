@@ -64,20 +64,21 @@ def execute_oc_command(
     args
         arguments to be passed to the OpenShift Container Platform CLI
     capture_output
-        flag indicating whether output shall be captured
+        flag indicating whether process output shall be captured
     check
         flag indicating whether an exception shall be thrown if the OpenShift
         Container Platform CLI returns with a nonzero return code
     oc_cli_path
         path to the OpenShift Container Platform CLI
     print_captured_output
-        flag indicating whether captured output shall also be written to
+        flag indicating whether captured process output shall also be written to
         stdout/stderr
 
     Returns
     -------
     ProcessResult
-        object storing the return code and captured output (if requested)
+        object storing the return code and captured process output (if
+        requested)
     """
 
     return dependency_manager.execute_binary(OpenShiftCLIPlugIn, args, capture_output, check, print_captured_output)
