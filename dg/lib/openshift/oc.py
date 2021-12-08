@@ -22,6 +22,10 @@ import dg.config
 import dg.utils.network
 import dg.utils.process
 
+from dg.lib.dependency_manager import dependency_manager
+from dg.lib.dependency_manager.plugins.openshift_cli_plugin import (
+    OpenShiftCLIPlugIn,
+)
 from dg.lib.error import DataGateCLIException
 from dg.utils.string import removeprefix, removesuffix
 
@@ -51,7 +55,6 @@ def execute_oc_command(
     args: List[str],
     capture_output=False,
     check=True,
-    oc_cli_path=dg.config.data_gate_configuration_manager.get_oc_cli_path(),
     print_captured_output=False,
 ) -> dg.utils.process.ProcessResult:
     """Executes the OpenShift Container Platform CLI
@@ -77,13 +80,7 @@ def execute_oc_command(
         object storing the return code and captured output (if requested)
     """
 
-    return dg.utils.process.execute_command(
-        oc_cli_path,
-        args,
-        capture_output=capture_output,
-        check=check,
-        print_captured_output=print_captured_output,
-    )
+    return dependency_manager.execute_binary(OpenShiftCLIPlugIn, args, capture_output, check, print_captured_output)
 
 
 def get_current_token() -> str:

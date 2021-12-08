@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import dg.lib.download_manager
+import dg.lib.dependency_manager
 
 from dg.utils.logging import loglevel_command
 
@@ -21,4 +21,4 @@ from dg.utils.logging import loglevel_command
 def download_dependencies():
     """Download dependencies"""
 
-    dg.lib.download_manager.download_manager.download_dependencies_if_required()
+    dg.lib.dependency_manager.dependency_manager.download_dependencies_if_required()

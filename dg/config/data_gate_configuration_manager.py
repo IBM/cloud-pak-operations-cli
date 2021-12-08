@@ -14,9 +14,10 @@
 
 import json
 import pathlib
-import sys
 
 from typing import Any, Dict, Optional
+
+import dg
 
 from dg.lib.error import DataGateCLIException
 
@@ -140,28 +141,6 @@ class DataGateConfigurationManager:
     def get_home_directory_path(self) -> pathlib.Path:
         return pathlib.Path.home()
 
-    def get_ibmcloud_cli_path(self) -> pathlib.Path:
-        """Returns the path to the IBM Cloud CLI
-
-        Returns
-        -------
-        pathlib.Path
-            path to the IBM Cloud CLI
-        """
-
-        return self.get_dg_bin_directory_path() / "ibmcloud"
-
-    def get_oc_cli_path(self) -> pathlib.Path:
-        """Returns the path to the OpenShift Container Platform CLI
-
-        Returns
-        -------
-        pathlib.Path
-            path to the OpenShift Container Platform CLI
-        """
-
-        return self.get_dg_bin_directory_path() / "oc"
-
     def get_root_package_path(self) -> pathlib.Path:
         """Returns the path of the root package
 
@@ -171,7 +150,7 @@ class DataGateConfigurationManager:
             path of the root package
         """
 
-        return pathlib.Path(sys.modules["dg"].__file__).parent
+        return pathlib.Path(dg.__file__).parent
 
     def get_value_from_credentials_file(self, key: str) -> Optional[str]:
         """Returns the value corresponding to the given key stored in the

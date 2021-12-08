@@ -19,6 +19,10 @@ import click
 import dg.lib.ibmcloud.iam
 
 from dg.config import data_gate_configuration_manager
+from dg.lib.dependency_manager import dependency_manager
+from dg.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import (
+    IBMCloudCLIPlugIn,
+)
 from dg.lib.error import DataGateCLIException
 from dg.lib.ibmcloud import (
     EXTERNAL_IBM_CLOUD_API_KEY_NAME,
@@ -48,8 +52,8 @@ def generate_api_key(delete_existing_api_key: bool) -> str:
                 if f"Multiple API keys matches found with name '{EXTERNAL_IBM_CLOUD_API_KEY_NAME}'" in error.stderr:
                     raise DataGateCLIException(
                         f"Multiple API keys with the name {EXTERNAL_IBM_CLOUD_API_KEY_NAME} exist. You need to "
-                        f"manually delete them using '{str(data_gate_configuration_manager.get_ibmcloud_cli_path())} "
-                        f"iam api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
+                        f"manually delete them using '{dependency_manager.get_binary_path(IBMCloudCLIPlugIn)} iam "
+                        f"api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
                     )
 
         data_gate_configuration_manager.store_credentials({INTERNAL_IBM_CLOUD_API_KEY_NAME: ""})

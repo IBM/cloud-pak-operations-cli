@@ -26,7 +26,7 @@ import dg.utils.file
 import dg.utils.operating_system
 
 from dg.dg import cli
-from dg.lib.download_manager.plugins.ibm_cloud_terraform_provider_plugin import (
+from dg.lib.dependency_manager.plugins.ibm_cloud_terraform_provider_plugin import (
     IBMCloudTerraformProviderPlugIn,
 )
 

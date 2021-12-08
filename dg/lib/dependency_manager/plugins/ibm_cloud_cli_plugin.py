@@ -1,4 +1,4 @@
-#  Copyright 2020, 2021 IBM Corporation
+#  Copyright 2021 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@ import os
 import pathlib
 import urllib.parse
 
+from typing import List, Optional
+
 import semver
 
 import dg.config
@@ -23,17 +25,18 @@ import dg.utils.compression
 import dg.utils.download
 import dg.utils.file
 import dg.utils.operating_system
+import dg.utils.process
 
-from dg.lib.download_manager.download_manager_plugin import (
-    AbstractDownloadManagerPlugIn,
+from dg.lib.dependency_manager.dependency_manager_plugin import (
+    AbstractDependencyManagerPlugIn,
 )
-from dg.lib.error import DataGateCLIException
+from dg.lib.error import DataGateCLIException, IBMCloudException
 from dg.utils.operating_system import OperatingSystem
 
 
-class IBMCloudCLIPlugIn(AbstractDownloadManagerPlugIn):
+class IBMCloudCLIPlugIn(AbstractDependencyManagerPlugIn):
     # override
-    def download_binary_version(self, version: semver.VersionInfo):
+    def download_dependency_version(self, version: semver.VersionInfo):
         operating_system = dg.utils.operating_system.get_operating_system()
         operating_system_directory_name_pattern_dict = {
             OperatingSystem.LINUX_X86_64: "linux_amd64",
@@ -48,15 +51,32 @@ class IBMCloudCLIPlugIn(AbstractDownloadManagerPlugIn):
         self._extract_archive(archive_path)
 
     # override
-    def get_binary_alias(self) -> str:
+    def execute_binary(
+        self, args: List[str], capture_output=False, check=True, print_captured_output=False
+    ) -> dg.utils.process.ProcessResult:
+        try:
+            return super().execute_binary(args, capture_output, check, print_captured_output)
+        except DataGateCLIException as exception:
+            raise IBMCloudException(exception.stderr)
+
+    # override
+    def get_binary_name(self) -> Optional[str]:
         return "ibmcloud"
 
     # override
-    def get_latest_binary_version(self) -> semver.VersionInfo:
-        latest_version = self._get_latest_binary_version_on_github("IBM-Cloud", "ibm-cloud-cli-release")
+    def get_dependency_alias(self) -> str:
+        return "ibmcloud"
+
+    # override
+    def get_dependency_name(self) -> str:
+        return "IBM Cloud CLI"
+
+    # override
+    def get_latest_dependency_version(self) -> semver.VersionInfo:
+        latest_version = self._get_latest_dependency_version_on_github("IBM-Cloud", "ibm-cloud-cli-release")
 
         if latest_version is None:
-            raise DataGateCLIException("No IBM Cloud CLI release could be found on GitHub")
+            raise DataGateCLIException(f"No {self.get_dependency_name()} release could be found on GitHub")
 
         return latest_version
 

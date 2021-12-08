@@ -1,4 +1,4 @@
-#  Copyright 2020, 2021 IBM Corporation
+#  Copyright 2021 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@ import pathlib
 import stat
 import urllib.parse
 
+from typing import Optional
+
 import semver
 
 import dg.config
@@ -24,16 +26,16 @@ import dg.utils.compression
 import dg.utils.download
 import dg.utils.operating_system
 
-from dg.lib.download_manager.download_manager_plugin import (
-    AbstractDownloadManagerPlugIn,
+from dg.lib.dependency_manager.dependency_manager_plugin import (
+    AbstractDependencyManagerPlugIn,
 )
 from dg.lib.error import DataGateCLIException
 from dg.utils.operating_system import OperatingSystem
 
 
-class TerraformPlugin(AbstractDownloadManagerPlugIn):
+class TerraformPlugin(AbstractDependencyManagerPlugIn):
     # override
-    def download_binary_version(self, version: semver.VersionInfo):
+    def download_dependency_version(self, version: semver.VersionInfo):
         operating_system = dg.utils.operating_system.get_operating_system()
         operating_system_to_file_name_suffix_dict = {
             OperatingSystem.LINUX_X86_64: "linux_amd64.zip",
@@ -49,15 +51,23 @@ class TerraformPlugin(AbstractDownloadManagerPlugIn):
         self._extract_archive(archive_path, operating_system)
 
     # override
-    def get_binary_alias(self) -> str:
+    def get_binary_name(self) -> Optional[str]:
         return "terraform"
 
     # override
-    def get_latest_binary_version(self) -> semver.VersionInfo:
-        latest_version = self._get_latest_binary_version_on_github("hashicorp", "terraform")
+    def get_dependency_alias(self) -> str:
+        return "terraform"
+
+    # override
+    def get_dependency_name(self) -> str:
+        return "Terraform"
+
+    # override
+    def get_latest_dependency_version(self) -> semver.VersionInfo:
+        latest_version = self._get_latest_dependency_version_on_github("hashicorp", "terraform")
 
         if latest_version is None:
-            raise DataGateCLIException("No Terraform release could be found on GitHub")
+            raise DataGateCLIException(f"No {self.get_dependency_name()} release could be found on GitHub")
 
         return latest_version
 
