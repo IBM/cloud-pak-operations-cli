@@ -1,4 +1,4 @@
-#  Copyright 2020, 2021 IBM Corporation
+#  Copyright 2021 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ import pathlib
 import re as regex
 import urllib.parse
 
+from typing import Optional
+
 import semver
 
 import dg.config
@@ -26,16 +28,16 @@ import dg.utils.download
 import dg.utils.file
 import dg.utils.operating_system
 
-from dg.lib.download_manager.download_manager_plugin import (
-    AbstractDownloadManagerPlugIn,
+from dg.lib.dependency_manager.dependency_manager_plugin import (
+    AbstractDependencyManagerPlugIn,
 )
 from dg.lib.error import DataGateCLIException
 from dg.utils.operating_system import OperatingSystem
 
 
-class OpenShiftClientCLIPlugIn(AbstractDownloadManagerPlugIn):
+class OpenShiftCLIPlugIn(AbstractDependencyManagerPlugIn):
     # override
-    def download_binary_version(self, version: semver.VersionInfo):
+    def download_dependency_version(self, version: semver.VersionInfo):
         operating_system = dg.utils.operating_system.get_operating_system()
         operating_system_file_name_pattern_dict = {
             OperatingSystem.LINUX_X86_64: "openshift-client-linux.tar.gz",
@@ -50,17 +52,25 @@ class OpenShiftClientCLIPlugIn(AbstractDownloadManagerPlugIn):
         self._extract_archive(archive_path)
 
     # override
-    def get_binary_alias(self) -> str:
+    def get_binary_name(self) -> Optional[str]:
         return "oc"
 
     # override
-    def get_latest_binary_version(self) -> semver.VersionInfo:
-        """Returns the latest version of the OpenShift Client CLI
+    def get_dependency_alias(self) -> str:
+        return "oc"
+
+    # override
+    def get_dependency_name(self) -> str:
+        return "OpenShift CLI"
+
+    # override
+    def get_latest_dependency_version(self) -> semver.VersionInfo:
+        """Returns the latest version of the OpenShift CLI
 
         Returns
         -------
         semver.VersionInfo
-            latest version of the OpenShift Client CLI
+            latest version of the OpenShift CLI
         """
 
         url = "https://mirror.openshift.com/pub/openshift-v4/clients/ocp/latest/release.txt"
@@ -96,18 +106,18 @@ class OpenShiftClientCLIPlugIn(AbstractDownloadManagerPlugIn):
         )
 
     def _parse_openshift_client_cli_version_from_versions_file(self, file_contents: str) -> semver.VersionInfo:
-        """Parses the OpenShift Client CLI version contained in the given file
+        """Parses the OpenShift CLI version contained in the given file
         contents
 
         Parameters
         ----------
         file_contents
-            file contents to be parsed for an OpenShift Client CLI version
+            file contents to be parsed for an OpenShift CLI version
 
         Returns
         -------
         semver.VersionInfo
-            parsed OpenShift Client CLI version
+            parsed OpenShift CLI version
         """
 
         search_result = regex.search(
@@ -116,7 +126,7 @@ class OpenShiftClientCLIPlugIn(AbstractDownloadManagerPlugIn):
         )
 
         if search_result is None:
-            raise DataGateCLIException("OpenShift Client CLI could not be parsed")
+            raise DataGateCLIException(f"{self.get_dependency_name()} could not be parsed")
 
         version = semver.VersionInfo.parse(f"{search_result.group(1)}")
 

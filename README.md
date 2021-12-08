@@ -262,6 +262,7 @@ dg ibmcloud oc cluster create \
 
   ```shell
   dg adm config set --key fyre_commands --value true
+  ```
 
 - [Installing IBM Cloud Pak for Data on a FYRE-based OpenShift cluster](docs/installing_ibm_cloud_pak_for_data_on_a_fyre-based_openshift_cluster.md)
 
@@ -271,7 +272,7 @@ dg ibmcloud oc cluster create \
 
 ## Known issues
 
-### OpenShift Client CLI (macOS)
+### OpenShift CLI (macOS)
 
 ```shell
 Unable to connect to the server: dial tcp: lookup … on …:53: no such host

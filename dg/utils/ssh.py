@@ -51,7 +51,7 @@ class RemoteClient:
     async def connect(self):
         """Connects to the remote host"""
 
-        self._connection = await asyncssh.connect(self._hostname, username="root")
+        self._connection = await asyncssh.connect(self._hostname, username="root")  # type: ignore
 
     async def disconnect(self):
         """Disconnects from the remote host"""
@@ -71,8 +71,9 @@ class RemoteClient:
         command
             command to execute on the remote host
         print_output
-            flag indicating whether the output of the command (stdout and stderr)
-            shall be printed to stdout and stderr
+            flag indicating whether output to stdout and stderr of the command
+            executed on the remote host shall be printed to stdout and stderr on the
+            local host
         """
 
         logging.info(f"Executing command on {self._hostname}: {command}")

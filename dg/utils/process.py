@@ -42,18 +42,19 @@ def execute_command(
     args
         arguments to be passed to the executable
     capture_output
-        flag indicating whether output shall be captured
+        flag indicating whether process output shall be captured
     check
         flag indicating whether an exception shall be thrown if the executable
         returns with a nonzero return code
     print_captured_output
-        flag indicating whether captured output shall also be written to
+        flag indicating whether captured process output shall also be written to
         stdout/stderr
 
     Returns
     -------
     ProcessResult
-        object storing the return code and captured output (if requested)
+        object storing the return code and captured process output (if
+        requested)
     """
 
     command = [str(program)] + args
@@ -109,15 +110,16 @@ def execute_command_without_check(
     args
         arguments to be passed to the executable
     capture_output
-        flag indicating whether output shall be captured
+        flag indicating whether process output shall be captured
     print_captured_output
-        flag indicating whether captured output shall also be written to
+        flag indicating whether captured process output shall also be written to
         stdout/stderr
 
     Returns
     -------
     ProcessResult
-        object storing the return code and captured output (if requested)
+        object storing the return code and captured process output (if
+        requested)
     """
 
     return execute_command(
