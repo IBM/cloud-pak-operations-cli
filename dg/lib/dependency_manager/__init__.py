@@ -16,6 +16,9 @@ from dg.lib.dependency_manager.dependency_manager import DependencyManager
 from dg.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import (
     IBMCloudCLIPlugIn,
 )
+from dg.lib.dependency_manager.plugins.ibm_cloud_pak_cli_plugin import (
+    IBMCloudPakCLIPlugIn,
+)
 from dg.lib.dependency_manager.plugins.ibm_cloud_terraform_provider_plugin import (
     IBMCloudTerraformProviderPlugIn,
 )
@@ -26,6 +29,7 @@ from dg.lib.dependency_manager.plugins.terraform_plugin import TerraformPlugin
 
 dependency_manager = DependencyManager()
 dependency_manager.register_plugin(IBMCloudCLIPlugIn)
+dependency_manager.register_plugin(IBMCloudPakCLIPlugIn)
 dependency_manager.register_plugin(IBMCloudTerraformProviderPlugIn)
 dependency_manager.register_plugin(OpenShiftCLIPlugIn)
 dependency_manager.register_plugin(TerraformPlugin)
