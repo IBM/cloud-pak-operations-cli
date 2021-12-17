@@ -14,11 +14,11 @@
 
 import unittest
 
-from dg.lib.error import DataGateCLIException
-from dg.lib.fyre.data.ocpplus_cluster_specification import (
+from cpo.lib.error import DataGateCLIException
+from cpo.lib.fyre.data.ocpplus_cluster_specification import (
     HAProxyTimoutSettings,
 )
-from dg.lib.fyre.types.ocp_post_request import (
+from cpo.lib.fyre.types.ocp_post_request import (
     HAProxyTimeoutData,
     OCPPostRequest,
 )

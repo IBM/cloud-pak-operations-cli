@@ -5,10 +5,10 @@
 		}
 	},
 	"files.exclude": {
-		"**/__pycache__": true,
 		".vscode/.ropeproject": true,
+		"**/__pycache__": true,
+		"**/*.egg-info": true,
 		"build": true,
-		"data_gate_cli.egg-info": true,
 		"dist": true
 	},
 	"python.analysis.typeCheckingMode": "basic",
@@ -27,7 +27,7 @@
 		"--multi-line",
 		"3",
 		"--project",
-		"dg",
+		"cpo",
 		"--thirdparty",
 		"click",
 		"--trailing-comma"

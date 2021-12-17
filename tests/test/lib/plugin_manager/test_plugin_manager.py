@@ -37,11 +37,11 @@ import tests.test.lib.plugin_manager.plugin_2.package_2
 import tests.test.lib.plugin_manager.plugin_2.package_3
 import tests.test.lib.plugin_manager.plugin_2.package_4
 
-import dg
+import cpo
 
-from dg.lib.click.lazy_loading_multi_command import LazyLoadingMultiCommand
-from dg.lib.error import DataGateCLIException
-from dg.lib.plugin_manager.plugin_manager import plugin_manager
+from cpo.lib.click.lazy_loading_multi_command import LazyLoadingMultiCommand
+from cpo.lib.error import DataGateCLIException
+from cpo.lib.plugin_manager.plugin_manager import plugin_manager
 
 
 def create_entry_point_mock_objects(entry_points: List[Tuple[str, ModuleType]]) -> List[Mock]:
@@ -62,7 +62,7 @@ def create_entry_points_result(entry_point_dicts: List[Dict[str, str]]) -> Dict[
     merged_entry_points: List[EntryPoint] = []
 
     for entry_point_dict in entry_point_dicts:
-        text = "[dg_plugins]\n"
+        text = "[cloud_pak_operations_cli_plugins]\n"
 
         for name, value in entry_point_dict.items():
             text += f"{name} = {value}\n"
@@ -75,17 +75,17 @@ def create_entry_points_result(entry_point_dicts: List[Dict[str, str]]) -> Dict[
                 merged_entry_points.append(entry_point)
 
     return {
-        dg.plugin_group_name: tuple(merged_entry_points),
+        cpo.plugin_group_name: tuple(merged_entry_points),
     }
 
 
 class TestPluginManager(unittest.TestCase):
     @patch(
-        "dg.lib.click.lazy_loading_multi_command.commands_package_path",
+        "cpo.lib.click.lazy_loading_multi_command.commands_package_path",
         pathlib.Path(tests.test.lib.plugin_manager.builtin_commands.__file__).parent,
     )
     @patch(
-        "dg.lib.plugin_manager.plugin_manager.DistributionEntryPointLoader",
+        "cpo.lib.plugin_manager.plugin_manager.DistributionEntryPointLoader",
         side_effect=create_entry_point_mock_objects(
             [
                 ("plugin-1", tests.test.lib.plugin_manager.plugin_1.package_1),
@@ -96,7 +96,7 @@ class TestPluginManager(unittest.TestCase):
         ),
     )
     @patch(
-        "dg.lib.plugin_manager.plugin_manager.entry_points",
+        "cpo.lib.plugin_manager.plugin_manager.entry_points",
         return_value=create_entry_points_result(
             [
                 {
@@ -123,7 +123,7 @@ class TestPluginManager(unittest.TestCase):
         plugin_manager.reload()
 
         multi_command_1 = LazyLoadingMultiCommand(
-            dg.distribution_package_name, tests.test.lib.plugin_manager.builtin_commands
+            cpo.distribution_package_name, tests.test.lib.plugin_manager.builtin_commands
         )
 
         multi_command_1_commands = multi_command_1.list_commands(Mock())
@@ -159,11 +159,11 @@ class TestPluginManager(unittest.TestCase):
         self.assertEqual(multi_command_3_commands[1], "bi-group-2-command-1")
 
     @patch(
-        "dg.lib.click.lazy_loading_multi_command.commands_package_path",
+        "cpo.lib.click.lazy_loading_multi_command.commands_package_path",
         pathlib.Path(tests.test.lib.plugin_manager.builtin_commands.__file__).parent,
     )
     @patch(
-        "dg.lib.plugin_manager.plugin_manager.DistributionEntryPointLoader",
+        "cpo.lib.plugin_manager.plugin_manager.DistributionEntryPointLoader",
         side_effect=create_entry_point_mock_objects(
             [
                 ("plugin-2", tests.test.lib.plugin_manager.plugin_2.package_1),
@@ -171,7 +171,7 @@ class TestPluginManager(unittest.TestCase):
         ),
     )
     @patch(
-        "dg.lib.plugin_manager.plugin_manager.entry_points",
+        "cpo.lib.plugin_manager.plugin_manager.entry_points",
         return_value=create_entry_points_result(
             [
                 {
@@ -188,23 +188,23 @@ class TestPluginManager(unittest.TestCase):
         plugin_manager.reload()
 
         multi_command_1 = LazyLoadingMultiCommand(
-            dg.distribution_package_name, tests.test.lib.plugin_manager.builtin_commands
+            cpo.distribution_package_name, tests.test.lib.plugin_manager.builtin_commands
         )
 
         with self.assertRaisesRegex(
             DataGateCLIException,
             f"Command 'bi-command-1' \\(distribution package: 'plugin-2', command hierarchy path: ''\\) cannot be "
             f"registered as a command with the same name was already provided by distribution package "
-            f"'{dg.distribution_package_name}'",
+            f"'{cpo.distribution_package_name}'",
         ):
             multi_command_1.list_commands(Mock())
 
     @patch(
-        "dg.lib.click.lazy_loading_multi_command.commands_package_path",
+        "cpo.lib.click.lazy_loading_multi_command.commands_package_path",
         pathlib.Path(tests.test.lib.plugin_manager.builtin_commands.__file__).parent,
     )
     @patch(
-        "dg.lib.plugin_manager.plugin_manager.DistributionEntryPointLoader",
+        "cpo.lib.plugin_manager.plugin_manager.DistributionEntryPointLoader",
         side_effect=create_entry_point_mock_objects(
             [
                 ("plugin-2", tests.test.lib.plugin_manager.plugin_2.package_2),
@@ -212,7 +212,7 @@ class TestPluginManager(unittest.TestCase):
         ),
     )
     @patch(
-        "dg.lib.plugin_manager.plugin_manager.entry_points",
+        "cpo.lib.plugin_manager.plugin_manager.entry_points",
         return_value=create_entry_points_result(
             [
                 {
@@ -229,23 +229,23 @@ class TestPluginManager(unittest.TestCase):
         plugin_manager.reload()
 
         multi_command_1 = LazyLoadingMultiCommand(
-            dg.distribution_package_name, tests.test.lib.plugin_manager.builtin_commands
+            cpo.distribution_package_name, tests.test.lib.plugin_manager.builtin_commands
         )
 
         with self.assertRaisesRegex(
             DataGateCLIException,
             f"Command group 'bi-group-1' \\(distribution package: 'plugin-2', command hierarchy path: ''\\) cannot be "
             f"registered as a command group with the same name was already provided by distribution package "
-            f"'{dg.distribution_package_name}'",
+            f"'{cpo.distribution_package_name}'",
         ):
             multi_command_1.list_commands(Mock())
 
     @patch(
-        "dg.lib.click.lazy_loading_multi_command.commands_package_path",
+        "cpo.lib.click.lazy_loading_multi_command.commands_package_path",
         pathlib.Path(tests.test.lib.plugin_manager.builtin_commands.__file__).parent,
     )
     @patch(
-        "dg.lib.plugin_manager.plugin_manager.DistributionEntryPointLoader",
+        "cpo.lib.plugin_manager.plugin_manager.DistributionEntryPointLoader",
         side_effect=create_entry_point_mock_objects(
             [
                 ("plugin-1", tests.test.lib.plugin_manager.plugin_1.package_1),
@@ -254,7 +254,7 @@ class TestPluginManager(unittest.TestCase):
         ),
     )
     @patch(
-        "dg.lib.plugin_manager.plugin_manager.entry_points",
+        "cpo.lib.plugin_manager.plugin_manager.entry_points",
         return_value=create_entry_points_result(
             [
                 {
@@ -272,7 +272,7 @@ class TestPluginManager(unittest.TestCase):
         plugin_manager.reload()
 
         multi_command_1 = LazyLoadingMultiCommand(
-            dg.distribution_package_name, tests.test.lib.plugin_manager.builtin_commands
+            cpo.distribution_package_name, tests.test.lib.plugin_manager.builtin_commands
         )
 
         with self.assertRaisesRegex(
@@ -283,11 +283,11 @@ class TestPluginManager(unittest.TestCase):
             multi_command_1.list_commands(Mock())
 
     @patch(
-        "dg.lib.click.lazy_loading_multi_command.commands_package_path",
+        "cpo.lib.click.lazy_loading_multi_command.commands_package_path",
         pathlib.Path(tests.test.lib.plugin_manager.builtin_commands.__file__).parent,
     )
     @patch(
-        "dg.lib.plugin_manager.plugin_manager.DistributionEntryPointLoader",
+        "cpo.lib.plugin_manager.plugin_manager.DistributionEntryPointLoader",
         side_effect=create_entry_point_mock_objects(
             [
                 ("plugin-1", tests.test.lib.plugin_manager.plugin_1.package_2),
@@ -296,7 +296,7 @@ class TestPluginManager(unittest.TestCase):
         ),
     )
     @patch(
-        "dg.lib.plugin_manager.plugin_manager.entry_points",
+        "cpo.lib.plugin_manager.plugin_manager.entry_points",
         return_value=create_entry_points_result(
             [
                 {
@@ -312,7 +312,7 @@ class TestPluginManager(unittest.TestCase):
         plugin_manager.reload()
 
         multi_command_1 = LazyLoadingMultiCommand(
-            dg.distribution_package_name, tests.test.lib.plugin_manager.builtin_commands
+            cpo.distribution_package_name, tests.test.lib.plugin_manager.builtin_commands
         )
 
         with self.assertRaisesRegex(

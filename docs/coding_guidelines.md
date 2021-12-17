@@ -1,4 +1,4 @@
-# Db2 Data Gate CLI: Coding Guidelines
+# IBM Cloud Pak Operations CLI: Coding Guidelines
 
 ## Comments
 
@@ -53,7 +53,7 @@ There is a script to automatically correct copyright headers ([Development Guide
 
 ## Imports
 
-To avoid circular imports, a module contained in one of the Db2 Data Gate CLI packages shown in the table below is only allowed to import other modules of the following categories:
+To avoid circular imports, a module contained in one of the packages shown in the table below is only allowed to import other modules of the following categories:
 
 - modules from the same package or other packages in the same row if no circular import is created
 - modules from other packages in rows below the row containing the package of the module
@@ -61,12 +61,12 @@ To avoid circular imports, a module contained in one of the Db2 Data Gate CLI pa
 | 1st level packages | 2nd level packages | 3rd level packages                                   |
 | ------------------ | ------------------ | ---------------------------------------------------- |
 | test               | …                  |                                                      |
-| dg                 | dg.commands        | dg.commands.adm<br />dg.commands.cluster<br />…      |
-|                    | dg.lib             | dg.lib.cloud_pak_for_data<br />dg.lib.cluster<br />… |
-|                    | dg.config          |                                                      |
-|                    | dg.utils           |                                                      |
+| cpo                | cpo.commands       | cpo.commands.adm<br />cpo.commands.cluster<br />…    |
+|                    | cpo.lib            | cpo.lib.click<br />cpo.lib.cloud_pak_for_data<br />… |
+|                    | cpo.config         |                                                      |
+|                    | cpo.utils          |                                                      |
 
-For example, a module contained in the `dg.config` package is allowed to import modules from the `dg.utils` package but must not import modules from the `dg.lib` package.
+For example, a module contained in the `cpo.config` package is allowed to import modules from the `cpo.utils` package but must not import modules from the `cpo.lib` package.
 
 ## Line length
 
@@ -94,8 +94,8 @@ Use the following decision criteria when to use which method:
 
 - Use `click.echo()` when printing the current timestamp and the log level is not appropriate. For example, when …
 
-  - … printing output that may be consumed by other programs (example: `dg cluster current`).
-  - … printing output that is formatted (example: `dg cluster ls`).
+  - … printing output that may be consumed by other programs (example: `cpo cluster current`).
+  - … printing output that is formatted (example: `cpo cluster ls`).
   - … printing output that is important for subsequent user interaction.
 
 - Use the `logging` package when printing the current timestamp and the log level is appropriate:
@@ -108,7 +108,7 @@ Use the following decision criteria when to use which method:
 
 ### Click support
 
-The advantage of the `logging` package is that the log level of the current logger may be changed to suppress log messages. To expose this feature when executing commands of the Db2 Data Gate CLI, Click commands should be defined using the `@loglevel_command` decorator, which automatically appends a non-required option named `--loglevel`:
+The advantage of the `logging` package is that the log level of the current logger may be changed to suppress log messages. To expose this feature when executing CLI commands, Click commands should be defined using the `@loglevel_command` decorator, which automatically appends a non-required option named `--loglevel`:
 
 ```
 Options:
@@ -125,7 +125,7 @@ The `logging` package and the decorator may be used as follows:
 ```python
 import logging
 
-from dg.utils.logging import loglevel_command
+from cpo.utils.logging import loglevel_command
 
 logger = logging.getLogger(__name__)
 

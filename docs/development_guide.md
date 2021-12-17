@@ -1,14 +1,14 @@
-# Development Guide
+# IBM Cloud Pak Operations CLI: Development Guide
 
 ## Setting up the development environment
 
-- Clone the Db2 Data Gate CLI GitHub repository:
+- Clone the IBM Cloud Pak Operations CLI GitHub repository:
 
   ```shell
-  git clone https://github.com/IBM/data-gate-cli.git
+  git clone https://github.com/IBM/cloud-pak-operations-cli
   ```
 
-- Execute the following commands to create a [virtual environment](https://virtualenv.pypa.io/en/latest/) within the directory the Db2 Data Gate CLI GitHub repository was cloned into:
+- Execute the following commands to create a [virtual environment](https://virtualenv.pypa.io/en/latest/) within the directory the GitHub repository was cloned into:
 
   - Linux/macOS:
 
@@ -30,9 +30,9 @@
     pip3 install --editable .
     ```
 
-## Extending the Db2 Data Gate CLI
+## Extending the IBM Cloud Pak Operations CLI
 
-The Db2 Data Gate CLI is based on the [Click package](https://palletsprojects.com/p/click/).
+The IBM Cloud Pak Operations CLI is based on the [Click package](https://palletsprojects.com/p/click/).
 
 ### Registering a new Click command
 
@@ -40,13 +40,13 @@ To register a new Click command, add the Python module containing the command to
 
 ### Registering a new Click group
 
-To register a new Click group (e.g., `click-group-name`), add a Python package (i.e., a directory containing a file named `__init__.py`) to the `commands` directory or one of its subdirectories (e.g., `click_group_name`). For each Python package below the `commands` directory, a new Click group (i.e., an instance of [LazyLoadingMultiCommand](dg/lib/click/lazy_loading_multi_command.py)) is implictly created.
+To register a new Click group (e.g., `click-group-name`), add a Python package (i.e., a directory containing a file named `__init__.py`) to the `commands` directory or one of its subdirectories (e.g., `click_group_name`). For each Python package below the `commands` directory, a new Click group (i.e., an instance of [LazyLoadingMultiCommand](cpo/lib/click/lazy_loading_multi_command.py)) is implictly created.
 
-## Writing a Db2 Date Gate CLI plug-in
+## Writing an IBM Cloud Pak Operations CLI plug-in
 
-The Db2 Data Gate CLI is extensible via plug-ins, which are regular distribution packages managed by `pip`.
+The IBM Cloud Pak Operations CLI is extensible via plug-ins, which are regular distribution packages managed by `pip`.
 
-To add Click commands or command groups to a built-in command group, CLI plug-ins (i.e., distribution packages) must export packages by specifying one or more entry points within the `dg_plugins` group in their configuration file.
+To add Click commands or command groups to a built-in command group, CLI plug-ins (i.e., distribution packages) must export packages by specifying one or more entry points within the `cloud_pak_operations_cli_plugins` group in their configuration file.
 
 To specify the built-in command group, the `__doc__` attribute of the `__init__.py` module of an entry point package must be set to the path of the built-in command group in the command hierarchy. Nested built-in command groups must be separated by slashes. If the `__doc__` attribute is not set, Click commands or command groups are added to the root command group.
 
@@ -68,7 +68,7 @@ package_2
 
 ```
 [options.entry_points]
-dg_plugins =
+cloud_pak_operations_cli_plugins =
     entry_point_1 = package_1
     entry_point_2 = package_2
 ```
@@ -83,7 +83,7 @@ python -m unittest discover tests.test
 
 ## Profiling using FunctionTrace (Linux/macOS)
 
-Use [FunctionTrace](https://functiontrace.com/) to profile a Db2 Data Gate CLI command as follows:
+Use [FunctionTrace](https://functiontrace.com/) to profile an IBM Cloud Pak Operations CLI command as follows:
 
 - [Install Rust and Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html#install-rust-and-cargo)
 
@@ -99,13 +99,13 @@ Use [FunctionTrace](https://functiontrace.com/) to profile a Db2 Data Gate CLI c
   pip3 install functiontrace
   ```
 
-- Execute the following command to profile a Db2 Data Gate CLI command:
+- Execute the following command to profile an IBM Cloud Pak Operations CLI command:
 
   ```shell
-  python3 -m functiontrace $(which dg) $COMMAND
+  python3 -m functiontrace $(which cpo) $COMMAND
   ```
 
-- After having executed the Db2 Data Gate CLI, the FunctionTrace server prints the location of the profiling data file:
+- After having executed the CLI command, the FunctionTrace server prints the location of the profiling data file:
 
   ```shell
   [FunctionTrace] Wrote profile data to …
@@ -127,6 +127,7 @@ Execute the following command to automatically correct copyright headers of sour
 
   ```shell
   python3 -m scripts.scripts update-copyright-headers $REPO_PATH
+  ```
 
 ## Testing the release of a new version using semantic versioning
 
@@ -159,10 +160,10 @@ After having pushed the branch and the tag, the following actions are performed:
 - A Python distribution is built using the tagged version as the package version.
 - The Python distribution is published to [TestPyPI](https://test.pypi.org/).
 
-To install a specific Db2 Data Gate CLI version from TestPyPI, execute the following command:
+To install a specific IBM Cloud Pak Operations CLI version from TestPyPI, execute the following command:
 
 ```shell
-pip3 install --extra-index-url https://pypi.org/simple --index-url https://test.pypi.org/simple/ data-gate-cli==$VERSION
+pip3 install --extra-index-url https://pypi.org/simple --index-url https://test.pypi.org/simple/ cloud-pak-operations-cli==$VERSION
 ```
 
 If you are satisfied with the result and would like to publish the Python distribution to [PyPI](https://pypi.org/), continue as follows:
@@ -195,9 +196,9 @@ After having pushed the tag, the following actions are performed:
 
 To add support for a new IBM Cloud Pak for Data 4.0.x release, perform the following steps:
 
-- Update the `_IBM_CLOUD_PAK_FOR_DATA_VERSION` class variable of the [CloudPakForDataManager](dg/lib/cloud_pak_for_data/cpd_4_0_0/cpd_manager.py) class
-- Update version numbers in [cpd-custom-resources.json](/dg/deps/config/cpd-custom-resources.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=integrations-services) (check custom resources providing a version number in the specification for changes)
-- Update [cpd-subscriptions.json](/dg/deps/config/cpd-subscriptions.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=tasks-creating-operator-subscriptions#preinstall-operator-subscriptions__svc-subcriptions) (check custom resources for changes)
+- Update the `_IBM_CLOUD_PAK_FOR_DATA_VERSION` class variable of the [CloudPakForDataManager](cpo/lib/cloud_pak_for_data/cpd_4_0_0/cpd_manager.py) class
+- Update version numbers in [cpd-custom-resources.json](/cpo/deps/config/cpd-custom-resources.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=integrations-services) (check custom resources providing a version number in the specification for changes)
+- Update [cpd-subscriptions.json](/cpo/deps/config/cpd-subscriptions.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=tasks-creating-operator-subscriptions#preinstall-operator-subscriptions__svc-subcriptions) (check custom resources for changes)
 
 ## References
 

@@ -9,19 +9,19 @@
 - Create a new OCP+ cluster for IBM Db2 Data Gate on IBM Cloud Pak for Data:
 
   ```shell
-  dg fyre cluster create-for-db2-data-gate --alias $ALIAS --cluster-name $FYRE_CLUSTER_NAME --ssh-key "$(cat ~/.ssh/id_rsa.pub)"
+  cpo fyre cluster create --alias $ALIAS --cluster-name $FYRE_CLUSTER_NAME --ssh-key "$(cat ~/.ssh/id_rsa.pub)" --worker-node-num-cpus 16 --worker-node-ram-size 64
   ```
 
 - Set the current registered OpenShift cluster:
 
   ```shell
-  dg cluster use $ALIAS
+  cpo cluster use $ALIAS
   ```
 
 - Install NFS storage class:
 
   ```shell
-  dg fyre cluster install-nfs-storage-class
+  cpo fyre cluster install-nfs-storage-class
   ```
 
 ## IBM Cloud Pak for Data 3.5.0
@@ -29,7 +29,7 @@
 - Log in to infrastructure node:
 
   ```shell
-  dg fyre cluster ssh --disable-strict-host-key-checking
+  cpo fyre cluster ssh --disable-strict-host-key-checking
   ```
 
 - Install packages:
@@ -38,62 +38,56 @@
   yum install --assumeyes git python38
   ```
 
-- Install Db2 Data Gate CLI:
+- Install IBM Cloud Pak Operations CLI:
 
   ```shell
-  pip3 install data-gate-cli
+  pip3 install cloud-pak-operations-cli
   ```
 
-- Execute the following Db2 Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
+- Execute the following IBM Cloud Pak Operations CLI commands to install IBM Cloud Pak for Data:
 
   - Download dependencies:
 
     ```shell
-    dg adm download-dependencies
+    cpo adm download-dependencies
     ```
 
   - Store credentials in a configuration file:
 
     ```shell
-    dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key $IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY
+    cpo adm store-credentials --ibm-cloud-pak-for-data-entitlement-key $IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY
     ```
 
   - Register the created OCP+ cluster:
 
     ```shell
-    dg fyre cluster add --alias $ALIAS --cluster-name $FYRE_CLUSTER_NAME --password $KUBEADMIN_PASSWORD
+    cpo fyre cluster add --alias $ALIAS --cluster-name $FYRE_CLUSTER_NAME --password $KUBEADMIN_PASSWORD
     ```
 
   - Set the current registered OpenShift cluster:
 
     ```shell
-    dg cluster use $ALIAS
-    ```
-
-  - Install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
-
-    ```shell
-    dg cpd3 install-db2-data-gate-stack --accept-all-licenses --storage-class managed-nfs-storage
-    ```
-
-## IBM Cloud Pak for Data 4.0.x
-
-- Execute the following Db2 Data Gate CLI commands to install IBM Cloud Pak for Data, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
-
-  - Store credentials in a configuration file:
-
-    ```shell
-    dg adm store-credentials --ibm-cloud-pak-for-data-entitlement-key $IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY
+    cpo cluster use $ALIAS
     ```
 
   - Install IBM Cloud Pak for Data:
 
     ```shell
-    dg cpd4 install --accept-license --force --license (ENTERPRISE|STANDARD) --storage-vendor nfs
+    cpo cpd3 install --accept-all-licenses --storage-class managed-nfs-storage
     ```
 
-  - Install IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate:
+## IBM Cloud Pak for Data 4.0.x
+
+- Execute the following IBM Cloud Pak Operations CLI commands to install IBM Cloud Pak for Data:
+
+  - Store credentials in a configuration file:
 
     ```shell
-    dg cpd4 service install-db2-data-gate-stack --accept-all-licenses --db2-license (ADVANCED|COMMUNITY|STANDARD) --license (ENTERPRISE|STANDARD) --storage-vendor nfs
+    cpo adm store-credentials --ibm-cloud-pak-for-data-entitlement-key $IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY
+    ```
+
+  - Install IBM Cloud Pak for Data:
+
+    ```shell
+    cpo cpd4 install --accept-license --force --license (ENTERPRISE|STANDARD) --storage-vendor nfs
     ```
