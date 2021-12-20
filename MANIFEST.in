@@ -1,1 +1,1 @@
-recursive-include dg/deps *
+recursive-include cpo/deps *

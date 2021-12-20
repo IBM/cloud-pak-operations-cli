@@ -2,6 +2,6 @@ __pycache__/
 .idea/
 .venv/
 .vscode/.ropeproject/
+**/*.egg-info/
 build/
-data_gate_cli.egg-info/
 dist/

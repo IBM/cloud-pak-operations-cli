@@ -14,12 +14,12 @@
 
 import unittest
 
-from dg.utils.string import removeprefix, removesuffix
+from cpo.utils.string import removeprefix, removesuffix
 
 
 class TestStringUtilities(unittest.TestCase):
     def test_removeprefix(self):
-        """Tests dg.utils.string.removeprefix()"""
+        """Tests cpo.utils.string.removeprefix()"""
 
         self.assertEqual(removeprefix("XYZ", "X"), "YZ")
         self.assertEqual(removeprefix("XYZ", "Z"), "XYZ")
@@ -27,7 +27,7 @@ class TestStringUtilities(unittest.TestCase):
         self.assertEqual(removeprefix("", ""), "")
 
     def test_removesuffix(self):
-        """Tests dg.utils.string.test_removesuffix()"""
+        """Tests cpo.utils.string.test_removesuffix()"""
 
         self.assertEqual(removesuffix("XYZ", "Z"), "XY")
         self.assertEqual(removesuffix("XYZ", "X"), "XYZ")

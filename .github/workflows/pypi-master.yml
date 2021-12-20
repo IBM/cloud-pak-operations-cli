@@ -63,7 +63,7 @@ jobs:
         # https://github.com/docker/metadata-action
         with:
           images: |
-            quay.io/ibm/data-gate-cli
+            quay.io/ibm/cloud-pak-operations-cli
           tags: |
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{version}}

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Installing Db2 Data Gate CLI"
+echo "Installing IBM Cloud Pak Operations CLI"
 python3 -m pip install --user .
 
 echo "Executing tests"

@@ -21,42 +21,42 @@ from unittest.mock import patch
 
 import click.testing
 
-import dg.config
-import dg.utils.file
-import dg.utils.operating_system
+import cpo.config
+import cpo.utils.file
+import cpo.utils.operating_system
 
-from dg.dg import cli
-from dg.lib.dependency_manager.plugins.ibm_cloud_terraform_provider_plugin import (
+from cpo.cpo import cli
+from cpo.lib.dependency_manager.plugins.ibm_cloud_terraform_provider_plugin import (
     IBMCloudTerraformProviderPlugIn,
 )
 
 
 class TestDownloadDependencies(unittest.TestCase):
     def add_os_specific_executable_extension(self, executable_name: str) -> str:
-        operating_system = dg.utils.operating_system.get_operating_system()
+        operating_system = cpo.utils.operating_system.get_operating_system()
 
-        if operating_system == dg.utils.operating_system.OperatingSystem.WINDOWS:
+        if operating_system == cpo.utils.operating_system.OperatingSystem.WINDOWS:
             executable_name += ".exe"
 
         return executable_name
 
-    def check_executable_exists(self, dg_bin_directory_path: pathlib.Path, executable_name: str):
+    def check_executable_exists(self, bin_directory_path: pathlib.Path, executable_name: str):
         self.assertTrue(
-            (pathlib.Path(dg_bin_directory_path) / self.add_os_specific_executable_extension(executable_name)).exists()
+            (pathlib.Path(bin_directory_path) / self.add_os_specific_executable_extension(executable_name)).exists()
         )
 
     @patch(
-        "dg.config.binaries_manager.data_gate_configuration_manager.get_home_directory_path",
+        "cpo.config.binaries_manager.configuration_manager.get_home_directory_path",
         return_value=pathlib.Path(tempfile.gettempdir()),
     )
     def test_command(self, test_mock):
-        """Tests that dg adm download-dependencies downloads
+        """Tests that cpo adm download-dependencies downloads
         dependencies"""
 
-        dg_bin_directory_path = dg.config.data_gate_configuration_manager.get_dg_bin_directory_path()
+        bin_directory_path = cpo.config.configuration_manager.get_bin_directory_path()
         terraform_plugins_directory_path = IBMCloudTerraformProviderPlugIn().get_terraform_plugins_directory_path()
 
-        for entry in dg_bin_directory_path.glob("*"):
+        for entry in bin_directory_path.glob("*"):
             if entry.is_file():
                 os.remove(entry)
 
@@ -69,9 +69,9 @@ class TestDownloadDependencies(unittest.TestCase):
             1,
         )
 
-        self.check_executable_exists(dg_bin_directory_path, "ibmcloud")
-        self.check_executable_exists(dg_bin_directory_path, "oc")
-        self.check_executable_exists(dg_bin_directory_path, "terraform")
+        self.check_executable_exists(bin_directory_path, "ibmcloud")
+        self.check_executable_exists(bin_directory_path, "oc")
+        self.check_executable_exists(bin_directory_path, "terraform")
 
 
 if __name__ == "__main__":
