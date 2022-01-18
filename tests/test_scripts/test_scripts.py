@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -36,10 +36,10 @@ class TestScripts(unittest.TestCase):
             repo = dulwich.repo.Repo.init(tempdir)
 
             for element in sorted((pathlib.Path(__file__).parent / "dependencies").iterdir()):
-                if element.name.endswith(".py"):
-                    shutil.copy(element, tempdir)
+                if element.name.endswith(".py_input"):
+                    shutil.copy(element, tempdir + "/" + element.stem + ".py")
 
-                    repo.stage(element.name)
+                    repo.stage(element.stem + ".py")
                 elif element.name.endswith(".py_expected"):
                     with open(element) as input_file, open(pathlib.Path(tempdir) / element.name, "w") as output_file:
                         for line in input_file:
@@ -59,9 +59,9 @@ class TestScripts(unittest.TestCase):
 
             # compare contents of modified files with contents of expected files
             for element in sorted((pathlib.Path(__file__).parent / "dependencies").iterdir()):
-                if element.name.endswith(".py"):
-                    file_1 = pathlib.Path(tempdir) / (element.name + "_expected")
-                    file_2 = pathlib.Path(tempdir) / element.name
+                if element.name.endswith(".py_input"):
+                    file_1 = pathlib.Path(tempdir) / (element.stem + ".py_expected")
+                    file_2 = pathlib.Path(tempdir) / (element.stem + ".py")
 
                     self.assertTrue(filecmp.cmp(file_1, file_2, shallow=False), f"{file_1} and {file_2} are not equal")
 

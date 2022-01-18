@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -222,6 +222,20 @@ class CopyrightHeaderManager:
         while len(input_file_lines) != 0 and (input_file_lines[0].strip() + "\n") == "\n":
             input_file_lines.pop(0)
 
+    def _skip_input_file_until_first_non_empty_line(self, input_file: TextIOWrapper, output_file: TextIOWrapper):
+        while (current_line := input_file.readline()) != "":
+            if current_line == "\n":
+                continue
+
+            if current_line.startswith("class") or current_line.startswith("def"):
+                # add an additional empty line if the first non-empty line after the
+                # copyright header is a class or function definition (as Black does)
+                output_file.write("\n")
+
+            output_file.write(current_line)
+
+            break
+
     def _write_output_file(
         self, input_file: TextIOWrapper, input_file_lines: List[str], commit_year_range: CommitYearRange
     ) -> pathlib.Path:
@@ -272,11 +286,7 @@ class CopyrightHeaderManager:
                 for input_file_line in input_file_lines:
                     output_file.write(input_file_line)
             else:
-                while (current_line := input_file.readline()) != "":
-                    if current_line != "\n":
-                        output_file.write(current_line)
-
-                        break
+                self._skip_input_file_until_first_non_empty_line(input_file, output_file)
 
             while (current_line := input_file.readline()) != "":
                 output_file.write(current_line)
