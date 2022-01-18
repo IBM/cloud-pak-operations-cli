@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -31,39 +31,42 @@ class OCPPlusClusterStatus:
         if use_json:
             click.echo(json.dumps(self._ocp_status_get_response, indent="\t", sort_keys=True))
         else:
-            vm_list: List[List[str]] = []
-            headers = [
-                "VM ID",
-                "hostname",
-                "KVM state",
-                "platform",
-                "job status",
-                "job completion",
-                "pingable",
-                "pingable last checked",
-                "sshable",
-                "sshable last checked",
-            ]
+            self._format_internal()
 
-            for vm in self._ocp_status_get_response["vm"]:
-                pingable_last_checked = vm["pingable_last_checked"]
+    def _format_internal(self):
+        vm_list: List[List[str]] = []
+        headers = [
+            "VM ID",
+            "hostname",
+            "KVM state",
+            "platform",
+            "job status",
+            "job completion",
+            "pingable",
+            "pingable last checked",
+            "sshable",
+            "sshable last checked",
+        ]
 
-                vm_list.append(
-                    [
-                        vm["vm_id"],
-                        vm["name"],
-                        vm["kvm_state"],
-                        vm["platform"],
-                        self._get_job_status(vm),
-                        self._get_job_completion_percent(vm),
-                        "✓" if vm["pingable"] == "y" else "-",
-                        pingable_last_checked if pingable_last_checked is not None else "-",
-                        "✓" if ("sshable" in vm) and (vm["sshable"] == "y") else "-",
-                        vm["sshable_last_checked"] if "sshable_last_checked" in vm else "-",
-                    ]
-                )
+        for vm in self._ocp_status_get_response["vm"]:
+            pingable_last_checked = vm["pingable_last_checked"]
 
-            click.echo(tabulate(vm_list, headers=headers))
+            vm_list.append(
+                [
+                    vm["vm_id"],
+                    vm["name"],
+                    vm["kvm_state"],
+                    vm["platform"],
+                    self._get_job_status(vm),
+                    self._get_job_completion_percent(vm),
+                    "✓" if vm["pingable"] == "y" else "-",
+                    pingable_last_checked if pingable_last_checked is not None else "-",
+                    "✓" if ("sshable" in vm) and (vm["sshable"] == "y") else "-",
+                    vm["sshable_last_checked"] if "sshable_last_checked" in vm else "-",
+                ]
+            )
+
+        click.echo(tabulate(vm_list, headers=headers))
 
     def _get_job_completion_percent(self, vm: VM) -> str:
         return str(vm["job_status"]["completion_percent"]) if "job_status" in vm else "-"

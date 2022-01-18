@@ -63,7 +63,7 @@ from cpo.utils.logging import loglevel_command
 @optgroup.option("--artifactory-api-key", help="Artifactory API key")
 @click.pass_context
 def install_db2(
-    ctx: click.Context,
+    ctx: click.Context,  # NOSONAR
     server: Optional[str],
     username: Optional[str],
     password: Optional[str],

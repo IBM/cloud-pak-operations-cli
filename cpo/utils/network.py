@@ -77,7 +77,10 @@ def get_local_ipv4_addresses() -> List[ipaddress.IPv4Address]:
             # IPv4 address is bound to NIC
             ifaddress = ifaddresses[netifaces.AF_INET][0]
 
-            result.append(ipaddress.ip_address(ifaddress["addr"]))
+            ip_address = ipaddress.ip_address(ifaddress["addr"])
+
+            if isinstance(ip_address, ipaddress.IPv4Address):
+                result.append(ip_address)
 
     result.sort()
 
@@ -120,7 +123,12 @@ def parse_hostname_result(hostname_result: str) -> List[ipaddress.IPv4Address]:
         all IPv4 addresses bound to local network interfaces
     """
 
-    hostname_result_list = hostname_result.rstrip().split(" ")
-    ipv4_addresses: List[ipaddress.IPv4Address] = list(map(lambda str: ipaddress.ip_address(str), hostname_result_list))
+    hostnames = hostname_result.rstrip().split(" ")
+    ip_addresses = list(map(lambda str: ipaddress.ip_address(str), hostnames))
+    ipv4_addresses: List[ipaddress.IPv4Address] = []
+
+    for ip_address in ip_addresses:
+        if isinstance(ip_address, ipaddress.IPv4Address):
+            ipv4_addresses.append(ip_address)
 
     return ipv4_addresses
