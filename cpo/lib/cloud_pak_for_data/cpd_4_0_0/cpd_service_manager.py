@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,12 +18,8 @@ from typing import Dict
 
 import cpo.config
 
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import (
-    CloudPakForDataServiceLicense,
-)
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.custom_resource_metadata import (
-    CustomResourceMetadata,
-)
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import CloudPakForDataServiceLicense
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.custom_resource_metadata import CustomResourceMetadata
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.subscription_metadata import (
     SubscriptionMetadata,
     SubscriptionMetadataSpec,

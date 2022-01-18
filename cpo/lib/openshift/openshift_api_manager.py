@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -948,7 +948,7 @@ class OpenShiftAPIManager:
             specification object for passing to the OpenShift REST API
         """
 
-        plural = custom_resource.kind.lower() + ('s' if not custom_resource.kind.lower().endswith('s') else '')
+        plural = custom_resource.kind.lower() + ("s" if not custom_resource.kind.lower().endswith("s") else "")
 
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api.create_namespaced_custom_object(

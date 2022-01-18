@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,10 +16,7 @@ from typing import Any, List
 
 import jmespath
 
-from cpo.lib.error import (
-    JmespathPathExpressionNotFoundException,
-    UnexpectedTypeException,
-)
+from cpo.lib.error import JmespathPathExpressionNotFoundException, UnexpectedTypeException
 
 
 def get_jmespath_list_of_strings(expression: str, data: Any) -> List[str]:

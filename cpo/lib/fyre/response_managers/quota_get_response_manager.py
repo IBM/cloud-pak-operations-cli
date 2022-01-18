@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,9 +14,7 @@
 
 from typing import Any, Optional, Type
 
-from cpo.lib.fyre.response_managers.json_response_manager import (
-    AbstractJSONResponseManager,
-)
+from cpo.lib.fyre.response_managers.json_response_manager import AbstractJSONResponseManager
 from cpo.lib.fyre.types.quota_get_response import QuotaGetResponse
 
 

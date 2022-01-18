@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@ import cpo.config.cluster_credentials_manager
 import cpo.lib.click.utils
 import cpo.utils.network
 
-from cpo.lib.openshift.nfs.nfs_subdir_external_provisioner import (
-    NFSSubdirExternalProvisioner,
-)
+from cpo.lib.openshift.nfs.nfs_subdir_external_provisioner import NFSSubdirExternalProvisioner
 from cpo.lib.openshift.utils.click import openshift_server_options
 from cpo.utils.logging import loglevel_command
 

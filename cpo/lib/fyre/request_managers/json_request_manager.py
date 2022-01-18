@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -24,12 +24,8 @@ import requests
 import cpo.lib.fyre.utils.request_status_progress_bar
 
 from cpo.lib.fyre.data.request_status_data import RequestStatusData
-from cpo.lib.fyre.response_managers.json_response_manager import (
-    AbstractJSONResponseManager,
-)
-from cpo.lib.fyre.response_managers.ocp_request_get_response_manager import (
-    OCPRequestGetResponseManager,
-)
+from cpo.lib.fyre.response_managers.json_response_manager import AbstractJSONResponseManager
+from cpo.lib.fyre.response_managers.ocp_request_get_response_manager import OCPRequestGetResponseManager
 from cpo.utils.http_method import HTTPMethod
 
 logger = logging.getLogger(__name__)

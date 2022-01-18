@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,9 +22,7 @@ import cpo.lib.click.utils
 import cpo.lib.cluster
 import cpo.utils.download
 
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.cpd_manager import (
-    CloudPakForDataManager,
-)
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.cpd_manager import CloudPakForDataManager
 from cpo.lib.openshift.utils.click import openshift_server_options
 from cpo.utils.logging import loglevel_command
 

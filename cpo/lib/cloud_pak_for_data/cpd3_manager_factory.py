@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@ import cpo.lib.cloud_pak_for_data.cpd3_manager
 import cpo.lib.cloud_pak_for_data.cpd_3_0_1.cpd_manager
 import cpo.lib.cloud_pak_for_data.cpd_3_5_0.cpd_manager
 
-from cpo.lib.cloud_pak_for_data.cpd3_manager import (
-    AbstractCloudPakForDataManager,
-)
+from cpo.lib.cloud_pak_for_data.cpd3_manager import AbstractCloudPakForDataManager
 from cpo.lib.error import DataGateCLIException
 
 

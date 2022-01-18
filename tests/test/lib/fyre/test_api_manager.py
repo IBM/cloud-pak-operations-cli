@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,13 +15,8 @@
 import unittest
 
 from cpo.lib.error import DataGateCLIException
-from cpo.lib.fyre.data.ocpplus_cluster_specification import (
-    HAProxyTimoutSettings,
-)
-from cpo.lib.fyre.types.ocp_post_request import (
-    HAProxyTimeoutData,
-    OCPPostRequest,
-)
+from cpo.lib.fyre.data.ocpplus_cluster_specification import HAProxyTimoutSettings
+from cpo.lib.fyre.types.ocp_post_request import HAProxyTimeoutData, OCPPostRequest
 
 
 class TestHAProxyTimoutSettings(unittest.TestCase):

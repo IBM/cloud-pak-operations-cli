@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,11 +17,7 @@ import re as regex
 from typing import List, Optional
 
 from cpo.lib.error import DataGateCLIException
-from cpo.lib.fyre.types.ocp_post_request import (
-    HAProxyData,
-    HAProxyTimeoutData,
-    OCPPostRequest,
-)
+from cpo.lib.fyre.types.ocp_post_request import HAProxyData, HAProxyTimeoutData, OCPPostRequest
 from cpo.utils.string import removeprefix
 
 

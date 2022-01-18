@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-
 from typing import List
 
 import click
@@ -25,9 +24,7 @@ import cpo.lib.click.utils
 import cpo.lib.cluster
 import cpo.utils.download
 
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.cpd_service_manager import (
-    CloudPakForDataServiceManager,
-)
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.cpd_service_manager import CloudPakForDataServiceManager
 from cpo.utils.logging import loglevel_command
 
 

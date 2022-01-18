@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,18 +22,10 @@ import cpo.lib.click.utils
 import cpo.lib.cluster
 import cpo.utils.download
 
-from cpo.lib.click.cpd_service_spec_param_type import (
-    CloudPakForDataServiceSpecParamType,
-)
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.cpd_manager import (
-    CloudPakForDataManager,
-)
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import (
-    CloudPakForDataServiceLicense,
-)
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_storage_vendor import (
-    CloudPakForDataStorageVendor,
-)
+from cpo.lib.click.cpd_service_spec_param_type import CloudPakForDataServiceSpecParamType
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.cpd_manager import CloudPakForDataManager
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import CloudPakForDataServiceLicense
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_storage_vendor import CloudPakForDataStorageVendor
 from cpo.lib.openshift.utils.click import openshift_server_options
 from cpo.utils.logging import loglevel_command
 
@@ -48,7 +40,7 @@ from cpo.utils.logging import loglevel_command
 @click.option(
     "--catalog-source",
     help="Catalog source for the service operator. If not specified, use default catalog for the operator \
-(usually 'ibm-operator-catalog')"
+(usually 'ibm-operator-catalog')",
 )
 @click.option(
     "--installation-option",
@@ -132,5 +124,5 @@ def install(
         cloud_pak_for_data_service_license,
         installation_option,
         storage_option,
-        catalog_source
+        catalog_source,
     )

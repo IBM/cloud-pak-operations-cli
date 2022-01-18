@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,16 +22,9 @@ from click_option_group import optgroup
 import cpo.config.cluster_credentials_manager
 import cpo.lib.click.utils
 
-from cpo.lib.cloud_pak_for_data.cpd3_manager import (
-    AbstractCloudPakForDataManager,
-    CloudPakForDataAssemblyBuildType,
-)
-from cpo.lib.cloud_pak_for_data.cpd3_manager_factory import (
-    CloudPakForDataManagerFactory,
-)
-from cpo.lib.openshift.utils.click import (
-    openshift_server_command_optgroup_options,
-)
+from cpo.lib.cloud_pak_for_data.cpd3_manager import AbstractCloudPakForDataManager, CloudPakForDataAssemblyBuildType
+from cpo.lib.cloud_pak_for_data.cpd3_manager_factory import CloudPakForDataManagerFactory
+from cpo.lib.openshift.utils.click import openshift_server_command_optgroup_options
 from cpo.utils.logging import loglevel_command
 
 

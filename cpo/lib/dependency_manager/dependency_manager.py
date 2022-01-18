@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@ from typing import Dict, List, Optional, Type
 import cpo.utils.process
 
 from cpo.config.binaries_manager import binaries_manager
-from cpo.lib.dependency_manager.dependency_manager_plugin import (
-    AbstractDependencyManagerPlugIn,
-)
+from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn
 from cpo.lib.error import DataGateCLIException
 
 
