@@ -91,8 +91,10 @@ def nuke_storage(zone: str):
                         )
 
             logging.info(
-                f"In total, {volumes_deleted} volumes have been marked for cancellation.",
-                bold=True,
+                click.style(
+                    f"In total, {volumes_deleted} volumes have been marked for cancellation.",
+                    bold=True,
+                )
             )
     else:
         click.echo("Aborting.")

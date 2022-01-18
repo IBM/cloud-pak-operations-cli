@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import importlib.metadata
 import re as regex
 import subprocess
 
@@ -27,7 +26,7 @@ from cpo.utils.logging import loglevel_command
 def update_dev():
     """Update the CLI to the latest development version"""
 
-    if importlib.metadata.version(distribution_package_name) != "0.0.1":
+    if metadata.version(distribution_package_name) != "0.0.1":
         raise DataGateCLIException(
             f"Current version is not a development version (use 'pip3 install --upgrade {distribution_package_name}' "
             f"to upgrade a release version)"

@@ -69,7 +69,7 @@ from cpo.utils.logging import loglevel_command
 )
 @click.pass_context
 def install(
-    ctx: click.Context,
+    ctx: click.Context,  # NOSONAR
     server: Optional[str],
     username: Optional[str],
     password: Optional[str],

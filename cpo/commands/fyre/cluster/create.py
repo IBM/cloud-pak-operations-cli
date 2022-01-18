@@ -112,7 +112,7 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
 @optgroup.option("--quick-burn-time-to-live", help="Quick burn TTL (hours)", type=click.INT)
 @click.pass_context
 def create(
-    ctx: click.Context,
+    ctx: click.Context,  # NOSONAR
     fyre_api_user_name: str,
     fyre_api_key: str,
     alias: Optional[str],
