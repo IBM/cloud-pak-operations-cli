@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -29,10 +29,7 @@ import cpo.utils.debugger
 
 from cpo import commands_package_path
 from cpo.lib.error import DataGateCLIException
-from cpo.lib.plugin_manager.package_data import (
-    PackageData,
-    PackageElementDescriptor,
-)
+from cpo.lib.plugin_manager.package_data import PackageData, PackageElementDescriptor
 from cpo.lib.plugin_manager.plugin_manager import plugin_manager
 from cpo.utils.path import is_relative_to
 

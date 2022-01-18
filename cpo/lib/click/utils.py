@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,12 +22,8 @@ import click
 import cpo.config.cluster_credentials_manager
 import cpo.lib.openshift.oc
 
-from cpo.lib.cloud_pak_for_data.cpd3_manager import (
-    CloudPakForDataAssemblyBuildType,
-)
-from cpo.lib.openshift.credentials.cluster_based_user_credentials import (
-    ClusterBasedUserCredentials,
-)
+from cpo.lib.cloud_pak_for_data.cpd3_manager import CloudPakForDataAssemblyBuildType
+from cpo.lib.openshift.credentials.cluster_based_user_credentials import ClusterBasedUserCredentials
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.credentials.token_credentials import TokenCredentials
 from cpo.lib.openshift.credentials.user_credentials import UserCredentials

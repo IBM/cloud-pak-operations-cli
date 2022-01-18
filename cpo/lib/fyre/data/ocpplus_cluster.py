@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,10 +21,7 @@ import click
 from tabulate import tabulate
 
 from cpo.lib.error import DataGateCLIException
-from cpo.lib.fyre.types.ocp_get_response_for_single_cluster import (
-    VM,
-    OCPGetResponseForSingleCluster,
-)
+from cpo.lib.fyre.types.ocp_get_response_for_single_cluster import VM, OCPGetResponseForSingleCluster
 
 
 class OCPPlusCluster:

@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,12 +15,8 @@
 from typing import Any, Final, Optional
 
 from cpo.lib.fyre.data.ocpplus_cluster import OCPPlusCluster
-from cpo.lib.fyre.request_managers.json_request_manager import (
-    AbstractJSONRequestManager,
-)
-from cpo.lib.fyre.response_managers.json_response_manager import (
-    AbstractJSONResponseManager,
-)
+from cpo.lib.fyre.request_managers.json_request_manager import AbstractJSONRequestManager
+from cpo.lib.fyre.response_managers.json_response_manager import AbstractJSONResponseManager
 from cpo.lib.fyre.response_managers.ocp_get_response_manager_for_single_cluster import (
     OCPGetResponseManagerForSingleCluster,
 )

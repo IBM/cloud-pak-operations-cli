@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,9 +17,7 @@ import click
 import cpo.lib.ibmcloud.status
 
 from cpo.lib.error import DataGateCLIException
-from cpo.lib.ibmcloud.oc.cluster.roks_cluster_factory import (
-    roks_cluster_factory,
-)
+from cpo.lib.ibmcloud.oc.cluster.roks_cluster_factory import roks_cluster_factory
 from cpo.utils.logging import loglevel_command
 
 

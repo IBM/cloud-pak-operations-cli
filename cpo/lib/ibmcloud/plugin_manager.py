@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@ import logging
 from typing import List
 
 from cpo.lib.error import IBMCloudException
-from cpo.lib.ibmcloud import (
-    execute_ibmcloud_command,
-    execute_ibmcloud_command_without_check,
-)
+from cpo.lib.ibmcloud import execute_ibmcloud_command, execute_ibmcloud_command_without_check
 
 
 class PlugInManager:

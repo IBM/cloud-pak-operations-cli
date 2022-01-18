@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,9 +19,7 @@ from typing import Final, List
 import cpo.utils.process
 
 from cpo.lib.dependency_manager import dependency_manager
-from cpo.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import (
-    IBMCloudCLIPlugIn,
-)
+from cpo.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import IBMCloudCLIPlugIn
 
 EXTERNAL_IBM_CLOUD_API_KEY_NAME: Final[str] = "cloud-pak-operations-cli"
 INTERNAL_IBM_CLOUD_API_KEY_NAME: Final[str] = "ibm_cloud_api_key"

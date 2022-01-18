@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -25,36 +25,21 @@ import cpo.lib.jmespath
 import cpo.utils.logging
 
 from cpo.cpo import click_logging_handler
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.catalog_source_manager import (
-    CatalogSourceManager,
-)
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.cpd_service_manager import (
-    CloudPakForDataServiceManager,
-)
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_access_data import (
-    CloudPakForDataAccessData,
-)
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.catalog_source_manager import CatalogSourceManager
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.cpd_service_manager import CloudPakForDataServiceManager
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_access_data import CloudPakForDataAccessData
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import (
     CloudPakForDataLicense,
     CloudPakForDataServiceLicense,
 )
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_storage_vendor import (
-    CloudPakForDataStorageVendor,
-)
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_storage_vendor import CloudPakForDataStorageVendor
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.custom_resource_definitions_event_data import (
     CustomResourceDefinitionsEventData,
 )
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.custom_resource_event_data import (
-    CustomResourceEventData,
-)
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.custom_resource_event_data import CustomResourceEventData
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.kind import Kind
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.subscription_metadata import (
-    SubscriptionMetadata,
-)
-from cpo.lib.error import (
-    DataGateCLIException,
-    JmespathPathExpressionNotFoundException,
-)
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.subscription_metadata import SubscriptionMetadata
+from cpo.lib.error import DataGateCLIException, JmespathPathExpressionNotFoundException
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.openshift_api_manager import OpenShiftAPIManager
 from cpo.lib.openshift.types.catalog_source import CatalogSourceList

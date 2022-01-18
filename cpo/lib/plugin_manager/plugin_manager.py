@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,9 +20,7 @@ from types import ModuleType
 from typing import Dict, Optional
 
 from cpo.lib.error import DataGateCLIException
-from cpo.lib.plugin_manager.distribution_entry_point_loader import (
-    DistributionEntryPointLoader,
-)
+from cpo.lib.plugin_manager.distribution_entry_point_loader import DistributionEntryPointLoader
 from cpo.lib.plugin_manager.package_data import PackageData
 
 logger = logging.getLogger(__name__)

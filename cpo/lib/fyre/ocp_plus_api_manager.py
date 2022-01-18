@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -24,69 +24,35 @@ from cpo.lib.fyre.data.check_hostname_data import CheckHostNameData
 from cpo.lib.fyre.data.ocp_available_data import OCPAvailableData
 from cpo.lib.fyre.data.ocpplus_cluster import OCPPlusCluster
 from cpo.lib.fyre.data.ocpplus_cluster_data import OCPPlusClusterData
-from cpo.lib.fyre.data.ocpplus_cluster_specification import (
-    OCPPlusClusterSpecification,
-)
+from cpo.lib.fyre.data.ocpplus_cluster_specification import OCPPlusClusterSpecification
 from cpo.lib.fyre.data.openshift_version_data import OpenShiftVersionData
 from cpo.lib.fyre.data.product_group_quota_data import ProductGroupQuotaData
 from cpo.lib.fyre.data.quick_burn_max_hours_data import QuickBurnMaxHoursData
 from cpo.lib.fyre.data.quick_burn_size_data import QuickBurnSizeData
 from cpo.lib.fyre.data.request_status_data import RequestStatusData
 from cpo.lib.fyre.data.status_data import OCPPlusClusterStatus
-from cpo.lib.fyre.request_managers.check_hostname_manager import (
-    CheckHostnameManager,
-)
+from cpo.lib.fyre.request_managers.check_hostname_manager import CheckHostnameManager
 from cpo.lib.fyre.request_managers.json_request_manager import OCPRequestManager
-from cpo.lib.fyre.request_managers.ocp_accept_transfer_put_manager import (
-    OCPAcceptTransferPutManager,
-)
-from cpo.lib.fyre.request_managers.ocp_add_additional_nodes_put_manager import (
-    OCPAddAdditionalNodesPutManager,
-)
-from cpo.lib.fyre.request_managers.ocp_available_manager import (
-    OCPAvailableManager,
-)
-from cpo.lib.fyre.request_managers.ocp_cluster_action_manager import (
-    OCPClusterActionManager,
-)
-from cpo.lib.fyre.request_managers.ocp_default_post_manager import (
-    OCPDefaultPostManager,
-)
+from cpo.lib.fyre.request_managers.ocp_accept_transfer_put_manager import OCPAcceptTransferPutManager
+from cpo.lib.fyre.request_managers.ocp_add_additional_nodes_put_manager import OCPAddAdditionalNodesPutManager
+from cpo.lib.fyre.request_managers.ocp_available_manager import OCPAvailableManager
+from cpo.lib.fyre.request_managers.ocp_cluster_action_manager import OCPClusterActionManager
+from cpo.lib.fyre.request_managers.ocp_default_post_manager import OCPDefaultPostManager
 from cpo.lib.fyre.request_managers.ocp_delete_manager import OCPDeleteManager
-from cpo.lib.fyre.request_managers.ocp_disable_delete_manager import (
-    OCPDisableDeleteManager,
-)
+from cpo.lib.fyre.request_managers.ocp_disable_delete_manager import OCPDisableDeleteManager
 from cpo.lib.fyre.request_managers.ocp_disk_put_manager import OCPDiskPutManager
-from cpo.lib.fyre.request_managers.ocp_enable_delete_manager import (
-    OCPEnableDeleteManager,
-)
+from cpo.lib.fyre.request_managers.ocp_enable_delete_manager import OCPEnableDeleteManager
 from cpo.lib.fyre.request_managers.ocp_get_manager import OCPGetManager
-from cpo.lib.fyre.request_managers.ocp_get_manager_for_single_cluster import (
-    OCPGetManagerForSingleCluster,
-)
-from cpo.lib.fyre.request_managers.ocp_node_action_manager import (
-    OCPNodeActionManager,
-)
+from cpo.lib.fyre.request_managers.ocp_get_manager_for_single_cluster import OCPGetManagerForSingleCluster
+from cpo.lib.fyre.request_managers.ocp_node_action_manager import OCPNodeActionManager
 from cpo.lib.fyre.request_managers.ocp_post_manager import OCPPostManager
-from cpo.lib.fyre.request_managers.ocp_quick_burn_max_hours_manager import (
-    OCPQuickBurnMaxHoursManager,
-)
-from cpo.lib.fyre.request_managers.ocp_quick_burn_sizes_manager import (
-    OCPQuickBurnSizesManager,
-)
-from cpo.lib.fyre.request_managers.ocp_resource_put_manager import (
-    OCPResourcePutManager,
-)
+from cpo.lib.fyre.request_managers.ocp_quick_burn_max_hours_manager import OCPQuickBurnMaxHoursManager
+from cpo.lib.fyre.request_managers.ocp_quick_burn_sizes_manager import OCPQuickBurnSizesManager
+from cpo.lib.fyre.request_managers.ocp_resource_put_manager import OCPResourcePutManager
 from cpo.lib.fyre.request_managers.ocp_status_manager import OCPStatusManager
-from cpo.lib.fyre.request_managers.ocp_transfer_put_manager import (
-    OCPTransferPutManager,
-)
-from cpo.lib.fyre.request_managers.quota_request_manager import (
-    QuotaRequestManager,
-)
-from cpo.lib.fyre.types.ocp_add_additional_nodes_put_request import (
-    OCPAddAdditionalNodesPutRequest,
-)
+from cpo.lib.fyre.request_managers.ocp_transfer_put_manager import OCPTransferPutManager
+from cpo.lib.fyre.request_managers.quota_request_manager import QuotaRequestManager
+from cpo.lib.fyre.types.ocp_add_additional_nodes_put_request import OCPAddAdditionalNodesPutRequest
 from cpo.lib.fyre.types.ocp_disk_put_request import OCPDiskPutRequest
 from cpo.lib.fyre.types.ocp_post_request import OCPPostRequest, WorkerData
 from cpo.lib.fyre.types.ocp_post_response import OCPPostResponse

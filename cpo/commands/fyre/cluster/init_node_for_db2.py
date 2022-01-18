@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -57,7 +57,9 @@ def init_node_for_db2(
         cpo.lib.click.utils.log_in_to_openshift_cluster(ctx, locals().copy())
         cpo.lib.fyre.utils.openshift.init_node_for_db2(node, db2_edition, use_host_path_storage)
     else:
-        oc_login_command_for_remote_host = cpo.lib.click.utils.get_oc_login_command_for_remote_host(ctx, locals().copy())
+        oc_login_command_for_remote_host = cpo.lib.click.utils.get_oc_login_command_for_remote_host(
+            ctx, locals().copy()
+        )
 
         asyncio.get_event_loop().run_until_complete(
             cpo.lib.fyre.utils.openshift.init_node_for_db2_from_remote_host(

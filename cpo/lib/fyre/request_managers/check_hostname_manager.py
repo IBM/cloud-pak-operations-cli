@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,15 +15,9 @@
 from typing import Any, Final, Optional
 
 from cpo.lib.fyre.data.check_hostname_data import CheckHostNameData
-from cpo.lib.fyre.request_managers.json_request_manager import (
-    AbstractJSONRequestManager,
-)
-from cpo.lib.fyre.response_managers.check_hostname_get_response_manager import (
-    CheckHostnameGetResponseManager,
-)
-from cpo.lib.fyre.response_managers.json_response_manager import (
-    AbstractJSONResponseManager,
-)
+from cpo.lib.fyre.request_managers.json_request_manager import AbstractJSONRequestManager
+from cpo.lib.fyre.response_managers.check_hostname_get_response_manager import CheckHostnameGetResponseManager
+from cpo.lib.fyre.response_managers.json_response_manager import AbstractJSONResponseManager
 from cpo.utils.http_method import HTTPMethod
 
 

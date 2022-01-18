@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,14 +20,9 @@ import cpo.lib.ibmcloud.iam
 
 from cpo.config import configuration_manager
 from cpo.lib.dependency_manager import dependency_manager
-from cpo.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import (
-    IBMCloudCLIPlugIn,
-)
+from cpo.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import IBMCloudCLIPlugIn
 from cpo.lib.error import DataGateCLIException
-from cpo.lib.ibmcloud import (
-    EXTERNAL_IBM_CLOUD_API_KEY_NAME,
-    INTERNAL_IBM_CLOUD_API_KEY_NAME,
-)
+from cpo.lib.ibmcloud import EXTERNAL_IBM_CLOUD_API_KEY_NAME, INTERNAL_IBM_CLOUD_API_KEY_NAME
 from cpo.lib.ibmcloud.iam import api_key_exists, delete_api_key_in_ibmcloud
 from cpo.utils.logging import loglevel_command
 

@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -60,7 +60,7 @@ class SubscriptionMetadata:
         elif self.spec.source is not None:
             source = self.spec.source
         else:
-            source = 'ibm-operator-catalog'
+            source = "ibm-operator-catalog"
 
         subscription: Subscription = {
             "apiVersion": "operators.coreos.com/v1alpha1",

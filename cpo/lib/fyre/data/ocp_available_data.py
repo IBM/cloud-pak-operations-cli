@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,9 +21,7 @@ import semver
 
 from tabulate import tabulate
 
-from cpo.lib.fyre.types.ocp_available_get_response import (
-    OCPAvailableGetResponse,
-)
+from cpo.lib.fyre.types.ocp_available_get_response import OCPAvailableGetResponse
 
 
 class OCPAvailableData:

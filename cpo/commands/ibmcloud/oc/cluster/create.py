@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -25,17 +25,11 @@ import cpo.lib.ibmcloud.status
 
 from cpo.config.cluster_credentials_manager import cluster_credentials_manager
 from cpo.lib.error import IBMCloudException
-from cpo.lib.ibmcloud import (
-    execute_ibmcloud_command,
-    execute_ibmcloud_command_without_check,
-)
+from cpo.lib.ibmcloud import execute_ibmcloud_command, execute_ibmcloud_command_without_check
 from cpo.lib.ibmcloud.install import install_cp4d_with_preinstall
 from cpo.lib.ibmcloud.login import login as login_to_ibm_cloud
 from cpo.lib.ibmcloud.oc.cluster.rm import delete_ibmcloud_cluster
-from cpo.lib.ibmcloud.openshift import (
-    get_full_openshift_version,
-    get_latest_supported_openshift_version,
-)
+from cpo.lib.ibmcloud.openshift import get_full_openshift_version, get_latest_supported_openshift_version
 from cpo.lib.ibmcloud.status import (
     cluster_exists,
     wait_for_cluster_deletion,

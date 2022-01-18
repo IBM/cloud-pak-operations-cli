@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,10 +18,7 @@ import cpo.lib.ibmcloud.status
 
 from cpo.config.cluster_credentials_manager import cluster_credentials_manager
 from cpo.lib.error import IBMCloudException
-from cpo.lib.ibmcloud import (
-    execute_ibmcloud_command_interactively,
-    execute_ibmcloud_command_without_check,
-)
+from cpo.lib.ibmcloud import execute_ibmcloud_command_interactively, execute_ibmcloud_command_without_check
 
 
 def delete_ibmcloud_cluster(name: str, force_deletion: bool):

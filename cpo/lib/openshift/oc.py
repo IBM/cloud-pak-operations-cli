@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,9 +23,7 @@ import cpo.utils.network
 import cpo.utils.process
 
 from cpo.lib.dependency_manager import dependency_manager
-from cpo.lib.dependency_manager.plugins.openshift_cli_plugin import (
-    OpenShiftCLIPlugIn,
-)
+from cpo.lib.dependency_manager.plugins.openshift_cli_plugin import OpenShiftCLIPlugIn
 from cpo.lib.error import DataGateCLIException
 from cpo.utils.string import removeprefix, removesuffix
 

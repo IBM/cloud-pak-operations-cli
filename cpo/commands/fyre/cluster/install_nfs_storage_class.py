@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,9 +23,7 @@ import cpo.utils.network
 
 from cpo.lib.fyre.ocp_plus_api_manager import OCPPlusAPIManager
 from cpo.lib.fyre.utils.click import fyre_command_options
-from cpo.lib.openshift.nfs.nfs_subdir_external_provisioner import (
-    NFSSubdirExternalProvisioner,
-)
+from cpo.lib.openshift.nfs.nfs_subdir_external_provisioner import NFSSubdirExternalProvisioner
 from cpo.utils.logging import loglevel_command
 
 

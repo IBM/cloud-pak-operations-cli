@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -26,14 +26,9 @@ from tqdm import tqdm
 import cpo.config
 import cpo.utils.logging
 
-from cpo.lib.cloud_pak_for_data.cpd3_manager import (
-    AbstractCloudPakForDataManager,
-)
+from cpo.lib.cloud_pak_for_data.cpd3_manager import AbstractCloudPakForDataManager
 from cpo.lib.error import DataGateCLIException, IBMCloudException
-from cpo.lib.ibmcloud import (
-    INTERNAL_IBM_CLOUD_API_KEY_NAME,
-    execute_ibmcloud_command,
-)
+from cpo.lib.ibmcloud import INTERNAL_IBM_CLOUD_API_KEY_NAME, execute_ibmcloud_command
 from cpo.lib.ibmcloud.iam import get_oauth_token, get_tokens
 from cpo.lib.ibmcloud.login import is_logged_in
 from cpo.lib.ibmcloud.target import get_ibmcloud_account_target_information

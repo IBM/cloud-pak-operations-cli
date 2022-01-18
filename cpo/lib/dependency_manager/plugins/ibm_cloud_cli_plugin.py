@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -27,9 +27,7 @@ import cpo.utils.file
 import cpo.utils.operating_system
 import cpo.utils.process
 
-from cpo.lib.dependency_manager.dependency_manager_plugin import (
-    AbstractDependencyManagerPlugIn,
-)
+from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn
 from cpo.lib.error import DataGateCLIException, IBMCloudException
 from cpo.utils.operating_system import OperatingSystem
 

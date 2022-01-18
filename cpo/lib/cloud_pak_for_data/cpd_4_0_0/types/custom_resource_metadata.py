@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,12 +14,8 @@
 
 from typing import Dict, List, Optional, Tuple, Union
 
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import (
-    CloudPakForDataServiceLicense,
-)
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_storage_vendor import (
-    CloudPakForDataStorageVendor,
-)
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import CloudPakForDataServiceLicense
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_storage_vendor import CloudPakForDataStorageVendor
 from cpo.lib.error import DataGateCLIException
 from cpo.lib.openshift.types.custom_resource import CustomResource
 from cpo.lib.openshift.types.kind_metadata import KindMetadata
