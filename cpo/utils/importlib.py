@@ -12,32 +12,54 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import collections
 import importlib.metadata
-import pathlib
 
-from typing import Optional
+from typing import List
 
-from cpo.utils.path import is_relative_to
+import cpo
 
 
 def get_distribution_package_name() -> str:
-    """Returns the distribution package name corresponding to this module
+    """Returns the name of the distribution package providing the "cpo" top-level package
 
     Returns
     -------
     str
-        distribution package name corresponding to this module
+        name of the distribution package providing the "cpo" top-level package
     """
 
-    distribution_package_name: Optional[str] = None
+    packages_to_distribution_packages_dict: collections.defaultdict[str, List[str]] = collections.defaultdict(list)
 
     for distribution in importlib.metadata.distributions():
-        if is_relative_to(pathlib.Path(__file__), distribution.locate_file("")):
-            distribution_package_name = distribution.metadata["name"]
+        file_contents = distribution.read_text("top_level.txt")
 
-            break
+        if file_contents is None:
+            continue
 
-    if distribution_package_name is None:
-        raise Exception("Distribution package name could not be identified")
+        for package in file_contents.split():
+            distribution_package_name = distribution.metadata["Name"]
 
-    return distribution_package_name
+            # The second check is required as importlib.metadata.distributions()
+            # returns the name of this distribution package twice for unknown
+            # reasons when running unit tests.
+            if (package not in packages_to_distribution_packages_dict) or (
+                distribution_package_name not in packages_to_distribution_packages_dict[package]
+            ):
+                packages_to_distribution_packages_dict[package].append(distribution_package_name)
+
+    package_name = cpo.__package__
+
+    if package_name not in packages_to_distribution_packages_dict:
+        raise Exception(
+            f"Distribution package name could not be identified (no distribution package provides a top-level package "
+            f"named '{package_name}')"
+        )
+
+    if len(packages_to_distribution_packages_dict[package_name]) != 1:
+        raise Exception(
+            f"Distribution package name could not be identified (more than one distribution package provides a "
+            f"top-level package named '{package_name}')"
+        )
+
+    return packages_to_distribution_packages_dict[package_name][0]
