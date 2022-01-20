@@ -39,9 +39,10 @@ from cpo.utils.logging import loglevel_command
 @optgroup.option(
     "--build-type",
     default=f"{CloudPakForDataAssemblyBuildType.RELEASE.name}",
-    help=f"Build type (default: {CloudPakForDataAssemblyBuildType.RELEASE.name.lower()})",
+    help="Build type",
+    show_default=True,
     type=click.Choice(
-        list(map(lambda x: x.name.lower(), CloudPakForDataAssemblyBuildType)),
+        list(map(lambda x: x.name, CloudPakForDataAssemblyBuildType)),
         case_sensitive=False,
     ),
 )
@@ -51,6 +52,7 @@ from cpo.utils.logging import loglevel_command
     "--version",
     default=AbstractCloudPakForDataManager.get_default_cloud_pak_for_data_version(),
     help="Cloud Pak for Data version",
+    show_default=True,
 )
 @optgroup.group("Release build options")
 @optgroup.option(

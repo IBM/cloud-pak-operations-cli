@@ -40,7 +40,7 @@ from cpo.utils.logging import loglevel_command
     "--project",
     default="default",
     help="Project used to install the Kubernetes NFS Subdir External Provisioner",
-    required=True,
+    show_default=True,
 )
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
 @click.pass_context
