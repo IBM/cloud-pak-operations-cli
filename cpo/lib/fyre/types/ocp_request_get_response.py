@@ -12,7 +12,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import TypedDict
+from typing import TypedDict, Union
+
+
+class LastStatus(TypedDict):
+    cluster_id: str
+    status: str
 
 
 class RequestData(TypedDict):
@@ -22,7 +27,7 @@ class RequestData(TypedDict):
     in_progress: str
     job_count: str
     last_status_time: str
-    last_status: str
+    last_status: Union[LastStatus, str]
     pending: str
     request_id: str
     task_count: str

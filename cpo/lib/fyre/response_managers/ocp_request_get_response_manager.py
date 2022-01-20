@@ -42,7 +42,23 @@ class OCPRequestGetResponseManager(AbstractJSONResponseManager):
                         "in_progress": {"type": "string"},
                         "job_count": {"type": "string"},
                         "last_status_time": {"type": "string"},
-                        "last_status": {"type": "string"},
+                        "last_status": {
+                            "anyOf": [
+                                {
+                                    "additionalProperties": False,
+                                    "properties": {
+                                        "cluster_id": {"type": "string"},
+                                        "status": {"type": "string"},
+                                    },
+                                    "required": [
+                                        "cluster_id",
+                                        "status",
+                                    ],
+                                    "type": "object",
+                                },
+                                {"type": "string"},
+                            ],
+                        },
                         "pending": {"type": "string"},
                         "request_id": {"type": "string"},
                         "task_count": {"type": "string"},

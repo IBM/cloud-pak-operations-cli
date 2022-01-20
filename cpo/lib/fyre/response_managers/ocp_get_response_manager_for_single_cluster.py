@@ -51,6 +51,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                         "locked_for_delete": {"type": "string"},
                         "ocp_username": {"type": "string"},
                         "ocp_version": {"type": "string"},
+                        "platform": {"type": "string"},
                         "product_group_id": {"type": "string"},
                         "vm_count": {"type": "integer"},
                         "vms": {
@@ -74,6 +75,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                         "locked_for_delete",
                         "ocp_username",
                         "ocp_version",
+                        "platform",
                         "product_group_id",
                         "vm_count",
                         "vms",
@@ -84,10 +86,12 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                     "additionalProperties": False,
                     "properties": {
                         "address": {"type": "string"},
+                        "scope": {"type": "string"},
                         "type": {"type": "string"},
                     },
                     "required": [
                         "address",
+                        "scope",
                         "type",
                     ],
                     "type": "object",
