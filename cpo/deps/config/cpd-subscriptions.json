@@ -7,6 +7,7 @@
 			"app.kubernetes.io/name": "ibm-cpd-ae-operator-subscription"
 		},
 		"name": "ibm-cpd-ae-operator-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -14,21 +15,11 @@
 			"name": "analyticsengine-operator"
 		}
 	},
-	"cloud-native-postgresql": {
-		"dependencies": [],
-		"labels": {},
-		"name": "cloud-native-postgresql-catalog-subscription",
-		"required_namespace": "openshift-operators",
-		"service": true,
-		"spec": {
-			"channel": "stable",
-			"name": "cloud-native-postgresql"
-		}
-	},
 	"cpd-platform-operator": {
 		"dependencies": [],
 		"labels": {},
 		"name": "cpd-operator",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": false,
 		"spec": {
@@ -40,6 +31,7 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-db2u-operator",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -53,6 +45,7 @@
 		],
 		"labels": {},
 		"name": "ibm-bigsql-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -68,6 +61,7 @@
 			"app.kubernetes.io/name": "ibm-ca-operator"
 		},
 		"name": "ibm-ca-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -83,6 +77,7 @@
 			"app.kubernetes.io/name": "ibm-cde-operator-subscription"
 		},
 		"name": "ibm-cde-operator-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -94,6 +89,7 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-common-service-operator",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": false,
 		"spec": {
@@ -105,6 +101,7 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-cpd-datastage-operator-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -120,6 +117,7 @@
 			"app.kubernetes.io/name": "ibm-cpd-dods-operator-catalog-subscription"
 		},
 		"name": "ibm-cpd-dods-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -127,12 +125,29 @@
 			"name": "ibm-cpd-dods"
 		}
 	},
+	"ibm-cpd-dp": {
+		"dependencies": [],
+		"labels": {
+			"app.kubernetes.io/instance": "ibm-cpd-dp-operator-catalog-subscription",
+			"app.kubernetes.io/managed-by": "ibm-cpd-dp-operator",
+			"app.kubernetes.io/name": "ibm-cpd-dp-operator-catalog-subscription"
+		},
+		"name": "ibm-cpd-dp-operator-catalog-subscription",
+		"operand_request_dependencies": [],
+		"required_namespace": null,
+		"service": true,
+		"spec": {
+			"channel": "v1.0",
+			"name": "ibm-cpd-dp"
+		}
+	},
 	"ibm-cpd-edb": {
-		"dependencies": [
-			"cloud-native-postgresql"
-		],
+		"dependencies": [],
 		"labels": {},
 		"name": "ibm-cpd-edb-operator-catalog-subscription",
+		"operand_request_dependencies": [
+			"common-service-edb"
+		],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -148,6 +163,7 @@
 			"app.kubernetes.io/name": "ibm-cpd-hadoop-operator-catalog-subscription"
 		},
 		"name": "ibm-cpd-hadoop-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -161,6 +177,7 @@
 		],
 		"labels": {},
 		"name": "ibm-cpd-mongodb-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -172,6 +189,7 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-cpd-openpages-operator",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -183,10 +201,11 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-productmaster-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
-			"channel": "alpha",
+			"channel": "v1.0",
 			"name": "ibm-cpd-productmaster"
 		}
 	},
@@ -198,6 +217,7 @@
 			"app.kubernetes.io/name": "ibm-cpd-rstudio-operator-catalog-subscription"
 		},
 		"name": "ibm-cpd-rstudio-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -213,6 +233,7 @@
 			"app.kubernetes.io/name": "ibm-cpd-spss-operator-catalog-subscription"
 		},
 		"name": "ibm-cpd-spss-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -230,6 +251,7 @@
 			"app.kubernetes.io/name": "ibm-cpd-wkc-operator-catalog-subscription"
 		},
 		"name": "ibm-cpd-wkc-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -241,10 +263,11 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-cpd-wml-accelerator-operator",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
-			"channel": "WML-Accelerator-2.3",
+			"channel": "v1.0",
 			"name": "ibm-cpd-wml-accelerator-operator"
 		}
 	},
@@ -256,6 +279,7 @@
 			"app.kubernetes.io/name": "ibm-cpd-wml-operator-subscription"
 		},
 		"name": "ibm-cpd-wml-operator-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -271,6 +295,7 @@
 			"app.kubernetes.io/name": "ibm-watson-openscale-operator-subscription"
 		},
 		"name": "ibm-watson-openscale-operator-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -286,6 +311,7 @@
 			"app.kubernetes.io/name": "ibm-cpd-ws-runtimes-operator"
 		},
 		"name": "ibm-cpd-ws-runtimes-operator",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -297,6 +323,7 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-cpd-ws-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -312,6 +339,7 @@
 			"app.kubernetes.io/name": "ibm-datagate-operator-subscription"
 		},
 		"name": "ibm-datagate-operator-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -325,6 +353,7 @@
 		],
 		"labels": {},
 		"name": "ibm-db2oltp-cp4d-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -338,6 +367,7 @@
 		],
 		"labels": {},
 		"name": "ibm-db2wh-cp4d-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -349,6 +379,7 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-dmc-operator-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -362,6 +393,7 @@
 		],
 		"labels": {},
 		"name": "ibm-dv-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -375,10 +407,11 @@
 		],
 		"labels": {},
 		"name": "ibm-informix-cp4d-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
-			"channel": "v1",
+			"channel": "v1.0",
 			"name": "ibm-informix-cp4d-operator"
 		}
 	},
@@ -386,10 +419,11 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-informix-operator-catalog-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
-			"channel": "stable",
+			"channel": "v1.0",
 			"name": "ibm-informix-operator"
 		}
 	},
@@ -401,6 +435,7 @@
 			"app.kubernetes.io/name": "ibm-mdm-operator-subscription"
 		},
 		"name": "ibm-mdm-operator-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -412,6 +447,7 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-planning-analytics-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -423,6 +459,7 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-voice-gateway-operator-subscription",
+		"operand_request_dependencies": [],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -434,6 +471,9 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-watson-assistant-operator-subscription",
+		"operand_request_dependencies": [
+			"common-service-edb"
+		],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -449,6 +489,9 @@
 			"app.kubernetes.io/name": "ibm-watson-discovery-operator-subscription"
 		},
 		"name": "ibm-watson-discovery-operator-subscription",
+		"operand_request_dependencies": [
+			"common-service-edb"
+		],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -464,6 +507,9 @@
 			"app.kubernetes.io/name": "ibm-watson-ks-operator-subscription"
 		},
 		"name": "ibm-watson-ks-operator-subscription",
+		"operand_request_dependencies": [
+			"common-service-edb"
+		],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -475,6 +521,9 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-watson-speech-operator-subscription",
+		"operand_request_dependencies": [
+			"common-service-edb"
+		],
 		"required_namespace": null,
 		"service": true,
 		"spec": {
@@ -486,7 +535,8 @@
 		"dependencies": [],
 		"labels": {},
 		"name": "ibm-mongodb-enterprise-catalog-subscription",
-		"required_namespace": "openshift-operators",
+		"operand_request_dependencies": [],
+		"required_namespace": null,
 		"service": true,
 		"spec": {
 			"channel": "stable",

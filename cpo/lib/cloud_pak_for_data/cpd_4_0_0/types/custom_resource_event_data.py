@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,10 +16,12 @@ from dataclasses import dataclass
 
 from halo.halo import Halo
 
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.status_key_data import StatusKeyData
+
 
 @dataclass
 class CustomResourceEventData:
-    name: str
-    spinner: Halo
-    status_key: str
+    custom_resource_name: str
     initial_event = True
+    spinner: Halo
+    status_key_data: StatusKeyData

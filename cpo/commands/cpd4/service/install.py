@@ -39,8 +39,9 @@ from cpo.utils.logging import loglevel_command
 @click.option("--accept-license", help="Accept IBM Cloud Pak for Data license", is_flag=True)
 @click.option(
     "--catalog-source",
-    help="Catalog source for the service operator. If not specified, use default catalog for the operator \
-(usually 'ibm-operator-catalog')",
+    default="ibm-operator-catalog",
+    help="Catalog source for the service operator",
+    show_default=True,
 )
 @click.option(
     "--installation-option",
@@ -81,7 +82,7 @@ def install(
     token: str,
     insecure_skip_tls_verify: Optional[bool],
     accept_license: bool,
-    catalog_source: Optional[str],
+    catalog_source: str,
     installation_option: List[Tuple[str, Union[bool, int, str]]],
     license: Optional[str],
     project: str,

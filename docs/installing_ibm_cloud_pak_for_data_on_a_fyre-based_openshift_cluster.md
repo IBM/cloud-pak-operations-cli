@@ -9,7 +9,7 @@
 - Create a new OCP+ cluster for IBM Db2 Data Gate on IBM Cloud Pak for Data:
 
   ```shell
-  cpo fyre cluster create --alias $ALIAS --cluster-name $FYRE_CLUSTER_NAME --ssh-key "$(cat ~/.ssh/id_rsa.pub)" --worker-node-num-cpus 16 --worker-node-ram-size 64
+  cpo fyre cluster create --alias $ALIAS --cluster-name $FYRE_CLUSTER_NAME --ocp-version 4.8 --ssh-key "$(cat ~/.ssh/id_rsa.pub)" --worker-node-num-cpus 16 --worker-node-ram-size 64
   ```
 
 - Set the current registered OpenShift cluster:

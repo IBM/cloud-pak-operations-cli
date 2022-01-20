@@ -77,6 +77,21 @@
 		"storage_option_required": false,
 		"version": "v1beta1"
 	},
+	"edb": {
+		"group": "edb.cpd.ibm.com",
+		"description": "EDB Postgres",
+		"kind": "CPDEdbService",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "cpd-edb-service",
+		"operator_name": "ibm-cpd-edb",
+		"spec": {},
+		"status_key_name": "edbStatus",
+		"storage_option_required": true,
+		"version": "v1"
+	},
 	"wml": {
 		"group": "wml.cpd.ibm.com",
 		"description": "Watson Machine Learning",
@@ -89,7 +104,7 @@
 		"operator_name": "ibm-cpd-wml-operator",
 		"spec": {},
 		"status_key_name": "wmlStatus",
-		"storage_option_required": false,
+		"storage_option_required": true,
 		"version": "v1beta1"
 	},
 	"ws": {
