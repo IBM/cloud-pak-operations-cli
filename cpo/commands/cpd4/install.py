@@ -54,7 +54,12 @@ from cpo.utils.logging import loglevel_command
         case_sensitive=False,
     ),
 )
-@click.option("--project", default="zen", help="Project where the Cloud Pak for Data control plane is installed")
+@click.option(
+    "--project",
+    default="zen",
+    help="Project where the Cloud Pak for Data control plane is installed",
+    show_default=True,
+)
 @click.option("--storage-class", help="Storage class used for installation")
 @click.option(
     "--storage-vendor",

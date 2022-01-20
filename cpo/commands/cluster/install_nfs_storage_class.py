@@ -32,12 +32,12 @@ from cpo.utils.logging import loglevel_command
 )
 @openshift_server_options
 @click.option("--nfs-server", help="NFS server", required=True)
-@click.option("--nfs-path", default="/var/nfs", help="NFS path", required=True)
+@click.option("--nfs-path", default="/var/nfs", help="NFS path", show_default=True)
 @click.option(
     "--project",
     default="default",
     help="Project used to install the Kubernetes NFS Subdir External Provisioner",
-    required=True,
+    show_default=True,
 )
 @click.pass_context
 def install_nfs_storage_class(

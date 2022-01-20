@@ -35,7 +35,12 @@ from cpo.utils.logging import loglevel_command
 @openshift_server_options
 @click.option("--delete-project", help="Delete project", is_flag=True)
 @click.option("--force", "-f", help="Skip confirmation", is_flag=True)
-@click.option("--project", default="zen", help="Project where the Cloud Pak for Data control plane is installed")
+@click.option(
+    "--project",
+    default="zen",
+    help="Project where the Cloud Pak for Data control plane is installed",
+    show_default=True,
+)
 @click.pass_context
 def uninstall(
     ctx: click.Context,
