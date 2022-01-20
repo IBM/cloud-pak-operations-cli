@@ -49,6 +49,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                         "location_name": {"type": "string"},
                         "locked_for_delete": {"type": "string"},
                         "ocp_version": {"type": "string"},
+                        "platform": {"type": "string"},
                         "vm_count": {"type": "integer"},
                         "vms": {
                             "items": {"$ref": "#/$defs/vm"},
@@ -69,6 +70,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                         "location_name",
                         "locked_for_delete",
                         "ocp_version",
+                        "platform",
                         "vm_count",
                         "vms",
                     ],
@@ -78,10 +80,12 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                     "additionalProperties": False,
                     "properties": {
                         "address": {"type": "string"},
+                        "scope": {"type": "string"},
                         "type": {"type": "string"},
                     },
                     "required": [
                         "address",
+                        "scope",
                         "type",
                     ],
                     "type": "object",
