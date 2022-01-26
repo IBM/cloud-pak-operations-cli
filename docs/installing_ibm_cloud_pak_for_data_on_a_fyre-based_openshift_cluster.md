@@ -24,6 +24,22 @@
   cpo fyre cluster install-nfs-storage-class
   ```
 
+## IBM Cloud Pak for Data 4.0.x
+
+- Execute the following IBM Cloud Pak Operations CLI commands to install IBM Cloud Pak for Data:
+
+  - Store credentials in a configuration file:
+
+    ```shell
+    cpo adm store-credentials --ibm-cloud-pak-for-data-entitlement-key $IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY
+    ```
+
+  - Install IBM Cloud Pak for Data:
+
+    ```shell
+    cpo cpd4 install --accept-license --force --license (ENTERPRISE|STANDARD) --storage-class managed-nfs-storage
+    ```
+
 ## IBM Cloud Pak for Data 3.5.0
 
 - Log in to infrastructure node:
@@ -74,20 +90,4 @@
 
     ```shell
     cpo cpd3 install --accept-all-licenses --storage-class managed-nfs-storage
-    ```
-
-## IBM Cloud Pak for Data 4.0.x
-
-- Execute the following IBM Cloud Pak Operations CLI commands to install IBM Cloud Pak for Data:
-
-  - Store credentials in a configuration file:
-
-    ```shell
-    cpo adm store-credentials --ibm-cloud-pak-for-data-entitlement-key $IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY
-    ```
-
-  - Install IBM Cloud Pak for Data:
-
-    ```shell
-    cpo cpd4 install --accept-license --force --license (ENTERPRISE|STANDARD) --storage-vendor nfs
     ```
