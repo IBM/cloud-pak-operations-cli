@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,29 +22,6 @@ class CatalogSourceManager:
     """Manages OpenShift catalog sources"""
 
     def __init__(self):
-        self._catalog_sources: CatalogSourceList = [
-            {
-                "apiVersion": CatalogSourceManager._API_VERSION,
-                "kind": "CatalogSource",
-                "metadata": {
-                    "name": "ibm-db2uoperator-catalog",
-                    "namespace": "openshift-marketplace",
-                },
-                "spec": {
-                    "displayName": "IBM Db2U Catalog",
-                    "image": "docker.io/ibmcom/ibm-db2uoperator-catalog:latest",
-                    "imagePullPolicy": "Always",
-                    "publisher": "IBM",
-                    "sourceType": "grpc",
-                    "updateStrategy": {
-                        "registryPoll": {
-                            "interval": "45m",
-                        },
-                    },
-                },
-            },
-        ]
-
         self._catalog_sources_foundational_services: CatalogSourceList = [
             {
                 "apiVersion": CatalogSourceManager._API_VERSION,
@@ -67,17 +44,6 @@ class CatalogSourceManager:
             },
         ]
 
-    def get_catalog_sources(self) -> CatalogSourceList:
-        """Returns OpenShift catalog sources for IBM Cloud Pak for Data services
-
-        Returns
-        -------
-        CatalogSourceList
-            list of OpenShift catalog sources
-        """
-
-        return self._catalog_sources
-
     def get_catalog_sources_for_foundational_services(self) -> CatalogSourceList:
         """Returns OpenShift catalog sources for IBM Cloud Pak for Data
         foundational services
@@ -89,22 +55,6 @@ class CatalogSourceManager:
         """
 
         return self._catalog_sources_foundational_services
-
-    def get_catalog_source_names(self) -> List[str]:
-        """Returns OpenShift catalog source names for IBM Cloud Pak for Data
-        services
-
-        Returns
-        -------
-        List[str]
-            list of OpenShift catalog sources names
-        """
-
-        return reduce(
-            lambda result, catalog_source: result + [catalog_source["metadata"]["name"]],
-            self._catalog_sources,
-            [],
-        )
 
     def get_catalog_source_names_for_foundational_services(self) -> List[str]:
         """Returns OpenShift catalog source names for IBM Cloud Pak for Data

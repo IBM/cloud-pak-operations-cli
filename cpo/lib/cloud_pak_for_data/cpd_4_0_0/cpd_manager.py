@@ -16,7 +16,9 @@ import base64
 import json
 import logging
 
-from typing import Any, Dict, Final, List, Optional, Tuple, Union
+from typing import Any, Dict, Final, List, Optional, Tuple, Union, cast
+
+import jmespath
 
 from halo import Halo
 from kubernetes import client
@@ -26,6 +28,7 @@ import cpo.utils.logging
 
 from cpo.cpo import click_logging_handler
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.catalog_source_manager import CatalogSourceManager
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.cpd_operand_manager import cloud_pak_for_data_operand_manager
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.cpd_service_manager import CloudPakForDataServiceManager
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_access_data import CloudPakForDataAccessData
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import (
@@ -38,13 +41,17 @@ from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.custom_resource_definitions_even
 )
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.custom_resource_event_data import CustomResourceEventData
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.kind import Kind
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.status_key_data import StatusKeyData
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.status_key_value import StatusKeyValue
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.subscription_metadata import SubscriptionMetadata
 from cpo.lib.error import DataGateCLIException, JmespathPathExpressionNotFoundException
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.openshift_api_manager import OpenShiftAPIManager
 from cpo.lib.openshift.types.catalog_source import CatalogSourceList
 from cpo.lib.openshift.types.custom_resource import CustomResource
+from cpo.lib.openshift.types.custom_resource_event_result import CustomResourceEventResult
 from cpo.lib.openshift.types.kind_metadata import KindMetadata
+from cpo.utils.string import removesuffix
 
 logger = logging.getLogger(__name__)
 
@@ -160,22 +167,12 @@ class CloudPakForDataManager:
         )
 
         return (
-            self._custom_resource_status_is_completed(custom_resource, custom_resource_metadata.status_key_name)
+            self._check_custom_resource_status(
+                custom_resource, custom_resource_metadata.status_key_name, StatusKeyValue.Completed
+            )
             if custom_resource is not None
             else False
         )
-
-    def _custom_resource_status_is_completed(self, custom_resource: Any, status_key_name: str) -> bool:
-        result = False
-
-        try:
-            status = cpo.lib.jmespath.get_jmespath_string(f"status.{status_key_name}", custom_resource)
-
-            result = status == "Completed"
-        except JmespathPathExpressionNotFoundException:
-            pass
-
-        return result
 
     def get_license_types_for_cloud_pak_for_data_service(
         self, service_name: str
@@ -236,7 +233,7 @@ class CloudPakForDataManager:
                 cpd_instance_project, "lite-cr", self._kinds[Kind.ZenService]
             )
         ) is not None:
-            if self._custom_resource_status_is_completed(custom_resource, "zenStatus"):
+            if self._check_custom_resource_status(custom_resource, "zenStatus", StatusKeyValue.Completed):
                 raise DataGateCLIException(
                     f"IBM Cloud Pak for Data is already installed in project '{cpd_instance_project}'"
                 )
@@ -280,7 +277,7 @@ class CloudPakForDataManager:
         license: CloudPakForDataServiceLicense,
         installation_options: List[Tuple[str, Union[bool, int, str]]],
         storage_option: Optional[Union[str, CloudPakForDataStorageVendor]],
-        catalog_source: Optional[str] = None,
+        catalog_source: str,
     ):
         """Installs an IBM Cloud Pak for Data service
 
@@ -299,8 +296,7 @@ class CloudPakForDataManager:
         storage_option
             storage class/vendor to be used when creating the custom resource
         catalog_source
-            catalog to install the operator from. If None (default), use default
-            catalog for the operator (usually 'ibm-operator-catalog')
+            catalog source for the service operator
         """
 
         if not self._cpd_service_manager.is_cloud_pak_for_data_service(service_name):
@@ -314,8 +310,20 @@ class CloudPakForDataManager:
                 cpd_instance_project, custom_resource_metadata.name, custom_resource_metadata.get_kind_metadata()
             )
         ) is not None:
-            if self._custom_resource_status_is_completed(custom_resource, custom_resource_metadata.status_key_name):
-                raise DataGateCLIException("IBM Cloud Pak for Data service already installed")
+            if self._check_custom_resource_status(
+                custom_resource, custom_resource_metadata.status_key_name, StatusKeyValue.Completed
+            ):
+                raise DataGateCLIException("IBM Cloud Pak for Data service is already installed")
+            elif self._check_custom_resource_status(
+                custom_resource, custom_resource_metadata.status_key_name, StatusKeyValue.Failed
+            ):
+                message = self._get_message_from_custom_resource(custom_resource, "status.conditions")
+
+                raise DataGateCLIException(
+                    f"Custom resource {custom_resource_metadata.get_kind_metadata().kind} "
+                    f"'{custom_resource_metadata.name}' already exists, but the installation of the IBM Cloud Pak for "
+                    f"Data service failed{': ' + message if message is not None else ''}"
+                )
         else:
             custom_resource_metadata.check_options(license, storage_option)
             self._create_operator_subscription(
@@ -338,22 +346,47 @@ class CloudPakForDataManager:
                     custom_resource_definitions_event_data=CustomResourceDefinitionsEventData({kind}, spinner),
                 )
 
-            self._create_custom_resource(cpd_instance_project, custom_resource)
+            try:
+                self._create_custom_resource(cpd_instance_project, custom_resource)
+            except Exception:
+                logger.error(
+                    f"Creating custom resource {custom_resource_metadata.get_kind_metadata().kind} "
+                    f"'{custom_resource_metadata.name}' failed"
+                )
+
+                raise
 
         with Halo(
             text=f"Waiting for custom resource {kind} '{custom_resource_metadata.name}' to be created",
             spinner="dots",
         ) as spinner, cpo.utils.logging.ScopedSpinnerDisabler(click_logging_handler, spinner):
-            self._openshift_manager.wait_for_namespaced_custom_resource(
+            custom_resource_event_result = self._openshift_manager.wait_for_namespaced_custom_resource(
                 cpd_instance_project,
                 custom_resource_metadata.get_kind_metadata(),
                 lambda message: self._suspend_spinner_and_log_debug_message(spinner, message),
-                self._add_event_indicates_custom_resource_status_is_completed,
-                # passed to _add_event_indicates_custom_resource_status_is_completed
+                self._add_event_indicates_custom_resource_reached_end_state,
+                # passed to _add_event_indicates_custom_resource_reached_end_state
                 custom_resource_event_data=CustomResourceEventData(
-                    custom_resource_metadata.name, spinner, custom_resource_metadata.status_key_name
+                    custom_resource_name=custom_resource_metadata.name,
+                    spinner=spinner,
+                    status_key_data=StatusKeyData(
+                        failure_value=StatusKeyValue.Failed,
+                        status_key_name=custom_resource_metadata.status_key_name,
+                        success_value=StatusKeyValue.Completed,
+                    ),
                 ),
             )
+
+            if not custom_resource_event_result.succeeded:
+                error_message = (
+                    f"Creating custom resource {custom_resource_metadata.get_kind_metadata().kind} "
+                    f"'{custom_resource_metadata.name}' failed"
+                )
+
+                if custom_resource_event_result.message is not None:
+                    error_message += ": " + custom_resource_event_result.message
+
+                raise DataGateCLIException(error_message)
 
     def uninstall_cloud_pak_for_data(self, cpd_operators_project: str, cpd_instance_project: str, delete_project: bool):
         """Uninstalls IBM Cloud Pak for Data
@@ -406,8 +439,6 @@ class CloudPakForDataManager:
             #      - cpd-platform-operator.ibm-common-services
             #      - ibm-cert-manager-operator.ibm-common-services
             #      - ibm-zen-operator.ibm-common-services
-
-            self._delete_catalog_sources(CatalogSourceManager().get_catalog_source_names())
 
             if delete_project:
                 logger.info(f"Deleting project '{cpd_instance_project}'")
@@ -524,6 +555,131 @@ class CloudPakForDataManager:
         custom_resource = self._cpd_service_manager.get_custom_resource_metadata(service_name)
 
         self.uninstall_operator(project, custom_resource.operator_name)
+
+    def _add_event_indicates_custom_resource_definitions_are_created(
+        self,
+        event: Any,
+        custom_resource_definitions_event_data: CustomResourceDefinitionsEventData,
+    ) -> bool:
+        """Callback for checking whether the given set of expected custom
+        resource definitions was created
+
+        Parameters
+        ----------
+        event
+            OpenShift watch event
+        expected_crd_kinds
+            set of expected custom resource definitions
+        encountered_crd_kinds
+            set of encountered custom resource definitions
+        spinner
+            active spinner
+
+        Returns
+        -------
+        bool
+            true, if the given set of expected custom resource definitions was
+            created
+        """
+
+        custom_resource_definitions_are_created = False
+
+        if event["type"] == "ADDED":
+            encountered_crd_kind = cpo.lib.jmespath.get_jmespath_string("object.spec.names.kind", event)
+
+            if encountered_crd_kind in custom_resource_definitions_event_data.expected_crd_kinds:
+                custom_resource_definitions_event_data.spinner.stop()
+                logger.info(f"Detected creation of custom resource definition '{encountered_crd_kind}'")
+                custom_resource_definitions_event_data.encountered_crd_kinds.add(encountered_crd_kind)
+
+            custom_resource_definitions_are_created = (
+                custom_resource_definitions_event_data.encountered_crd_kinds
+                == custom_resource_definitions_event_data.expected_crd_kinds
+            )
+
+            if not custom_resource_definitions_are_created:
+                custom_resource_definitions_event_data.spinner.start()
+
+        return custom_resource_definitions_are_created
+
+    def _add_event_indicates_custom_resource_reached_end_state(
+        self, event: Any, kind_metadata: KindMetadata, custom_resource_event_data: CustomResourceEventData
+    ) -> Optional[CustomResourceEventResult]:
+        """Callback for checking whether the status of the custom resource of
+        the given kind and the given name reached an end state
+
+        Parameters
+        ----------
+        event
+            OpenShift watch event
+        kind_metadata
+            kind metadata of the custom resource to be checked
+        custom_resource_event_data
+            object used for data exchange
+
+        Returns
+        -------
+        bool
+            true, if the status of the custom resource of the given kind and the
+            given name reached an end state
+        """
+
+        custom_resource_event_result: Optional[CustomResourceEventResult] = None
+
+        if event["type"] == "ADDED":
+            resource_name = cpo.lib.jmespath.get_jmespath_string("object.metadata.name", event)
+
+            try:
+                if resource_name == custom_resource_event_data.custom_resource_name:
+                    if custom_resource_event_data.initial_event:
+                        custom_resource_event_data.initial_event = False
+
+                        logger.info(
+                            f"Detected creation of custom resource {kind_metadata.kind} "
+                            f"'{custom_resource_event_data.custom_resource_name}'"
+                        )
+
+                    status_key_value = cpo.lib.jmespath.get_jmespath_string(
+                        f"object.status.{custom_resource_event_data.status_key_data.status_key_name}", event
+                    )
+
+                    if status_key_value == custom_resource_event_data.status_key_data.success_value.value:
+                        custom_resource_event_data.spinner.stop()
+                        logger.info(
+                            f"Creating custom resource {kind_metadata.kind} "
+                            f"'{custom_resource_event_data.custom_resource_name}' succeeded"
+                        )
+
+                        custom_resource_event_result = CustomResourceEventResult(succeeded=True)
+                    elif (custom_resource_event_data.status_key_data.failure_value is not None) and (
+                        status_key_value == custom_resource_event_data.status_key_data.failure_value.value
+                    ):
+                        custom_resource_event_data.spinner.stop()
+                        logger.error(
+                            f"Creating custom resource {kind_metadata.kind} "
+                            f"'{custom_resource_event_data.custom_resource_name}' failed"
+                        )
+
+                        message = self._get_message_from_custom_resource(event, "object.status.conditions")
+                        custom_resource_event_result = CustomResourceEventResult(message=message, succeeded=False)
+            except JmespathPathExpressionNotFoundException:
+                pass
+
+        return custom_resource_event_result
+
+    def _check_custom_resource_status(
+        self, custom_resource: Any, status_key_name: str, status_to_be_checked: StatusKeyValue
+    ) -> bool:
+        result = False
+
+        try:
+            status = cpo.lib.jmespath.get_jmespath_string(f"status.{status_key_name}", custom_resource)
+
+            result = status == status_to_be_checked.value
+        except JmespathPathExpressionNotFoundException:
+            pass
+
+        return result
 
     def _configure_global_pull_secret(self, ibm_cloud_pak_for_data_entitlement_key: str):
         """Configures the global pull secret to ensure that a cluster has the
@@ -669,7 +825,9 @@ class CloudPakForDataManager:
             IBM Cloud Pak for Data operators project
         """
 
-        self._create_operator_subscription_if_not_exists(cpd_operators_project, "cpd-platform-operator")
+        self._create_operator_subscription_if_not_exists(
+            cpd_operators_project, "cpd-platform-operator", "ibm-operator-catalog"
+        )
 
     def _create_cloud_pak_foundational_services_operator_subscription(self, project: str):
         """Creates the 'IBM Cloud Pak foundational services' operator
@@ -698,7 +856,7 @@ class CloudPakForDataManager:
             project in which the subscription shall be created
         """
 
-        self._create_operator_subscription_if_not_exists(project, "ibm-common-service-operator")
+        self._create_operator_subscription_if_not_exists(project, "ibm-common-service-operator", "ibm-operator-catalog")
 
     def _create_custom_resource(self, project: str, custom_resource: CustomResource):
         """Creates a custom resource
@@ -717,7 +875,74 @@ class CloudPakForDataManager:
         logger.info(f"Creating custom resource {custom_resource.kind} '{name}'")
         logger.debug(f"Sending JSON object:\n{body_str}")
 
-        self._openshift_manager.create_custom_resource(project, custom_resource)
+        self._openshift_manager.create_namespaced_custom_resource(project, custom_resource)
+
+    def _create_operand_request_dependencies(
+        self, cpd_operators_project: str, operator_name: str, subscription_metadata: SubscriptionMetadata
+    ):
+        """Creates dependent operand requests for the operator
+        corresponding to the given subscription metadata
+
+        Parameters
+        ----------
+        cpd_operators_project
+            IBM Cloud Pak for Data operators project
+        operator_name
+            name of the operator for which dependent operand requests shall be
+            created
+        subscription_metadata
+            metadata of the subscription to be created
+        created_dependent_subscriptions
+            list of created dependent subscriptions
+        """
+
+        for operand_request_name in subscription_metadata.operand_request_dependencies:
+            kind_metadata = self._kinds[Kind.OperandRequest]
+
+            if (
+                custom_resource := self._openshift_manager.get_namespaced_custom_resource_if_exists(
+                    cpd_operators_project, operand_request_name, kind_metadata
+                )
+            ) is not None:
+                if self._check_custom_resource_status(custom_resource, "phase", StatusKeyValue.Running):
+                    continue
+            else:
+                logging.info(f"Creating operand request '{operand_request_name}' for operator '{operator_name}'")
+
+                operand_request_metadata = cloud_pak_for_data_operand_manager.get_operand_request_metadata(
+                    operand_request_name
+                )
+
+                custom_resource = CustomResource(
+                    group=kind_metadata.group,
+                    kind=kind_metadata.kind,
+                    metadata={
+                        "name": operand_request_name,
+                        "namespace": cpd_operators_project,
+                    },
+                    spec=cast(Dict[str, Any], operand_request_metadata["spec"]),
+                    version=kind_metadata.version,
+                )
+
+                self._openshift_manager.create_namespaced_custom_resource(cpd_operators_project, custom_resource)
+
+            with Halo(
+                text="Waiting for operand request to be created", spinner="dots"
+            ) as spinner, cpo.utils.logging.ScopedSpinnerDisabler(click_logging_handler, spinner):
+                self._openshift_manager.wait_for_namespaced_custom_resource(
+                    cpd_operators_project,
+                    kind_metadata,
+                    lambda message, spinner=spinner: self._suspend_spinner_and_log_debug_message(spinner, message),
+                    self._add_event_indicates_custom_resource_reached_end_state,
+                    # passed to _add_event_indicates_custom_resource_reached_end_state
+                    custom_resource_event_data=CustomResourceEventData(
+                        custom_resource_name=operand_request_name,
+                        spinner=spinner,
+                        status_key_data=StatusKeyData(
+                            failure_value=None, status_key_name="phase", success_value=StatusKeyValue.Running
+                        ),
+                    ),
+                )
 
     def _create_operator_group(self, project: str):
         """Creates an operator group for the 'ibm-common-services' namespace
@@ -742,7 +967,7 @@ class CloudPakForDataManager:
         self,
         project: str,
         operator_name: str,
-        catalog_source: Optional[str] = None,
+        catalog_source: str,
         created_dependent_subscriptions: List[str] = [],
     ):
         """Creates an operator subscription
@@ -754,8 +979,7 @@ class CloudPakForDataManager:
         operator_name
             name of the operator for which a subscription shall be created
         catalog_source
-            catalog to install the operator from. If None (default), use default
-            catalog for the operator (usually 'ibm-operator-catalog')
+            catalog source for the service operator
         created_dependent_subscriptions
             list of created dependent subscriptions
 
@@ -766,7 +990,11 @@ class CloudPakForDataManager:
 
         subscription_metadata = self._cpd_service_manager.get_subscription_metadata(operator_name)
 
-        self._create_operator_subscription_dependencies(project, subscription_metadata, created_dependent_subscriptions)
+        self._create_operator_subscription_dependencies(
+            project, catalog_source, subscription_metadata, created_dependent_subscriptions
+        )
+
+        self._create_operand_request_dependencies(project, operator_name, subscription_metadata)
 
         if not self._openshift_manager.subscription_exists(project, subscription_metadata.name):
             if len(created_dependent_subscriptions) == 0:
@@ -777,6 +1005,7 @@ class CloudPakForDataManager:
             else:
                 logging.info(
                     f"Creating subscription '{subscription_metadata.name}' for dependent operator '{operator_name}'"
+                    f"from catalog '{catalog_source}'"
                 )
 
             subscription = self._cpd_service_manager.get_subscription_metadata(operator_name).get_subscription(
@@ -786,7 +1015,11 @@ class CloudPakForDataManager:
             self._openshift_manager.create_subscription(project, subscription)
 
     def _create_operator_subscription_dependencies(
-        self, project: str, subscription_metadata: SubscriptionMetadata, created_dependent_subscriptions: List[str]
+        self,
+        project: str,
+        catalog_source: str,
+        subscription_metadata: SubscriptionMetadata,
+        created_dependent_subscriptions: List[str],
     ):
         """Creates dependent operator subscriptions for the operator
         corresponding to the given subscription metadata
@@ -795,6 +1028,8 @@ class CloudPakForDataManager:
         ----------
         project
             project in which the operator subscription shall be created
+        catalog_source
+            catalog source for the service operator
         subscription_metadata
             metadata of the subscription to be created
         created_dependent_subscriptions
@@ -822,13 +1057,11 @@ class CloudPakForDataManager:
                     if subscription_metadata.required_namespace is not None
                     else project,
                     dependent_operator_name,
-                    None,
+                    catalog_source,
                     created_dependent_subscriptions + [dependent_subscription_name],
                 )
 
-    def _create_operator_subscription_if_not_exists(
-        self, project: str, operator_name: str, catalog_source: Optional[str] = None
-    ):
+    def _create_operator_subscription_if_not_exists(self, project: str, operator_name: str, catalog_source: str):
         """Creates an operator subscription if it does not exist
 
         Parameters
@@ -838,8 +1071,7 @@ class CloudPakForDataManager:
         operator_name
             name of the operator for which a subscription shall be created
         catalog_source
-            catalog to install the operator from. If None (default), use default
-            catalog for the operator (usually 'ibm-operator-catalog')
+            catalog source for the service operator
         """
 
         subscription_metadata = self._cpd_service_manager.get_subscription_metadata(operator_name)
@@ -866,52 +1098,34 @@ class CloudPakForDataManager:
         else:
             logging.info(f"Skipping creation of project '{project}'")
 
-    def _add_event_indicates_custom_resource_definitions_are_created(
-        self,
-        event: Any,
-        kind_metadata: KindMetadata,
-        custom_resource_definitions_event_data: CustomResourceDefinitionsEventData,
-    ) -> bool:
-        """Callback for checking whether the given set of expected custom
-        resource definitions was created
+    def _delete_catalog_sources(self, catalog_source_names: List[str]):
+        """Deletes the catalog sources with the given names
 
         Parameters
         ----------
-        event
-            OpenShift watch event
-        expected_crd_kinds
-            set of expected custom resource definitions
-        encountered_crd_kinds
-            set of encountered custom resource definitions
-        spinner
-            active spinner
-
-        Returns
-        -------
-        bool
-            true, if the given set of expected custom resource definitions was
-            created
+        catalog_source_names
+            names of the catalog sources to be deleted
         """
 
-        custom_resource_definitions_are_created = False
+        for catalog_source_name in catalog_source_names:
+            logger.info(f"Deleting catalog source '{catalog_source_name}'")
+            self._openshift_manager.delete_catalog_source("openshift-marketplace", catalog_source_name)
 
-        if event["type"] == "ADDED":
-            encountered_crd_kind = cpo.lib.jmespath.get_jmespath_string("object.spec.names.kind", event)
+    def _delete_custom_resource(self, project: str, kind: Kind, name: str):
+        """Deletes the custom resource of the given kind and the given name
 
-            if encountered_crd_kind in custom_resource_definitions_event_data.expected_crd_kinds:
-                custom_resource_definitions_event_data.spinner.stop()
-                logger.info(f"Detected creation of custom resource definition '{encountered_crd_kind}'")
-                custom_resource_definitions_event_data.encountered_crd_kinds.add(encountered_crd_kind)
+        Parameters
+        ----------
+        project
+            project in which the custom resource shall be deleted
+        kind
+            kind of the custom resource to be deleted
+        name
+            name of the custom resource to be deleted
+        """
 
-            custom_resource_definitions_are_created = (
-                custom_resource_definitions_event_data.encountered_crd_kinds
-                == custom_resource_definitions_event_data.expected_crd_kinds
-            )
-
-            if not custom_resource_definitions_are_created:
-                custom_resource_definitions_event_data.spinner.start()
-
-        return custom_resource_definitions_are_created
+        logger.info(f"Deleting {str(kind)} '{name}'")
+        self._openshift_manager.delete_custom_resource(project, self._kinds[kind], name)
 
     def _delete_event_indicates_custom_resource_is_deleted(
         self, event: Any, kind_metadata: KindMetadata, name: str
@@ -943,95 +1157,6 @@ class CloudPakForDataManager:
             custom_resource_is_deleted = (resource_name == name) and (resource_kind == kind_metadata.kind)
 
         return custom_resource_is_deleted
-
-    def _add_event_indicates_custom_resource_status_is_completed(
-        self, event: Any, kind_metadata: KindMetadata, custom_resource_event_data: CustomResourceEventData
-    ) -> bool:
-        """Callback for checking whether the status of the custom resource of
-        the given kind and the given name equals "Completed"
-
-        Parameters
-        ----------
-        event
-            OpenShift watch event
-        kind_metadata
-            kind metadata of the custom resource to be checked
-        name
-            name of the custom resource to be checked
-        status_key
-            name of the status key
-        spinner
-            active spinner
-
-        Returns
-        -------
-        bool
-            true, if the status of the custom resource of the given kind and the
-            given name equals "Completed"
-        """
-
-        status_is_completed = False
-
-        if event["type"] == "ADDED":
-            resource_name = cpo.lib.jmespath.get_jmespath_string("object.metadata.name", event)
-            status_is_completed = False
-
-            try:
-                if resource_name == custom_resource_event_data.name:
-                    if custom_resource_event_data.initial_event:
-                        custom_resource_event_data.initial_event = False
-
-                        logger.info(
-                            f"Detected creation of custom resource {kind_metadata.kind} "
-                            f"'{custom_resource_event_data.name}'"
-                        )
-
-                    status_is_completed = (
-                        cpo.lib.jmespath.get_jmespath_string(
-                            f"object.status.{custom_resource_event_data.status_key}", event
-                        )
-                        == "Completed"
-                    )
-
-                    if status_is_completed:
-                        custom_resource_event_data.spinner.stop()
-                        logger.info(
-                            f"Detected creation of custom resource {kind_metadata.kind} "
-                            f"'{custom_resource_event_data.name}' completed"
-                        )
-            except JmespathPathExpressionNotFoundException:
-                pass
-
-        return status_is_completed
-
-    def _delete_catalog_sources(self, catalog_source_names: List[str]):
-        """Deletes the catalog sources with the given names
-
-        Parameters
-        ----------
-        catalog_source_names
-            names of the catalog sources to be deleted
-        """
-
-        for catalog_source_name in catalog_source_names:
-            logger.info(f"Deleting catalog source '{catalog_source_name}'")
-            self._openshift_manager.delete_catalog_source("openshift-marketplace", catalog_source_name)
-
-    def _delete_custom_resource(self, project: str, kind: Kind, name: str):
-        """Deletes the custom resource of the given kind and the given name
-
-        Parameters
-        ----------
-        project
-            project in which the custom resource shall be deleted
-        kind
-            kind of the custom resource to be deleted
-        name
-            name of the custom resource to be deleted
-        """
-
-        logger.info(f"Deleting {str(kind)} '{name}'")
-        self._openshift_manager.delete_custom_resource(project, self._kinds[kind], name)
 
     def _get_access_data(self) -> CloudPakForDataAccessData:
         """Returns IBM Cloud Pak for Data access data
@@ -1098,6 +1223,27 @@ class CloudPakForDataManager:
             cpo.lib.jmespath.get_jmespath_string("initial_admin_password", core_v1_api_result.data)
         ).decode("utf-8")
 
+    def _get_message_from_custom_resource(self, event: Any, jmespath_expression: str) -> Optional[str]:
+        conditions: Any = jmespath.search(jmespath_expression, event)
+        message: Optional[str] = None
+
+        if (conditions is not None) and isinstance(conditions, List):
+            for condition in conditions:
+                if (
+                    isinstance(condition, Dict)
+                    and ("message" in condition)
+                    and ("type" in condition)
+                    and (condition["type"] == "Failure")
+                ):
+                    message = condition["message"]
+
+                    break
+
+        if message is not None:
+            message = removesuffix(message, "\nThe playbook has failed. See earlier output for exact error")
+
+        return message
+
     def _get_namespaced_custom_resource_names(self, project: str, kind: Kind) -> List[str]:
         """Returns names of custom resources of the given kind
 
@@ -1115,7 +1261,6 @@ class CloudPakForDataManager:
         """
 
         kind_metadata = self._kinds[kind]
-
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api_result = custom_objects_api.list_namespaced_custom_object(
             kind_metadata.group, kind_metadata.version, project, kind_metadata.plural
@@ -1155,7 +1300,6 @@ class CloudPakForDataManager:
 
         logger.info("Installing IBM Cloud Pak for Data")
         self._create_project(cpd_instance_project)
-        self._create_catalog_sources(CatalogSourceManager().get_catalog_sources())
         self._create_cloud_pak_for_data_operator_subscription(cpd_operators_project)
         self._create_cloud_pak_for_data_custom_resource(cpd_instance_project, license, storage_option)
 
@@ -1263,10 +1407,18 @@ class CloudPakForDataManager:
                 cpd_instance_project,
                 self._kinds[Kind.ZenService],
                 lambda message: self._suspend_spinner_and_log_debug_message(spinner, message),
-                self._add_event_indicates_custom_resource_status_is_completed,
-                # passed to _add_event_indicates_custom_resource_status_is_completed
-                custom_resource_event_data=CustomResourceEventData("lite-cr", spinner, "zenStatus"),
+                self._add_event_indicates_custom_resource_reached_end_state,
+                # passed to _add_event_indicates_custom_resource_reached_end_state
+                custom_resource_event_data=CustomResourceEventData(
+                    custom_resource_name="lite-cr",
+                    spinner=spinner,
+                    status_key_data=StatusKeyData(
+                        failure_value=StatusKeyValue.Failed,
+                        status_key_name="zenStatus",
+                        success_value=StatusKeyValue.Completed,
+                    ),
+                ),
             )
 
     _FOUNDATIONAL_SERVICES_PROJECT: Final[str] = "ibm-common-services"
-    _IBM_CLOUD_PAK_FOR_DATA_VERSION: Final[str] = "4.0.2"
+    _IBM_CLOUD_PAK_FOR_DATA_VERSION: Final[str] = "4.0.4"

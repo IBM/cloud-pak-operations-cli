@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,27 +12,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import TypedDict, Union
+
+from dataclasses import dataclass
+from typing import Optional
+
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.status_key_value import StatusKeyValue
 
 
-class LastStatus(TypedDict):
-    cluster_id: str
-    status: str
-
-
-class RequestData(TypedDict):
-    complete: str
-    completion_percent: int
-    failed: str
-    in_progress: str
-    job_count: str
-    last_status_time: str
-    last_status: Union[LastStatus, str]
-    pending: str
-    request_id: str
-    task_count: str
-
-
-class OCPRequestGetResponse(TypedDict):
-    request: RequestData
-    status: str
+@dataclass
+class StatusKeyData:
+    failure_value: Optional[StatusKeyValue]
+    status_key_name: str
+    success_value: StatusKeyValue

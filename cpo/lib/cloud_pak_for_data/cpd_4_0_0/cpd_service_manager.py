@@ -151,11 +151,11 @@ class CloudPakForDataServiceManager:
                         dependencies=value["dependencies"],
                         labels=value["labels"],
                         name=value["name"],
+                        operand_request_dependencies=value["operand_request_dependencies"],
                         required_namespace=value["required_namespace"],
                         service=value["service"],
                         spec=SubscriptionMetadataSpec(
                             channel=value["spec"]["channel"],
                             name=value["spec"]["name"],
-                            source=value["spec"].get("source"),
                         ),
                     )

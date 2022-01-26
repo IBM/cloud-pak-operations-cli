@@ -28,6 +28,7 @@ from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.data.global_pull_secret_data import GlobalPullSecretData
 from cpo.lib.openshift.types.catalog_source import CatalogSource
 from cpo.lib.openshift.types.custom_resource import CustomResource
+from cpo.lib.openshift.types.custom_resource_event_result import CustomResourceEventResult
 from cpo.lib.openshift.types.kind_metadata import KindMetadata
 from cpo.lib.openshift.types.object_meta import ObjectMeta
 from cpo.lib.openshift.types.operator_group import OperatorGroup
@@ -150,19 +151,6 @@ class OpenShiftAPIManager:
             subjects=subjects,
         )
 
-    def create_custom_resource(self, project: str, custom_resource: CustomResource):
-        """Creates a custom resource
-
-        Parameters
-        ----------
-        project
-            project in which the custom resource shall be created
-        custom_resource
-            specification object for passing to the OpenShift REST API
-        """
-
-        self.execute_kubernetes_client(self._create_custom_resource, custom_resource=custom_resource, project=project)
-
     def create_deployment(self, project: str, deployment: Any):
         """Creates a deployment
 
@@ -175,6 +163,21 @@ class OpenShiftAPIManager:
         """
 
         self.execute_kubernetes_client(self._create_deployment, deployment=deployment, project=project)
+
+    def create_namespaced_custom_resource(self, project: str, custom_resource: CustomResource):
+        """Creates a namespaced custom resource
+
+        Parameters
+        ----------
+        project
+            project in which the namespaced custom resource shall be created
+        custom_resource
+            specification object for passing to the OpenShift REST API
+        """
+
+        self.execute_kubernetes_client(
+            self._create_namespaced_custom_resource, custom_resource=custom_resource, project=project
+        )
 
     def create_operator_group(self, project: str, name: str):
         """Creates an OpenShift operator group
@@ -861,9 +864,9 @@ class OpenShiftAPIManager:
         project: str,
         kind_metadata: KindMetadata,
         log_callback: Callable[[str], None],
-        success_callback: Callable[..., bool],
+        success_callback: Callable[..., Optional[CustomResourceEventResult]],
         **kwargs
-    ):
+    ) -> CustomResourceEventResult:
         """Waits for a specific custom resource of the given kind to be created in
         the given project
 
@@ -884,7 +887,7 @@ class OpenShiftAPIManager:
             additional arguments passed to success_callback
         """
 
-        self.execute_kubernetes_client(
+        return self.execute_kubernetes_client(
             self._wait_for_namespaced_custom_resource,
             kind_metadata=kind_metadata,
             log_callback=log_callback,
@@ -937,7 +940,11 @@ class OpenShiftAPIManager:
             "rbac.authorization.k8s.io", "v1", "clusterrolebindings", cluster_role_binding
         )
 
-    def _create_custom_resource(self, project: str, custom_resource: CustomResource):
+    def _create_deployment(self, project: str, deployment: Any):
+        custom_objects_api = client.CustomObjectsApi()
+        custom_objects_api.create_namespaced_custom_object("apps", "v1", project, "deployments", deployment)
+
+    def _create_namespaced_custom_resource(self, project: str, custom_resource: CustomResource):
         """Creates a custom resource
 
         Parameters
@@ -958,10 +965,6 @@ class OpenShiftAPIManager:
             plural,
             custom_resource.create_custom_resource_dict(),
         )
-
-    def _create_deployment(self, project: str, deployment: Any):
-        custom_objects_api = client.CustomObjectsApi()
-        custom_objects_api.create_namespaced_custom_object("apps", "v1", project, "deployments", deployment)
 
     def _create_operator_group(self, project: str, name: str):
         operator_group: OperatorGroup = {
@@ -1332,7 +1335,7 @@ class OpenShiftAPIManager:
                     resource_version=resource_version,
                 ):
                     resource_version = cpo.lib.jmespath.get_jmespath_string("object.metadata.resourceVersion", event)
-                    succeeded = success_callback(event, kind_metadata=kind_metadata, **kwargs)
+                    succeeded = success_callback(event, **kwargs)
 
                     if succeeded:
                         w.stop()
@@ -1347,13 +1350,13 @@ class OpenShiftAPIManager:
         project: str,
         kind_metadata: KindMetadata,
         log_callback: Callable[[str], None],
-        success_callback: Callable[..., bool],
+        success_callback: Callable[..., Optional[CustomResourceEventResult]],
         **kwargs
-    ):
+    ) -> CustomResourceEventResult:
         custom_objects_api = client.CustomObjectsApi()
-        succeeded = False
+        custom_resource_event_result: Optional[CustomResourceEventResult] = None
 
-        while not succeeded:
+        while custom_resource_event_result is None:
             try:
                 resource_version: Optional[str] = None
                 w = watch.Watch()
@@ -1367,12 +1370,14 @@ class OpenShiftAPIManager:
                     resource_version=resource_version,
                 ):
                     resource_version = cpo.lib.jmespath.get_jmespath_string("object.metadata.resourceVersion", event)
-                    succeeded = success_callback(event, kind_metadata=kind_metadata, **kwargs)
+                    custom_resource_event_result = success_callback(event, kind_metadata=kind_metadata, **kwargs)
 
-                    if succeeded:
+                    if custom_resource_event_result is not None:
                         w.stop()
             except client.ApiException as exception:
                 self._handle_api_exception(exception, log_callback)
                 resource_version = None
             except urllib3.exceptions.ProtocolError as exception:
                 self._handle_protocol_error(exception, log_callback)
+
+        return custom_resource_event_result

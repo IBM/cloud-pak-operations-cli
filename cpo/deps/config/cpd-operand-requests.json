@@ -1,0 +1,16 @@
+{
+	"common-service-edb": {
+		"spec": {
+			"requests": [
+				{
+					"operands": [
+						{
+							"name": "cloud-native-postgresql"
+						}
+					],
+					"registry": "common-service"
+				}
+			]
+		}
+	}
+}

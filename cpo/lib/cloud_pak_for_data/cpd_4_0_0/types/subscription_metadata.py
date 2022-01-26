@@ -24,7 +24,6 @@ class SubscriptionMetadataSpec:
 
     channel: str
     name: str
-    source: Optional[str] = None
 
 
 @dataclass
@@ -34,11 +33,12 @@ class SubscriptionMetadata:
     dependencies: List[str]
     labels: Dict[str, str]
     name: str
+    operand_request_dependencies: List[str]
     required_namespace: Optional[str]
     service: bool
     spec: SubscriptionMetadataSpec
 
-    def get_subscription(self, project: str, catalog_source: Optional[str] = None) -> Subscription:
+    def get_subscription(self, project: str, catalog_source: str) -> Subscription:
         """Returns a specification object for passing to the OpenShift REST API
         when creating a subscription
 
@@ -55,12 +55,6 @@ class SubscriptionMetadata:
         Subscription
             subscription object
         """
-        if catalog_source is not None:
-            source = catalog_source
-        elif self.spec.source is not None:
-            source = self.spec.source
-        else:
-            source = "ibm-operator-catalog"
 
         subscription: Subscription = {
             "apiVersion": "operators.coreos.com/v1alpha1",
@@ -73,7 +67,7 @@ class SubscriptionMetadata:
                 "channel": self.spec.channel,
                 "installPlanApproval": "Automatic",
                 "name": self.spec.name,
-                "source": source,
+                "source": catalog_source,
                 "sourceNamespace": "openshift-marketplace",
             },
         }
