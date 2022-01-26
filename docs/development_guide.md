@@ -197,8 +197,9 @@ After having pushed the tag, the following actions are performed:
 To add support for a new IBM Cloud Pak for Data 4.0.x release, perform the following steps:
 
 - Update the `_IBM_CLOUD_PAK_FOR_DATA_VERSION` class variable of the [CloudPakForDataManager](cpo/lib/cloud_pak_for_data/cpd_4_0_0/cpd_manager.py) class
-- Update version numbers in [cpd-custom-resources.json](/cpo/deps/config/cpd-custom-resources.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=integrations-services) (check custom resources providing a version number in the specification for changes)
-- Update [cpd-subscriptions.json](/cpo/deps/config/cpd-subscriptions.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=tasks-creating-operator-subscriptions#preinstall-operator-subscriptions__svc-subcriptions) (check custom resources for changes)
+- Update [cpd-custom-resources.json](/cpo/deps/config/cpd-custom-resources.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=integrations-services) (check custom resources for changes)
+- Update [cpd-operand-requests.json](/cpo/deps/config/cpd-operand-requests.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=tasks-creating-operator-subscriptions#preinstall-operator-subscriptions__svc-subcriptions) (check subscriptions for changes)
+- Update [cpd-subscriptions.json](/cpo/deps/config/cpd-subscriptions.json) according to the [IBM Cloud Pak for Data 4.0 documentation](https://www.ibm.com/docs/en/cloud-paks/cp-data/4.0?topic=tasks-creating-operator-subscriptions#preinstall-operator-subscriptions__svc-subcriptions) (check subscriptions for changes)
 
 ## References
 
