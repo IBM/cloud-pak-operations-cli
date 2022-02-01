@@ -1,4 +1,4 @@
-#  Copyright 2020 IBM Corporation
+#  Copyright 2021 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,11 +22,11 @@ from typing import TypedDict
 
 import click.testing
 
-import dg.lib.fyre.cluster
+import cpo.lib.fyre.cluster
 
-from dg.config.cluster_credentials_manager import cluster_credentials_manager
-from dg.dg import cli
-from dg.lib.cluster.cluster import AbstractCluster
+from cpo.config.cluster_credentials_manager import cluster_credentials_manager
+from cpo.cpo import cli
+from cpo.lib.cluster.cluster import AbstractCluster
 
 
 class ClusterData(TypedDict):
@@ -38,14 +38,12 @@ class ClusterData(TypedDict):
 
 class TestAddClusterCommands(unittest.TestCase):
     def test_add_cluster_command(self):
-        dg_clusters_file_path = pathlib.Path(tempfile.gettempdir()) / "clusters.json"
+        clusters_file_path = pathlib.Path(tempfile.gettempdir()) / "clusters.json"
 
-        if dg_clusters_file_path.exists():
-            os.remove(dg_clusters_file_path)
+        if clusters_file_path.exists():
+            os.remove(clusters_file_path)
 
-        cluster_credentials_manager.get_dg_clusters_file_path = unittest.mock.MagicMock(
-            return_value=dg_clusters_file_path
-        )
+        cluster_credentials_manager.get_clusters_file_path = unittest.mock.MagicMock(return_value=clusters_file_path)
 
         cluster_credentials_manager.reload()
 
@@ -145,5 +143,5 @@ class TestAddClusterCommands(unittest.TestCase):
         )
 
         self.assertEqual(returned_cluster_data["password"], cluster_data["password"])
-        self.assertEqual(returned_cluster_data["type"], dg.lib.fyre.cluster.CLUSTER_TYPE_ID)
+        self.assertEqual(returned_cluster_data["type"], cpo.lib.fyre.cluster.CLUSTER_TYPE_ID)
         self.assertEqual(returned_cluster_data["username"], "kubeadmin")

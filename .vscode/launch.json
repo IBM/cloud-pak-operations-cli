@@ -5,10 +5,10 @@
 	"version": "0.2.0",
 	"configurations": [
 		{
-			"name": "Python: dg",
+			"name": "Python: cpo",
 			"type": "python",
 			"request": "launch",
-			"module": "dg.dg",
+			"module": "cpo.cpo",
 			"console": "internalConsole",
 			"internalConsoleOptions": "openOnSessionStart",
 			"args": [
@@ -16,7 +16,7 @@
 			]
 		},
 		{
-			"name": "Python: dg unit tests",
+			"name": "Python: unit tests (cpo)",
 			"type": "python",
 			"request": "launch",
 			"module": "unittest",
@@ -26,12 +26,24 @@
 				"discover",
 				"tests.test"
 			]
+		},
+		{
+			"name": "Python: unit tests (scripts)",
+			"type": "python",
+			"request": "launch",
+			"module": "unittest",
+			"console": "internalConsole",
+			"internalConsoleOptions": "openOnSessionStart",
+			"args": [
+				"discover",
+				"tests.test_scripts"
+			]
 		}
 	],
 	"inputs": [
 		{
 			"id": "args",
-			"description": "dg arguments",
+			"description": "cpo arguments",
 			"type": "promptString"
 		}
 	]

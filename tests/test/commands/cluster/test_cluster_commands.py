@@ -1,4 +1,4 @@
-#  Copyright 2020 IBM Corporation
+#  Copyright 2021 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,13 +22,13 @@ from typing import TypedDict
 
 import click.testing
 
-import dg.config
-import dg.lib.cluster
-import dg.lib.cluster.cluster_factory
+import cpo.config
+import cpo.lib.cluster
+import cpo.lib.cluster.cluster_factory
 
-from dg.config.cluster_credentials_manager import cluster_credentials_manager
-from dg.dg import cli
-from dg.lib.cluster.cluster import AbstractCluster, ClusterData
+from cpo.config.cluster_credentials_manager import cluster_credentials_manager
+from cpo.cpo import cli
+from cpo.lib.cluster.cluster import AbstractCluster, ClusterData
 
 
 class UnitTestClusterData(TypedDict):
@@ -53,7 +53,7 @@ class UnitTestCluster(AbstractCluster):
         pass
 
 
-class UnitTestClusterFactory(dg.lib.cluster.cluster_factory.AbstractClusterFactory):
+class UnitTestClusterFactory(cpo.lib.cluster.cluster_factory.AbstractClusterFactory):
     def create_cluster(self, server: str, cluster_data: ClusterData) -> AbstractCluster:
         return UnitTestCluster(server, cluster_data)
 
@@ -61,19 +61,17 @@ class UnitTestClusterFactory(dg.lib.cluster.cluster_factory.AbstractClusterFacto
         return ""
 
 
-dg.lib.cluster.cluster_factories["Unit Test"] = UnitTestClusterFactory()
+cpo.lib.cluster.cluster_factories["Unit Test"] = UnitTestClusterFactory()
 
 
 class TestClusterCommands(unittest.TestCase):
     def setUp(self):
-        dg_clusters_file_path = pathlib.Path(tempfile.gettempdir()) / "clusters.json"
+        clusters_file_path = pathlib.Path(tempfile.gettempdir()) / "clusters.json"
 
-        if dg_clusters_file_path.exists():
-            os.remove(dg_clusters_file_path)
+        if clusters_file_path.exists():
+            os.remove(clusters_file_path)
 
-        cluster_credentials_manager.get_dg_clusters_file_path = unittest.mock.MagicMock(
-            return_value=dg_clusters_file_path
-        )
+        cluster_credentials_manager.get_clusters_file_path = unittest.mock.MagicMock(return_value=clusters_file_path)
 
         cluster_credentials_manager.reload()
 

@@ -1,0 +1,125 @@
+{
+	"datagate": {
+		"description": "Db2 Data Gate",
+		"group": "datagate.cpd.ibm.com",
+		"kind": "DatagateService",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "datagateservice-cr",
+		"operator_name": "ibm-datagate-operator",
+		"spec": {
+			"datagate": "yes"
+		},
+		"status_key_name": "datagateStatus",
+		"storage_option_required": true,
+		"version": "v1"
+	},
+	"db2oltp": {
+		"description": "Db2",
+		"group": "databases.cpd.ibm.com",
+		"kind": "Db2oltpService",
+		"licenses": [
+			"Advanced",
+			"Community",
+			"Standard"
+		],
+		"name": "db2oltp-cr",
+		"operator_name": "ibm-db2oltp-cp4d-operator",
+		"spec": {},
+		"status_key_name": "db2oltpStatus",
+		"storage_option_required": false,
+		"version": "v1"
+	},
+	"db2wh": {
+		"description": "Db2 Warehouse",
+		"group": "databases.cpd.ibm.com",
+		"kind": "Db2whService",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "db2wh-cr",
+		"operator_name": "ibm-db2wh-cp4d-operator",
+		"spec": {},
+		"status_key_name": "db2whStatus",
+		"storage_option_required": false,
+		"version": "v1"
+	},
+	"dmc": {
+		"description": "Db2 Data Management Console",
+		"group": "dmc.databases.ibm.com",
+		"kind": "Dmcaddon",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "dmc-addon",
+		"operator_name": "ibm-dmc-operator",
+		"spec": {},
+		"status_key_name": "dmcAddonStatus",
+		"storage_option_required": false,
+		"version": "v1"
+	},
+	"dods": {
+		"group": "dods.cpd.ibm.com",
+		"description": "Decision Optimization",
+		"kind": "DODS",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "dods-cr",
+		"operator_name": "ibm-cpd-dods",
+		"spec": {},
+		"status_key_name": "dodsStatus",
+		"storage_option_required": false,
+		"version": "v1beta1"
+	},
+	"edb": {
+		"group": "edb.cpd.ibm.com",
+		"description": "EDB Postgres",
+		"kind": "CPDEdbService",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "cpd-edb-service",
+		"operator_name": "ibm-cpd-edb",
+		"spec": {},
+		"status_key_name": "edbStatus",
+		"storage_option_required": true,
+		"version": "v1"
+	},
+	"wml": {
+		"group": "wml.cpd.ibm.com",
+		"description": "Watson Machine Learning",
+		"kind": "WmlBase",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "wml-cr",
+		"operator_name": "ibm-cpd-wml-operator",
+		"spec": {},
+		"status_key_name": "wmlStatus",
+		"storage_option_required": true,
+		"version": "v1beta1"
+	},
+	"ws": {
+		"group": "ws.cpd.ibm.com",
+		"description": "Watson Studio",
+		"kind": "WS",
+		"licenses": [
+			"Enterprise",
+			"Standard"
+		],
+		"name": "ws-cr",
+		"operator_name": "ibm-cpd-wsl",
+		"spec": {},
+		"status_key_name": "wsStatus",
+		"storage_option_required": false,
+		"version": "v1beta1"
+	}
+}

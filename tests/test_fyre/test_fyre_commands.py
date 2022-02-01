@@ -1,4 +1,4 @@
-#  Copyright 2020 IBM Corporation
+#  Copyright 2021 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -27,13 +27,13 @@ from typing import List, Optional
 import click
 import click.testing
 
-import dg.utils.logging
+import cpo.utils.logging
 
-from dg.config import data_gate_configuration_manager
-from dg.dg import cli
-from dg.lib.error import DataGateCLIException
+from cpo.config import configuration_manager
+from cpo.cpo import cli
+from cpo.lib.error import DataGateCLIException
 
-dg.utils.logging.init_root_logger()
+cpo.utils.logging.init_root_logger()
 
 
 class ClusterAction(Enum):
@@ -65,12 +65,14 @@ class NodeActionWithoutForce(Enum):
 class TestFYRECommands(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        dg_directory_path = pathlib.Path(tempfile.gettempdir()) / ".dg"
+        cli_data_directory_path = pathlib.Path(tempfile.gettempdir()) / ".cpo"
 
-        if dg_directory_path.exists():
-            shutil.rmtree(dg_directory_path)
+        if cli_data_directory_path.exists():
+            shutil.rmtree(cli_data_directory_path)
 
-        data_gate_configuration_manager.get_dg_directory_path = unittest.mock.MagicMock(return_value=dg_directory_path)
+        configuration_manager.get_cli_data_directory_path = unittest.mock.MagicMock(
+            return_value=cli_data_directory_path
+        )
 
         TestFYRECommands._logger.setLevel("INFO")
         TestFYRECommands._log_in_to_fyre()
@@ -99,14 +101,14 @@ class TestFYRECommands(unittest.TestCase):
     def test_fyre_commands(self):
         """Tests FYRE commands"""
 
-        # 1. Test dg.commands.fyre.cluster package
+        # 1. Test cpo.commands.fyre.cluster package
         self._create_cluster()
 
-        # 1.1 Test dg.commands.fyre.cluster package (R/O)
+        # 1.1 Test cpo.commands.fyre.cluster package (R/O)
         self._cluster_action_without_force(ClusterActionWithoutForce.DETAILS)
         self._cluster_action_without_force(ClusterActionWithoutForce.STATUS)
 
-        # 1.2 Test dg.commands.fyre.cluster package (R/W)
+        # 1.2 Test cpo.commands.fyre.cluster package (R/W)
         self._cluster_action(ClusterAction.SHUTDOWN)
         self._cluster_action(ClusterAction.BOOT)
         self._cluster_action(ClusterAction.REBOOT)
@@ -144,12 +146,12 @@ class TestFYRECommands(unittest.TestCase):
         self._cluster_action_without_force(ClusterActionWithoutForce.DISABLE_DELETE)
         self._cluster_action_without_force(ClusterActionWithoutForce.ENABLE_DELETE)
 
-        # 1.3 Test dg.commands.fyre.info package
+        # 1.3 Test cpo.commands.fyre.info package
         self._check_hostname()
         self._get_default_size()
-        self._invoke_dg_command(["fyre", "info", "get-openshift-versions-all-platforms"])
-        self._invoke_dg_command(["fyre", "info", "get-quick-burn-max-hours"])
-        self._invoke_dg_command(["fyre", "info", "get-quick-burn-sizes"])
+        self._invoke_cli_command(["fyre", "info", "get-openshift-versions-all-platforms"])
+        self._invoke_cli_command(["fyre", "info", "get-quick-burn-max-hours"])
+        self._invoke_cli_command(["fyre", "info", "get-quick-burn-sizes"])
 
     def _add_worker_node(self):
         args = [
@@ -173,12 +175,12 @@ class TestFYRECommands(unittest.TestCase):
             "16",
         ]
 
-        self._invoke_dg_command(args)
+        self._invoke_cli_command(args)
 
     def _check_hostname(self):
         assert TestFYRECommands._cluster_name is not None
 
-        result = self._invoke_dg_command(
+        result = self._invoke_cli_command(
             ["fyre", "info", "check-cluster-name", "--cluster-name", TestFYRECommands._cluster_name]
         )
 
@@ -191,7 +193,7 @@ class TestFYRECommands(unittest.TestCase):
     def _cluster_action(self, cluster_action: ClusterAction):
         assert TestFYRECommands._cluster_name is not None
 
-        self._invoke_dg_command(
+        self._invoke_cli_command(
             [
                 "fyre",
                 "cluster",
@@ -205,7 +207,7 @@ class TestFYRECommands(unittest.TestCase):
     def _cluster_action_without_force(self, cluster_action: ClusterActionWithoutForce):
         assert TestFYRECommands._cluster_name is not None
 
-        self._invoke_dg_command(
+        self._invoke_cli_command(
             [
                 "fyre",
                 "cluster",
@@ -216,7 +218,7 @@ class TestFYRECommands(unittest.TestCase):
         )
 
     def _create_cluster(self):
-        click_result = self._invoke_dg_command(["fyre", "cluster", "create"])
+        click_result = self._invoke_cli_command(["fyre", "cluster", "create"])
         search_result = regex.search("Created cluster '(.+)'", click_result.output)
 
         self.assertIsNotNone(search_result)
@@ -240,7 +242,7 @@ class TestFYRECommands(unittest.TestCase):
             "--force",
         ]
 
-        return self._invoke_dg_command(args, ignore_exception)
+        return self._invoke_cli_command(args, ignore_exception)
 
     def _edit_master_node(self, node_name: str):
         args = [
@@ -258,7 +260,7 @@ class TestFYRECommands(unittest.TestCase):
             "64",
         ]
 
-        self._invoke_dg_command(args)
+        self._invoke_cli_command(args)
 
     def _edit_worker_node(self, node_name: str, ignore_exception=False) -> click.testing.Result:
         args = [
@@ -282,12 +284,12 @@ class TestFYRECommands(unittest.TestCase):
             "64",
         ]
 
-        return self._invoke_dg_command(args, ignore_exception)
+        return self._invoke_cli_command(args, ignore_exception)
 
     def _get_default_size(self):
-        self._invoke_dg_command(["fyre", "info", "get-default-sizes", "--platform", "p"])
-        self._invoke_dg_command(["fyre", "info", "get-default-sizes", "--platform", "x"])
-        self._invoke_dg_command(["fyre", "info", "get-default-sizes", "--platform", "z"])
+        self._invoke_cli_command(["fyre", "info", "get-default-sizes", "--platform", "p"])
+        self._invoke_cli_command(["fyre", "info", "get-default-sizes", "--platform", "x"])
+        self._invoke_cli_command(["fyre", "info", "get-default-sizes", "--platform", "z"])
 
     def _ignore_exception_if_regex_matches(self, result: click.testing.Result, pattern: str):
         if (
@@ -303,12 +305,12 @@ class TestFYRECommands(unittest.TestCase):
                 TestFYRECommands._logger.info(f"Ignoring exception: {exception.get_error_message()}")
 
     def _install_db2_data_gate_stack(self):
-        args = ["cluster", "install-db2-data-gate-stack", "--storage-class", "managed-nfs-storage"]
+        args = ["cluster", "install-db2-data-gate-stack", "--storage-vendor", "nfs"]
 
-        self._invoke_dg_command(args)
+        self._invoke_cli_command(args)
 
-    def _invoke_dg_command(self, args: List[str], ignore_exception=False) -> click.testing.Result:
-        TestFYRECommands._logger.info(f"Testing: dg {' '.join(args)}")
+    def _invoke_cli_command(self, args: List[str], ignore_exception=False) -> click.testing.Result:
+        TestFYRECommands._logger.info(f"Testing: cpo {' '.join(args)}")
 
         runner = click.testing.CliRunner()
         result = runner.invoke(cli, args)
@@ -321,7 +323,7 @@ class TestFYRECommands(unittest.TestCase):
     def _node_action(self, node_name: str, cluster_action: NodeAction, ignore_exception=False) -> click.testing.Result:
         assert TestFYRECommands._cluster_name is not None
 
-        return self._invoke_dg_command(
+        return self._invoke_cli_command(
             [
                 "fyre",
                 "cluster",

@@ -5,10 +5,10 @@
 		}
 	},
 	"files.exclude": {
-		"**/__pycache__": true,
 		".vscode/.ropeproject": true,
+		"**/__pycache__": true,
+		"**/*.egg-info": true,
 		"build": true,
-		"data_gate_cli.egg-info": true,
 		"dist": true
 	},
 	"python.analysis.typeCheckingMode": "basic",
@@ -24,15 +24,16 @@
 	"python.sortImports.args": [
 		"--lines-between-types",
 		"1",
+		"--line-length",
+		"120",
 		"--multi-line",
 		"3",
 		"--project",
-		"dg",
+		"cpo",
 		"--thirdparty",
 		"click",
 		"--trailing-comma"
 	],
-	"python.testing.nosetestsEnabled": false,
 	"python.testing.pytestEnabled": false,
 	"python.testing.unittestArgs": [
 		"--start-directory",
