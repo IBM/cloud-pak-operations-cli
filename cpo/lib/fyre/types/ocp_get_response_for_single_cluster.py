@@ -36,6 +36,7 @@ class VM(TypedDict):
 class Cluster(TypedDict):
     access_url: str
     auto_patch: str
+    cluster_count: str
     cluster_id: str
     cluster_name: str
     cluster_type: str
