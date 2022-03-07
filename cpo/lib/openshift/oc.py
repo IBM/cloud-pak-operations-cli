@@ -17,7 +17,7 @@ import logging
 import re
 import tempfile
 
-from typing import Final, List
+from typing import Final, List, Tuple
 
 import semver
 
@@ -249,26 +249,70 @@ def get_deployment_name(search_string: str) -> List[str]:
     return result
 
 
-def scale_deployment(deployment_name: str, scale_factor: int):
-    """Scale a given Openshift deployment to a given scale factor"""
+def get_pod_name(search_string: str) -> List[str]:
+    """Returns the available Openshift pod(s) for a given search string"""
 
-    oc_scale_deployment_args = ["scale", "deploy", deployment_name, "--replicas", str(scale_factor)]
+    oc_get_pods_args = ["get", "pods"]
 
-    execute_oc_command(oc_scale_deployment_args)
+    oc_get_pods_result = execute_oc_command(oc_get_pods_args, capture_output=True).stdout
+
+    result = []
+    for line in oc_get_pods_result.splitlines():
+        if search_string in line:
+            result.append(line.split()[0].strip())
+
+    if not result:
+        raise DataGateCLIException(f"Pod(s) containing the string '{search_string}' could not be found")
+
+    return result
 
 
-def wait_until_deployment_rollout_completes(deployment_name: str, timeout: str):
-    """Wait until a deployment change is rolled out for a particular deployment"""
+def get_pod_status(pod_name: str) -> str:
+    """Returns the current pod status for a given pod name"""
+    oc_get_pods_args = ["get", "pods"]
 
-    oc_rollout_status_args = ["rollout", "status", "deployment", deployment_name, "--watch"]
-    if timeout:
-        oc_rollout_status_args.extend(["--timeout", timeout])
+    oc_get_pods_result = execute_oc_command(oc_get_pods_args, capture_output=True).stdout
 
-    result = execute_oc_command(oc_rollout_status_args)
+    pod_information = []
+    for line in oc_get_pods_result.splitlines():
+        if pod_name in line:
+            pod_information = line.split()
+            break
 
-    if result.return_code != 0:
-        raise DataGateCLIException(f"Rollout of deployment '{deployment_name}' failed with rc={result.return_code}'")
+    pod_status = ""
+    if len(pod_information) >= 3:
+        pod_status = pod_information[2].strip()
+    else:
+        raise DataGateCLIException(f"Unable to retrieve pod status for pod '{pod_name}'")
 
+    return pod_status
+
+
+def get_pod_readiness(pod_name: str) -> Tuple[int, int]:
+    """Returns the current pod readiness for a given pod name"""
+    oc_get_pods_args = ["get", "pods"]
+
+    oc_get_pods_result = execute_oc_command(oc_get_pods_args, capture_output=True).stdout
+
+    pod_information = []
+    for line in oc_get_pods_result.splitlines():
+        if pod_name in line:
+            pod_information = line.split()
+            break
+
+    pod_readiness = ()
+    if len(pod_information) >= 2:
+        ready = pod_information[1].split('/')
+        if len(ready) == 2:
+            ready_current = int(ready[0].strip())
+            ready_total = int(ready[1].strip())
+            pod_readiness = (ready_current, ready_total)
+        else:
+            raise DataGateCLIException(f"Unable to parse pod readiness string '{ready}' into currently ready and total ready parts")
+    else:
+        raise DataGateCLIException(f"Unable to retrieve pod status for pod '{pod_name}'")
+
+    return pod_readiness
 
 def get_custom_resource(custom_resource_kind: str, custom_resource_id: str) -> dict:
     """Get the custom resource for a given kind and id"""
@@ -289,25 +333,3 @@ def replace_custom_resource(custom_resource_json: dict):
         oc_set_custom_resource_args = ["replace", "-f", tmp.name]
 
         execute_oc_command(oc_set_custom_resource_args)
-
-
-def get_replicasets_for_deployment(deployment_name: str) -> List[str]:
-    oc_get_replicasets_args = [ "get", "replicasets", "-l", f"app={deployment_name}"]
-
-    oc_get_replicasets_result = execute_oc_command(oc_get_replicasets_args, capture_output=True).stdout
-
-    result = []
-    for line in oc_get_replicasets_result.splitlines():
-        if deployment_name in line:
-            result.append(line.split()[0].strip())
-
-    if not result:
-        raise DataGateCLIException(f"Replicaset(s) containing the deployment name '{deployment_name}' could not be found")
-
-    return result
-
-
-def delete_replicaset(replicaset_name: str):
-    oc_delete_replicaset_args = ["delete", "replicaset", replicaset_name]
-
-    execute_oc_command(oc_delete_replicaset_args)

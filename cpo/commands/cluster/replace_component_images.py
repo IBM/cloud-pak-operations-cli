@@ -15,11 +15,16 @@
 import logging
 import re
 
+from time import sleep
+
 import click
 
-from dg.lib.error import DataGateCLIException
-from dg.lib.openshift import oc
-from dg.utils.logging import loglevel_command
+from cpo.lib.error import DataGateCLIException
+from cpo.lib.openshift import oc
+from cpo.utils.logging import loglevel_command
+from cpo.utils.wait import wait_for
+
+logger = logging.getLogger(__name__)
 
 
 @loglevel_command()
@@ -74,9 +79,6 @@ def replace_component_images(
     if data_gate_ui:
         components["datagate_ui"] = data_gate_ui
 
-    oc.scale_deployment(deployment_name, 0)
-    oc.wait_until_deployment_rollout_completes(deployment_name, timeout)
-
     dg_id = _infer_custom_resource_id_from_deployment_name(deployment_name)
     custom_resource_json = oc.get_custom_resource("datagateinstanceservice", dg_id)
 
@@ -87,12 +89,12 @@ def replace_component_images(
 
     oc.replace_custom_resource(custom_resource_json)
 
-    # remove existing replicasets to prevent spinning up more than one Data Gate pod
-    for replicaset in oc.get_replicasets_for_deployment(_get_app_name_from_deployment_name(deployment_name)):
-        oc.delete_replicaset(replicaset)
-
-    oc.scale_deployment(deployment_name, 1)
-    oc.wait_until_deployment_rollout_completes(deployment_name, timeout)
+    data_gate_pod_name = _get_data_gate_pod_name_from_deployment_name(deployment_name)
+    _wait_for_pod_status_to_change(deployment_name, "Running")
+    logger.info(f"Waiting for Data Gate pod to restart")
+    _wait_for_pod_status(deployment_name, "Running", timeout=600)
+    data_gate_pod_name = _get_data_gate_pod_name_from_deployment_name(deployment_name)
+    wait_for(300, 30, f"Waiting for pod '{data_gate_pod_name}' to become ready", _is_pod_ready, data_gate_pod_name)
 
 
 def _get_app_name_from_deployment_name(deployment_name: str) -> str:
@@ -108,6 +110,70 @@ def _get_app_name_from_deployment_name(deployment_name: str) -> str:
         )
 
     return result
+
+
+def _get_data_gate_pod_name_from_deployment_name(deployment_name: str) -> str:
+    app_name = _get_app_name_from_deployment_name(deployment_name)
+    search_string = app_name + "-data-gate"
+
+    # TODO "Error: Pod(s) containing the string 'dg-1644857595143440-data-gate' could not be found"
+    pod_name = oc.get_pod_name(search_string)
+
+    if pod_name:
+        result = pod_name[0]
+    else:
+        raise DataGateCLIException(f"Unable to retrieve pod name for Data Gate deployment '{deployment_name}'")
+
+    return result
+
+
+def _wait_for_pod_status(deployment_name: str, status: str, interval: int = 30, timeout: int = 300):
+    """Wait for a given pod to be in a given status"""
+    wait_time = 0
+    pod_name = ""
+
+    while wait_time < timeout:
+        # pod name has to be retrieved each time from deployment name, as it can change when a pod gets deleted
+        # for some reason
+        pod_name = _get_data_gate_pod_name_from_deployment_name(deployment_name)
+        pod_status = ""
+        try:
+            pod_status = oc.get_pod_status(pod_name)
+        except:
+            # pod was deleted between retrieving the pod name and checking the status, ignore it
+            pass
+        if pod_status == status:
+            break
+
+        sleep(interval)
+        wait_time += interval
+    else:
+        # TODO are we running into the else branch even though the while loop succeeded
+        raise DataGateCLIException(f"Timeout of {timeout} seconds hit while waiting for pod '{pod_name}' status to become '{status}'")
+
+
+def _is_pod_ready(pod_name: str):
+    readiness = oc.get_pod_readiness(pod_name)
+
+    return readiness[0] == readiness[1]
+
+
+def _wait_for_pod_status_to_change(deployment_name: str, current_status: str, interval: int = 30, timeout: int = 300):
+    """Wait for a given pod to change from a given status to any other status"""
+    wait_time = 0
+    pod_name = ""
+
+    while wait_time < timeout:
+        # pod name has to be retrieved each time from deployment name, as it can change when a pod gets deleted
+        # for some reason
+        pod_name = _get_data_gate_pod_name_from_deployment_name(deployment_name)
+        if oc.get_pod_status(pod_name) != current_status:
+            break
+
+        sleep(interval)
+        wait_time += interval
+    else:
+        raise DataGateCLIException(f"Timeout of {timeout} seconds hit while waiting for pod '{pod_name}' status to change from '{current_status}' to any other status")
 
 
 def _infer_custom_resource_id_from_deployment_name(deployment_name: str) -> str:
