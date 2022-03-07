@@ -17,4 +17,5 @@ from typing import TypedDict
 
 class IP(TypedDict):
     address: str
+    ip_scope: str
     type: str
