@@ -17,7 +17,7 @@ import logging
 import re
 import tempfile
 
-from typing import Final, List, Tuple
+from typing import Final, List, Tuple, Union
 
 import semver
 
@@ -28,6 +28,7 @@ import cpo.utils.process
 from cpo.lib.dependency_manager import dependency_manager
 from cpo.lib.dependency_manager.plugins.openshift_cli_plugin import OpenShiftCLIPlugIn
 from cpo.lib.error import DataGateCLIException
+from cpo.lib.openshift.types.get_pod_entry import GetPodEntry
 from cpo.utils.string import removeprefix, removesuffix
 
 OPENSHIFT_REST_API_VERSION: Final[str] = "v1"
@@ -267,52 +268,19 @@ def get_pod_name(search_string: str) -> List[str]:
     return result
 
 
-def get_pod_status(pod_name: str) -> str:
+def get_pod_status(pod_name: str) -> GetPodEntry:
     """Returns the current pod status for a given pod name"""
     oc_get_pods_args = ["get", "pods"]
 
     oc_get_pods_result = execute_oc_command(oc_get_pods_args, capture_output=True).stdout
 
-    pod_information = []
+    line = ""
     for line in oc_get_pods_result.splitlines():
         if pod_name in line:
-            pod_information = line.split()
             break
 
-    pod_status = ""
-    if len(pod_information) >= 3:
-        pod_status = pod_information[2].strip()
-    else:
-        raise DataGateCLIException(f"Unable to retrieve pod status for pod '{pod_name}'")
+    return GetPodEntry.parse(line)
 
-    return pod_status
-
-
-def get_pod_readiness(pod_name: str) -> Tuple[int, int]:
-    """Returns the current pod readiness for a given pod name"""
-    oc_get_pods_args = ["get", "pods"]
-
-    oc_get_pods_result = execute_oc_command(oc_get_pods_args, capture_output=True).stdout
-
-    pod_information = []
-    for line in oc_get_pods_result.splitlines():
-        if pod_name in line:
-            pod_information = line.split()
-            break
-
-    pod_readiness = ()
-    if len(pod_information) >= 2:
-        ready = pod_information[1].split('/')
-        if len(ready) == 2:
-            ready_current = int(ready[0].strip())
-            ready_total = int(ready[1].strip())
-            pod_readiness = (ready_current, ready_total)
-        else:
-            raise DataGateCLIException(f"Unable to parse pod readiness string '{ready}' into currently ready and total ready parts")
-    else:
-        raise DataGateCLIException(f"Unable to retrieve pod status for pod '{pod_name}'")
-
-    return pod_readiness
 
 def get_custom_resource(custom_resource_kind: str, custom_resource_id: str) -> dict:
     """Get the custom resource for a given kind and id"""
