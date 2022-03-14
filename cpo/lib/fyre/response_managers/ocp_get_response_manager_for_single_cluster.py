@@ -38,6 +38,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                     "properties": {
                         "access_url": {"type": "string"},
                         "auto_patch": {"type": "string"},
+                        "cluster_count": {"type": "string"},
                         "cluster_id": {"type": "string"},
                         "cluster_name": {"type": "string"},
                         "cluster_type": {"type": "string"},
@@ -62,10 +63,11 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                     "required": [
                         "access_url",
                         "auto_patch",
+                        "cluster_count",
                         "cluster_id",
                         "cluster_name",
-                        "compliance",
                         "cluster_type",
+                        "compliance",
                         "created",
                         "deployment_status",
                         "description",
@@ -86,12 +88,12 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                     "additionalProperties": False,
                     "properties": {
                         "address": {"type": "string"},
-                        "scope": {"type": "string"},
+                        "ip_scope": {"type": "string"},
                         "type": {"type": "string"},
                     },
                     "required": [
                         "address",
-                        "scope",
+                        "ip_scope",
                         "type",
                     ],
                     "type": "object",

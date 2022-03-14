@@ -33,17 +33,23 @@ class VM(TypedDict):
 class Cluster(TypedDict):
     access_url: str
     auto_patch: str
+    cluster_count: str
     cluster_id: str
     cluster_name: str
+    cluster_type: str
     compliance: str
     created: str
     deployment_status: str
     description: str
+    expiration: str
     fips_enabled: str
     kubeadmin_password: str
     location_name: str
     locked_for_delete: str
+    ocp_username: str
     ocp_version: str
+    product_group: str
+    product_group_id: str
     vm_count: int
     vms: List[VM]
 
