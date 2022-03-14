@@ -15,8 +15,6 @@
 import logging
 import re
 
-from time import sleep
-
 import click
 
 from cpo.lib.error import DataGateCLIException
