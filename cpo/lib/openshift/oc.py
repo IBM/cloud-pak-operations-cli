@@ -13,11 +13,9 @@
 #  limitations under the License.
 
 import json
-import logging
-import re
 import tempfile
 
-from typing import Final, List, Tuple, Union
+from typing import Final, List
 
 import semver
 
