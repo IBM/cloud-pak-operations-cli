@@ -281,7 +281,7 @@ def get_pod_status(pod_name: str) -> GetPodEntry:
 
 
 def get_custom_resource(custom_resource_kind: str, custom_resource_id: str) -> dict:
-    """Get the custom resource for a given kind and id"""
+    """Get the custom resource for a given kind and ID"""
 
     oc_get_custom_resource_args = ["get", custom_resource_kind, custom_resource_id, "-o", "json"]
 
@@ -292,10 +292,10 @@ def get_custom_resource(custom_resource_kind: str, custom_resource_id: str) -> d
 
 
 def replace_custom_resource(custom_resource_json: dict):
-    with tempfile.NamedTemporaryFile(mode="w+") as tmp:
-        json.dump(custom_resource_json, tmp)
-        tmp.flush()
+    with tempfile.NamedTemporaryFile(mode="w+") as json_file:
+        json.dump(custom_resource_json, json_file)
+        json_file.flush()
 
-        oc_set_custom_resource_args = ["replace", "-f", tmp.name]
+        oc_set_custom_resource_args = ["replace", "--filename", json_file.name]
 
         execute_oc_command(oc_set_custom_resource_args)
