@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 import json
+import tempfile
 
 from typing import Final, List
 
@@ -25,6 +26,7 @@ import cpo.utils.process
 from cpo.lib.dependency_manager import dependency_manager
 from cpo.lib.dependency_manager.plugins.openshift_cli_plugin import OpenShiftCLIPlugIn
 from cpo.lib.error import DataGateCLIException
+from cpo.lib.openshift.types.get_pod_entry import GetPodEntry
 from cpo.utils.string import removeprefix, removesuffix
 
 OPENSHIFT_REST_API_VERSION: Final[str] = "v1"
@@ -226,3 +228,75 @@ def log_in_to_openshift_cluster_with_token(server: str, token: str):
     oc_login_args = get_oc_login_args_with_token(server, token)
 
     execute_oc_command(oc_login_args)
+
+
+def get_deployment_name(search_string: str) -> List[str]:
+    """Returns the available OpenShift deployment(s) for a given search string"""
+
+    oc_get_deployments_args = ["get", "deployments"]
+
+    oc_get_deployments_result = execute_oc_command(oc_get_deployments_args, capture_output=True).stdout
+
+    result = []
+    for line in oc_get_deployments_result.splitlines():
+        if search_string in line:
+            result.append(line.split()[0].strip())
+
+    if not result:
+        raise DataGateCLIException(f"Deployment(s) containing the string '{search_string}' could not be found")
+
+    return result
+
+
+def get_pod_name(search_string: str) -> List[str]:
+    """Returns the available OpenShift pod(s) for a given search string"""
+
+    oc_get_pods_args = ["get", "pods"]
+
+    oc_get_pods_result = execute_oc_command(oc_get_pods_args, capture_output=True).stdout
+
+    result = []
+    for line in oc_get_pods_result.splitlines():
+        if search_string in line:
+            result.append(line.split()[0].strip())
+
+    if not result:
+        raise DataGateCLIException(f"Pod(s) containing the string '{search_string}' could not be found")
+
+    return result
+
+
+def get_pod_status(pod_name: str) -> GetPodEntry:
+    """Returns the current pod status for a given pod name"""
+
+    oc_get_pods_args = ["get", "pods"]
+
+    oc_get_pods_result = execute_oc_command(oc_get_pods_args, capture_output=True).stdout
+
+    line = ""
+    for line in oc_get_pods_result.splitlines():
+        if pod_name in line:
+            break
+
+    return GetPodEntry.parse(line)
+
+
+def get_custom_resource(custom_resource_kind: str, custom_resource_id: str) -> dict:
+    """Get the custom resource for a given kind and ID"""
+
+    oc_get_custom_resource_args = ["get", custom_resource_kind, custom_resource_id, "--output", "json"]
+
+    oc_get_custom_resource_result = json.loads(
+        execute_oc_command(oc_get_custom_resource_args, capture_output=True).stdout
+    )
+    return oc_get_custom_resource_result
+
+
+def replace_custom_resource(custom_resource_json: dict):
+    with tempfile.NamedTemporaryFile(mode="w+") as json_file:
+        json.dump(custom_resource_json, json_file)
+        json_file.flush()
+
+        oc_set_custom_resource_args = ["replace", "--filename", json_file.name]
+
+        execute_oc_command(oc_set_custom_resource_args)
