@@ -34,7 +34,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
         return {
             "$defs": {
                 "cluster": {
-                    "additionalProperties": False,
+                    "additionalProperties": True,
                     "properties": {
                         "access_url": {"type": "string"},
                         "auto_patch": {"type": "string"},
@@ -91,7 +91,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 "ip": {
-                    "additionalProperties": False,
+                    "additionalProperties": True,
                     "properties": {
                         "address": {"type": "string"},
                         "ip_scope": {"type": "string"},
@@ -105,7 +105,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 "vm": {
-                    "additionalProperties": False,
+                    "additionalProperties": True,
                     "properties": {
                         "additional_disk": {
                             "items": {"type": "string"},
@@ -140,7 +140,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
             },
             "anyOf": [
                 {
-                    "additionalProperties": False,
+                    "additionalProperties": True,
                     "properties": {
                         "cluster_count": {"type": "integer"},
                         "clusters": {
@@ -155,7 +155,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 {
-                    "additionalProperties": False,
+                    "additionalProperties": True,
                     "properties": {
                         "details": {"type": "string"},
                         "status": {"const": "info"},
