@@ -34,7 +34,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
         return {
             "$defs": {
                 "cluster": {
-                    "additionalProperties": False,
+                    "additionalProperties": True,
                     "properties": {
                         "access_url": {"type": "string"},
                         "auto_patch": {"type": "string"},
@@ -48,6 +48,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                         "description": {"type": "string"},
                         "expiration": {"type": "string"},
                         "fips_enabled": {"type": "string"},
+                        "initial_ocp_version": {"type": "string"},
                         "kubeadmin_password": {"type": "string"},
                         "locked_for_delete": {"type": "string"},
                         "ocp_username": {"type": "string"},
@@ -73,6 +74,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                         "description",
                         "expiration",
                         "fips_enabled",
+                        "initial_ocp_version",
                         "kubeadmin_password",
                         "locked_for_delete",
                         "ocp_username",
@@ -85,7 +87,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 "ip": {
-                    "additionalProperties": False,
+                    "additionalProperties": True,
                     "properties": {
                         "address": {"type": "string"},
                         "ip_scope": {"type": "string"},
@@ -99,7 +101,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 "vm": {
-                    "additionalProperties": False,
+                    "additionalProperties": True,
                     "properties": {
                         "additional_disk": {
                             "items": {"type": "string"},
@@ -136,7 +138,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                     "type": "object",
                 },
             },
-            "additionalProperties": False,
+            "additionalProperties": True,
             "properties": {
                 "cluster_count": {"type": "integer"},
                 "clusters": {
