@@ -76,7 +76,6 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                         "description",
                         "expiration",
                         "fips_enabled",
-                        "initial_ocp_version",
                         "kubeadmin_password",
                         "location_name",
                         "locked_for_delete",

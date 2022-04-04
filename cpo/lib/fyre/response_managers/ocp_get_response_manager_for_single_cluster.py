@@ -74,7 +74,6 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                         "description",
                         "expiration",
                         "fips_enabled",
-                        "initial_ocp_version",
                         "kubeadmin_password",
                         "locked_for_delete",
                         "ocp_username",
