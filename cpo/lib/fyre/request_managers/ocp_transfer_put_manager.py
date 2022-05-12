@@ -62,6 +62,6 @@ class OCPTransferPutManager(AbstractJSONRequestManager):
 
     # override
     def is_request_id_to_be_ignored(self) -> bool:
-        return False
+        return True
 
     _IBM_OCPPLUS_OCP_TRANSFER_PUT_URL: Final[str] = "https://ocpapi.svl.ibm.com/v1/ocp/{cluster_name}/transfer"

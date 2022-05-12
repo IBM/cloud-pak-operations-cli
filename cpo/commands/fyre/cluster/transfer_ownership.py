@@ -46,15 +46,15 @@ def transfer_ownership(
     cluster_name: str,
     comment: Optional[str],
     new_owner: Optional[str],
-    new_product_group: Optional[int],
+    new_product_group_id: Optional[int],
     site: Optional[str],
 ):
     """Transfer ownership of an OCP+ cluster to a new user and/or product group"""
 
-    if new_owner is None and new_product_group is None:
+    if new_owner is None and new_product_group_id is None:
         raise click.UsageError("You must set options '--new-owner' and/or '--new-product-group-id'.", ctx)
 
     cpo.utils.network.disable_insecure_request_warning()
     OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).transfer(
-        cluster_name, new_owner, new_product_group, comment, site
+        cluster_name, new_owner, new_product_group_id, comment, site
     )
