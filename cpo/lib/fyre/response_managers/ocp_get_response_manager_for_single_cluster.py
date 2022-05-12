@@ -55,6 +55,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                         "ocp_version": {"type": "string"},
                         "platform": {"type": "string"},
                         "product_group_id": {"type": "string"},
+                        "user_id": {"type": "string"},
                         "vm_count": {"type": "integer"},
                         "vms": {
                             "items": {"$ref": "#/$defs/vm"},
@@ -80,6 +81,7 @@ class OCPGetResponseManagerForSingleCluster(AbstractJSONResponseManager):
                         "ocp_version",
                         "platform",
                         "product_group_id",
+                        "user_id",
                         "vm_count",
                         "vms",
                     ],
