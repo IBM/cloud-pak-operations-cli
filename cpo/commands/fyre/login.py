@@ -23,7 +23,7 @@ from cpo.utils.logging import loglevel_command
 
 @loglevel_command()
 @fyre_command_options
-def login(fyre_api_user_name: str, fyre_api_key: str):
+def login(fyre_api_user_name: str, fyre_api_key: str, disable_strict_response_schema_check: bool):
     """Log in to FYRE"""
 
     credentials_to_be_stored = locals().copy()
@@ -31,7 +31,7 @@ def login(fyre_api_user_name: str, fyre_api_key: str):
     cpo.utils.network.disable_insecure_request_warning()
 
     try:
-        OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).get_quota(None)
+        OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).get_quota(None)
     except DataGateCLIException as exception:
         if "failed authentication" in exception._error_message:
             raise DataGateCLIException("Failed to log in to FYRE due to invalid credentials")

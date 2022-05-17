@@ -35,14 +35,21 @@ from cpo.utils.logging import loglevel_command
 @click.option("--cluster-name", help="Name of the OCP+ cluster to be deleted", required=True)
 @click.option("--force", "-f", help="Skip confirmation", is_flag=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def rm(fyre_api_user_name: str, fyre_api_key: str, cluster_name: str, force: bool, site: Optional[str]):
+def rm(
+    fyre_api_user_name: str,
+    fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
+    cluster_name: str,
+    force: bool,
+    site: Optional[str],
+):
     """Delete an OCP+ cluster"""
 
     if not force:
         click.confirm(f"Do you really want to delete cluster '{cluster_name}'?", abort=True)
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).rm(cluster_name, site)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).rm(cluster_name, site)
 
     server = f"https://api.{cluster_name}.cp.fyre.ibm.com:6443"
     cluster = cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_cluster(server)

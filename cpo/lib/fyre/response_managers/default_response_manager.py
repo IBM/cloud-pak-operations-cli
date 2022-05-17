@@ -22,6 +22,9 @@ class DefaultResponseManager(AbstractJSONResponseManager):
     """JSON response manager for REST endpoints (PUT) returning a generic
     success response"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        super().__init__(disable_strict_response_schema_check)
+
     # override
     def get_error_message(self, json_error_response: Any) -> Optional[str]:
         return self.get_default_error_message(json_error_response)

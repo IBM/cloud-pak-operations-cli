@@ -34,10 +34,17 @@ from cpo.utils.logging import loglevel_command
 @click.option("--json", help="Prints the command output in JSON format", is_flag=True)
 @click.option("--platform", help="Platform", required=True, type=click.Choice(["p", "x", "z"]))
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def get_openshift_versions(fyre_api_user_name: str, fyre_api_key: str, json: bool, platform: str, site: Optional[str]):
+def get_openshift_versions(
+    fyre_api_user_name: str,
+    fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
+    json: bool,
+    platform: str,
+    site: Optional[str],
+):
     """Get available OpenShift Container Platform versions"""
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).get_openshift_versions(
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).get_openshift_versions(
         platform, site
     ).format_openshift_versions(json)

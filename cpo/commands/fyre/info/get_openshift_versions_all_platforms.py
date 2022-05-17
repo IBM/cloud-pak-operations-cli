@@ -32,9 +32,13 @@ from cpo.utils.logging import loglevel_command
 )
 @fyre_command_options
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def get_openshift_versions_all_platforms(fyre_api_user_name: str, fyre_api_key: str, site: Optional[str]):
+def get_openshift_versions_all_platforms(
+    fyre_api_user_name: str, fyre_api_key: str, disable_strict_response_schema_check: bool, site: Optional[str]
+):
     """Get available OpenShift Container Platform versions for all
     platforms"""
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).get_openshift_versions_all_platforms(site).format()
+    OCPPlusAPIManager(
+        fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check
+    ).get_openshift_versions_all_platforms(site).format()

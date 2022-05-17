@@ -40,6 +40,7 @@ from cpo.utils.logging import loglevel_command
 def edit_inf_node(
     fyre_api_user_name: str,
     fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
     additional_disk_size: List[int],
     cluster_name: str,
     force: bool,
@@ -54,4 +55,6 @@ def edit_inf_node(
             )
 
         cpo.utils.network.disable_insecure_request_warning()
-        OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).edit_inf_node(cluster_name, additional_disk_size, site)
+        OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).edit_inf_node(
+            cluster_name, additional_disk_size, site
+        )

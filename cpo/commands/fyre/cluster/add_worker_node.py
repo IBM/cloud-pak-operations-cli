@@ -57,6 +57,7 @@ def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[i
 def add_worker_node(
     fyre_api_user_name: str,
     fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
     cluster_name: str,
     disable_scheduling: bool,
     force: bool,
@@ -72,7 +73,7 @@ def add_worker_node(
         click.confirm(f"Do you really want to add an additional worker node to cluster '{cluster_name}'?", abort=True)
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).add_node(
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).add_node(
         cluster_name,
         disable_scheduling,
         site,

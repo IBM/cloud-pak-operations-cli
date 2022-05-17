@@ -21,6 +21,9 @@ from cpo.lib.fyre.types.ocp_request_get_response import OCPRequestGetResponse
 class OCPRequestGetResponseManager(AbstractJSONResponseManager):
     """JSON response manager for ocp/request/{request_id} REST endpoint (GET)"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        super().__init__(disable_strict_response_schema_check)
+
     # override
     def get_error_message(self, json_error_response: Any) -> Optional[str]:
         return self.get_default_error_message(json_error_response)
@@ -34,7 +37,7 @@ class OCPRequestGetResponseManager(AbstractJSONResponseManager):
         return {
             "$defs": {
                 "request": {
-                    "additionalProperties": False,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "complete": {"type": "string"},
                         "completion_percent": {"type": "integer"},
@@ -45,7 +48,7 @@ class OCPRequestGetResponseManager(AbstractJSONResponseManager):
                         "last_status": {
                             "anyOf": [
                                 {
-                                    "additionalProperties": False,
+                                    "additionalProperties": self._disable_strict_response_schema_check,
                                     "properties": {
                                         "cluster_id": {"type": "string"},
                                         "status": {"type": "string"},
@@ -78,7 +81,7 @@ class OCPRequestGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
             },
-            "additionalProperties": False,
+            "additionalProperties": self._disable_strict_response_schema_check,
             "properties": {
                 "request": {"$ref": "#/$defs/request"},
                 "status": {"type": "string"},

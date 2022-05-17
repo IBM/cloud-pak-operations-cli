@@ -21,6 +21,9 @@ from cpo.lib.fyre.types.quota_get_response import QuotaGetResponse
 class QuotaGetResponseManager(AbstractJSONResponseManager):
     """JSON response manager for quota REST endpoint (GET)"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        super().__init__(disable_strict_response_schema_check)
+
     # override
     def get_error_message(self, json_error_response: Any) -> Optional[str]:
         return self.get_default_error_message(json_error_response)
@@ -36,7 +39,7 @@ class QuotaGetResponseManager(AbstractJSONResponseManager):
         return {
             "$defs": {
                 "platformQuota": {
-                    "additionalProperties": False,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "cpu_percent": {"type": "integer"},
                         "cpu_used": {"type": "integer"},
@@ -56,7 +59,7 @@ class QuotaGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 "productGroupQuota": {
-                    "additionalProperties": False,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "ip": {
                             "properties": {
@@ -96,7 +99,7 @@ class QuotaGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
             },
-            "additionalProperties": False,
+            "additionalProperties": self._disable_strict_response_schema_check,
             "properties": {
                 "details": {
                     "items": {"$ref": "#/$defs/productGroupQuota"},

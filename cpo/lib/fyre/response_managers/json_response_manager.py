@@ -26,6 +26,9 @@ from cpo.lib.fyre.types.default_error_response import DefaulErrorResponse
 class AbstractJSONResponseManager(ABC):
     """Base class of all JSON response manager classes"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        self._disable_strict_response_schema_check = disable_strict_response_schema_check
+
     def check_response(self, json_response: Any, error_message: str):
         """Checks the given JSON response
 
@@ -85,12 +88,12 @@ class AbstractJSONResponseManager(ABC):
         """
 
         return {
-            "additionalProperties": False,
+            "additionalProperties": self._disable_strict_response_schema_check,
             "properties": {
                 "details": {
                     "anyOf": [
                         {
-                            "additionalProperties": False,
+                            "additionalProperties": self._disable_strict_response_schema_check,
                             "properties": {
                                 "errors": {
                                     "items": {

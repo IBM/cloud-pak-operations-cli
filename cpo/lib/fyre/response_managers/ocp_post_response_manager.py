@@ -23,6 +23,9 @@ from cpo.lib.fyre.types.ocp_post_response import OCPPostErrorResponse, OCPPostRe
 class OCPPostResponseManager(AbstractJSONResponseManager):
     """JSON response manager for ocp REST endpoint (GET)"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        super().__init__(disable_strict_response_schema_check)
+
     # override
     def get_error_message(self, json_error_response: Any) -> Optional[str]:
         validate(json_error_response, self.get_error_response_schema())
@@ -52,7 +55,7 @@ class OCPPostResponseManager(AbstractJSONResponseManager):
     # override
     def get_error_response_schema(self) -> Optional[Any]:
         return {
-            "additionalProperties": False,
+            "additionalProperties": self._disable_strict_response_schema_check,
             "properties": {
                 "build_errors": {
                     "items": {

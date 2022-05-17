@@ -35,14 +35,19 @@ from cpo.utils.logging import loglevel_command
 @click.option("--platform", help="Platform", required=True, type=click.Choice(["p", "x", "z"]))
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
 def create_default(
-    fyre_api_user_name: str, fyre_api_key: str, alias: Optional[str], platform: str, site: Optional[str]
+    fyre_api_user_name: str,
+    fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
+    alias: Optional[str],
+    platform: str,
+    site: Optional[str],
 ):
     """Create a new OCP+ cluster with defaults"""
 
     cpo.utils.network.disable_insecure_request_warning()
 
-    assigned_cluster_name = OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).create_cluster_with_defaults(
-        alias, platform, site
-    )
+    assigned_cluster_name = OCPPlusAPIManager(
+        fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check
+    ).create_cluster_with_defaults(alias, platform, site)
 
     click.echo(f"Created cluster '{assigned_cluster_name}'")
