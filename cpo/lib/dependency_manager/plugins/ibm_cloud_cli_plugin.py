@@ -55,7 +55,10 @@ class IBMCloudCLIPlugIn(AbstractDependencyManagerPlugIn):
         try:
             return super().execute_binary(args, capture_output, check, print_captured_output)
         except DataGateCLIException as exception:
-            raise IBMCloudException(exception.stderr)
+            if exception.stderr is not None:
+                raise IBMCloudException(exception.stderr)
+            else:
+                raise
 
     # override
     def get_binary_name(self) -> Optional[str]:

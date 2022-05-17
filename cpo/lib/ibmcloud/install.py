@@ -98,7 +98,7 @@ def _get_entitlement_key(api_key: str) -> str:
     if api_key is not None:
         entitlement_name = "IBM Cloud Pak for Data"
 
-        token = get_tokens(api_key)
+        token = get_tokens()
         auth_token = token["token_type"] + " " + token["access_token"]
 
         url = "https://billing.cloud.ibm.com/v1/licensing/entitlements"
@@ -128,7 +128,7 @@ def _get_entitlement_key(api_key: str) -> str:
 def execute_install(cluster_id: str, api_key: str) -> Any:
     version_locator = _get_cp4d_version_locator(str(AbstractCloudPakForDataManager.get_ibm_cloud_supported_version()))
 
-    token = get_tokens(api_key)
+    token = get_tokens()
     auth_token = token["token_type"] + " " + token["access_token"]
     refresh_token = token["refresh_token"]
     target_information = get_ibmcloud_account_target_information()

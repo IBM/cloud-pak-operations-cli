@@ -56,7 +56,7 @@ class HAProxyTimoutSettings:
 
     def _check_argument(self, argument: Optional[str]) -> Optional[str]:
         if argument is not None:
-            search_result = regex.match("\\d+[d|h|m|ms|s|us]", argument)
+            search_result = regex.match("\\d+(d|h|m|ms|s|us)", argument)
 
             if search_result is None:
                 raise DataGateCLIException(f"Invalid string format: {argument}")

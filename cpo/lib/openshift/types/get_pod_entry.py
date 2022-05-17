@@ -13,6 +13,9 @@
 #  limitations under the License.
 
 
+from cpo.lib.error import DataGateCLIException
+
+
 class GetPodEntry:
     def __init__(self, name: str, readiness_actual: int, readiness_total: int, status: str, restarts: int, age: str):
         self.name = name
@@ -27,13 +30,13 @@ class GetPodEntry:
         parts = line.split()
 
         if len(parts) != 5:
-            raise Exception("Unable to split pod status line into 5 parts.")
+            raise DataGateCLIException("Unable to split pod status line into 5 parts.")
 
         name = parts[0]
 
         ready = parts[1].split("/")
         if len(ready) != 2:
-            raise Exception("Unable to split ready information into 2 parts")
+            raise DataGateCLIException("Unable to split ready information into 2 parts")
         readiness_actual = int(ready[0])
         readiness_total = int(ready[1])
 

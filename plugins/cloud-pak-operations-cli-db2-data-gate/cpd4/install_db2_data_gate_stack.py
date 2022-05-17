@@ -45,6 +45,12 @@ logger = logging.getLogger(__name__)
 @openshift_server_options
 @click.option("--accept-all-licenses", help="Accept all licenses", is_flag=True)
 @click.option(
+    "--catalog-source",
+    default="ibm-operator-catalog",
+    help="Catalog source for the service operator",
+    show_default=True,
+)
+@click.option(
     "--db2-license",
     help="IBM Db2 license",
     required=True,
@@ -81,6 +87,7 @@ def install_db2_data_gate_stack(
     token: str,
     insecure_skip_tls_verify: Optional[bool],
     accept_all_licenses: bool,
+    catalog_source: str,
     db2_license: str,
     license: str,
     project: str,
@@ -123,6 +130,7 @@ def install_db2_data_gate_stack(
             CloudPakForDataServiceLicense[db2_license.capitalize()],
             [],
             storage_option,
+            catalog_source,
         )
     else:
         logger.info("Skippig installation of Db2")
@@ -137,6 +145,7 @@ def install_db2_data_gate_stack(
             cloud_pak_for_data_service_license,
             [],
             storage_option,
+            catalog_source,
         )
     else:
         logger.info("Skippig installation of Db2 Warehouse")
@@ -151,6 +160,7 @@ def install_db2_data_gate_stack(
             cloud_pak_for_data_service_license,
             [],
             storage_option,
+            catalog_source,
         )
     else:
         logger.info("Skippig installation of Db2 Data Management Console")
@@ -165,6 +175,7 @@ def install_db2_data_gate_stack(
             cloud_pak_for_data_service_license,
             [],
             storage_option,
+            catalog_source,
         )
     else:
         logger.info("Skippig installation of Db2 Data Gate")

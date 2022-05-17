@@ -20,6 +20,7 @@ from typing import List
 
 import netifaces
 import urllib3
+import urllib3.exceptions
 
 
 class ScopedInsecureRequestWarningDisabler:
