@@ -34,8 +34,17 @@ from cpo.utils.logging import loglevel_command
 @click.option("--cluster-name", help="Cluster name to be checked", required=True)
 @click.option("--json", help="Prints the command output in JSON format", is_flag=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def check_cluster_name(fyre_api_user_name: str, fyre_api_key: str, cluster_name: str, json: bool, site: Optional[str]):
+def check_cluster_name(
+    fyre_api_user_name: str,
+    fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
+    cluster_name: str,
+    json: bool,
+    site: Optional[str],
+):
     """Check if a cluster name is available"""
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).check_cluster_name(cluster_name, site).format(json)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).check_cluster_name(
+        cluster_name, site
+    ).format(json)

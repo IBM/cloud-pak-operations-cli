@@ -22,6 +22,9 @@ class OCPStatusGetResponseManager(AbstractJSONResponseManager):
     """JSON response manager for ocp/{cluster name}/status REST endpoint
     (GET)"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        super().__init__(disable_strict_response_schema_check)
+
     # override
     def get_error_message(self, json_error_response: Any) -> Optional[str]:
         return self.get_default_error_message(json_error_response)
@@ -35,12 +38,12 @@ class OCPStatusGetResponseManager(AbstractJSONResponseManager):
         return {
             "$defs": {
                 "vm": {
-                    "additionalProperties": False,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "job_status": {
                             "anyOf": [
                                 {
-                                    "additionalProperties": False,
+                                    "additionalProperties": self._disable_strict_response_schema_check,
                                     "properties": {
                                         "completion_percent": {"type": "integer"},
                                         "status": {"type": "string"},
@@ -78,7 +81,7 @@ class OCPStatusGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 "request": {
-                    "additionalProperties": False,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "complete": {"type": "string"},
                         "completion_percent": {"type": "integer"},
@@ -102,7 +105,7 @@ class OCPStatusGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
             },
-            "additionalProperties": False,
+            "additionalProperties": self._disable_strict_response_schema_check,
             "properties": {
                 "cluster_id": {"type": "string"},
                 "cluster_name": {"type": "string"},
@@ -114,7 +117,7 @@ class OCPStatusGetResponseManager(AbstractJSONResponseManager):
                 "status": {
                     "anyOf": [
                         {
-                            "additionalProperties": False,
+                            "additionalProperties": self._disable_strict_response_schema_check,
                             "properties": {
                                 "active_requests": {"type": "integer"},
                                 "request": {

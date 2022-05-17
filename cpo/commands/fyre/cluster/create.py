@@ -37,7 +37,7 @@ from cpo.utils.logging import loglevel_command
 
 def validate_haproxy_timeout_setting(ctx, param, value):
     if value is not None:
-        search_result = regex.match("\\d+[d|h|m|ms|s|us]", value)
+        search_result = regex.match("\\d+(d|h|m|ms|s|us)", value)
 
         if search_result is None:
             raise click.BadParameter("Invalid string format")
@@ -115,6 +115,7 @@ def create(
     ctx: click.Context,  # NOSONAR
     fyre_api_user_name: str,
     fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
     alias: Optional[str],
     cluster_name: Optional[str],
     description: Optional[str],
@@ -165,7 +166,9 @@ def create(
 
     cpo.utils.network.disable_insecure_request_warning()
 
-    assigned_cluster_name = OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).create_cluster(
+    assigned_cluster_name = OCPPlusAPIManager(
+        fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check
+    ).create_cluster(
         OCPPlusClusterSpecification(
             alias,
             cluster_name,

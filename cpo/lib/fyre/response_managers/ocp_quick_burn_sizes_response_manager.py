@@ -21,6 +21,9 @@ from cpo.lib.fyre.types.ocp_quick_burn_sizes_response import OCPQuickBurnSizesRe
 class OCPQuickBurnSizesResponseManager(AbstractJSONResponseManager):
     """JSON response manager for ocp/quick_burn_sizes REST endpoint (GET)"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        super().__init__(disable_strict_response_schema_check)
+
     # override
     def get_error_message(self, json_error_response: Any) -> Optional[str]:
         return None
@@ -36,7 +39,7 @@ class OCPQuickBurnSizesResponseManager(AbstractJSONResponseManager):
         return {
             "$defs": {
                 "nodeSizeSpecification": {
-                    "additionalProperties": False,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "additional_disk": {
                             "type": "string",
@@ -66,7 +69,7 @@ class OCPQuickBurnSizesResponseManager(AbstractJSONResponseManager):
                     ],
                 },
                 "nodeSizeSpecificationData": {
-                    "additionalProperties": False,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "inf": {
                             "$ref": node_size_specification_ref,
@@ -85,7 +88,7 @@ class OCPQuickBurnSizesResponseManager(AbstractJSONResponseManager):
                     ],
                 },
                 "platformQuickBurnSizeSpecificationData": {
-                    "additionalProperties": False,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "large": {
                             "$ref": "#/$defs/nodeSizeSpecificationData",
@@ -100,7 +103,7 @@ class OCPQuickBurnSizesResponseManager(AbstractJSONResponseManager):
                     ],
                 },
             },
-            "additionalProperties": False,
+            "additionalProperties": self._disable_strict_response_schema_check,
             "properties": {
                 "p": {
                     "$ref": "#/$defs/platformQuickBurnSizeSpecificationData",

@@ -41,6 +41,7 @@ from cpo.utils.logging import loglevel_command
 def reboot_node(
     fyre_api_user_name: str,
     fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
     cluster_name: str,
     force: bool,
     node_name: str,
@@ -52,4 +53,6 @@ def reboot_node(
         click.confirm(f"Do you really want to reboot node '{node_name}' of cluster '{cluster_name}'?", abort=True)
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).reboot_node(cluster_name, node_name, site)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).reboot_node(
+        cluster_name, node_name, site
+    )

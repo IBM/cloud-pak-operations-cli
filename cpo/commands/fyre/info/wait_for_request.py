@@ -30,8 +30,12 @@ from cpo.utils.logging import loglevel_command
 )
 @fyre_command_options
 @click.option("--request-id", help="Request ID", required=True)
-def wait_for_request(fyre_api_user_name: str, fyre_api_key: str, request_id: str):
+def wait_for_request(
+    fyre_api_user_name: str, fyre_api_key: str, disable_strict_response_schema_check: bool, request_id: str
+):
     """Wait for request to complete"""
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).wait_for_request_completion(request_id)
+    OCPPlusAPIManager(
+        fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check
+    ).wait_for_request_completion(request_id)

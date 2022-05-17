@@ -33,8 +33,16 @@ from cpo.utils.logging import loglevel_command
 @fyre_command_options
 @click.option("--json", help="Prints the command output in JSON format", is_flag=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def get_quick_burn_sizes(fyre_api_user_name: str, fyre_api_key: str, json: bool, site: Optional[str]):
+def get_quick_burn_sizes(
+    fyre_api_user_name: str,
+    fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
+    json: bool,
+    site: Optional[str],
+):
     """Get available sizes for a quick burn deployment"""
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).get_quickburn_sizes(site).format(json)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).get_quickburn_sizes(
+        site
+    ).format(json)

@@ -22,8 +22,14 @@ from cpo.utils.http_method import HTTPMethod
 
 
 class QuotaRequestManager(AbstractJSONRequestManager):
-    def __init__(self, fyre_api_user_name: str, fyre_api_key: str, site: Optional[str] = None):
-        super().__init__(fyre_api_user_name, fyre_api_key, site)
+    def __init__(
+        self,
+        fyre_api_user_name: str,
+        fyre_api_key: str,
+        disable_strict_response_schema_check: bool,
+        site: Optional[str] = None,
+    ):
+        super().__init__(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check, site)
 
     def execute_get_request(
         self,
@@ -36,7 +42,7 @@ class QuotaRequestManager(AbstractJSONRequestManager):
 
     # override
     def get_json_response_manager(self) -> AbstractJSONResponseManager:
-        return QuotaGetResponseManager()
+        return QuotaGetResponseManager(self._disable_strict_response_schema_check)
 
     # override
     def get_request_schema(self) -> Any:

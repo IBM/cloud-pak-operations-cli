@@ -52,6 +52,7 @@ def validate_node_name(ctx, param, value) -> Optional[str]:
 def edit_worker_node(
     fyre_api_user_name: str,
     fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
     additional_disk_size: List[int],
     cluster_name: str,
     force: bool,
@@ -67,6 +68,6 @@ def edit_worker_node(
             click.confirm(f"Do you really want to edit node '{node_name}' of cluster '{cluster_name}'?", abort=True)
 
         cpo.utils.network.disable_insecure_request_warning()
-        OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).edit_worker_node(
+        OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).edit_worker_node(
             cluster_name, node_name, additional_disk_size, node_num_cpus, node_ram_size, site
         )

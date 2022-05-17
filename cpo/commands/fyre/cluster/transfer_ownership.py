@@ -43,6 +43,7 @@ def transfer_ownership(
     ctx: click.Context,
     fyre_api_user_name: str,
     fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
     cluster_name: str,
     comment: Optional[str],
     new_owner: Optional[str],
@@ -55,6 +56,6 @@ def transfer_ownership(
         raise click.UsageError("You must set options '--new-owner' and/or '--new-product-group-id'.", ctx)
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).transfer(
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).transfer(
         cluster_name, new_owner, new_product_group_id, comment, site
     )

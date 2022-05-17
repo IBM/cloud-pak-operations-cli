@@ -21,6 +21,9 @@ from cpo.lib.fyre.types.check_hostname_get_response import CheckHostnameGetRespo
 class CheckHostnameGetResponseManager(AbstractJSONResponseManager):
     """JSON response manager for check_hostname/{name} REST endpoint (GET)"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        super().__init__(disable_strict_response_schema_check)
+
     # override
     def get_error_message(self, json_error_response: Any) -> Optional[str]:
         return None
@@ -32,7 +35,7 @@ class CheckHostnameGetResponseManager(AbstractJSONResponseManager):
     # override
     def get_response_schema(self) -> Any:
         return {
-            "additionalProperties": False,
+            "additionalProperties": self._disable_strict_response_schema_check,
             "properties": {
                 "details": {
                     "type": "string",

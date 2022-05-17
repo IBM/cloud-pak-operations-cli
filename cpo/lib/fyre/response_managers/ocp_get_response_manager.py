@@ -21,6 +21,9 @@ from cpo.lib.fyre.types.ocp_get_response import OCPGetResponse
 class OCPGetResponseManager(AbstractJSONResponseManager):
     """JSON response manager for ocp REST endpoint (GET)"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        super().__init__(disable_strict_response_schema_check)
+
     # override
     def get_error_message(self, json_error_response: Any) -> str:
         return self.get_default_error_message(json_error_response)
@@ -34,7 +37,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
         return {
             "$defs": {
                 "cluster": {
-                    "additionalProperties": True,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "access_url": {"type": "string"},
                         "auto_patch": {"type": "string"},
@@ -90,7 +93,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 "ip": {
-                    "additionalProperties": True,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "address": {"type": "string"},
                         "ip_scope": {"type": "string"},
@@ -104,7 +107,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 "vm": {
-                    "additionalProperties": True,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "additional_disk": {
                             "items": {"type": "string"},
@@ -139,7 +142,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
             },
             "anyOf": [
                 {
-                    "additionalProperties": True,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "cluster_count": {"type": "integer"},
                         "clusters": {
@@ -154,7 +157,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 {
-                    "additionalProperties": True,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "details": {"type": "string"},
                         "status": {"const": "info"},

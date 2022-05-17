@@ -37,8 +37,16 @@ from cpo.utils.logging import loglevel_command
     "--cluster-name", help="Name of the OCP+ cluster whose incoming transfer shall be accepted", required=True
 )
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def accept_transfer(fyre_api_user_name: str, fyre_api_key: str, cluster_name: str, site: Optional[str]):
+def accept_transfer(
+    fyre_api_user_name: str,
+    fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
+    cluster_name: str,
+    site: Optional[str],
+):
     """Accept an incoming OCP+ cluster transfer"""
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).accept_transfer(cluster_name, site)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).accept_transfer(
+        cluster_name, site
+    )

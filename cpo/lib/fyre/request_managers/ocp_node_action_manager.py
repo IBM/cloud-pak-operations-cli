@@ -25,12 +25,13 @@ class OCPNodeActionManager(AbstractJSONRequestManager):
         self,
         fyre_api_user_name: str,
         fyre_api_key: str,
+        disable_strict_response_schema_check: bool,
         site: Optional[str],
         cluster_name: str,
         node_name: str,
         action: str,
     ):
-        super().__init__(fyre_api_user_name, fyre_api_key, site)
+        super().__init__(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check, site)
 
         self._action = action
         self._cluster_name = cluster_name
@@ -47,7 +48,7 @@ class OCPNodeActionManager(AbstractJSONRequestManager):
 
     # override
     def get_json_response_manager(self) -> AbstractJSONResponseManager:
-        return DefaultResponseManager()
+        return DefaultResponseManager(self._disable_strict_response_schema_check)
 
     # override
     def get_request_schema(self) -> Any:

@@ -22,6 +22,9 @@ class OCPAvailableGetResponseManager(AbstractJSONResponseManager):
     """JSON response manager for ocp_available/{platform} REST endpoint
     (GET)"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        super().__init__(disable_strict_response_schema_check)
+
     # override
     def get_error_message(self, json_error_response: Any) -> Optional[str]:
         return self.get_default_error_message(json_error_response)
@@ -37,7 +40,7 @@ class OCPAvailableGetResponseManager(AbstractJSONResponseManager):
         return {
             "$defs": {
                 "defaultClusterSizeData": {
-                    "additionalProperties": False,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "inf": {"$ref": node_size_ref},
                         "master": {"$ref": node_size_ref},
@@ -51,7 +54,7 @@ class OCPAvailableGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
                 "nodeSize": {
-                    "additionalProperties": False,
+                    "additionalProperties": self._disable_strict_response_schema_check,
                     "properties": {
                         "additional_disk_size": {"type": "string"},
                         "additional_disk": {"type": "string"},
@@ -72,7 +75,7 @@ class OCPAvailableGetResponseManager(AbstractJSONResponseManager):
                     "type": "object",
                 },
             },
-            "additionalProperties": False,
+            "additionalProperties": self._disable_strict_response_schema_check,
             "properties": {
                 "default_size": {
                     "$ref": "#/$defs/defaultClusterSizeData",

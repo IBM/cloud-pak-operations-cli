@@ -22,6 +22,9 @@ class OCPQuickBurnMaxHoursResponseManager(AbstractJSONResponseManager):
     """JSON response manager for ocp/quick_burn_max_hours REST endpoint
     (GET)"""
 
+    def __init__(self, disable_strict_response_schema_check: bool):
+        super().__init__(disable_strict_response_schema_check)
+
     # override
     def get_error_message(self, json_error_response: Any) -> Optional[str]:
         return None
@@ -33,7 +36,7 @@ class OCPQuickBurnMaxHoursResponseManager(AbstractJSONResponseManager):
     # override
     def get_response_schema(self) -> Any:
         return {
-            "additionalProperties": False,
+            "additionalProperties": self._disable_strict_response_schema_check,
             "properties": {
                 "quick_burn_max_hours": {"type": "string"},
             },

@@ -34,8 +34,16 @@ from cpo.utils.logging import loglevel_command
 @fyre_command_options
 @click.option("--cluster-name", help="Name of the OCP+ cluster whose erasability shall be enabled", required=True)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def enable_delete(fyre_api_user_name: str, fyre_api_key: str, cluster_name: str, site: Optional[str]):
+def enable_delete(
+    fyre_api_user_name: str,
+    fyre_api_key: str,
+    disable_strict_response_schema_check: bool,
+    cluster_name: str,
+    site: Optional[str],
+):
     """Enable erasability of an OCP+ cluster"""
 
     cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key).enable_delete(cluster_name, site)
+    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).enable_delete(
+        cluster_name, site
+    )
