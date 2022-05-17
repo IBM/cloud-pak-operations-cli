@@ -46,7 +46,6 @@ class Cluster(TypedDict):
     description: str
     expiration: str
     fips_enabled: str
-    kubeadmin_password: str
     locked_for_delete: str
     ocp_username: str
     ocp_version: str
