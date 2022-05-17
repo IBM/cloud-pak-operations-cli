@@ -195,7 +195,7 @@ def get_persistent_volume_name(namespace: str, persistent_volume_claim_name: str
     return volume_name
 
 
-def get_persistent_volume_id(namespace: str, persistent_volume_name: str):
+def get_persistent_volume_id(persistent_volume_name: str):
     oc_get_pv_args = [
         "get",
         "pv",

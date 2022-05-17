@@ -17,7 +17,7 @@ import logging
 from typing import Any, Callable, Dict, List, Optional
 
 import semver
-import urllib3
+import urllib3.exceptions
 
 from kubernetes import client, config, watch
 

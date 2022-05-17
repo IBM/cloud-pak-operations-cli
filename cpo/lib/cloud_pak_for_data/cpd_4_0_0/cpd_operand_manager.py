@@ -20,9 +20,7 @@ import jsonschema
 
 import cpo.config
 
-from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.operand_request_metadata import (
-    OperandRequestMetadata,
-)
+from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.operand_request_metadata import OperandRequestMetadata
 from cpo.lib.error import DataGateCLIException
 
 

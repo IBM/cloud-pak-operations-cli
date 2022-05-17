@@ -85,7 +85,7 @@ def get_oauth_token() -> str:
     return result
 
 
-def get_tokens(api_key: str) -> Any:
+def get_tokens() -> Any:
     """Retrieves the IAM access token, refresh token and token type from the
     local ibmcloud configuration file"""
 

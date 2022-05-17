@@ -49,7 +49,7 @@ def increase_openshift_image_registry_volume_capacity(
         "openshift-image-registry", "image-registry-storage"
     )
 
-    volume_id = cpo.lib.openshift.oc.get_persistent_volume_id("openshift-image-registry", persistent_volume_name)
+    volume_id = cpo.lib.openshift.oc.get_persistent_volume_id(persistent_volume_name)
     volume_details = _get_volume_details(volume_id)
     volume_capacity = _get_volume_capacity(volume_details)
 

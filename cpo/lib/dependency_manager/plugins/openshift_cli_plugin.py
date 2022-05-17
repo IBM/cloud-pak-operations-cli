@@ -119,7 +119,7 @@ class OpenShiftCLIPlugIn(AbstractDependencyManagerPlugIn):
         """
 
         search_result = regex.search(
-            "Version:  (\\d+\\.\\d+\\.\\d+)",
+            "Version: {2}(\\d+\\.\\d+\\.\\d+)",
             file_contents,
         )
 
