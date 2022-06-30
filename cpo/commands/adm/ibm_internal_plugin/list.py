@@ -12,19 +12,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-# Install latest version - we need to crawl the files
-import cpo.utils.process
+
+import cpo.lib.ibm_internal_plugin.list
+
+from cpo.utils.logging import loglevel_command
 
 
+@loglevel_command()
 def list():
-    """Lists all dev-plugins"""
+    """List available IBM-internal CLI plug-ins"""
 
-    cpo.utils.process.execute_command(
-        "pip",  # type: ignore
-        [
-            "search",
-            "-i",
-            "https://na.artifactory.swg-devops.com/artifactory/api/pypi/idaa-data-gate-cli-pypi-local/simple",
-            "cloud-pak-operations-cli"
-        ],
-    )
+    cpo.lib.ibm_internal_plugin.list.list()

@@ -12,14 +12,18 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-
-import cpo.lib.dev_plugin.list
-
-from cpo.utils.logging import loglevel_command
+import cpo.utils.process
 
 
-@loglevel_command()
-def list():
-    """Installs plugin"""
+def install(distribution_package_name: str):
+    """Installs the distribution package with the given name"""
 
-    cpo.lib.dev_plugin.list.list()
+    cpo.utils.process.execute_command(
+        "pip",  # type: ignore
+        [
+            "install",
+            distribution_package_name,
+            "--index-url",
+            "https://na.artifactory.swg-devops.com/artifactory/api/pypi/idaa-data-gate-cli-pypi-local/simple",
+        ],
+    )

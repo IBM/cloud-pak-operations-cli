@@ -14,7 +14,7 @@
 
 import click
 
-import cpo.lib.dev_plugin.install
+import cpo.lib.ibm_internal_plugin.install
 
 from cpo.utils.logging import loglevel_command
 
@@ -22,6 +22,6 @@ from cpo.utils.logging import loglevel_command
 @loglevel_command()
 @click.argument("module")
 def install(module: str):
-    """Installs dev-plugin"""
+    """Install an IBM-internal CLI plug-in"""
 
-    cpo.lib.dev_plugin.install.install(module)
+    cpo.lib.ibm_internal_plugin.install.install(module)
