@@ -23,7 +23,7 @@ def list():
         "pip",  # type: ignore
         [
             "search",
-            "--index-url",
+            "--index",
             "https://na.artifactory.swg-devops.com/artifactory/api/pypi/idaa-data-gate-cli-pypi-local/simple",
             "cloud-pak-operations-cli"
         ],
