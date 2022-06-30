@@ -20,8 +20,8 @@ from cpo.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.argument("module")
-def install(module: str):
+@click.argument("distribution-package-name")
+def install(distribution_package_name: str):
     """Install an IBM-internal CLI plug-in"""
 
-    cpo.lib.ibm_internal_plugin.install.install(module)
+    cpo.lib.ibm_internal_plugin.install.install(distribution_package_name)
