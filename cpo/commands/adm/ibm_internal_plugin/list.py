@@ -27,7 +27,7 @@ from cpo.utils.logging import loglevel_command
 )
 @click.option(
     "--artifactory-password",
-    help="Artifactory password. The password is usually the API Key located in the 'Edit profile' page in Artifactory.",
+    help="Artifactory password. The password is usually the API Key located in the 'Edit Profile' page in Artifactory.",
     required=True,
 )
 def list(artifactory_username, artifactory_password):
