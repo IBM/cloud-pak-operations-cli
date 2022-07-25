@@ -15,7 +15,7 @@
 import cpo.utils.process
 
 
-def install(distribution_package_name: str):
+def install(distribution_package_name: str, artifactory_username: str, artifactory_password: str):
     """Installs the distribution package with the given name"""
 
     cpo.utils.process.execute_command(
@@ -24,6 +24,9 @@ def install(distribution_package_name: str):
             "install",
             distribution_package_name,
             "--index-url",
-            "https://na.artifactory.swg-devops.com/artifactory/api/pypi/idaa-data-gate-cli-pypi-local/simple",
+            (
+                f"https://{artifactory_username}:{artifactory_password}@"
+                "na.artifactory.swg-devops.com/artifactory/api/pypi/idaa-data-gate-cli-pypi-local/simple"
+            ),
         ],
     )

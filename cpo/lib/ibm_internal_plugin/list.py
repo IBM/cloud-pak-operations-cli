@@ -16,7 +16,7 @@
 import cpo.utils.process
 
 
-def list():
+def list(artifactory_username: str, artifactory_password: str):
     """Lists IBM-internal CLI plug-ins"""
 
     cpo.utils.process.execute_command(
@@ -24,7 +24,10 @@ def list():
         [
             "search",
             "--index",
-            "https://na.artifactory.swg-devops.com/artifactory/api/pypi/idaa-data-gate-cli-pypi-local/simple",
-            "cloud-pak-operations-cli"
+            (
+                f"https://{artifactory_username}:{artifactory_password}@"
+                "na.artifactory.swg-devops.com/artifactory/api/pypi/idaa-data-gate-cli-pypi-local/simple"
+            ),
+            "cloud-pak-operations-cli",
         ],
     )

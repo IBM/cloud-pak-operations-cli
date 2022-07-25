@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import click
 
 import cpo.lib.ibm_internal_plugin.list
 
@@ -19,7 +20,17 @@ from cpo.utils.logging import loglevel_command
 
 
 @loglevel_command()
-def list():
+@click.option(
+    "--artifactory-username",
+    help="Artifactory username. The username is usually the IBM e-mail address.",
+    required=True,
+)
+@click.option(
+    "--artifactory-password",
+    help="Artifactory password. The password is usually the API Key located in the 'Edit Profile' page in Artifactory.",
+    required=True,
+)
+def list(artifactory_username, artifactory_password):
     """List available IBM-internal CLI plug-ins"""
 
-    cpo.lib.ibm_internal_plugin.list.list()
+    cpo.lib.ibm_internal_plugin.list.list(artifactory_username, artifactory_password)
