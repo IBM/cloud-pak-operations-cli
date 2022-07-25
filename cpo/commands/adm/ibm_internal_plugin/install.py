@@ -21,7 +21,17 @@ from cpo.utils.logging import loglevel_command
 
 @loglevel_command()
 @click.argument("distribution-package-name")
-def install(distribution_package_name: str):
+@click.option(
+    "--artifactory-username",
+    help="Artifactory username. The username is usually the IBM e-mail address.",
+    required=True,
+)
+@click.option(
+    "--artifactory-password",
+    help="Artifactory password. The password is usually the API Key located in the 'Edit profile' page in Artifactory.",
+    required=True,
+)
+def install(distribution_package_name: str, artifactory_username: str, artifactory_password: str):
     """Install an IBM-internal CLI plug-in"""
 
-    cpo.lib.ibm_internal_plugin.install.install(distribution_package_name)
+    cpo.lib.ibm_internal_plugin.install.install(distribution_package_name, artifactory_username, artifactory_password)
