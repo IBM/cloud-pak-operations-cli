@@ -19,7 +19,7 @@ def install(distribution_package_name: str, artifactory_username: str, artifacto
     """Installs the distribution package with the given name"""
 
     cpo.utils.process.execute_command(
-        "pip",  # type: ignore
+        "pip3",  # type: ignore
         [
             "install",
             distribution_package_name,
