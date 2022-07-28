@@ -28,5 +28,6 @@ def install(distribution_package_name: str, artifactory_username: str, artifacto
                 f"https://{artifactory_username}:{artifactory_password}@"
                 "na.artifactory.swg-devops.com/artifactory/api/pypi/idaa-data-gate-cli-pypi-local/simple"
             ),
+            "--user",
         ],
     )
