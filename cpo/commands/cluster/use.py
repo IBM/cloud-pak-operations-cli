@@ -21,7 +21,15 @@ from cpo.utils.logging import loglevel_command
 
 @loglevel_command()
 @click.argument("alias_or_server")
-def use(alias_or_server: str):
+@click.option(
+    "--login",
+    help="Log in to the current OpenShift cluster",
+    is_flag=True,
+)
+def use(alias_or_server: str, login: bool):
     """Set the current registered OpenShift cluster"""
 
-    cpo.config.cluster_credentials_manager.cluster_credentials_manager.set_cluster(alias_or_server)
+    current_cluster = cpo.config.cluster_credentials_manager.cluster_credentials_manager.set_cluster(alias_or_server)
+
+    if login:
+        current_cluster.login()
