@@ -13,7 +13,12 @@
 			"internalConsoleOptions": "openOnSessionStart",
 			"args": [
 				"${input:args}"
-			]
+			],
+			// required as virtual environment is not activated by Python debugger
+			// and, for example, ansible-playbook is not found otherwise
+			"env": {
+				"PATH": "${workspaceFolder}/.venv/bin:${env:PATH}"
+			}
 		},
 		{
 			"name": "Python: unit tests (cpo)",
@@ -25,7 +30,12 @@
 			"args": [
 				"discover",
 				"tests.test"
-			]
+			],
+			// required as virtual environment is not activated by Python debugger
+			// and, for example, ansible-playbook is not found otherwise
+			"env": {
+				"PATH": "${workspaceFolder}/.venv/bin:${env:PATH}"
+			}
 		},
 		{
 			"name": "Python: unit tests (scripts)",
