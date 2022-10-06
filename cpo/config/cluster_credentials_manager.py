@@ -319,7 +319,7 @@ class ClusterCredentialsManager:
 
         self._save_clusters_file()
 
-    def set_cluster(self, alias_or_server: str):
+    def set_cluster(self, alias_or_server: str) -> AbstractCluster:
         """Sets the current registered OpenShift cluster
 
         Parameters
@@ -327,6 +327,12 @@ class ClusterCredentialsManager:
         alias_or_server
             alias or server URL of the registered OpenShift cluster to be set as
             the current cluster
+
+        Returns
+        -------
+        AbstractCluster
+            metadata of the registered OpenShift cluster with the given alias or
+            server URL
         """
 
         cluster = self.get_cluster(alias_or_server)
@@ -336,6 +342,8 @@ class ClusterCredentialsManager:
 
         self._clusters_file_contents["current_cluster"] = cluster.get_server()
         self._save_clusters_file()
+
+        return cluster
 
     def _get_clusters(self) -> Dict[str, ClusterData]:
         """Returns registered OpenShift clusters
