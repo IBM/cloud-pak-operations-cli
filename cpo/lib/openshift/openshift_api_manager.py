@@ -54,6 +54,7 @@ class OpenShiftAPIManager:
 
     def __init__(self, credentials: AbstractCredentials):
         self._credentials = credentials
+        self._kube_config_dict: Dict[str, Any] = {}
         self._kube_config_initialized = False
 
     def cluster_role_exists(self, name: str) -> bool:
@@ -474,6 +475,12 @@ class OpenShiftAPIManager:
             project=project,
         )
 
+    def get_kube_config(self) -> Dict[str, Any]:
+        if not self._kube_config_initialized:
+            self._set_kube_config()
+
+        return self._kube_config_dict
+
     def namespaced_custom_resource_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> bool:
         """Returns whether the custom resource with the given name in the given
         project of the given kind exists
@@ -695,6 +702,12 @@ class OpenShiftAPIManager:
         """
 
         return self.execute_kubernetes_client(self._project_exists, name=name)
+
+    def refresh_access_token(self):
+        if not self._credentials.is_refreshable():
+            raise DataGateCLIException("OAuth access token expired and cannot be refreshed")
+
+        self._credentials.refresh_access_token()
 
     def role_binding_exists(self, project: str, name: str) -> bool:
         """Returns whether the role binding with the given name exists in the
@@ -1209,7 +1222,8 @@ class OpenShiftAPIManager:
         if exception.status != 410:
             raise exception
 
-        log_callback(exception.reason)
+        if exception.reason is not None:
+            log_callback(exception.reason)
 
     def _handle_protocol_error(self, exception: urllib3.exceptions.ProtocolError, log_callback: Callable[[str], None]):
         """Handles urllib3 protocol error exceptions
@@ -1278,37 +1292,37 @@ class OpenShiftAPIManager:
     def _set_kube_config(self):
         """Sets the Kubernetes configuration of the Kubernetes Python client"""
 
-        config.load_kube_config_from_dict(
-            {
-                "clusters": [
-                    {
-                        "cluster": {
-                            "insecure-skip-tls-verify": self._credentials.insecure_skip_tls_verify,
-                            "server": self._credentials.server,
-                        },
-                        "name": "cluster",
-                    }
-                ],
-                "contexts": [
-                    {
-                        "context": {
-                            "cluster": "cluster",
-                            "user": "user",
-                        },
-                        "name": "context",
-                    }
-                ],
-                "current-context": "context",
-                "users": [
-                    {
-                        "name": "user",
-                        "user": {
-                            "token": self._credentials.get_access_token(),
-                        },
-                    }
-                ],
-            }
-        )
+        self._kube_config_dict = {
+            "clusters": [
+                {
+                    "cluster": {
+                        "insecure-skip-tls-verify": self._credentials.insecure_skip_tls_verify,
+                        "server": self._credentials.server,
+                    },
+                    "name": "cluster",
+                }
+            ],
+            "contexts": [
+                {
+                    "context": {
+                        "cluster": "cluster",
+                        "user": "user",
+                    },
+                    "name": "context",
+                }
+            ],
+            "current-context": "context",
+            "users": [
+                {
+                    "name": "user",
+                    "user": {
+                        "token": self._credentials.get_access_token(),
+                    },
+                }
+            ],
+        }
+
+        config.load_kube_config_from_dict(self._kube_config_dict)
 
         self._kube_config_initialized = True
 
