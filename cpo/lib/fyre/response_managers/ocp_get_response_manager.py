@@ -51,6 +51,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                         "description": {"type": "string"},
                         "expiration": {"type": "string"},
                         "fips_enabled": {"type": "string"},
+                        "host_down": {"type": "string"},
                         "initial_ocp_version": {"type": "string"},
                         "kubeadmin_password": {"type": "string"},
                         "location_name": {"type": "string"},
@@ -79,6 +80,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                         "description",
                         "expiration",
                         "fips_enabled",
+                        "host_down",
                         "kubeadmin_password",
                         "location_name",
                         "locked_for_delete",
@@ -114,6 +116,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                             "type": "array",
                         },
                         "cpu": {"type": "string"},
+                        "host_down": {"type": "string"},
                         "hostname": {"type": "string"},
                         "ips": {
                             "items": {"$ref": "#/$defs/ip"},
@@ -128,6 +131,7 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                     },
                     "required": [
                         "cpu",
+                        "host_down",
                         "hostname",
                         "ips",
                         "memory",
