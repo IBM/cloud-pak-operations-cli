@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@ from typing import Optional
 
 import click
 
-import cpo.config
 import cpo.config.cluster_credentials_manager
 import cpo.lib.click.utils
-import cpo.lib.fyre.cluster
 import cpo.utils.network
 
-from cpo.lib.fyre.ocp_plus_api_manager import OCPPlusAPIManager
-from cpo.lib.fyre.utils.click import fyre_command_options
+from cpo.lib.ansible.playbook_runners.deploy_odf_playbook_runner import DeployODFPlaybookRunner
+from cpo.lib.openshift.utils.click import openshift_server_options
 from cpo.utils.logging import loglevel_command
 
 
@@ -32,21 +30,18 @@ from cpo.utils.logging import loglevel_command
         cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@fyre_command_options
-@click.option("--cluster-name", help="Name of the OCP+ cluster whose status shall be listed", required=True)
-@click.option("--json", help="Prints the command output in JSON format", is_flag=True)
-@click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
-def status(
-    fyre_api_user_name: str,
-    fyre_api_key: str,
-    disable_strict_response_schema_check: bool,
-    cluster_name: str,
-    json: bool,
-    site: Optional[str],
+@openshift_server_options
+@click.pass_context
+def install_odf_storage_classes(
+    ctx: click.Context,
+    server: Optional[str],
+    username: Optional[str],
+    password: Optional[str],
+    token: Optional[str],
+    insecure_skip_tls_verify: Optional[bool],
 ):
-    """List the status of an OCP+ cluster"""
+    """Install Red Hat OpenShift Data Foundation (ODF) storage classes"""
 
-    cpo.utils.network.disable_insecure_request_warning()
-    OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).get_cluster_status(
-        cluster_name, site
-    ).format(json)
+    credentials = cpo.lib.click.utils.get_cluster_credentials(ctx, locals().copy())
+
+    DeployODFPlaybookRunner(credentials).run_playbook()

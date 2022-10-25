@@ -19,6 +19,35 @@ import jmespath
 from cpo.lib.error import JmespathPathExpressionNotFoundException, UnexpectedTypeException
 
 
+def get_jmespath_bool(expression: str, data: Any) -> bool:
+    """Returns a bool extracted from the given object based on the given
+    JMESPath expression
+
+    Parameters
+    ----------
+    expression
+        JMESPath expression
+    data
+        object to be searched
+
+    Returns
+    -------
+    bool
+        bool extracted from the given object based on the given JMESPath
+        expression
+    """
+
+    search_result = jmespath.search(expression, data)
+
+    if search_result is None:
+        raise JmespathPathExpressionNotFoundException(expression)
+
+    if not isinstance(search_result, bool):
+        raise UnexpectedTypeException(search_result)
+
+    return search_result
+
+
 def get_jmespath_list_of_strings(expression: str, data: Any) -> List[str]:
     """Returns a list of strings extracted from the given object based on
     the given JMESPath expression
