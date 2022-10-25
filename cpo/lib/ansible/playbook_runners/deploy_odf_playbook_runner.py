@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,10 +12,14 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import TypedDict
+from cpo.lib.ansible.openshift_playbook_runner import OpenShiftPlaybookRunner
+from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 
 
-class IP(TypedDict):
-    address: str
-    ip_scope: str
-    type: str
+class DeployODFPlaybookRunner(OpenShiftPlaybookRunner):
+    def __init__(self, credentials: AbstractCredentials):
+        super().__init__(self._get_playbook_name_from_class_name(), credentials)
+
+        version = self._openshift_api_manager.get_version()
+
+        self.openshift_server_version = f"{version.major}.{version.minor}"

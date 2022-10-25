@@ -1,0 +1,251 @@
+---
+- connection: local
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: "Create Namespace resource (name: openshift-local-storage)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          api_version: v1
+          kind: Namespace
+          metadata:
+            name: openshift-local-storage
+        state: present
+
+    - name: "Create OperatorGroup resource (name: local-operator-group)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+            name: local-operator-group
+            namespace: openshift-local-storage
+          spec:
+            targetNamespaces:
+              - openshift-local-storage
+        state: present
+
+    - name: "Create Subscription resource (name: local-storage-operator)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: local-storage-operator
+            namespace: openshift-local-storage
+          spec:
+            channel: "{{ openshift_server_version | string }}"
+            installPlanApproval: Automatic
+            name: local-storage-operator
+            source: redhat-operators
+            sourceNamespace: openshift-marketplace
+        state: present
+
+    - name: "Waiting for creation of custom resource definitions"
+      wait_for_custom_resource_definitions:
+        kubeconfig: "{{ kube_config }}"
+        custom_resource_definitions:
+          - "LocalVolumeDiscovery"
+          - "LocalVolumeDiscoveryResult"
+          - "LocalVolumeSet"
+
+    - name: Get worker nodes
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: Node
+        kubeconfig: "{{ kube_config }}"
+        label_selectors:
+          - node-role.kubernetes.io/worker =
+      register: nodes
+
+    - name: Label worker nodes (cluster.ocs.openshift.io/openshift-storage='')
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          api_version: v1
+          kind: Node
+          metadata:
+            labels:
+              cluster.ocs.openshift.io/openshift-storage: ""
+            name: "{{ item }}"
+        state: patched
+      loop: "{{ nodes | json_query('resources[*].metadata.name') }}"
+
+    - name: "Create LocalVolumeDiscovery resource (name: auto-discover-devices)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: local.storage.openshift.io/v1alpha1
+          kind: LocalVolumeDiscovery
+          metadata:
+            name: auto-discover-devices
+            namespace: openshift-local-storage
+          spec:
+            nodeSelector:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: cluster.ocs.openshift.io/openshift-storage
+                      operator: In
+                      values:
+                        - ""
+        state: present
+
+    - set_fact:
+        num_nodes: "{{ nodes.resources | length }}"
+
+    - name: "Waiting for LocalVolumeDiscoveryResult resources"
+      kubernetes.core.k8s_info:
+        api_version: local.storage.openshift.io/v1alpha1
+        kind: LocalVolumeDiscoveryResult
+        kubeconfig: "{{ kube_config }}"
+        namespace: openshift-local-storage
+      register: local_volume_discovery_results
+      until: '(local_volume_discovery_results.resources | json_query("length([?contains(metadata.ownerReferences[].name, ''auto-discover-devices'')])")) == (num_nodes | int)'
+      delay: 30
+
+    - set_fact:
+        num_devices: '{{ local_volume_discovery_results.resources | json_query("length([?contains(metadata.ownerReferences[].name, ''auto-discover-devices'')].status.discoveredDevices[] | [?status.state==''Available''])") }}'
+        # storage_size: '{{ local_volume_discovery_results.resources | json_query("sum([?contains(metadata.ownerReferences[].name, ''auto-discover-devices'')].status.discoveredDevices[] | [?status.state==''Available''].size)") }}'
+
+    - fail:
+        msg: "No available discovered devices"
+      when: num_devices == 0
+
+    - name: "Create LocalVolumeSet resource (name: localblock)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: local.storage.openshift.io/v1alpha1
+          kind: LocalVolumeSet
+          metadata:
+            name: localblock
+            namespace: openshift-local-storage
+          spec:
+            deviceInclusionSpec:
+              deviceTypes:
+                - disk
+                - part
+            nodeSelector:
+              nodeSelectorTerms:
+                - matchExpressions:
+                    - key: cluster.ocs.openshift.io/openshift-storage
+                      operator: In
+                      values:
+                        - ""
+            storageClassName: localblock
+            volumeMode: Block
+        state: present
+
+    - name: "Waiting for PersistentVolume resources"
+      kubernetes.core.k8s_info:
+        api_version: v1
+        kind: PersistentVolume
+        kubeconfig: "{{ kube_config }}"
+      register: persistent_volume_results
+      until: '(persistent_volume_results.resources | json_query("length([?metadata.labels.\"storage.openshift.com/owner-name\" == ''localblock''])")) == (num_devices | int)'
+      delay: 30
+
+    - name: "Create Namespace resource (name: openshift-storage)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          api_version: v1
+          kind: Namespace
+          metadata:
+            labels:
+              openshift.io/cluster-monitoring: "true"
+            name: openshift-storage
+        state: present
+
+    - name: "Create OperatorGroup resource (name: openshift-storage-operatorgroup)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+            name: openshift-storage-operatorgroup
+            namespace: openshift-storage
+          spec:
+            targetNamespaces:
+              - openshift-storage
+        state: present
+
+    - name: "Create Subscription resource (name: odf-operator)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: odf-operator
+            namespace: openshift-storage
+          spec:
+            channel: "{{ 'stable-' + openshift_server_version }}"
+            installPlanApproval: Automatic
+            name: odf-operator
+            source: redhat-operators
+            sourceNamespace: openshift-marketplace
+        state: present
+
+    - name: "Waiting for creation of custom resource definitions"
+      wait_for_custom_resource_definitions:
+        kubeconfig: "{{ kube_config }}"
+        custom_resource_definitions:
+          - "StorageCluster"
+
+    - name: "Create StorageCluster resource (name: ocs-storagecluster)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: ocs.openshift.io/v1
+          kind: StorageCluster
+          metadata:
+            name: ocs-storagecluster
+            namespace: openshift-storage
+          spec:
+            flexibleScaling: true
+            monDataDirHostPath: /var/lib/rook
+            resources:
+              mds:
+                limits:
+                  cpu: "3"
+                  memory: "8Gi"
+                requests:
+                  cpu: "1"
+                  memory: "8Gi"
+            storageDeviceSets:
+              - count: "{{ num_devices | int }}"
+                dataPVCTemplate:
+                  spec:
+                    accessModes:
+                      - ReadWriteOnce
+                    resources:
+                      requests:
+                        storage: "1"
+                    storageClassName: localblock
+                    volumeMode: Block
+                name: ocs-deviceset-ocs-storagecluster
+                replica: 1
+                resources:
+                  limits:
+                    cpu: "2"
+                    memory: "5Gi"
+                  requests:
+                    cpu: "1"
+                    memory: "5Gi"
+        state: present
+
+    - name: "Waiting for creation and readiness of custom resource (name: ocs-storagecluster)"
+      wait_for_namespaced_custom_resource:
+        custom_resource_name: "ocs-storagecluster"
+        group: "ocs.openshift.io"
+        jmespath_expression: "object.status.phase == 'Ready'"
+        kind: "StorageCluster"
+        kubeconfig: "{{ kube_config }}"
+        plural: "storageclusters"
+        project: "openshift-storage"
+        version: "v1"
