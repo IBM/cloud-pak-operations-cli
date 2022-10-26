@@ -14,7 +14,7 @@
 
 import unittest
 
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.lib.fyre.data.ocpplus_cluster_specification import HAProxyTimoutSettings
 from cpo.lib.fyre.types.ocp_post_request import HAProxyTimeoutData, OCPPostRequest
 
@@ -65,7 +65,7 @@ class TestHAProxyTimoutSettings(unittest.TestCase):
         invalidly formatted string raises an exception"""
 
         self.assertRaisesRegex(
-            DataGateCLIException,
+            CloudPakOperationsCLIException,
             "Invalid string format: 10",
             HAProxyTimoutSettings,
             "10",

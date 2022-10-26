@@ -28,7 +28,11 @@ class OCPPostResponseManager(AbstractJSONResponseManager):
 
     # override
     def get_error_message(self, json_error_response: Any) -> Optional[str]:
-        validate(json_error_response, self.get_error_response_schema())
+        error_response_schema = self.get_error_response_schema()
+
+        assert error_response_schema is not None
+
+        validate(json_error_response, error_response_schema)
 
         error_messages: List[str] = []
         error_response: OCPPostErrorResponse = json_error_response

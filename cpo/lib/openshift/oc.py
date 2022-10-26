@@ -25,8 +25,8 @@ import cpo.utils.process
 
 from cpo.lib.dependency_manager import dependency_manager
 from cpo.lib.dependency_manager.plugins.openshift_cli_plugin import OpenShiftCLIPlugIn
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.openshift.types.get_pod_entry import GetPodEntry
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.string import removeprefix, removesuffix
 
 OPENSHIFT_REST_API_VERSION: Final[str] = "v1"
@@ -185,7 +185,7 @@ def get_persistent_volume_name(namespace: str, persistent_volume_claim_name: str
     oc_get_pvc_command_result = json.loads(execute_oc_command(oc_get_pvc_args, capture_output=True).stdout)
 
     if len(oc_get_pvc_command_result["items"]) == 0:
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Namespace '{namespace}' does not contain a persistent volume claim with name "
             f"'{persistent_volume_claim_name}''"
         )
@@ -208,7 +208,9 @@ def get_persistent_volume_id(persistent_volume_name: str):
     )
 
     if oc_get_pv_command_result == "":
-        raise DataGateCLIException(f"Persistent volume with name '{persistent_volume_name}' could not be found")
+        raise CloudPakOperationsCLIException(
+            f"Persistent volume with name '{persistent_volume_name}' could not be found"
+        )
 
     return oc_get_pv_command_result
 
@@ -243,7 +245,9 @@ def get_deployment_name(search_string: str) -> List[str]:
             result.append(line.split()[0].strip())
 
     if not result:
-        raise DataGateCLIException(f"Deployment(s) containing the string '{search_string}' could not be found")
+        raise CloudPakOperationsCLIException(
+            f"Deployment(s) containing the string '{search_string}' could not be found"
+        )
 
     return result
 
@@ -261,7 +265,7 @@ def get_pod_name(search_string: str) -> List[str]:
             result.append(line.split()[0].strip())
 
     if not result:
-        raise DataGateCLIException(f"Pod(s) containing the string '{search_string}' could not be found")
+        raise CloudPakOperationsCLIException(f"Pod(s) containing the string '{search_string}' could not be found")
 
     return result
 

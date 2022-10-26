@@ -19,6 +19,8 @@ from typing import List
 
 import cpo
 
+from cpo.utils.error import CloudPakOperationsCLIException
+
 
 def get_distribution_package_name() -> str:
     """Returns the name of the distribution package providing the "cpo" top-level package
@@ -51,13 +53,13 @@ def get_distribution_package_name() -> str:
     package_name = cpo.__package__
 
     if package_name not in packages_to_distribution_packages_dict:
-        raise Exception(
+        raise CloudPakOperationsCLIException(
             f"Distribution package name could not be identified (no distribution package provides a top-level package "
             f"named '{package_name}')"
         )
 
     if len(packages_to_distribution_packages_dict[package_name]) != 1:
-        raise Exception(
+        raise CloudPakOperationsCLIException(
             f"Distribution package name could not be identified (more than one distribution package provides a "
             f"top-level package named '{package_name}')"
         )

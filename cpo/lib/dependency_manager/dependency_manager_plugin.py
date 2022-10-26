@@ -25,7 +25,7 @@ import semver
 import cpo.utils.process
 
 from cpo.config import configuration_manager
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class AbstractDependencyManagerPlugIn(ABC):
@@ -73,7 +73,7 @@ class AbstractDependencyManagerPlugIn(ABC):
         binary_path = self.get_binary_path()
 
         if binary_path is None:
-            raise DataGateCLIException(f"Dependency '{self.get_dependency_name()} does not provide a binary'")
+            raise CloudPakOperationsCLIException(f"Dependency '{self.get_dependency_name()} does not provide a binary'")
 
         return cpo.utils.process.execute_command(
             binary_path,

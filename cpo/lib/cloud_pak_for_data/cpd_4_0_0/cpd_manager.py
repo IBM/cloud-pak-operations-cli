@@ -44,13 +44,13 @@ from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.kind import Kind
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.status_key_data import StatusKeyData
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.status_key_value import StatusKeyValue
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.subscription_metadata import SubscriptionMetadata
-from cpo.lib.error import DataGateCLIException, JmespathPathExpressionNotFoundException
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.openshift_api_manager import OpenShiftAPIManager
 from cpo.lib.openshift.types.catalog_source import CatalogSourceList
 from cpo.lib.openshift.types.custom_resource import CustomResource
 from cpo.lib.openshift.types.custom_resource_event_result import CustomResourceEventResult
 from cpo.lib.openshift.types.kind_metadata import KindMetadata
+from cpo.utils.error import CloudPakOperationsCLIException, JmespathPathExpressionNotFoundException
 from cpo.utils.string import removesuffix
 
 logger = logging.getLogger(__name__)
@@ -159,7 +159,7 @@ class CloudPakForDataManager:
         """
 
         if not self._cpd_service_manager.is_cloud_pak_for_data_service(service_name):
-            raise DataGateCLIException("Unknown IBM Cloud Pak for Data service")
+            raise CloudPakOperationsCLIException("Unknown IBM Cloud Pak for Data service")
 
         custom_resource_metadata = self._cpd_service_manager.get_custom_resource_metadata(service_name)
         custom_resource = self._openshift_manager.get_namespaced_custom_resource_if_exists(
@@ -193,7 +193,7 @@ class CloudPakForDataManager:
         """
 
         if not self._cpd_service_manager.is_cloud_pak_for_data_service(service_name):
-            raise DataGateCLIException("Unknown IBM Cloud Pak for Data service")
+            raise CloudPakOperationsCLIException("Unknown IBM Cloud Pak for Data service")
 
         custom_resource_metadata = self._cpd_service_manager.get_custom_resource_metadata(service_name)
 
@@ -234,7 +234,7 @@ class CloudPakForDataManager:
             )
         ) is not None:
             if self._check_custom_resource_status(custom_resource, "zenStatus", StatusKeyValue.Completed):
-                raise DataGateCLIException(
+                raise CloudPakOperationsCLIException(
                     f"IBM Cloud Pak for Data is already installed in project '{cpd_instance_project}'"
                 )
         else:
@@ -300,7 +300,7 @@ class CloudPakForDataManager:
         """
 
         if not self._cpd_service_manager.is_cloud_pak_for_data_service(service_name):
-            raise DataGateCLIException("Unknown IBM Cloud Pak for Data service")
+            raise CloudPakOperationsCLIException("Unknown IBM Cloud Pak for Data service")
 
         custom_resource_metadata = self._cpd_service_manager.get_custom_resource_metadata(service_name)
         kind = custom_resource_metadata.kind
@@ -313,13 +313,13 @@ class CloudPakForDataManager:
             if self._check_custom_resource_status(
                 custom_resource, custom_resource_metadata.status_key_name, StatusKeyValue.Completed
             ):
-                raise DataGateCLIException("IBM Cloud Pak for Data service is already installed")
+                raise CloudPakOperationsCLIException("IBM Cloud Pak for Data service is already installed")
             elif self._check_custom_resource_status(
                 custom_resource, custom_resource_metadata.status_key_name, StatusKeyValue.Failed
             ):
                 message = self._get_message_from_custom_resource(custom_resource, "status.conditions")
 
-                raise DataGateCLIException(
+                raise CloudPakOperationsCLIException(
                     f"Custom resource {custom_resource_metadata.get_kind_metadata().kind} "
                     f"'{custom_resource_metadata.name}' already exists, but the installation of the IBM Cloud Pak for "
                     f"Data service failed{': ' + message if message is not None else ''}"
@@ -386,7 +386,7 @@ class CloudPakForDataManager:
                 if custom_resource_event_result.message is not None:
                     error_message += ": " + custom_resource_event_result.message
 
-                raise DataGateCLIException(error_message)
+                raise CloudPakOperationsCLIException(error_message)
 
     def uninstall_cloud_pak_for_data(self, cpd_operators_project: str, cpd_instance_project: str, delete_project: bool):
         """Uninstalls IBM Cloud Pak for Data
@@ -1047,7 +1047,7 @@ class CloudPakForDataManager:
                 ).name
 
                 if dependent_subscription_name in created_dependent_subscriptions:
-                    raise DataGateCLIException("Circular dependency detected")
+                    raise CloudPakOperationsCLIException("Circular dependency detected")
 
                 if self._openshift_manager.subscription_exists(project, dependent_subscription_name):
                     continue

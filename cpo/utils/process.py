@@ -20,7 +20,7 @@ from typing import Callable, List, Optional
 
 import click
 
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class ProcessResult:
@@ -89,7 +89,7 @@ def execute_command(
         if len(stderr_buffer) != 0:
             error_output = f" ({stderr_buffer})"
 
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Command '{command_string}' failed with return code {return_code}{error_output}.",
             "\n".join(stderr_buffer),
             "\n".join(stdout_buffer),

@@ -27,11 +27,11 @@ import cpo.config
 import cpo.utils.logging
 
 from cpo.lib.cloud_pak_for_data.cpd3_manager import AbstractCloudPakForDataManager
-from cpo.lib.error import DataGateCLIException, IBMCloudException
 from cpo.lib.ibmcloud import INTERNAL_IBM_CLOUD_API_KEY_NAME, execute_ibmcloud_command
 from cpo.lib.ibmcloud.iam import get_oauth_token, get_tokens
 from cpo.lib.ibmcloud.login import is_logged_in
 from cpo.lib.ibmcloud.target import get_ibmcloud_account_target_information
+from cpo.utils.error import CloudPakOperationsCLIException, IBMCloudException
 from cpo.utils.wait import wait_for
 
 logger = logging.getLogger(__name__)
@@ -116,11 +116,11 @@ def _get_entitlement_key(api_key: str) -> str:
                     result = resource["apikey"]
                     break
         else:
-            raise DataGateCLIException(
+            raise CloudPakOperationsCLIException(
                 f"Failed to retrieve Cloud Pak for Data entitlement key (HTTP status code: {response.status_code})"
             )
     else:
-        raise DataGateCLIException("Unable to retrieve IBM Cloud API key")
+        raise CloudPakOperationsCLIException("Unable to retrieve IBM Cloud API key")
 
     return result
 
@@ -162,7 +162,7 @@ def execute_install(cluster_id: str, api_key: str) -> Any:
     if response.ok:
         logging.info("Installation request submitted successfully")
     else:
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Failed to start Cloud Pak for Data installation on cluster {cluster_id}:\n"
             f"HTTP status code: {response.status_code}\n"
             f"HTTP response: {response.text}"
@@ -175,7 +175,7 @@ def get_schematics_workspace_details(install_details: Any) -> Any:
     result = ""
 
     if install_details is None or "workspace_id" not in install_details:
-        raise DataGateCLIException("Unable to retrieve IBM Schematics workspace details")
+        raise CloudPakOperationsCLIException("Unable to retrieve IBM Schematics workspace details")
 
     workspace_id = install_details["workspace_id"]
     auth_token = get_oauth_token()
@@ -188,7 +188,7 @@ def get_schematics_workspace_details(install_details: Any) -> Any:
     if response.ok:
         result = response.json()
     else:
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Failed to get Cloud Pak for Data installation details for IBM Schematics workspace ID {workspace_id}:\n"
             f"HTTP status code: {response.status_code}\n"
             f"HTTP response: {response.text}"
@@ -205,7 +205,7 @@ def is_installation_finished(install_details: Any) -> bool:
     status = get_install_status(install_details)
 
     if status == "FAILED":
-        raise DataGateCLIException(f"Workspace '{install_details['workspace_id']}' is in status '{status}'")
+        raise CloudPakOperationsCLIException(f"Workspace '{install_details['workspace_id']}' is in status '{status}'")
 
     return status == "ACTIVE"
 
@@ -221,7 +221,7 @@ def wait_until_installation_is_finished(install_details: Any) -> None:
                 install_details,
             )
     except Exception:
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Timeout exceeded or workspace error, details can be found here: "
             f"https://cloud.ibm.com/schematics/workspaces/{install_details['workspace_id']}/activity"
         )
@@ -255,10 +255,10 @@ def get_installation_log(install_details: Any) -> str:
     try:
         log_path = get_schematics_workspace_details(install_details)["runtime_data"][0]["log_store_url"]
     except Exception:
-        raise DataGateCLIException("Unable to retrieve log path value for IBM Schematics workspace")
+        raise CloudPakOperationsCLIException("Unable to retrieve log path value for IBM Schematics workspace")
 
     if install_details is None or "workspace_id" not in install_details or (log_path == ""):
-        raise DataGateCLIException("Unable to retrieve IBM Schematics log path")
+        raise CloudPakOperationsCLIException("Unable to retrieve IBM Schematics log path")
 
     workspace_id = install_details["workspace_id"]
     auth_token = get_oauth_token()
@@ -271,7 +271,7 @@ def get_installation_log(install_details: Any) -> str:
     if response.ok:
         result = response.text
     else:
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Failed to get Cloud Pak for Data installation log for workspace ID {workspace_id}:\n"
             f"HTTP status code: {response.status_code}\n"
             f"HTTP response: {response.text}"
@@ -284,7 +284,7 @@ def get_workspace_output_values(install_details: Any) -> Any:
     result = ""
 
     if install_details is None or "workspace_id" not in install_details:
-        raise DataGateCLIException("Unable to retrieve IBM Schematics workspace output values")
+        raise CloudPakOperationsCLIException("Unable to retrieve IBM Schematics workspace output values")
 
     workspace_id = install_details["workspace_id"]
     auth_token = get_oauth_token()
@@ -297,7 +297,7 @@ def get_workspace_output_values(install_details: Any) -> Any:
     if response.ok:
         result = response.json()
     else:
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Failed to get IBM Schematics output values for workspace ID {workspace_id}:\n"
             f"HTTP status code: {response.status_code}\n"
             f"HTTP response: {response.text}"
@@ -317,7 +317,7 @@ def get_cp4d_url(install_details: Any) -> str:
                 "resource_controller_url"
             ]
         except Exception:
-            raise DataGateCLIException(
+            raise CloudPakOperationsCLIException(
                 f"Unable to retrieve Cloud Pak for Data URL. Details:\n{workspace_output_values}"
             )
 
@@ -332,7 +332,7 @@ def install_cp4d_with_preinstall(cluster_name: str):
     if not is_logged_in() or api_key is None:
         credentials_file_path = cpo.config.configuration_manager.get_credentials_file_path()
 
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Not logged in to IBM Cloud or no API key found in {credentials_file_path}. Please run 'cpo ibmcloud "
             f"login' to log in."
         )

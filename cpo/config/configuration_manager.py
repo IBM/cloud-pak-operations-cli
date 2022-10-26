@@ -19,7 +19,7 @@ from typing import Any, Dict, Optional
 
 import cpo
 
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class ConfigurationManager:
@@ -73,7 +73,7 @@ class ConfigurationManager:
                 elif value.lower() in ConfigurationManager._supported_false_boolean_values:
                     result = False
                 else:
-                    raise DataGateCLIException(
+                    raise CloudPakOperationsCLIException(
                         f"Expected value of configuration parameter '{key}' must be a boolean of the form "
                         f"[{', '.join(ConfigurationManager._supported_true_boolean_values)}] or "
                         f"[{', '.join(ConfigurationManager._supported_false_boolean_values)}] but found "
@@ -208,7 +208,7 @@ class ConfigurationManager:
         if value.lower() not in (
             ConfigurationManager._supported_true_boolean_values + ConfigurationManager._supported_false_boolean_values
         ):
-            raise DataGateCLIException(
+            raise CloudPakOperationsCLIException(
                 f"Passed value '{value}' for '{key}' must be a boolean of the form "
                 f"[{', '.join(ConfigurationManager._supported_true_boolean_values)}] or "
                 f"[{', '.join(ConfigurationManager._supported_false_boolean_values)}]."

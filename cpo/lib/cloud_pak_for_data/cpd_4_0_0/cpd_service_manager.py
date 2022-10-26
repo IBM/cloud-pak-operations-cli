@@ -24,7 +24,7 @@ from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.subscription_metadata import (
     SubscriptionMetadata,
     SubscriptionMetadataSpec,
 )
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class CloudPakForDataServiceManager:
@@ -52,7 +52,7 @@ class CloudPakForDataServiceManager:
         self._initialize_custom_resources_dict_if_required()
 
         if service_name not in self._custom_resources:
-            raise DataGateCLIException("Unknown IBM Cloud Pak for Data service")
+            raise CloudPakOperationsCLIException("Unknown IBM Cloud Pak for Data service")
 
         return self._custom_resources[service_name]
 
@@ -86,7 +86,7 @@ class CloudPakForDataServiceManager:
         self._initialize_subscriptions_dict_if_required()
 
         if operator_name not in self._subscriptions:
-            raise DataGateCLIException("Unknown IBM Cloud Pak for Data service")
+            raise CloudPakOperationsCLIException("Unknown IBM Cloud Pak for Data service")
 
         return self._subscriptions[operator_name]
 

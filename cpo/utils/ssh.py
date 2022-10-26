@@ -15,15 +15,26 @@
 import logging
 import pathlib
 
+from abc import ABC, abstractmethod
 from typing import Optional, Type
 
 import asyncssh
 import click
 import colorama
 
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 asyncssh.set_log_level(logging.WARNING)
+
+
+class AbstractRemoteClientSSHSession(ABC):
+    @abstractmethod
+    def check_exit_status(self):
+        pass
+
+    @abstractmethod
+    def get_received_data(self) -> str:
+        pass
 
 
 class RemoteClient:
@@ -79,11 +90,13 @@ class RemoteClient:
         logging.info(f"Executing command on {self._hostname}: {command}")
 
         if self._connection is None:
-            raise DataGateCLIException("Not connected to " + self._hostname)
+            raise CloudPakOperationsCLIException("Not connected to " + self._hostname)
 
         channel, session = await self._connection.create_session(
             create_remote_client_ssh_session(print_output), command
         )
+
+        assert isinstance(session, AbstractRemoteClientSSHSession)
 
         await channel.wait_closed()
         session.check_exit_status()
@@ -100,7 +113,7 @@ class RemoteClient:
         """
 
         if self._connection is None:
-            raise DataGateCLIException("Not connected to " + self._hostname)
+            raise CloudPakOperationsCLIException("Not connected to " + self._hostname)
 
         await asyncssh.scp(str(path), self._connection)
 
@@ -122,7 +135,7 @@ def create_remote_client_ssh_session(print_output: bool) -> Type[asyncssh.SSHCli
         parameterized subclass of asyncssh.SSHClientSession
     """
 
-    class RemoteClientSSHSession(asyncssh.SSHClientSession):
+    class RemoteClientSSHSession(AbstractRemoteClientSSHSession, asyncssh.SSHClientSession):
         """Class extending the asyncssh.SSHClientSession class
 
         This class extends the asyncssh.SSHClientSession class as follows:
@@ -143,6 +156,7 @@ def create_remote_client_ssh_session(print_output: bool) -> Type[asyncssh.SSHCli
             self._channel: Optional[asyncssh.SSHClientChannel] = None
             self._received_data = ""
 
+        # override
         def check_exit_status(self):
             """Checks the exit status of a command executed on a remote host and
             raises an asyncssh.ProcessError exception if it is not 0"""
@@ -159,12 +173,18 @@ def create_remote_client_ssh_session(print_output: bool) -> Type[asyncssh.SSHCli
                     "",
                 )
 
+        # override
         def connection_made(self, channel: asyncssh.SSHClientChannel):
             """see asyncssh.SSHClientSession.connection_made()"""
 
             self._channel = channel
 
+        # override
         def data_received(self, data, datatype):
+            """see asyncssh.SSHClientSession.data_received()"""
+
+            assert isinstance(data, str)
+
             if datatype == asyncssh.EXTENDED_DATA_STDERR:
                 self._received_data += data
 
@@ -180,9 +200,8 @@ def create_remote_client_ssh_session(print_output: bool) -> Type[asyncssh.SSHCli
                 if print_output:
                     click.echo(data, nl=False)
 
+        # override
         def get_received_data(self) -> str:
-            """see asyncssh.SSHClientSession.get_received_data()"""
-
             return self._received_data
 
     return RemoteClientSSHSession

@@ -16,7 +16,7 @@ from typing import Any, List
 
 import jmespath
 
-from cpo.lib.error import JmespathPathExpressionNotFoundException, UnexpectedTypeException
+from cpo.utils.error import JmespathPathExpressionNotFoundException, UnexpectedTypeException
 
 
 def get_jmespath_bool(expression: str, data: Any) -> bool:

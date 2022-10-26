@@ -18,9 +18,9 @@ from typing import Any
 
 import cpo.utils.logging
 
-from cpo.lib.error import DataGateCLIException, IBMCloudException
 from cpo.lib.ibmcloud import execute_ibmcloud_command
 from cpo.lib.ibmcloud.oc.cluster.ls import list_existing_clusters
+from cpo.utils.error import CloudPakOperationsCLIException, IBMCloudException
 from cpo.utils.wait import wait_for
 
 
@@ -103,7 +103,7 @@ def get_cluster_status(cluster_name: str) -> ClusterStatus:
     except json.JSONDecodeError as exception:
         command_string = "ibmcloud " + " ".join(args)
 
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Invalid JSON received from command {command_string}:\n{command_result.stdout}"
         ) from exception
 
@@ -133,7 +133,7 @@ def get_ingress_status(cluster_name: str) -> IngressStatus:
     except json.JSONDecodeError as exception:
         command_string = "ibmcloud " + " ".join(args)
 
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Invalid JSON received from command {command_string}:\n{command_result.stdout}"
         ) from exception
 

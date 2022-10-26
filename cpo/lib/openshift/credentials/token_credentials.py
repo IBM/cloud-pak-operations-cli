@@ -12,8 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class TokenCredentials(AbstractCredentials):
@@ -35,4 +35,4 @@ class TokenCredentials(AbstractCredentials):
 
     # override
     def refresh_access_token(self):
-        raise DataGateCLIException("OAuth access token cannot be refreshed")
+        raise CloudPakOperationsCLIException("OAuth access token cannot be refreshed")

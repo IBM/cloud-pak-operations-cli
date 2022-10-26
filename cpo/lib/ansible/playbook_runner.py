@@ -24,7 +24,7 @@ from ansible_runner.runner import Runner
 from ansible_runner.streaming import Processor, Transmitter, Worker
 
 from cpo.config import configuration_manager
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.string import removeprefix, removesuffix
 
 logger = logging.getLogger(__name__)
@@ -42,7 +42,7 @@ class PlaybookRunner:
         runner = self._run_playbook()
 
         if runner.status == "failed":
-            raise DataGateCLIException("Ansible playbook failed")
+            raise CloudPakOperationsCLIException("Ansible playbook failed")
 
     def _event_handler(self, event_data: Any):
         """Callback invoked by Ansible Runner in case Ansible Runner itself

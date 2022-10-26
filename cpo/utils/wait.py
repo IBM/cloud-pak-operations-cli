@@ -18,7 +18,7 @@ from time import sleep
 
 import click
 
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 logger = logging.getLogger(__name__)
 
@@ -41,4 +41,4 @@ def wait_for(timeout, interval, action_name, predicate, *args, **kwargs):
         sleep(interval)
         time_passed += interval
     else:
-        raise DataGateCLIException(f"{action_name} timed out.")
+        raise CloudPakOperationsCLIException(f"{action_name} timed out.")

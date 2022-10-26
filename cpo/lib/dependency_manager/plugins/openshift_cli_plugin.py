@@ -29,7 +29,7 @@ import cpo.utils.file
 import cpo.utils.operating_system
 
 from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.operating_system import OperatingSystem
 
 
@@ -124,7 +124,7 @@ class OpenShiftCLIPlugIn(AbstractDependencyManagerPlugIn):
         )
 
         if search_result is None:
-            raise DataGateCLIException(f"{self.get_dependency_name()} could not be parsed")
+            raise CloudPakOperationsCLIException(f"{self.get_dependency_name()} could not be parsed")
 
         version = semver.VersionInfo.parse(f"{search_result.group(1)}")
 

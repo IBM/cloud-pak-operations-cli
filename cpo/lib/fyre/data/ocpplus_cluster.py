@@ -20,8 +20,8 @@ import click
 
 from tabulate import tabulate
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.fyre.types.ocp_get_response_for_single_cluster import VM, OCPGetResponseForSingleCluster
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class OCPPlusCluster:
@@ -88,7 +88,7 @@ class OCPPlusCluster:
                 break
 
         if result is None:
-            raise DataGateCLIException("Infrastructure node could not be identified")
+            raise CloudPakOperationsCLIException("Infrastructure node could not be identified")
 
         return result
 

@@ -19,8 +19,8 @@ from typing import Any
 
 import cpo.lib.ibmcloud
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.ibmcloud import execute_ibmcloud_command
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 def api_key_exists(name: str) -> bool:
@@ -80,7 +80,7 @@ def get_oauth_token() -> str:
     if oauth_token_result and "iam_token" in oauth_token_result:
         result = oauth_token_result["iam_token"]
     else:
-        raise DataGateCLIException(f"Unable to retrieve oauth token using command '{command}'")
+        raise CloudPakOperationsCLIException(f"Unable to retrieve oauth token using command '{command}'")
 
     return result
 

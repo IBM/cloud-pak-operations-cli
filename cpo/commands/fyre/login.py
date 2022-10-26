@@ -15,9 +15,9 @@
 import cpo.config
 import cpo.utils.network
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.fyre.ocp_plus_api_manager import OCPPlusAPIManager
 from cpo.lib.fyre.utils.click import fyre_command_options
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.logging import loglevel_command
 
 
@@ -32,10 +32,10 @@ def login(fyre_api_user_name: str, fyre_api_key: str, disable_strict_response_sc
 
     try:
         OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).get_quota(None)
-    except DataGateCLIException as exception:
+    except CloudPakOperationsCLIException as exception:
         if "failed authentication" in exception._error_message:
-            raise DataGateCLIException("Failed to log in to FYRE due to invalid credentials")
+            raise CloudPakOperationsCLIException("Failed to log in to FYRE due to invalid credentials")
         else:
-            raise DataGateCLIException("Failed to log in to FYRE")
+            raise CloudPakOperationsCLIException("Failed to log in to FYRE")
 
     cpo.config.configuration_manager.store_credentials(credentials_to_be_stored)

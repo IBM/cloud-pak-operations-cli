@@ -16,9 +16,9 @@ from typing import Dict, List, Optional, Tuple, Union
 
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_service_license import CloudPakForDataServiceLicense
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.cloud_pak_for_data_storage_vendor import CloudPakForDataStorageVendor
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.openshift.types.custom_resource import CustomResource
 from cpo.lib.openshift.types.kind_metadata import KindMetadata
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class CustomResourceMetadata:
@@ -62,13 +62,15 @@ class CustomResourceMetadata:
         """
 
         if license not in self._licenses:
-            raise DataGateCLIException(
+            raise CloudPakOperationsCLIException(
                 f"Unsupported license (supported licenses: "
                 f"{', '.join(list(map(lambda license: license.name, self._licenses)))})"
             )
 
         if storage_option is None and self._storage_option_required:
-            raise DataGateCLIException("You must set option '--storage-class' or '--storage-vendor' for this service.")
+            raise CloudPakOperationsCLIException(
+                "You must set option '--storage-class' or '--storage-vendor' for this service."
+            )
 
     @property
     def description(self) -> str:

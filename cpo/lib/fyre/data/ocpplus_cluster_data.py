@@ -20,8 +20,8 @@ import click
 
 from tabulate import tabulate
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.fyre.types.ocp_get_response import VM, Cluster, OCPGetResponse
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class OCPPlusClusterData:
@@ -114,7 +114,7 @@ class OCPPlusClusterData:
                 break
 
         if result is None:
-            raise DataGateCLIException(f"Cluster not found ({cluster_name})")
+            raise CloudPakOperationsCLIException(f"Cluster not found ({cluster_name})")
 
         return result
 

@@ -40,7 +40,7 @@ import tests.test.lib.plugin_manager.plugin_2.package_4
 import cpo
 
 from cpo.lib.click.lazy_loading_multi_command import LazyLoadingMultiCommand
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.lib.plugin_manager.plugin_manager import plugin_manager
 
 
@@ -192,7 +192,7 @@ class TestPluginManager(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(
-            DataGateCLIException,
+            CloudPakOperationsCLIException,
             f"Command 'bi-command-1' \\(distribution package: 'plugin-2', command hierarchy path: ''\\) cannot be "
             f"registered as a command with the same name was already provided by distribution package "
             f"'{cpo.distribution_package_name}'",
@@ -233,7 +233,7 @@ class TestPluginManager(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(
-            DataGateCLIException,
+            CloudPakOperationsCLIException,
             f"Command group 'bi-group-1' \\(distribution package: 'plugin-2', command hierarchy path: ''\\) cannot be "
             f"registered as a command group with the same name was already provided by distribution package "
             f"'{cpo.distribution_package_name}'",
@@ -276,7 +276,7 @@ class TestPluginManager(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(
-            DataGateCLIException,
+            CloudPakOperationsCLIException,
             "Command 'command-1' \\(distribution package: 'plugin-2', command hierarchy path: ''\\) cannot be "
             "registered as a command with the same name was already provided by distribution package 'plugin-1'",
         ):
@@ -316,7 +316,7 @@ class TestPluginManager(unittest.TestCase):
         )
 
         with self.assertRaisesRegex(
-            DataGateCLIException,
+            CloudPakOperationsCLIException,
             "Command group 'group-1' \\(distribution package: 'plugin-2', command hierarchy path: ''\\) cannot be "
             "registered as a command group with the same name was already provided by distribution package 'plugin-1'",
         ):

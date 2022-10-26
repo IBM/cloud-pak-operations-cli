@@ -15,7 +15,7 @@
 import cpo.config.cluster_credentials_manager
 import cpo.lib.click.utils
 
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.logging import loglevel_command
 
 
@@ -30,6 +30,6 @@ def login():
     current_cluster = cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
 
     if current_cluster is None:
-        raise DataGateCLIException("No current cluster selected")
+        raise CloudPakOperationsCLIException("No current cluster selected")
 
     current_cluster.login()
