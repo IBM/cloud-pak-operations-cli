@@ -17,8 +17,8 @@ import logging
 
 from typing import Any, Optional
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.ibmcloud import execute_ibmcloud_command
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.process import ProcessResult
 
 logger = logging.getLogger(__name__)
@@ -85,4 +85,4 @@ class VLANManager:
     ):
         logging.info("Returned VLAN information:\n" + ibmcloud_oc_vlan_ls_command_result.stdout)
 
-        raise DataGateCLIException(f"Could not obtain default {vlan_type} VLAN ID for zone {zone}")
+        raise CloudPakOperationsCLIException(f"Could not obtain default {vlan_type} VLAN ID for zone {zone}")

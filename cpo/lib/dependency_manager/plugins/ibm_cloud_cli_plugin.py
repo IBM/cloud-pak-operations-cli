@@ -28,7 +28,7 @@ import cpo.utils.operating_system
 import cpo.utils.process
 
 from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn
-from cpo.lib.error import DataGateCLIException, IBMCloudException
+from cpo.utils.error import CloudPakOperationsCLIException, IBMCloudException
 from cpo.utils.operating_system import OperatingSystem
 
 
@@ -54,7 +54,7 @@ class IBMCloudCLIPlugIn(AbstractDependencyManagerPlugIn):
     ) -> cpo.utils.process.ProcessResult:
         try:
             return super().execute_binary(args, capture_output, check, print_captured_output)
-        except DataGateCLIException as exception:
+        except CloudPakOperationsCLIException as exception:
             if exception.stderr is not None:
                 raise IBMCloudException(exception.stderr)
             else:
@@ -77,7 +77,7 @@ class IBMCloudCLIPlugIn(AbstractDependencyManagerPlugIn):
         latest_version = self._get_latest_dependency_version_on_github("IBM-Cloud", "ibm-cloud-cli-release")
 
         if latest_version is None:
-            raise DataGateCLIException(f"No {self.get_dependency_name()} release could be found on GitHub")
+            raise CloudPakOperationsCLIException(f"No {self.get_dependency_name()} release could be found on GitHub")
 
         return latest_version
 

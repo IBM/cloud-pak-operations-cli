@@ -21,7 +21,6 @@ import click
 from cpo.config import configuration_manager
 from cpo.lib.dependency_manager import dependency_manager
 from cpo.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import IBMCloudCLIPlugIn
-from cpo.lib.error import DataGateCLIException, IBMCloudException
 from cpo.lib.ibmcloud import (
     EXTERNAL_IBM_CLOUD_API_KEY_NAME,
     INTERNAL_IBM_CLOUD_API_KEY_NAME,
@@ -29,6 +28,7 @@ from cpo.lib.ibmcloud import (
 )
 from cpo.lib.ibmcloud.iam import delete_api_key_in_ibmcloud
 from cpo.lib.ibmcloud.login import is_logged_in
+from cpo.utils.error import CloudPakOperationsCLIException, IBMCloudException
 from cpo.utils.logging import loglevel_command
 
 logger = logging.getLogger(__name__)
@@ -50,7 +50,7 @@ def logout(delete_api_key: bool):
             delete_api_key_in_ibmcloud()
         except CalledProcessError as error:
             if f"Multiple API keys matches found with name '{EXTERNAL_IBM_CLOUD_API_KEY_NAME}'" in error.stderr:
-                raise DataGateCLIException(
+                raise CloudPakOperationsCLIException(
                     f"Multiple API keys with the name {EXTERNAL_IBM_CLOUD_API_KEY_NAME} exist. You need to manually "
                     f"delete them using '{dependency_manager.get_binary_path(IBMCloudCLIPlugIn)} iam "
                     f"api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"

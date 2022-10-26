@@ -23,7 +23,6 @@ from kubernetes import client, config, watch
 
 import cpo.lib.jmespath
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.data.global_pull_secret_data import GlobalPullSecretData
 from cpo.lib.openshift.types.catalog_source import CatalogSource
@@ -37,6 +36,7 @@ from cpo.lib.openshift.types.role_binding import RoleBinding
 from cpo.lib.openshift.types.role_rule import RoleRule
 from cpo.lib.openshift.types.service_account import ServiceAccount
 from cpo.lib.openshift.types.subscription import Subscription
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.network import ScopedInsecureRequestWarningDisabler
 
 logger = logging.getLogger(__name__)
@@ -534,7 +534,7 @@ class OpenShiftAPIManager:
             except client.ApiException as exception:
                 if exception.status == 401:
                     if not self._credentials.is_refreshable():
-                        raise DataGateCLIException("OAuth access token expired and cannot be refreshed")
+                        raise CloudPakOperationsCLIException("OAuth access token expired and cannot be refreshed")
 
                     self._credentials.refresh_access_token()
                     self._set_kube_config()
@@ -705,7 +705,7 @@ class OpenShiftAPIManager:
 
     def refresh_access_token(self):
         if not self._credentials.is_refreshable():
-            raise DataGateCLIException("OAuth access token expired and cannot be refreshed")
+            raise CloudPakOperationsCLIException("OAuth access token expired and cannot be refreshed")
 
         self._credentials.refresh_access_token()
 

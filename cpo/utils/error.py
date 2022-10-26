@@ -19,7 +19,7 @@ from typing import Optional
 import colorama
 
 
-class DataGateCLIException(Exception):
+class CloudPakOperationsCLIException(Exception):
     def __init__(self, error_message: str, stderr: Optional[str] = None, stdout: Optional[str] = None):
         super().__init__(error_message)
         self._error_message = error_message[7:] if error_message.startswith("Error: ") else error_message
@@ -52,7 +52,7 @@ class DataGateCLIException(Exception):
         return self._stdout
 
 
-class IBMCloudException(DataGateCLIException):
+class IBMCloudException(CloudPakOperationsCLIException):
     @classmethod
     def get_parsed_error_message(cls, error_message: str) -> str:
         # use regex.DOTALL to match newline characters
@@ -103,11 +103,11 @@ class IBMCloudException(DataGateCLIException):
         return f"{colorama.Style.BRIGHT}{str}{colorama.Style.RESET_ALL}"
 
 
-class JmespathPathExpressionNotFoundException(DataGateCLIException):
+class JmespathPathExpressionNotFoundException(CloudPakOperationsCLIException):
     def __init__(self, expresion):
         super().__init__(f"Jmespath expression not found ({expresion})")
 
 
-class UnexpectedTypeException(DataGateCLIException):
+class UnexpectedTypeException(CloudPakOperationsCLIException):
     def __init__(self, value):
         super().__init__(f"Unexpected type ({type(value)})")

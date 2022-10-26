@@ -17,8 +17,8 @@ import cpo.lib.ibmcloud
 import cpo.lib.openshift.oc
 
 from cpo.lib.cluster.cluster import AbstractCluster, ClusterData
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.ibmcloud import INTERNAL_IBM_CLOUD_API_KEY_NAME
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class ROKSCluster(AbstractCluster):
@@ -31,7 +31,7 @@ class ROKSCluster(AbstractCluster):
         if api_key is None:
             credentials_file_path = cpo.config.configuration_manager.get_credentials_file_path()
 
-            raise DataGateCLIException(f"IBM Cloud API key not found in {credentials_file_path}")
+            raise CloudPakOperationsCLIException(f"IBM Cloud API key not found in {credentials_file_path}")
 
         return api_key
 
@@ -44,6 +44,6 @@ class ROKSCluster(AbstractCluster):
         )
 
         if api_key is None:
-            raise DataGateCLIException("IBM Cloud API key not found in stored credentials")
+            raise CloudPakOperationsCLIException("IBM Cloud API key not found in stored credentials")
 
         cpo.lib.openshift.oc.log_in_to_openshift_cluster_with_password(self.server, "apikey", api_key)

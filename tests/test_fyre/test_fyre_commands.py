@@ -31,7 +31,7 @@ import cpo.utils.logging
 
 from cpo.config import configuration_manager
 from cpo.cpo import cli
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 cpo.utils.logging.init_root_logger()
 
@@ -295,9 +295,9 @@ class TestFYRECommands(unittest.TestCase):
         if (
             result.exit_code != 0
             and result.exception is not None
-            and isinstance(result.exception, DataGateCLIException)
+            and isinstance(result.exception, CloudPakOperationsCLIException)
         ):
-            exception: DataGateCLIException = result.exception
+            exception: CloudPakOperationsCLIException = result.exception
 
             if regex.match(pattern, exception.get_error_message()) is None:
                 self._check_result(result)

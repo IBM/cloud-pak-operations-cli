@@ -21,7 +21,7 @@ import jsonschema
 import cpo.config
 
 from cpo.lib.cloud_pak_for_data.cpd_4_0_0.types.operand_request_metadata import OperandRequestMetadata
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class CloudPakForDataOperandManager:
@@ -96,7 +96,7 @@ class CloudPakForDataOperandManager:
         self._initialize_operands_dict_if_required()
 
         if operand_request_name not in self._operands:
-            raise DataGateCLIException("Unknown IBM Cloud Pak for Data service")
+            raise CloudPakOperationsCLIException("Unknown IBM Cloud Pak for Data service")
 
         return self._operands[operand_request_name]
 

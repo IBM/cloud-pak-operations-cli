@@ -18,7 +18,7 @@ import subprocess
 from importlib import metadata
 
 from cpo import distribution_package_name
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.logging import loglevel_command
 
 
@@ -27,7 +27,7 @@ def update_dev():
     """Update the CLI to the latest development version"""
 
     if metadata.version(distribution_package_name) != "0.0.1":
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"Current version is not a development version (use 'pip3 install --upgrade {distribution_package_name}' "
             f"to upgrade a release version)"
         )

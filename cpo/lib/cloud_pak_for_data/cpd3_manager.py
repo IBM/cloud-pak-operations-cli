@@ -31,7 +31,7 @@ import cpo.utils.download
 import cpo.utils.operating_system
 import cpo.utils.process
 
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.operating_system import OperatingSystem
 
 
@@ -71,7 +71,7 @@ class AbstractCloudPakForDataManager(ABC):
         if not AbstractCloudPakForDataManager.is_openshift_version_supported(
             cloud_pak_for_data_version, openshift_version
         ):
-            raise DataGateCLIException(
+            raise CloudPakOperationsCLIException(
                 f"Cloud Pak for Data {cloud_pak_for_data_version} cannot be installed on OpenShift {openshift_version}"
             )
 
@@ -397,7 +397,9 @@ class AbstractCloudPakForDataManager(ABC):
                     yaml_file,
                 )
         except yaml.YAMLError as exc:
-            raise DataGateCLIException("Exception while adding Artifactory credentials to YAML file: " + str(exc))
+            raise CloudPakOperationsCLIException(
+                "Exception while adding Artifactory credentials to YAML file: " + str(exc)
+            )
 
         return file_path
 

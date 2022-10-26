@@ -25,7 +25,7 @@ import cpo.utils.download
 import cpo.utils.operating_system
 
 from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.operating_system import OperatingSystem
 
 
@@ -64,7 +64,7 @@ class IBMCloudPakCLIPlugIn(AbstractDependencyManagerPlugIn):
         latest_version = self._get_latest_dependency_version_on_github("IBM", "cloud-pak-cli")
 
         if latest_version is None:
-            raise DataGateCLIException(f"No {self.get_dependency_name()} release could be found on GitHub")
+            raise CloudPakOperationsCLIException(f"No {self.get_dependency_name()} release could be found on GitHub")
 
         return latest_version
 

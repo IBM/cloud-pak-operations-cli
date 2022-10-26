@@ -23,9 +23,13 @@ import jmespath
 
 from tabulate import tabulate
 
-from cpo.lib.error import DataGateCLIException, JmespathPathExpressionNotFoundException, UnexpectedTypeException
 from cpo.lib.openshift.types.auths_dict import AuthDict, AuthsDict
 from cpo.lib.openshift.types.credentials import Credentials
+from cpo.utils.error import (
+    CloudPakOperationsCLIException,
+    JmespathPathExpressionNotFoundException,
+    UnexpectedTypeException,
+)
 
 
 class GlobalPullSecretData:
@@ -74,7 +78,7 @@ class GlobalPullSecretData:
         auths = self._secret_get_response["auths"]
 
         if registry_location not in auths:
-            raise DataGateCLIException(f"Credentials for registry location '{registry_location}' not found")
+            raise CloudPakOperationsCLIException(f"Credentials for registry location '{registry_location}' not found")
 
         del auths[registry_location]
 
@@ -100,7 +104,7 @@ class GlobalPullSecretData:
                 search_result = regex.match("(.*)\\:(.*)", base64.standard_b64decode(auth["auth"]).decode("utf-8"))
 
                 if search_result is None:
-                    raise DataGateCLIException("…")
+                    raise CloudPakOperationsCLIException("…")
 
                 image_registry_password = search_result.group(2)
 
@@ -190,6 +194,6 @@ class GlobalPullSecretData:
         search_result = regex.match("(.*)\\:(.*)", base64.standard_b64decode(encoded_credentials).decode("utf-8"))
 
         if search_result is None:
-            raise DataGateCLIException("Invalid credentials format")
+            raise CloudPakOperationsCLIException("Invalid credentials format")
 
         return Credentials(username=search_result.group(1), password=search_result.group(2))

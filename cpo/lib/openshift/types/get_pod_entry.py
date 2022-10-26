@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class GetPodEntry:
@@ -30,13 +30,13 @@ class GetPodEntry:
         parts = line.split()
 
         if len(parts) != 5:
-            raise DataGateCLIException("Unable to split pod status line into 5 parts.")
+            raise CloudPakOperationsCLIException("Unable to split pod status line into 5 parts.")
 
         name = parts[0]
 
         ready = parts[1].split("/")
         if len(ready) != 2:
-            raise DataGateCLIException("Unable to split ready information into 2 parts")
+            raise CloudPakOperationsCLIException("Unable to split ready information into 2 parts")
         readiness_actual = int(ready[0])
         readiness_total = int(ready[1])
 

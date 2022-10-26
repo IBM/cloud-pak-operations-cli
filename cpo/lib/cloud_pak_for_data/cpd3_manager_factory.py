@@ -21,7 +21,7 @@ import cpo.lib.cloud_pak_for_data.cpd_3_0_1.cpd_manager
 import cpo.lib.cloud_pak_for_data.cpd_3_5_0.cpd_manager
 
 from cpo.lib.cloud_pak_for_data.cpd3_manager import AbstractCloudPakForDataManager
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class CloudPakForDataManagerFactory:
@@ -49,7 +49,9 @@ class CloudPakForDataManagerFactory:
         """
 
         if cloud_pak_for_data_version not in CloudPakForDataManagerFactory._cloud_pak_for_data_managers:
-            raise DataGateCLIException(f"Unknown Cloud Pak for Data version ({str(cloud_pak_for_data_version)})")
+            raise CloudPakOperationsCLIException(
+                f"Unknown Cloud Pak for Data version ({str(cloud_pak_for_data_version)})"
+            )
 
         return CloudPakForDataManagerFactory._cloud_pak_for_data_managers[cloud_pak_for_data_version]
 

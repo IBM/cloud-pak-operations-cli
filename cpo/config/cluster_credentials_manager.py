@@ -23,7 +23,7 @@ import cpo.lib.cluster
 
 from cpo.config import configuration_manager
 from cpo.lib.cluster.cluster import AbstractCluster, ClusterData
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 ContextData = Dict[str, Any]
 
@@ -84,7 +84,7 @@ class ClusterCredentialsManager:
         cluster = self.get_cluster(alias_or_server)
 
         if cluster is None:
-            raise DataGateCLIException(f"Cluster not found ({alias_or_server})")
+            raise CloudPakOperationsCLIException(f"Cluster not found ({alias_or_server})")
 
         if ("alias" in cluster_data_to_be_added) and ((new_alias := cluster_data_to_be_added["alias"]) != ""):
             self._raise_if_alias_exists(new_alias)
@@ -146,7 +146,7 @@ class ClusterCredentialsManager:
         cluster = self.get_cluster(alias_or_server)
 
         if cluster is None:
-            raise DataGateCLIException(f"Cluster not found ({alias_or_server})")
+            raise CloudPakOperationsCLIException(f"Cluster not found ({alias_or_server})")
 
         return cluster
 
@@ -231,7 +231,7 @@ class ClusterCredentialsManager:
             cluster = self.get_cluster(server_of_current_cluster)
 
             if cluster is None:
-                raise DataGateCLIException("Current cluster not found")
+                raise CloudPakOperationsCLIException("Current cluster not found")
 
         return cluster
 
@@ -289,7 +289,7 @@ class ClusterCredentialsManager:
 
         for server, cluster_data in clusters.items():
             if ("alias" in cluster_data) and (cluster_data["alias"] == alias_to_be_searched):
-                raise DataGateCLIException("Alias already exists")
+                raise CloudPakOperationsCLIException("Alias already exists")
 
     def reload(self):
         """Reloads the clusters file"""
@@ -309,7 +309,7 @@ class ClusterCredentialsManager:
         cluster = self.get_cluster(alias_or_server)
 
         if cluster is None:
-            raise DataGateCLIException(f"Cluster not found ({alias_or_server})")
+            raise CloudPakOperationsCLIException(f"Cluster not found ({alias_or_server})")
 
         clusters = self._get_clusters()
         clusters.pop(cluster.get_server())
@@ -338,7 +338,7 @@ class ClusterCredentialsManager:
         cluster = self.get_cluster(alias_or_server)
 
         if cluster is None:
-            raise DataGateCLIException(f"Cluster not found ({alias_or_server})")
+            raise CloudPakOperationsCLIException(f"Cluster not found ({alias_or_server})")
 
         self._clusters_file_contents["current_cluster"] = cluster.get_server()
         self._save_clusters_file()
@@ -355,7 +355,7 @@ class ClusterCredentialsManager:
         """
 
         if "clusters" not in self._clusters_file_contents:
-            raise DataGateCLIException("Corrupt configuration file")
+            raise CloudPakOperationsCLIException("Corrupt configuration file")
 
         return self._clusters_file_contents["clusters"]
 
@@ -384,7 +384,7 @@ class ClusterCredentialsManager:
 
         for cluster_data in clusters.values():
             if ("alias" in cluster_data) and (cluster_data["alias"] == alias_to_be_searched):
-                raise DataGateCLIException("Alias already exists")
+                raise CloudPakOperationsCLIException("Alias already exists")
 
     def _raise_if_alias_or_server_exists(self, alias_to_be_searched: str, server_to_be_searched: str):
         """Raises an exception if the given alias or server URL is already
@@ -402,9 +402,9 @@ class ClusterCredentialsManager:
 
         for server, cluster_data in clusters.items():
             if server == server_to_be_searched:
-                raise DataGateCLIException("Server already exists")
+                raise CloudPakOperationsCLIException("Server already exists")
             elif ("alias" in cluster_data) and (cluster_data["alias"] == alias_to_be_searched):
-                raise DataGateCLIException("Alias already exists")
+                raise CloudPakOperationsCLIException("Alias already exists")
 
     def _save_clusters_file(self):
         """Stores registered OpenShift clusters in a configuration file"""

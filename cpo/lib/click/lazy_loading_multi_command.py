@@ -28,9 +28,9 @@ import cpo
 import cpo.utils.debugger
 
 from cpo import commands_package_path
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.plugin_manager.package_data import PackageData, PackageElementDescriptor
 from cpo.lib.plugin_manager.plugin_manager import plugin_manager
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.path import is_relative_to
 
 logger = logging.getLogger(__name__)
@@ -265,7 +265,7 @@ class LazyLoadingMultiCommand(click.MultiCommand):
             else ""
         )
 
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"{command_type_1} '{command_name}' (distribution package: '"
             f"{package_element_descriptor.distribution_package_name}'{command_hierarchy_path}) cannot be registered as "
             f"a {command_type_2} with the same name was already provided by distribution package '"

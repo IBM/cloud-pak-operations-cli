@@ -24,7 +24,6 @@ import cpo.lib.ibmcloud.oc.cluster
 import cpo.lib.ibmcloud.status
 
 from cpo.config.cluster_credentials_manager import cluster_credentials_manager
-from cpo.lib.error import IBMCloudException
 from cpo.lib.ibmcloud import execute_ibmcloud_command, execute_ibmcloud_command_without_check
 from cpo.lib.ibmcloud.install import install_cp4d_with_preinstall
 from cpo.lib.ibmcloud.login import login as login_to_ibm_cloud
@@ -37,6 +36,7 @@ from cpo.lib.ibmcloud.status import (
     wait_for_ingress_readiness,
 )
 from cpo.lib.ibmcloud.vlan_manager import VLANManager
+from cpo.utils.error import IBMCloudException
 from cpo.utils.logging import loglevel_command
 
 logger = logging.getLogger(__name__)

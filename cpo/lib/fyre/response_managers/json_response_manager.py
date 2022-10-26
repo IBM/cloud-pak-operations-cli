@@ -19,8 +19,8 @@ import jsonschema
 
 from jsonschema import validate
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.fyre.types.default_error_response import DefaulErrorResponse
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class AbstractJSONResponseManager(ABC):
@@ -210,4 +210,4 @@ class AbstractJSONResponseManager(ABC):
         if error_response_schema is not None and jsonschema.Draft7Validator(error_response_schema).is_valid(
             json_response
         ):
-            raise DataGateCLIException(f"{error_message} [{self.get_error_message(json_response)}]")
+            raise CloudPakOperationsCLIException(f"{error_message} [{self.get_error_message(json_response)}]")

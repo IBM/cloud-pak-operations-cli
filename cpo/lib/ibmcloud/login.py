@@ -17,7 +17,6 @@ import click
 import cpo.config
 import cpo.lib.ibmcloud.plugin_manager
 
-from cpo.lib.error import DataGateCLIException, IBMCloudException
 from cpo.lib.ibmcloud import (
     INTERNAL_IBM_CLOUD_API_KEY_NAME,
     execute_ibmcloud_command_interactively,
@@ -25,6 +24,7 @@ from cpo.lib.ibmcloud import (
 )
 from cpo.lib.ibmcloud.iam import generate_api_key
 from cpo.lib.ibmcloud.target import get_ibmcloud_account_target_information
+from cpo.utils.error import CloudPakOperationsCLIException, IBMCloudException
 
 
 def is_logged_in() -> bool:
@@ -68,7 +68,9 @@ def _login_using_api_key(apikey: str):
     )
 
     if login_command.return_code != 0:
-        raise DataGateCLIException(f"Login to IBM Cloud using the given API key failed:\n{login_command.stdout}")
+        raise CloudPakOperationsCLIException(
+            f"Login to IBM Cloud using the given API key failed:\n{login_command.stdout}"
+        )
     else:
         click.echo(login_command.stdout)
 
@@ -77,7 +79,7 @@ def _login_interactively():
     login_command_return_code = execute_ibmcloud_command_interactively(["login", "--no-region", "--sso"])
 
     if login_command_return_code != 0:
-        raise DataGateCLIException("Interactive login to IBM Cloud failed.")
+        raise CloudPakOperationsCLIException("Interactive login to IBM Cloud failed.")
 
 
 def _disable_update_notifications():

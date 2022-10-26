@@ -21,8 +21,8 @@ import requests
 
 from requests.models import Response
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.network import ScopedInsecureRequestWarningDisabler
 
 
@@ -71,17 +71,17 @@ class UserCredentials(AbstractCredentials):
 
         if not response.ok:
             if response.content is not None:
-                raise DataGateCLIException(response.content.decode())
+                raise CloudPakOperationsCLIException(response.content.decode())
             else:
                 response.raise_for_status()
 
         if "Location" not in response.headers:
-            raise DataGateCLIException("HTTP Location header not found")
+            raise CloudPakOperationsCLIException("HTTP Location header not found")
 
         fragment = urllib.parse.parse_qs(urllib.parse.urlparse(response.headers["Location"]).fragment)
 
         if "access_token" not in fragment:
-            raise DataGateCLIException("access_token key not found in URL fragment")
+            raise CloudPakOperationsCLIException("access_token key not found in URL fragment")
 
         self.persist_access_token(fragment["access_token"][0])
 
@@ -104,14 +104,14 @@ class UserCredentials(AbstractCredentials):
 
         if not response.ok:
             if response.content is not None:
-                raise DataGateCLIException(response.content.decode())
+                raise CloudPakOperationsCLIException(response.content.decode())
             else:
                 response.raise_for_status()
 
         json_response = json.loads(response.content)
 
         if "authorization_endpoint" not in json_response:
-            raise DataGateCLIException("authorization_endpoint key not found in JSON response")
+            raise CloudPakOperationsCLIException("authorization_endpoint key not found in JSON response")
 
         authorization_endpoint = json_response["authorization_endpoint"]
 

@@ -20,7 +20,7 @@ import cpo.utils.process
 
 from cpo.config.binaries_manager import binaries_manager
 from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class DependencyManager:
@@ -69,12 +69,14 @@ class DependencyManager:
         plugin = self._download_manager_dict.get(cls)
 
         if plugin is None:
-            raise DataGateCLIException(f"Plug-in with class name '{cls.__name__} was not registered")
+            raise CloudPakOperationsCLIException(f"Plug-in with class name '{cls.__name__} was not registered")
 
         binary_path = plugin.get_binary_path()
 
         if binary_path is None:
-            raise DataGateCLIException(f"Dependency '{plugin.get_dependency_name()} does not provide a binary'")
+            raise CloudPakOperationsCLIException(
+                f"Dependency '{plugin.get_dependency_name()} does not provide a binary'"
+            )
 
         if not binary_path.exists():
             latest_dependency_version = plugin.get_latest_dependency_version()
@@ -101,7 +103,7 @@ class DependencyManager:
         plugin = self._download_manager_dict.get(cls)
 
         if plugin is None:
-            raise DataGateCLIException(f"Plug-in with class name '{cls.__name__} was not registered")
+            raise CloudPakOperationsCLIException(f"Plug-in with class name '{cls.__name__} was not registered")
 
         return plugin.get_binary_path()
 

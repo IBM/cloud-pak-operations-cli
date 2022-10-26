@@ -19,9 +19,9 @@ from typing import Any, Dict, Optional
 import cpo.lib.jmespath
 
 from cpo.lib.ansible.playbook_runner import PlaybookRunner
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.openshift_api_manager import OpenShiftAPIManager
+from cpo.utils.error import CloudPakOperationsCLIException
 
 logger = logging.getLogger(__name__)
 
@@ -57,9 +57,9 @@ class OpenShiftPlaybookRunner(PlaybookRunner):
                 runner = self._run_playbook()
 
                 if runner.status == "failed":
-                    raise DataGateCLIException("Ansible playbook failed")
+                    raise CloudPakOperationsCLIException("Ansible playbook failed")
             else:
-                raise DataGateCLIException("Ansible playbook failed")
+                raise CloudPakOperationsCLIException("Ansible playbook failed")
 
     # override
     def _event_handler(self, event_data: Any):

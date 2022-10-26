@@ -16,8 +16,8 @@ import re as regex
 
 from typing import List, Optional
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.fyre.types.ocp_post_request import HAProxyData, HAProxyTimeoutData, OCPPostRequest
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.string import removeprefix
 
 
@@ -59,7 +59,7 @@ class HAProxyTimoutSettings:
             search_result = regex.match("\\d+(d|h|m|ms|s|us)", argument)
 
             if search_result is None:
-                raise DataGateCLIException(f"Invalid string format: {argument}")
+                raise CloudPakOperationsCLIException(f"Invalid string format: {argument}")
 
         return argument
 

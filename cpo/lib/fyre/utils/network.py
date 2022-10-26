@@ -17,7 +17,7 @@ import re as regex
 
 from typing import List, Optional
 
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 def get_private_ip_address_of_infrastructure_node(ipv4_addresses: List[ipaddress.IPv4Address]) -> ipaddress.IPv4Address:
@@ -46,6 +46,6 @@ def get_private_ip_address_of_infrastructure_node(ipv4_addresses: List[ipaddress
             break
 
     if result is None:
-        raise DataGateCLIException("Private IP address not found")
+        raise CloudPakOperationsCLIException("Private IP address not found")
 
     return result

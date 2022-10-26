@@ -19,8 +19,8 @@ from typing import Any, Optional
 import semver
 
 from cpo.lib.cloud_pak_for_data.cpd3_manager import AbstractCloudPakForDataManager
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.ibmcloud import execute_ibmcloud_command
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 def get_full_openshift_version(openshift_version: semver.VersionInfo) -> str:
@@ -38,7 +38,7 @@ def get_full_openshift_version(openshift_version: semver.VersionInfo) -> str:
                 if not AbstractCloudPakForDataManager.is_openshift_version_supported(
                     ibm_cloud_supported_cloud_pak_for_data_version, openshift_version
                 ):
-                    raise DataGateCLIException(
+                    raise CloudPakOperationsCLIException(
                         f"OpenShift {str(openshift_version)} is not supported by IBM Cloud Pak for Data "
                         f"{str(ibm_cloud_supported_cloud_pak_for_data_version)}"
                     )
@@ -48,7 +48,7 @@ def get_full_openshift_version(openshift_version: semver.VersionInfo) -> str:
                 break
 
     if full_openshift_version is None:
-        raise DataGateCLIException(f"OpenShift {str(openshift_version)} is not supported by IBM Cloud")
+        raise CloudPakOperationsCLIException(f"OpenShift {str(openshift_version)} is not supported by IBM Cloud")
 
     return full_openshift_version
 
@@ -71,7 +71,7 @@ def get_latest_supported_openshift_version() -> str:
                 current_openshift_version = openshift_version
 
     if current_openshift_version is None:
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"None of the OpenShift versions available in IBM Cloud is supported by IBM Cloud Pak for Data "
             f"{str(ibm_cloud_supported_cloud_pak_for_data_version)}:\n{version_command_result_json}"
         )

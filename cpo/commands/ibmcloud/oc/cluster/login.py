@@ -16,8 +16,8 @@ import click
 
 import cpo.lib.ibmcloud.status
 
-from cpo.lib.error import DataGateCLIException
 from cpo.lib.ibmcloud.oc.cluster.roks_cluster_factory import roks_cluster_factory
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.logging import loglevel_command
 
 
@@ -32,6 +32,6 @@ def login(cluster_name: str):
         cluster = roks_cluster_factory.create_cluster(cluster_status.get_server_url(), {})
         cluster.login()
     else:
-        raise DataGateCLIException(
+        raise CloudPakOperationsCLIException(
             f"The cluster {cluster_name} is not ready yet, hence, it is not possible to log in to it."
         )

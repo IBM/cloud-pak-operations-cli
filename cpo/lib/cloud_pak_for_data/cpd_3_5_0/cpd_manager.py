@@ -37,7 +37,7 @@ from cpo.lib.cloud_pak_for_data.cpd3_manager import (
     CloudPakForDataAssemblyBuildType,
     CloudPakForDataVersion,
 )
-from cpo.lib.error import DataGateCLIException
+from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.operating_system import OperatingSystem
 
 cloud_pak_for_data_configuration_data_dict = {
@@ -369,7 +369,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 break
 
         if result is None:
-            raise DataGateCLIException(
+            raise CloudPakOperationsCLIException(
                 f"IBM Cloud Pak for Data installer release for Cloud Pak for Data "
                 f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
@@ -412,7 +412,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
                 break
 
         if result is None:
-            raise DataGateCLIException(
+            raise CloudPakOperationsCLIException(
                 f"Download URL of IBM Cloud Pak for Data installer for Cloud Pak for Data "
                 f"{self._get_cloud_pak_for_data_version()} could not be found on GitHub"
             )
@@ -440,7 +440,7 @@ class CloudPakForDataManager(AbstractCloudPakForDataManager):
         )
 
         if search_result is None:
-            raise DataGateCLIException("Cloud Pak for Data version could not be parsed")
+            raise CloudPakOperationsCLIException("Cloud Pak for Data version could not be parsed")
 
         version = semver.VersionInfo.parse(f"{search_result.group(2)}+{search_result.group(1)}")
 

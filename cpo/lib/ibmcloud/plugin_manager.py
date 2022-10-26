@@ -17,8 +17,8 @@ import logging
 
 from typing import List
 
-from cpo.lib.error import IBMCloudException
 from cpo.lib.ibmcloud import execute_ibmcloud_command, execute_ibmcloud_command_without_check
+from cpo.utils.error import IBMCloudException
 
 
 class PlugInManager:
