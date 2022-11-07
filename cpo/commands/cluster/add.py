@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,25 +17,26 @@ from typing import Optional
 import click
 
 import cpo.config.cluster_credentials_manager
-import cpo.lib.ibmcloud.ks.cluster
-import cpo.lib.ibmcloud.status
+import cpo.lib.openshift.cluster
 
 from cpo.utils.logging import loglevel_command
 
 
 @loglevel_command()
+@click.option("--server", help="OpenShift server URL", required=True)
 @click.option("--alias", help="Alias used to reference a cluster instead of its server URL")
-@click.option("--cluster-name", help="Name of the IBM Cloud Kubernetes Service cluster to be registered", required=True)
-def add(alias: Optional[str], cluster_name: str):
-    """Register an existing IBM Cloud Kubernetes Service cluster"""
-
-    server = cpo.lib.ibmcloud.status.get_cluster_status(cluster_name).get_server_url()
+@click.option("--username", default="kubeadmin", help="OpenShift username", show_default=True)
+@click.option("--password", help="OpenShift password", required=True)
+def add(server: str, alias: Optional[str], username: str, password: str):
+    """Register an existing Red Hat OpenShift cluster"""
 
     cpo.config.cluster_credentials_manager.cluster_credentials_manager.add_cluster(
         alias if (alias is not None) else "",
         server,
-        cpo.lib.ibmcloud.ks.cluster.CLUSTER_TYPE_ID,
+        cpo.lib.openshift.cluster.CLUSTER_TYPE_ID,
         {
-            "cluster_name": cluster_name,
+            "insecure_skip_tls_verify": True,
+            "password": password,
+            "username": username,
         },
     )
