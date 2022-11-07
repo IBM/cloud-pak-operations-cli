@@ -14,12 +14,18 @@
 
 import click
 
+import cpo.config.cluster_credentials_manager
+import cpo.lib.click.utils
 import cpo.lib.ibm_internal_plugin.list
 
 from cpo.utils.logging import loglevel_command
 
 
-@loglevel_command()
+@loglevel_command(
+    context_settings=cpo.lib.click.utils.create_default_map_from_dict(
+        cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
+    )
+)
 @click.option(
     "--artifactory-username",
     help="Artifactory username. The username is usually the IBM e-mail address.",
@@ -27,10 +33,10 @@ from cpo.utils.logging import loglevel_command
 )
 @click.option(
     "--artifactory-password",
-    help="Artifactory password. The password is usually the API Key located in the 'Edit Profile' page in Artifactory.",
+    help="Artifactory password. The password is usually the API key located in the 'Edit Profile' page in Artifactory.",
     required=True,
 )
-def list(artifactory_username, artifactory_password):
+def ls(artifactory_username, artifactory_password):
     """List available IBM-internal CLI plug-ins"""
 
     cpo.lib.ibm_internal_plugin.list.list(artifactory_username, artifactory_password)
