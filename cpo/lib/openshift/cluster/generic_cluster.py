@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,32 +12,23 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import cpo.lib.openshift.oc
+
 from cpo.lib.cluster.cluster import AbstractCluster, ClusterData
-from cpo.lib.ibmcloud import execute_ibmcloud_command
 
 
-class IKSCluster(AbstractCluster):
+class GenericCluster(AbstractCluster):
     def __init__(self, server: str, cluster_data: ClusterData):
         super().__init__(server, cluster_data)
 
-    # override
     def get_password(self) -> str:
-        # TODO implement
-        return ""
+        return self.cluster_data["password"]
 
-    # override
     def get_username(self) -> str:
-        # TODO implement
-        return ""
+        return self.cluster_data["username"]
 
     # override
     def login(self):
-        args = [
-            "ks",
-            "cluster",
-            "config",
-            "--cluster",
-            self.get_cluster_data()["cluster_name"],
-        ]
-
-        execute_ibmcloud_command(args)
+        cpo.lib.openshift.oc.log_in_to_openshift_cluster_with_password(
+            self.server, self.cluster_data["username"], self.cluster_data["password"]
+        )
