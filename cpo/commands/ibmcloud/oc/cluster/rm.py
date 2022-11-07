@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,14 +14,17 @@
 
 import click
 
-from cpo.lib.ibmcloud.oc.cluster.rm import delete_ibmcloud_cluster
+from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
 from cpo.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.option("-c", "--cluster-name", help="cluster name", required=True)
-@click.option("--force", "force_deletion", help="Force deletion of the cluster", is_flag=True)
-def rm(cluster_name: str, force_deletion: bool):
+@click.option("--cluster-name", help="Name of the Red Hat OpenShift on IBM Cloud cluster to be deleted", required=True)
+@click.option("--force", help="Skip confirmation", is_flag=True)
+def rm(cluster_name: str, force: bool):
     """Delete a Red Hat OpenShift on IBM Cloud cluster"""
 
-    delete_ibmcloud_cluster(cluster_name, force_deletion)
+    if not force:
+        click.confirm(f"Do you really want to delete cluster '{cluster_name}'?", abort=True)
+
+    IBMCloudAPIManager().delete_cluster(cluster_name)

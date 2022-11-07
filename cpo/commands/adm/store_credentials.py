@@ -24,16 +24,13 @@ from cpo.utils.logging import loglevel_command
 @loglevel_command()
 @click.option("--artifactory-password", help="Artifactory password")
 @click.option("--artifactory-username", help="Artifactory username")
-@click.option("--ibm-cloud-api-key", help="IBM Cloud API key")
 @click.option(
     "--ibm-cloud-pak-for-data-entitlement-key",
-    "-e",
     help="IBM Cloud Pak for Data entitlement key (see https://myibm.ibm.com/products-services/containerlibrary)",
 )
 def store_credentials(
     artifactory_password: Optional[str],
     artifactory_username: Optional[str],
-    ibm_cloud_api_key: Optional[str],
     ibm_cloud_pak_for_data_entitlement_key: Optional[str],
 ):
     """Store credentials in a configuration file"""

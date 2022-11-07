@@ -48,7 +48,7 @@ There is a script to automatically correct copyright headers ([Development Guide
 
 ## Errors
 
-- When raising an Exception, use the `DataGateCLIException` class or `IBMCloudExceptionClass` class.
+- When raising an Exception, use the `CloudPakOperationsCLIException` class or `IBMCloudExceptionClass` class.
 - Error messages must be complete sentences with a full stop or incomplete sentences without a full stop.
 
 ## Imports
@@ -58,13 +58,13 @@ To avoid circular imports, a module contained in one of the packages shown in th
 - modules from the same package or other packages in the same row if no circular import is created
 - modules from other packages in rows below the row containing the package of the module
 
-| 1st level packages | 2nd level packages | 3rd level packages                                   |
-| ------------------ | ------------------ | ---------------------------------------------------- |
-| test               | …                  |                                                      |
-| cpo                | cpo.commands       | cpo.commands.adm<br />cpo.commands.cluster<br />…    |
-|                    | cpo.lib            | cpo.lib.click<br />cpo.lib.cloud_pak_for_data<br />… |
-|                    | cpo.config         |                                                      |
-|                    | cpo.utils          |                                                      |
+| 1st level packages | 2nd level packages | 3rd level packages                                |
+| ------------------ | ------------------ | ------------------------------------------------- |
+| test               | …                  |                                                   |
+| cpo                | cpo.commands       | cpo.commands.adm<br />cpo.commands.cluster<br />… |
+|                    | cpo.lib            | cpo.lib.click<br />…                              |
+|                    | cpo.config         |                                                   |
+|                    | cpo.utils          |                                                   |
 
 For example, a module contained in the `cpo.config` package is allowed to import modules from the `cpo.utils` package but must not import modules from the `cpo.lib` package.
 

@@ -16,7 +16,7 @@ import os
 import pathlib
 import urllib.parse
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import semver
 
@@ -50,10 +50,17 @@ class IBMCloudCLIPlugIn(AbstractDependencyManagerPlugIn):
 
     # override
     def execute_binary(
-        self, args: List[str], capture_output=False, check=True, print_captured_output=False
+        self,
+        args: List[str],
+        env: Dict[str, str] = os.environ.copy(),
+        capture_output=False,
+        check=True,
+        print_captured_output=False,
     ) -> cpo.utils.process.ProcessResult:
         try:
-            return super().execute_binary(args, capture_output, check, print_captured_output)
+            return super().execute_binary(
+                args, env, capture_output=capture_output, check=check, print_captured_output=print_captured_output
+            )
         except CloudPakOperationsCLIException as exception:
             if exception.stderr is not None:
                 raise IBMCloudException(exception.stderr)

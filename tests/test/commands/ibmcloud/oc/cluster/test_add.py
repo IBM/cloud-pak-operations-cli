@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,12 +23,13 @@ from typing import TypedDict
 import click.testing
 
 import cpo.lib.ibmcloud.oc.cluster
-import cpo.lib.ibmcloud.status
 import cpo.utils.process
 
 from cpo.config.cluster_credentials_manager import cluster_credentials_manager
 from cpo.cpo import cli
 from cpo.lib.cluster.cluster import AbstractCluster
+from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
+from cpo.utils.process import ProcessResult
 
 
 class ClusterData(TypedDict):
@@ -66,42 +67,46 @@ class TestAddClusterCommands(unittest.TestCase):
     def _add_cluster(self, cluster_data: ClusterData, num_expected_cluster: int):
         server = cluster_data["server"]
 
-        cpo.lib.ibmcloud.status.execute_ibmcloud_command = unittest.mock.MagicMock(
-            return_value=cpo.utils.process.ProcessResult(
-                stderr="", stdout=f'{{"serverURL": "{server}"}}', return_code=0
+        with unittest.mock.patch.object(
+            IBMCloudAPIManager,
+            "execute_ibmcloud_command",
+            lambda self, args, capture_output=False, check=True, print_captured_output=False: ProcessResult(
+                command=[],
+                stderr=[],
+                stdout=[f'{{"serverURL": "{server}"}}'],
+                return_code=0,
+            ),
+        ):
+            runner = click.testing.CliRunner()
+            result = runner.invoke(
+                cli,
+                [
+                    "ibmcloud",
+                    "oc",
+                    "cluster",
+                    "add",
+                    "--alias",
+                    cluster_data["alias"],
+                    "--cluster-name",
+                    cluster_data["cluster_name"],
+                ],
             )
-        )
 
-        runner = click.testing.CliRunner()
-        result = runner.invoke(
-            cli,
-            [
-                "ibmcloud",
-                "oc",
-                "cluster",
-                "add",
-                "--alias",
-                cluster_data["alias"],
-                "--cluster-name",
-                cluster_data["cluster_name"],
-            ],
-        )
+            if result.exception is not None:
+                raise (result.exception)
 
-        if result.exception is not None:
-            raise (result.exception)
+            self.assertEqual(result.exit_code, 0)
+            self.assertEqual(
+                len(cluster_credentials_manager.get_clusters_file_contents_with_default()["clusters"]),
+                num_expected_cluster,
+            )
 
-        self.assertEqual(result.exit_code, 0)
-        self.assertEqual(
-            len(cluster_credentials_manager.get_clusters_file_contents_with_default()["clusters"]),
-            num_expected_cluster,
-        )
+            cluster = cluster_credentials_manager.get_cluster(cluster_data["server"])
 
-        cluster = cluster_credentials_manager.get_cluster(cluster_data["server"])
+            self.assertIsNotNone(cluster)
 
-        self.assertIsNotNone(cluster)
-
-        if cluster is not None:
-            self._check_cluster(cluster, cluster_data)
+            if cluster is not None:
+                self._check_cluster(cluster, cluster_data)
 
     def _add_cluster_1(self) -> ClusterData:
         cluster_1_data: ClusterData = {

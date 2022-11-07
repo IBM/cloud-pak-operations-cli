@@ -4,9 +4,11 @@
 	"multiAzCapable": false,
 	"vlans": [],
 	"worker_vlans": [],
-	"workerZones": ["sjc03"],
+	"workerZones": [
+		"sjc03"
+	],
 	"id": "btfno4sd0b984kje2agg",
-	"name": "datagate.test",
+	"name": "cluster",
 	"region": "us-south",
 	"resourceGroup": "35c178dd590444b2965af1b0fff1f7e4",
 	"resourceGroupName": "Default",

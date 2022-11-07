@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 
 import click
 
-import cpo.lib.ibmcloud.status
-
+from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
 from cpo.utils.logging import loglevel_command
 
 
@@ -25,7 +24,7 @@ from cpo.utils.logging import loglevel_command
 def status(cluster_name: str, json: bool):
     """Display the status of a Red Hat OpenShift on IBM Cloud cluster"""
 
-    cluster_status = cpo.lib.ibmcloud.status.get_cluster_status(cluster_name)
+    cluster_status = IBMCloudAPIManager().get_cluster_status(cluster_name)
     status_output = cluster_status.get_json() if json else str(cluster_status)
 
     click.echo(status_output)

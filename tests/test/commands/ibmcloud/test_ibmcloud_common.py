@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,105 +12,84 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import pathlib
 import unittest
 
-from pathlib import Path
 from unittest.mock import patch
 
-from cpo.lib.ibmcloud.iam import api_key_exists, generate_api_key
-from cpo.lib.ibmcloud.install import _get_cp4d_version_locator
-from cpo.lib.ibmcloud.status import get_cluster_status
-from cpo.lib.ibmcloud.vlan_manager import VLANManager
+from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
 from cpo.utils.process import ProcessResult
 
 
 class TestIBMCloudCommon(unittest.TestCase):
-    @patch(
-        "cpo.lib.ibmcloud.iam.execute_ibmcloud_command",
-        return_value=ProcessResult(
-            stderr="",
-            stdout=(Path(__file__).parent / "dependencies/ibmcloud_generate_api_key.json").read_text(),
+    @patch.object(
+        IBMCloudAPIManager,
+        "execute_ibmcloud_command",
+        lambda self, args, capture_output=False, check=True, print_captured_output=False, skip_login=False: ProcessResult(  # noqa: E501
+            command=[],
+            stderr=[],
+            stdout=[(pathlib.Path(__file__).parent / "dependencies/ibmcloud_generate_api_key.json").read_text()],
             return_code=0,
         ),
     )
-    def test_generate_api_key(self, test_mock):
-        result = generate_api_key()
-        self.assertEqual("3O_fwBGvkWrug5VrI0aQJwRPuqX1Yb7_MtSTZK_qFthb", result)
+    def test_generate_api_key(self):
+        result = IBMCloudAPIManager().generate_api_key()
+        self.assertEqual("3O_fwBGvkWrug5VrI0aQJwRPuqX1Yb7_MtSTZK_qFthb", result.api_key)
 
-    @patch(
-        "cpo.lib.ibmcloud.iam.execute_ibmcloud_command",
-        return_value=ProcessResult(
-            stderr="",
-            stdout=(Path(__file__).parent / "dependencies/ibmcloud_api_keys.json").read_text(),
+    @patch.object(
+        IBMCloudAPIManager,
+        "execute_ibmcloud_command",
+        lambda self, args, capture_output=False, check=True, print_captured_output=False: ProcessResult(
+            command=[],
+            stderr=[],
+            stdout=[(pathlib.Path(__file__).parent / "dependencies/ibmcloud_api_keys.json").read_text()],
             return_code=0,
         ),
     )
-    def test_api_key_exists(self, test_mock):
-        self.assertTrue(api_key_exists("cpo.api.key"))
-        self.assertTrue(api_key_exists("cpo.api.key.2"))
-        self.assertFalse(api_key_exists("cpo.api.key.3"))
+    def test_api_key_exists(self):
+        ibm_cloud_api_manager = IBMCloudAPIManager()
 
-    @patch(
-        "cpo.lib.ibmcloud.vlan_manager.execute_ibmcloud_command",
-        return_value=ProcessResult(
-            stderr="",
-            stdout=(Path(__file__).parent / "dependencies/ibmcloud_list_vlans.json").read_text(),
-            return_code=0,
-        ),
-    )
-    def test_get_default_public_vlan(self, test_mock):
-        vlan_manager = VLANManager("sjc03")
-
-        self.assertEqual("2734440", vlan_manager.default_public_vlan)
-
-    @patch(
-        "cpo.lib.ibmcloud.vlan_manager.execute_ibmcloud_command",
-        return_value=ProcessResult(
-            stderr="",
-            stdout=(Path(__file__).parent / "dependencies/ibmcloud_list_vlans.json").read_text(),
-            return_code=0,
-        ),
-    )
-    def test_get_default_private_vlan(self, test_mock):
-        vlan_manager = VLANManager("sjc03")
-
-        self.assertEqual("2734442", vlan_manager.default_private_vlan)
-
-    @patch(
-        "cpo.lib.ibmcloud.status.execute_ibmcloud_command",
-        return_value=ProcessResult(
-            stderr="",
-            stdout=(Path(__file__).parent / "dependencies/ibmcloud_oc_cluster_status.json").read_text(),
-            return_code=0,
-        ),
-    )
-    def test_is_cluster_ready_false(self, test_mock):
-        self.assertFalse(get_cluster_status("datagate.test").is_ready())
-
-    @patch(
-        "cpo.lib.ibmcloud.status.execute_ibmcloud_command",
-        return_value=ProcessResult(
-            stderr="",
-            stdout=(Path(__file__).parent / "dependencies/ibmcloud_oc_cluster_status_2.json").read_text(),
-            return_code=0,
-        ),
-    )
-    def test_is_cluster_ready_true(self, test_mock):
-        self.assertTrue(get_cluster_status("datagate.test").is_ready())
-
-    @patch(
-        "cpo.lib.ibmcloud.install.execute_ibmcloud_command",
-        return_value=ProcessResult(
-            stderr="",
-            stdout=Path(Path(__file__).parent / "dependencies/ibmcloud_catalog_search_pak.json").read_text(),
-            return_code=0,
-        ),
-    )
-    def test_get_cp4d_version_locator(self, test_mock):
-        self.assertEqual(
-            _get_cp4d_version_locator("3.0.1"),
-            "1082e7d2-5e2f-0a11-a3bc-f88a8e1931fc.bac1d34a-d912-45e4-bc81-10cd7b94bcc1-global",
+        self.assertTrue(
+            ibm_cloud_api_manager.api_key_exists_in_ibm_cloud("ApiKey-65e62b94-6dc9-41c2-af0f-01740158b691")
         )
+
+        self.assertTrue(
+            ibm_cloud_api_manager.api_key_exists_in_ibm_cloud("ApiKey-205dd46e-1807-4cba-a536-58d8115bd888")
+        )
+
+        self.assertFalse(
+            ibm_cloud_api_manager.api_key_exists_in_ibm_cloud("ApiKey-efacdca5-adae-4e1d-82d0-cf8cce34ee2d")
+        )
+
+    @patch.object(
+        IBMCloudAPIManager,
+        "execute_ibmcloud_command",
+        lambda self, args, capture_output=False, check=True, print_captured_output=False: ProcessResult(
+            command=[],
+            stderr=[],
+            stdout=[(pathlib.Path(__file__).parent / "dependencies/ibmcloud_oc_cluster_status_1.json").read_text()],
+            return_code=0,
+        ),
+    )
+    def test_is_cluster_ready_false(self):
+        ibm_cloud_api_manager = IBMCloudAPIManager()
+
+        self.assertFalse(ibm_cloud_api_manager.get_cluster_status("cluster").is_ready())
+
+    @patch.object(
+        IBMCloudAPIManager,
+        "execute_ibmcloud_command",
+        lambda self, args, capture_output=False, check=True, print_captured_output=False: ProcessResult(
+            command=[],
+            stderr=[],
+            stdout=[(pathlib.Path(__file__).parent / "dependencies/ibmcloud_oc_cluster_status_2.json").read_text()],
+            return_code=0,
+        ),
+    )
+    def test_is_cluster_ready_true(self):
+        ibm_cloud_api_manager = IBMCloudAPIManager()
+
+        self.assertTrue(ibm_cloud_api_manager.get_cluster_status("cluster").is_ready())
 
 
 if __name__ == "__main__":

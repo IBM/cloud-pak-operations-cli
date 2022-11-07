@@ -12,6 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import os
 import pathlib
 
 from typing import Dict, List, Optional, Type
@@ -34,6 +35,7 @@ class DependencyManager:
         self,
         cls: Type[AbstractDependencyManagerPlugIn],
         args: List[str],
+        env: Dict[str, str] = os.environ.copy(),
         capture_output=False,
         check=True,
         print_captured_output=False,
@@ -50,6 +52,8 @@ class DependencyManager:
             dependency manager plug-in type
         args
             arguments to be passed to the binary
+        env
+            dictionary of environment variables passed to the process
         capture_output
             flag indicating whether process output shall be captured
         check
@@ -84,7 +88,9 @@ class DependencyManager:
             plugin.download_dependency_version(latest_dependency_version)
             binaries_manager.set_binary_version(plugin.get_dependency_alias(), str(latest_dependency_version))
 
-        return plugin.execute_binary(args, capture_output, check, print_captured_output)
+        return plugin.execute_binary(
+            args, env, capture_output=capture_output, check=check, print_captured_output=print_captured_output
+        )
 
     def get_binary_path(self, cls: Type[AbstractDependencyManagerPlugIn]) -> Optional[pathlib.Path]:
         """Returns the path of the binary provided by the dependency

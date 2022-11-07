@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from cpo.lib.ibmcloud.login import login as login_to_ibm_cloud
+from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
 from cpo.utils.logging import loglevel_command
 
 
@@ -20,4 +20,4 @@ from cpo.utils.logging import loglevel_command
 def login():
     """Log in to IBM Cloud"""
 
-    login_to_ibm_cloud()
+    IBMCloudAPIManager().log_in()

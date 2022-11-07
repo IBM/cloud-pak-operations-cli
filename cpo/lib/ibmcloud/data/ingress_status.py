@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,4 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-__doc__ = "⚠ Caution - No-holds-barred administrative functions"
+from typing import Any
+
+
+class IngressStatus:
+    def __init__(self, status_output: Any):
+        self._status_output = status_output
+
+    def is_ready(self) -> bool:
+        result = False
+
+        if ("status" in self._status_output) and (self._status_output["status"] == "healthy"):
+            result = True
+
+        return result

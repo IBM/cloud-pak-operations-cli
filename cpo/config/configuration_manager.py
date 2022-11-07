@@ -127,6 +127,17 @@ class ConfigurationManager:
 
         return self.get_home_directory_path() / ".cpo"
 
+    def get_ibmcloud_data_directory_path(self) -> pathlib.Path:
+        """Returns the path of the IBM Cloud CLI data directory
+
+        Returns
+        -------
+        pathlib.Path
+            path of the IBM Cloud CLI data directory
+        """
+
+        return self.get_cli_data_directory_path() / ".bluemix"
+
     def get_settings_file_path(self) -> pathlib.Path:
         """Returns the path of the settings file
 
@@ -259,7 +270,7 @@ class ConfigurationManager:
                 if value != "":
                     credentials[key] = value
                 else:
-                    credentials.pop(key)
+                    credentials.pop(key, None)
 
         self.get_cli_data_directory_path().mkdir(exist_ok=True)
 

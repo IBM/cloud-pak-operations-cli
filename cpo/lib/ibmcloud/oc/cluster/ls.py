@@ -14,24 +14,17 @@
 
 from typing import Any, Union
 
-from cpo.lib.ibmcloud import execute_ibmcloud_command_without_check
-from cpo.lib.ibmcloud.login import is_logged_in
-from cpo.utils.error import CloudPakOperationsCLIException
+from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
 
 
 def list_existing_clusters(json: bool) -> Union[str, Any]:
     """List all available clusters"""
 
-    if not is_logged_in():
-        raise CloudPakOperationsCLIException("Not logged in to IBM Cloud. Please run 'cpo ibmcloud login' to log in.")
+    args = ["oc", "cluster", "ls"]
 
-    command = ["oc", "cluster", "ls"]
     if json:
-        command.append("--json")
+        args.append("--json")
 
-    result = execute_ibmcloud_command_without_check(command, capture_output=True)
-
-    if result.return_code != 0 and "ibmcloud login" in result.stderr:
-        raise CloudPakOperationsCLIException("Please use 'cpo ibmcloud login' before running this command.")
+    result = IBMCloudAPIManager().execute_ibmcloud_command(args, capture_output=True)
 
     return result.stdout

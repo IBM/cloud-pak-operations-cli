@@ -22,49 +22,10 @@ import click
 import cpo.config.cluster_credentials_manager
 import cpo.lib.openshift.oc
 
-from cpo.lib.cloud_pak_for_data.cpd3_manager import CloudPakForDataAssemblyBuildType
 from cpo.lib.openshift.credentials.cluster_based_user_credentials import ClusterBasedUserCredentials
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.credentials.token_credentials import TokenCredentials
 from cpo.lib.openshift.credentials.user_credentials import UserCredentials
-
-
-def check_cloud_pak_for_data_options(
-    ctx: click.Context, build_type: CloudPakForDataAssemblyBuildType, options: Dict[str, Any]
-):
-    """Checks if values for required Click options were passed to a Click
-    command to install an IBM Cloud Pak for Data assembly
-
-    Parameters
-    ----------
-    ctx
-        Click context
-    build_type
-        build type of an IBM Cloud Pak for Data assembly to be installed
-    options
-        options passed to a Click command
-    """
-
-    if build_type == CloudPakForDataAssemblyBuildType.DEV:
-        if (
-            ("artifactory_user_name" in options)
-            and (options["artifactory_user_name"] is None)
-            and ("artifactory_api_key" in options)
-            and (options["artifactory_api_key"] is None)
-        ):
-            raise click.UsageError(
-                "Missing options '--artifactory-user-name' and '--artifactory-api-key'",
-                ctx,
-            )
-        elif ("artifactory_user_name" in options) and (options["artifactory_user_name"] is None):
-            raise click.UsageError("Missing option '--artifactory-user-name'", ctx)
-        elif ("artifactory_api_key" in options) and (options["artifactory_api_key"] is None):
-            raise click.UsageError("Missing option '--artifactory-api-key'", ctx)
-    else:
-        if ("ibm_cloud_pak_for_data_entitlement_key" in options) and (
-            options["ibm_cloud_pak_for_data_entitlement_key"] is None
-        ):
-            raise click.UsageError("Missing option '--ibm-cloud-pak-for-data-entitlement-key'", ctx)
 
 
 def create_default_map_from_dict(dict: Dict[str, Any]):

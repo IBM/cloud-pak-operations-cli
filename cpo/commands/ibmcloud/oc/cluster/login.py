@@ -14,8 +14,7 @@
 
 import click
 
-import cpo.lib.ibmcloud.status
-
+from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
 from cpo.lib.ibmcloud.oc.cluster.roks_cluster_factory import roks_cluster_factory
 from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.logging import loglevel_command
@@ -26,12 +25,10 @@ from cpo.utils.logging import loglevel_command
 def login(cluster_name: str):
     """Log in to a Red Hat OpenShift on IBM Cloud cluster"""
 
-    cluster_status = cpo.lib.ibmcloud.status.get_cluster_status(cluster_name)
+    cluster_status = IBMCloudAPIManager().get_cluster_status(cluster_name)
 
     if cluster_status.is_ready():
         cluster = roks_cluster_factory.create_cluster(cluster_status.get_server_url(), {})
         cluster.login()
     else:
-        raise CloudPakOperationsCLIException(
-            f"The cluster {cluster_name} is not ready yet, hence, it is not possible to log in to it."
-        )
+        raise CloudPakOperationsCLIException(f"Cluster {cluster_name} is not yet ready")

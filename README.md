@@ -10,7 +10,7 @@
     </p>
 </div>
 
-The IBM Cloud Pak Operations CLI allows the user-friendly installation of IBM Cloud Pak for Data 3.5.0/4.0.x and IBM Cloud Pak for Data services on OpenShift clusters. It also allows the one-click deployment of a Red Hat OpenShift on IBM Cloud cluster including the installation of IBM Cloud Pak for Data 3.5.0 as software.
+The IBM Cloud Pak Operations CLI provides basic functionality to manage Red Hat OpenShift clusters and IBM Cloud Pak for Data on various cloud platforms on top of the OpenShift CLI (oc) and the [IBM Cloud Pak for Data CLI](https://github.com/IBM/cpd-cli) (cpd-cli).
 
 For IBM-internal users, the IBM Cloud Pak Operations CLI additionally supports managing OpenShift clusters on Fyre.
 
@@ -26,11 +26,19 @@ For IBM-internal users, the IBM Cloud Pak Operations CLI additionally supports m
   brew install python
   ```
 
-- Windows (requires [Chocolatey](https://chocolatey.org/)):
+- Windows:
 
-  ```shell
-  choco install python
-  ```
+  - Winget:
+
+    ```shell
+    winget install --exact --id=Python.Python.3.12
+    ```
+
+  - [Chocolatey](https://chocolatey.org/)
+
+    ```shell
+    choco install python
+    ```
 
 #### IBM Cloud Pak Operations CLI installation and update (latest release build)
 
@@ -106,7 +114,7 @@ cpo adm update-dev
 
 #### Dependency download
 
-- Downloads dependencies (IBM Cloud CLI, IBM Cloud Terraform provider, OpenShift CLI, Terraform CLI)
+- Downloads dependencies (IBM Cloud CLI, IBM Cloud Pak CLI, OpenShift CLI)
 
   ```shell
   cpo adm download-dependencies
@@ -136,7 +144,9 @@ docker run -it quay.io/ibm/cloud-pak-operations-cli:latest bash
 
 ## Usage
 
-### Installation of IBM Cloud Pak for Data 3.5.0/4.0.x, IBM Db2, IBM Db2 Warehouse, IBM Db2 Data Management Console, and IBM Db2 for z/OS Data Gate
+### Cluster management
+
+#### Registering a generic OpenShift cluster
 
 - Register cluster:
 
@@ -150,53 +160,13 @@ docker run -it quay.io/ibm/cloud-pak-operations-cli:latest bash
   cpo cluster use $ALIAS
   ```
 
-- Store your [IBM Cloud Pak for Data entitlement key](https://myibm.ibm.com/products-services/containerlibrary):
+- Use cluster and log in using the OpenShift CLI:
 
   ```shell
-  cpo adm store-credentials \
-      --ibm-cloud-pak-for-data-entitlement-key $IBM_CLOUD_PAK_FOR_DATA_ENTITLEMENT_KEY
+  cpo cluster use $ALIAS --login
   ```
 
-- Install IBM Cloud Pak for Data:
-
-<table>
-<thead>
-<tr>
-<th>Version</th>
-<th>Command</th>
-</tr>
-</thead>
-<tbody>
-<tr/>
-<tr>
-<td>3.5.0</td>
-<td>
-
-```shell
-cpo cpd3 install --storage-class $STORAGE_CLASS
-```
-
-</td>
-</tr>
-<tr/>
-<tr>
-<td>4.0.x</td>
-<td>
-
-```shell
-cpo cpd4 install \
-    --accept-license \
-    --force \
-    --license (ENTERPRISE|STANDARD) \
-    --storage-class $STORAGE_CLASS
-```
-
-</td>
-</tr>
-</tbody>
-</table>
-
-### Installation of IBM Cloud Pak for Data 3.5.0, Db2 Warehouse, and IBM Db2 for z/OS Data Gate as software on IBM Cloud
+#### Registering a Red Hat OpenShift on IBM Cloud cluster
 
 - Log in to IBM Cloud:
 
@@ -204,43 +174,41 @@ cpo cpd4 install \
   cpo ibmcloud login
   ```
 
-- Install IBM Cloud Pak for Data, IBM Db2 Warehouse, and IBM Db2 for z/OS Data Gate:
+- Register cluster:
 
-<table>
-<thead>
-<tr>
-<th>Action</th>
-<th>Command</th>
-</tr>
-</thead>
-<tbody>
-<tr/>
-<tr>
-<td>Installation with an existing cluster</td>
-<td>
+  ```shell
+  cpo ibmcloud oc cluster add --alias $ALIAS --cluster-name $CLUSTER_NAME
+  ```
 
-```shell
-cpo ibmcloud oc cluster install --cluster-name $CLUSTER_NAME
-```
+### Security management
 
-</td>
-</tr>
-<tr/>
-<tr>
-<td>Installation without an existing cluster</td>
-<td>
+- Obtain an OAuth access token for the current OpenShift cluster:
 
-```shell
-cpo ibmcloud oc cluster create \
-    --alias $ALIAS \
-    --cluster-name $CLUSTER_NAME \
-    --full-install
-```
+  ```shell
+  cpo cluster get-cluster-access-token
+  ```
 
-</td>
-</tr>
-</tbody>
-</table>
+- Manage the global pull secret:
+
+  ```shell
+  cpo cluster pull-secret
+  ```
+
+### Storage management
+
+- Deploy Kubernetes NFS Subdir External Provisioner:
+
+  ```shell
+  cpo cluster install-nfs-storage-class
+  ```
+
+- Deploy OpenShift Data Foundation (Linux and macOS):
+
+  ```shell
+  cpo cluster install-odf-storage-classes
+  ```
+
+  Note: Currently, opinionated configuration values are used for deploying the `StorageCluster` custom resource (see [Ansible playbook](cpo/deps/playbooks/deploy_odf_playbook.yaml)).
 
 ### IBM-internal
 
@@ -249,8 +217,6 @@ cpo ibmcloud oc cluster create \
   ```shell
   cpo adm config set --key fyre_commands --value true
   ```
-
-- [Installing IBM Cloud Pak for Data on a Fyre-based OpenShift cluster](docs/installing_ibm_cloud_pak_for_data_on_a_fyre-based_openshift_cluster.md)
 
 ## Development
 

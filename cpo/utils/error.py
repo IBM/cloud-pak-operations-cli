@@ -27,20 +27,24 @@ class CloudPakOperationsCLIException(Exception):
         self._stdout = stdout
 
     def __str__(self):
-        output = f"{colorama.Style.BRIGHT}{self._error_message}{colorama.Style.RESET_ALL}"
+        output = self._get_highlighted_str(self._error_message)
 
-        if self._stderr is not None:
-            output += f" – error details:\n{self._stderr}"
-
-        if self._stdout is not None:
+        if (self._stderr is not None) and (self._stderr != ""):
             if not output.endswith("\n"):
                 output += "\n"
 
-            output += f"Standard output:\n{self._stdout}"
+            output += f"Error output:\n{self._stderr.rstrip()}"
+
+        if (self._stdout is not None) and (self._stdout != ""):
+            if not output.endswith("\n"):
+                output += "\n"
+
+            output += f"Standard output:\n{self._stdout.rstrip()}"
 
         return output
 
-    def get_error_message(self):
+    @property
+    def error_message(self) -> str:
         return self._error_message
 
     @property
@@ -51,8 +55,15 @@ class CloudPakOperationsCLIException(Exception):
     def stdout(self) -> Optional[str]:
         return self._stdout
 
+    def _get_highlighted_str(self, str: str) -> str:
+        return f"{colorama.Style.BRIGHT}{str}{colorama.Style.RESET_ALL}"
+
 
 class IBMCloudException(CloudPakOperationsCLIException):
+    @classmethod
+    def create_exception(cls, exception: CloudPakOperationsCLIException):
+        return IBMCloudException(exception.error_message, exception.stderr, exception.stdout)
+
     @classmethod
     def get_parsed_error_message(cls, error_message: str) -> str:
         # use regex.DOTALL to match newline characters
@@ -79,28 +90,6 @@ class IBMCloudException(CloudPakOperationsCLIException):
 
     def __init__(self, error_message, stderr: Optional[str] = None, stdout: Optional[str] = None):
         super().__init__(error_message, stderr, stdout)
-
-    def __str__(self):
-        output: Optional[str] = None
-
-        if self._stderr is None:
-            output = self._get_highlighted_str(IBMCloudException.get_parsed_error_message(self._error_message))
-        else:
-            output = (
-                f"{self._get_highlighted_str(self._error_message)} – error details:\n"
-                f"{IBMCloudException.get_parsed_error_message(self._stderr)}"
-            )
-
-        if self._stdout is not None:
-            if not output.endswith("\n"):
-                output += "\n"
-
-            output += f"Standard output:\n{self._stdout}"
-
-        return output
-
-    def _get_highlighted_str(self, str: str) -> str:
-        return f"{colorama.Style.BRIGHT}{str}{colorama.Style.RESET_ALL}"
 
 
 class JmespathPathExpressionNotFoundException(CloudPakOperationsCLIException):

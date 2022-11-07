@@ -13,11 +13,12 @@
 #  limitations under the License.
 
 import json
+import os
 import pathlib
 import re as regex
 
 from abc import ABC, abstractmethod
-from typing import List, Optional
+from typing import Dict, List, Optional
 
 import requests
 import semver
@@ -44,7 +45,12 @@ class AbstractDependencyManagerPlugIn(ABC):
         pass
 
     def execute_binary(
-        self, args: List[str], capture_output=False, check=True, print_captured_output=False
+        self,
+        args: List[str],
+        env: Dict[str, str] = os.environ.copy(),
+        capture_output=False,
+        check=True,
+        print_captured_output=False,
     ) -> cpo.utils.process.ProcessResult:
         """Executes the binary associated with the dependency
 
@@ -54,6 +60,8 @@ class AbstractDependencyManagerPlugIn(ABC):
         ----------
         args
             arguments to be passed to the binary
+        env
+            dictionary of environment variables passed to the process
         capture_output
             flag indicating whether process output shall be captured
         check
@@ -78,6 +86,7 @@ class AbstractDependencyManagerPlugIn(ABC):
         return cpo.utils.process.execute_command(
             binary_path,
             args,
+            env,
             capture_output=capture_output,
             check=check,
             print_captured_output=print_captured_output,

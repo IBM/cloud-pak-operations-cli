@@ -14,9 +14,10 @@
 
 import asyncio
 import logging
+import os
 import pathlib
 
-from typing import Callable, List, Optional
+from typing import Callable, Dict, List, Optional
 
 import click
 
@@ -24,14 +25,38 @@ from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class ProcessResult:
-    def __init__(self, return_code: int, stderr: str, stdout: str):
+    def __init__(self, command: List[str], return_code: int, stderr: List[str], stdout: List[str]):
+        self.command = command
         self.return_code = return_code
-        self.stderr = stderr
-        self.stdout = stdout
+        self._stderr = stderr
+        self._stdout = stdout
+
+    def raise_for_status(self):
+        if self.return_code != 0:
+            command_string = " ".join(self.command)
+
+            raise CloudPakOperationsCLIException(
+                f"Command '{command_string}' failed with return code {self.return_code}.",
+                self.stderr,
+                self.stdout,
+            )
+
+    @property
+    def stderr(self) -> str:
+        return "\n".join(self._stderr)
+
+    @property
+    def stdout(self) -> str:
+        return "\n".join(self._stdout)
 
 
 def execute_command(
-    program: pathlib.Path, args: List[str], capture_output=False, check=True, print_captured_output=False
+    program: pathlib.Path,
+    args: List[str],
+    env: Dict[str, str] = os.environ.copy(),
+    capture_output=False,
+    check=True,
+    print_captured_output=False,
 ) -> ProcessResult:
     """Executes a process
 
@@ -41,6 +66,8 @@ def execute_command(
         path of the executable
     args
         arguments to be passed to the executable
+    env
+        dictionary of environment variables passed to the process
     capture_output
         flag indicating whether process output shall be captured
     check
@@ -59,7 +86,7 @@ def execute_command(
 
     command = [str(program)] + args
 
-    logging.info(f"Executing command: {' '.join(command)}")
+    logging.debug(f"Executing command: {' '.join(command)}")
 
     return_code: Optional[int] = None
     stderr_buffer: List[str] = []
@@ -70,32 +97,20 @@ def execute_command(
             _create_subprocess_and_capture_output(
                 program,
                 args,
+                env,
                 lambda line: _process_stdout_output(line, stdout_buffer, print_captured_output),
                 lambda line: _process_stderr_output(line, stderr_buffer, print_captured_output),
             )
         )
     else:
-        return_code = asyncio.run(
-            _create_subprocess(
-                program,
-                args,
-            )
-        )
+        return_code = asyncio.run(_create_subprocess(program, args, env))
 
-    if (return_code != 0) and check:
-        command_string = " ".join(command)
-        error_output = ""
+    result = ProcessResult(command, return_code, stderr_buffer, stdout_buffer)
 
-        if len(stderr_buffer) != 0:
-            error_output = f" ({stderr_buffer})"
+    if check:
+        result.raise_for_status()
 
-        raise CloudPakOperationsCLIException(
-            f"Command '{command_string}' failed with return code {return_code}{error_output}.",
-            "\n".join(stderr_buffer),
-            "\n".join(stdout_buffer),
-        )
-
-    return ProcessResult(return_code, "\n".join(stderr_buffer), "\n".join(stdout_buffer))
+    return result
 
 
 def execute_command_without_check(
@@ -131,7 +146,7 @@ def execute_command_without_check(
     )
 
 
-async def _create_subprocess(program: pathlib.Path, args: List[str]) -> int:
+async def _create_subprocess(program: pathlib.Path, args: List[str], env: Dict[str, str]) -> int:
     """Executes a process
 
     Parameters
@@ -140,6 +155,8 @@ async def _create_subprocess(program: pathlib.Path, args: List[str]) -> int:
         path of the executable
     args
         arguments to be passed to the executable
+    env
+        dictionary of environment variables passed to the process
 
     Returns
     -------
@@ -147,13 +164,13 @@ async def _create_subprocess(program: pathlib.Path, args: List[str]) -> int:
         return code
     """
 
-    process = await asyncio.create_subprocess_exec(*([str(program)] + args))
+    process = await asyncio.create_subprocess_exec(*([str(program)] + args), env=env)
 
     return await process.wait()
 
 
 async def _create_subprocess_and_capture_output(
-    program: pathlib.Path, args: List[str], stdout_callback, stderr_callback
+    program: pathlib.Path, args: List[str], env: Dict[str, str], stdout_callback, stderr_callback
 ) -> int:
     """Executes a process and captures its output to stdout/stderr
 
@@ -163,6 +180,8 @@ async def _create_subprocess_and_capture_output(
         path of the executable
     args
         arguments to be passed to the executable
+    env
+        dictionary of environment variables passed to the process
     stdout_callback
         callback invoked when a line was read from stdout
     stderr_callback
@@ -176,6 +195,7 @@ async def _create_subprocess_and_capture_output(
 
     process = await asyncio.create_subprocess_exec(
         *([str(program)] + args),
+        env=env,
         stderr=asyncio.subprocess.PIPE,
         stdout=asyncio.subprocess.PIPE,
     )
