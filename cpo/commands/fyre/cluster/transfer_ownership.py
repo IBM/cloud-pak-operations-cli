@@ -36,7 +36,7 @@ from cpo.utils.logging import loglevel_command
 @click.option("--cluster-name", help="Name of the OCP+ cluster to be transferred", required=True)
 @click.option("--comment", help="Comment")
 @click.option("--new-owner", help="User ID, username, or e-mail address of new owner")
-@click.option("--new-product-group-id", help="ID of new FYRE product group", type=click.INT)
+@click.option("--new-product-group-id", help="ID of new Fyre product group", type=click.INT)
 @click.option("--site", help="OCP+ site", type=click.Choice(["rtp", "svl"]))
 @click.pass_context
 def transfer_ownership(

@@ -40,7 +40,7 @@ def get_quota(
     json: bool,
     site: Optional[str],
 ):
-    """Get quotas for product groups the given FYRE user is part of"""
+    """Get quotas for product groups the given Fyre user is part of"""
 
     cpo.utils.network.disable_insecure_request_warning()
     OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).get_quota(site).format(

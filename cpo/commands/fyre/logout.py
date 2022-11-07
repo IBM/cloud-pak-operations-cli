@@ -20,7 +20,7 @@ from cpo.utils.logging import loglevel_command
 
 @loglevel_command()
 def logout():
-    """Log out from FYRE"""
+    """Log out from Fyre"""
 
     credentials_to_be_stored = {"fyre_api_key": "", "fyre_api_user_name": ""}
 

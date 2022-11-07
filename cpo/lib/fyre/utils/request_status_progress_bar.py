@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,9 +21,9 @@ from cpo.lib.fyre.data.request_status_data import RequestStatusData
 
 
 def wait_for_request_completion(request_id: str, get_request_status_callback: Callable[[str], RequestStatusData]):
-    """Waits for an FYRE/OCP+ API request to complete
+    """Waits for an Fyre/OCP+ API request to complete
 
-    The status of a request is itself retrieved using the FYRE/OCP+ API.
+    The status of a request is itself retrieved using the Fyre/OCP+ API.
     To visualize the progress, a progress bar is shown.
 
     Parameters

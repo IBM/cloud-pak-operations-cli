@@ -63,7 +63,7 @@ logger = logging.getLogger(__name__)
 
 
 class OCPPlusAPIManager:
-    """Manages REST communication with the FYRE/OCP+ API"""
+    """Manages REST communication with the Fyre/OCP+ API"""
 
     @staticmethod
     def add_cluster(
@@ -624,7 +624,7 @@ class OCPPlusAPIManager:
         ).execute_get_request()
 
     def get_quota(self, site: Optional[str]) -> ProductGroupQuotaData:
-        """Returns quotas for product groups the given FYRE user is part of
+        """Returns quotas for product groups the given Fyre user is part of
 
         Parameters
         ----------
@@ -634,7 +634,7 @@ class OCPPlusAPIManager:
         Returns
         -------
         ProductGroupQuotaData
-            object containing quotas for product groups the given FYRE user is part
+            object containing quotas for product groups the given Fyre user is part
             of
         """
 
@@ -801,7 +801,7 @@ class OCPPlusAPIManager:
         new_owner
             User ID, username, or e-mail address of new owner
         new_product_group
-            ID of new FYRE product group
+            ID of new Fyre product group
         comment
             Comment
         site
@@ -828,9 +828,9 @@ class OCPPlusAPIManager:
         ).execute_put_request(ocp_transfer_put_request)
 
     def wait_for_request_completion(self, request_id: str):
-        """Waits for an FYRE/OCP+ API request to complete
+        """Waits for an Fyre/OCP+ API request to complete
 
-        The status of a request is itself retrieved using the FYRE/OCP+ API.
+        The status of a request is itself retrieved using the Fyre/OCP+ API.
         To visualize the progress, a progress bar is shown.
 
         Parameters
@@ -872,7 +872,7 @@ class OCPPlusAPIManager:
         site
             OCP+ site
         ocp_post_response
-            FYRE/OCP+ POST reponse (https://ocpapi.svl.ibm.com/v1/ocp)
+            Fyre/OCP+ POST reponse (https://ocpapi.svl.ibm.com/v1/ocp)
         """
 
         cluster_name = ocp_post_response["cluster_name"]

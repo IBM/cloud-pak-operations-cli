@@ -12,7 +12,7 @@
 
 The IBM Cloud Pak Operations CLI allows the user-friendly installation of IBM Cloud Pak for Data 3.5.0/4.0.x and IBM Cloud Pak for Data services on OpenShift clusters. It also allows the one-click deployment of a Red Hat OpenShift on IBM Cloud cluster including the installation of IBM Cloud Pak for Data 3.5.0 as software.
 
-For IBM-internal users, the IBM Cloud Pak Operations CLI additionally supports managing OpenShift clusters on FYRE.
+For IBM-internal users, the IBM Cloud Pak Operations CLI additionally supports managing OpenShift clusters on Fyre.
 
 ## Installation & Configuration
 
@@ -244,13 +244,13 @@ cpo ibmcloud oc cluster create \
 
 ### IBM-internal
 
-- Enable FYRE-specific commands:
+- Enable Fyre-specific commands:
 
   ```shell
   cpo adm config set --key fyre_commands --value true
   ```
 
-- [Installing IBM Cloud Pak for Data on a FYRE-based OpenShift cluster](docs/installing_ibm_cloud_pak_for_data_on_a_fyre-based_openshift_cluster.md)
+- [Installing IBM Cloud Pak for Data on a Fyre-based OpenShift cluster](docs/installing_ibm_cloud_pak_for_data_on_a_fyre-based_openshift_cluster.md)
 
 ## Development
 
