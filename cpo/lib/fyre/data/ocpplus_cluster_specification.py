@@ -132,7 +132,7 @@ class OCPPlusClusterSpecification:
         platform
             Hardware platform
         product_group_id
-            FYRE product group ID
+            Fyre product group ID
         pull_secret
             Pull secret
         quick_burn_settings

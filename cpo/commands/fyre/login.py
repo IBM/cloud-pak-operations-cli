@@ -24,7 +24,7 @@ from cpo.utils.logging import loglevel_command
 @loglevel_command()
 @fyre_command_options
 def login(fyre_api_user_name: str, fyre_api_key: str, disable_strict_response_schema_check: bool):
-    """Log in to FYRE"""
+    """Log in to Fyre"""
 
     credentials_to_be_stored = locals().copy()
 
@@ -34,8 +34,8 @@ def login(fyre_api_user_name: str, fyre_api_key: str, disable_strict_response_sc
         OCPPlusAPIManager(fyre_api_user_name, fyre_api_key, disable_strict_response_schema_check).get_quota(None)
     except CloudPakOperationsCLIException as exception:
         if "failed authentication" in exception._error_message:
-            raise CloudPakOperationsCLIException("Failed to log in to FYRE due to invalid credentials")
+            raise CloudPakOperationsCLIException("Failed to log in to Fyre due to invalid credentials")
         else:
-            raise CloudPakOperationsCLIException("Failed to log in to FYRE")
+            raise CloudPakOperationsCLIException("Failed to log in to Fyre")
 
     cpo.config.configuration_manager.store_credentials(credentials_to_be_stored)

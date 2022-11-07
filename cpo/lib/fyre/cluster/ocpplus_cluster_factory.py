@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ from cpo.lib.cluster.cluster_factory import AbstractClusterFactory, ClusterData
 from cpo.lib.fyre.cluster.ocpplus_cluster import OCPPlusCluster
 
 
-class OCPPluslusterFactory(AbstractClusterFactory):
+class OCPPlusClusterFactory(AbstractClusterFactory):
     def create_cluster(self, server: str, cluster_data: ClusterData) -> AbstractCluster:
         return OCPPlusCluster(server, cluster_data)
 
@@ -25,7 +25,7 @@ class OCPPluslusterFactory(AbstractClusterFactory):
         return OCPPlusCluster(f"https://api.{cluster_name}.cp.fyre.ibm.com:6443", cluster_data)
 
     def get_cluster_type_name(self) -> str:
-        return "FYRE (OCP+)"
+        return "Fyre (OCP+)"
 
 
-ocpplus_cluster_factory = OCPPluslusterFactory()
+ocpplus_cluster_factory = OCPPlusClusterFactory()

@@ -1,4 +1,4 @@
-# Installing IBM Cloud Pak for Data on a FYRE-based OpenShift cluster
+# Installing IBM Cloud Pak for Data on a Fyre-based OpenShift cluster
 
 ## Required Credentials
 

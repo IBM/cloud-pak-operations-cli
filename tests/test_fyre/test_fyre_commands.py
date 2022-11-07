@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -99,7 +99,7 @@ class TestFYRECommands(unittest.TestCase):
             TestFYRECommands._check_result(result)
 
     def test_fyre_commands(self):
-        """Tests FYRE commands"""
+        """Tests Fyre commands"""
 
         # 1. Test cpo.commands.fyre.cluster package
         self._create_cluster()

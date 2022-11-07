@@ -23,8 +23,8 @@ from click_option_group import optgroup
 
 def fyre_command_optgroup_options(f: Callable[..., Any]) -> Callable[..., Any]:
     options = [
-        optgroup.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True),
-        optgroup.option("--fyre-api-user-name", help="FYRE API user name", required=True),
+        optgroup.option("--fyre-api-key", help="Fyre API key (see https://fyre.svl.ibm.com/account)", required=True),
+        optgroup.option("--fyre-api-user-name", help="Fyre API user name", required=True),
         optgroup.option(
             "--disable-strict-response-schema-check",
             help="Disable strict schema check for OCP+ API response",
@@ -37,8 +37,8 @@ def fyre_command_optgroup_options(f: Callable[..., Any]) -> Callable[..., Any]:
 
 def fyre_command_options(f: Callable[..., Any]) -> Callable[..., Any]:
     options = [
-        click.option("--fyre-api-key", help="FYRE API key (see https://fyre.svl.ibm.com/account)", required=True),
-        click.option("--fyre-api-user-name", help="FYRE API user name", required=True),
+        click.option("--fyre-api-key", help="Fyre API key (see https://fyre.svl.ibm.com/account)", required=True),
+        click.option("--fyre-api-user-name", help="Fyre API user name", required=True),
         click.option(
             "--disable-strict-response-schema-check",
             help="Disable strict schema check for OCP+ API response",

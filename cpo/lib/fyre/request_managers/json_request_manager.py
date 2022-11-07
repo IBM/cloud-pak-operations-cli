@@ -118,7 +118,7 @@ class AbstractJSONRequestManager(ABC):
     def is_request_id_to_be_ignored(self) -> bool:
         """Returns whether the request ID returned by a request shall be ignored
 
-        Although some FYRE/OCP+ API endpoints return a request ID, it cannot be
+        Although some Fyre/OCP+ API endpoints return a request ID, it cannot be
         used to get the request status. Request managers corresponding to these
         endpoints must return True.
 
@@ -135,7 +135,7 @@ class AbstractJSONRequestManager(ABC):
         http_method: HTTPMethod,
         data: Any = None,
     ) -> Any:
-        """Executes a FYRE/OCP+ API JSON request
+        """Executes a Fyre/OCP+ API JSON request
 
         Parameters
         ----------
@@ -147,7 +147,7 @@ class AbstractJSONRequestManager(ABC):
         Returns
         -------
         Any
-            FYRE/OCP+ API JSON response
+            Fyre/OCP+ API JSON response
         """
 
         return self._execute_request_with_params(
@@ -162,7 +162,7 @@ class AbstractJSONRequestManager(ABC):
         error_message: str,
         data: Any = None,
     ) -> Any:
-        """Executes a FYRE/OCP+ API JSON request
+        """Executes a Fyre/OCP+ API JSON request
 
         Parameters
         ----------
@@ -180,7 +180,7 @@ class AbstractJSONRequestManager(ABC):
         Returns
         -------
         Any
-            FYRE/OCP+ API JSON response
+            Fyre/OCP+ API JSON response
         """
 
         auth = (self._fyre_api_user_name, self._fyre_api_key)

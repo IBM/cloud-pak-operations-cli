@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ class ConfigurationManager:
     """Manages the CLI configuration"""
 
     def are_fyre_commands_hidden(self) -> bool:
-        """Returns whether FYRE options shall be displayed in help texts. The
+        """Returns whether Fyre options shall be displayed in help texts. The
         functionality is always usable.
 
         Returns
         -------
         bool
-            true, if FYRE options shall be hidden in help texts
+            true, if Fyre options shall be hidden in help texts
         """
 
         return not self.get_bool_config_value("fyre_commands", False)
