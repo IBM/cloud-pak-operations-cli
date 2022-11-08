@@ -1,7 +1,48 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = [
-	"setuptools-git-versioning",
-	"setuptools>=42",
-	"wheel"
+requires = ["setuptools-git-versioning", "setuptools>=61", "wheel"]
+
+[project]
+authors = [{ email = "db2datagate@ibm.com", name = "IBM Corporation" }]
+classifiers = [
+	"Development Status :: 4 - Beta",
+	"License :: OSI Approved :: Apache Software License",
+	"Operating System :: MacOS",
+	"Operating System :: Microsoft :: Windows",
+	"Operating System :: POSIX :: Linux",
+	"Programming Language :: Python :: 3.8"
 ]
+dependencies = [
+	"ansible",
+	"ansible_runner",
+	"asyncssh",
+	"click",
+	"click-option-group",
+	"colorama",
+	"halo",
+	"jmespath",
+	"jsonschema",
+	"kubernetes >= 12",
+	"netifaces",
+	"pyyaml",
+	"q",
+	"requests",
+	"semver",
+	"tabulate",
+	"tqdm",
+	"urllib3"
+]
+description = "IBM Cloud Pak Operations CLI"
+dynamic = ["version"]
+name = "cloud-pak-operations-cli"
+readme = "README.md"
+requires-python = ">=3.8"
+
+[project.scripts]
+cpo = "cpo.cpo:cli"
+
+[project.urls]
+repository = "https://github.com/IBM/cloud-pak-operations-cli"
+
+[tool.setuptools-git-versioning]
+enabled = true

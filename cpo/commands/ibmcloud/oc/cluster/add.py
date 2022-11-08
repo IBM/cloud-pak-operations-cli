@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2022 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,8 +18,8 @@ import click
 
 import cpo.config.cluster_credentials_manager
 import cpo.lib.ibmcloud.oc.cluster
-import cpo.lib.ibmcloud.status
 
+from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
 from cpo.utils.logging import loglevel_command
 
 
@@ -31,7 +31,7 @@ from cpo.utils.logging import loglevel_command
 def add(alias: Optional[str], cluster_name: str):
     """Register an existing Red Hat OpenShift on IBM Cloud cluster"""
 
-    server = cpo.lib.ibmcloud.status.get_cluster_status(cluster_name).get_server_url()
+    server = IBMCloudAPIManager().get_cluster_status(cluster_name).get_server_url()
 
     cpo.config.cluster_credentials_manager.cluster_credentials_manager.add_cluster(
         alias if (alias is not None) else "",

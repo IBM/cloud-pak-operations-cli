@@ -87,7 +87,7 @@ class RemoteClient:
             local host
         """
 
-        logging.info(f"Executing command on {self._hostname}: {command}")
+        logging.debug(f"Executing command on {self._hostname}: {command}")
 
         if self._connection is None:
             raise CloudPakOperationsCLIException("Not connected to " + self._hostname)

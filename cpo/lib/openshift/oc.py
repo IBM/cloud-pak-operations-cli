@@ -81,7 +81,13 @@ def execute_oc_command(
         requested)
     """
 
-    return dependency_manager.execute_binary(OpenShiftCLIPlugIn, args, capture_output, check, print_captured_output)
+    return dependency_manager.execute_binary(
+        OpenShiftCLIPlugIn,
+        args,
+        capture_output=capture_output,
+        check=check,
+        print_captured_output=print_captured_output,
+    )
 
 
 def get_current_token() -> str:

@@ -51,8 +51,6 @@ class TestStoreCredentialsCommand(unittest.TestCase):
                 "artifactory_password",
                 "--artifactory-username",
                 "artifactory_username",
-                "--ibm-cloud-api-key",
-                "ibm_cloud_api_key",
             ],
         )
 
@@ -60,10 +58,8 @@ class TestStoreCredentialsCommand(unittest.TestCase):
 
         self.assertIn("artifactory_password", default_map)
         self.assertIn("artifactory_username", default_map)
-        self.assertIn("ibm_cloud_api_key", default_map)
         self.assertEqual(default_map["artifactory_password"], "artifactory_password")
         self.assertEqual(default_map["artifactory_username"], "artifactory_username")
-        self.assertEqual(default_map["ibm_cloud_api_key"], "ibm_cloud_api_key")
 
         # check that key-value pairs were removed from credentials.json
         runner = click.testing.CliRunner()
@@ -76,8 +72,6 @@ class TestStoreCredentialsCommand(unittest.TestCase):
                 "",
                 "--artifactory-username",
                 "",
-                "--ibm-cloud-api-key",
-                "",
             ],
         )
 
@@ -85,7 +79,6 @@ class TestStoreCredentialsCommand(unittest.TestCase):
 
         self.assertNotIn("artifactory_password", default_map)
         self.assertNotIn("artifactory_username", default_map)
-        self.assertNotIn("ibm_cloud_api_key", default_map)
 
     def _load_credentials_file(self, credentials_file_path: pathlib.Path):
         json = cpo.lib.click.utils.create_default_map_from_json_file(credentials_file_path)

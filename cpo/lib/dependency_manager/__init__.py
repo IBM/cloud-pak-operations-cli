@@ -15,13 +15,9 @@
 from cpo.lib.dependency_manager.dependency_manager import DependencyManager
 from cpo.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import IBMCloudCLIPlugIn
 from cpo.lib.dependency_manager.plugins.ibm_cloud_pak_cli_plugin import IBMCloudPakCLIPlugIn
-from cpo.lib.dependency_manager.plugins.ibm_cloud_terraform_provider_plugin import IBMCloudTerraformProviderPlugIn
 from cpo.lib.dependency_manager.plugins.openshift_cli_plugin import OpenShiftCLIPlugIn
-from cpo.lib.dependency_manager.plugins.terraform_plugin import TerraformPlugin
 
 dependency_manager = DependencyManager()
 dependency_manager.register_plugin(IBMCloudCLIPlugIn)
 dependency_manager.register_plugin(IBMCloudPakCLIPlugIn)
-dependency_manager.register_plugin(IBMCloudTerraformProviderPlugIn)
 dependency_manager.register_plugin(OpenShiftCLIPlugIn)
-dependency_manager.register_plugin(TerraformPlugin)

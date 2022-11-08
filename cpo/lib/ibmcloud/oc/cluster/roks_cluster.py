@@ -17,7 +17,7 @@ import cpo.lib.ibmcloud
 import cpo.lib.openshift.oc
 
 from cpo.lib.cluster.cluster import AbstractCluster, ClusterData
-from cpo.lib.ibmcloud import INTERNAL_IBM_CLOUD_API_KEY_NAME
+from cpo.lib.ibmcloud import INTERNAL_KEY_NAME_FOR_IBM_CLOUD_API_KEY
 from cpo.utils.error import CloudPakOperationsCLIException
 
 
@@ -26,7 +26,9 @@ class ROKSCluster(AbstractCluster):
         super().__init__(server, cluster_data)
 
     def get_password(self) -> str:
-        api_key = cpo.config.configuration_manager.get_value_from_credentials_file(INTERNAL_IBM_CLOUD_API_KEY_NAME)
+        api_key = cpo.config.configuration_manager.get_value_from_credentials_file(
+            INTERNAL_KEY_NAME_FOR_IBM_CLOUD_API_KEY
+        )
 
         if api_key is None:
             credentials_file_path = cpo.config.configuration_manager.get_credentials_file_path()
@@ -40,7 +42,7 @@ class ROKSCluster(AbstractCluster):
 
     def login(self):
         api_key = cpo.config.configuration_manager.get_value_from_credentials_file(
-            cpo.lib.ibmcloud.INTERNAL_IBM_CLOUD_API_KEY_NAME
+            cpo.lib.ibmcloud.INTERNAL_KEY_NAME_FOR_IBM_CLOUD_API_KEY
         )
 
         if api_key is None:

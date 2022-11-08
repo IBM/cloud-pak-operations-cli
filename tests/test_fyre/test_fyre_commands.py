@@ -299,15 +299,10 @@ class TestFYRECommands(unittest.TestCase):
         ):
             exception: CloudPakOperationsCLIException = result.exception
 
-            if regex.match(pattern, exception.get_error_message()) is None:
+            if regex.match(pattern, exception.error_message) is None:
                 self._check_result(result)
             else:
-                TestFYRECommands._logger.info(f"Ignoring exception: {exception.get_error_message()}")
-
-    def _install_db2_data_gate_stack(self):
-        args = ["cluster", "install-db2-data-gate-stack", "--storage-vendor", "nfs"]
-
-        self._invoke_cli_command(args)
+                TestFYRECommands._logger.info(f"Ignoring exception: {exception.error_message}")
 
     def _invoke_cli_command(self, args: List[str], ignore_exception=False) -> click.testing.Result:
         TestFYRECommands._logger.info(f"Testing: cpo {' '.join(args)}")

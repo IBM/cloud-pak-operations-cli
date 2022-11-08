@@ -14,21 +14,9 @@
 
 import logging
 
-from subprocess import CalledProcessError
-
 import click
 
-from cpo.config import configuration_manager
-from cpo.lib.dependency_manager import dependency_manager
-from cpo.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import IBMCloudCLIPlugIn
-from cpo.lib.ibmcloud import (
-    EXTERNAL_IBM_CLOUD_API_KEY_NAME,
-    INTERNAL_IBM_CLOUD_API_KEY_NAME,
-    execute_ibmcloud_command_without_check,
-)
-from cpo.lib.ibmcloud.iam import delete_api_key_in_ibmcloud
-from cpo.lib.ibmcloud.login import is_logged_in
-from cpo.utils.error import CloudPakOperationsCLIException, IBMCloudException
+from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
 from cpo.utils.logging import loglevel_command
 
 logger = logging.getLogger(__name__)
@@ -37,34 +25,15 @@ logger = logging.getLogger(__name__)
 @loglevel_command()
 @click.option(
     "--delete-api-key",
-    help="Delete the API key which was created for the IBM Cloud Pak Operations CLI (in IBM Cloud and on disk)",
+    help="Delete the API key created for the IBM Cloud Pak Operations CLI (in IBM Cloud and on disk)",
     is_flag=True,
 )
 def logout(delete_api_key: bool):
     """Log out from IBM Cloud"""
 
+    ibm_cloud_api_manager = IBMCloudAPIManager()
+
     if delete_api_key:
-        logger.info("Deleting the Data Gate API key in IBM Cloud")
+        ibm_cloud_api_manager.delete_api_key_in_ibm_cloud_and_on_disk()
 
-        try:
-            delete_api_key_in_ibmcloud()
-        except CalledProcessError as error:
-            if f"Multiple API keys matches found with name '{EXTERNAL_IBM_CLOUD_API_KEY_NAME}'" in error.stderr:
-                raise CloudPakOperationsCLIException(
-                    f"Multiple API keys with the name {EXTERNAL_IBM_CLOUD_API_KEY_NAME} exist. You need to manually "
-                    f"delete them using '{dependency_manager.get_binary_path(IBMCloudCLIPlugIn)} iam "
-                    f"api-key-delete {EXTERNAL_IBM_CLOUD_API_KEY_NAME}'"
-                )
-
-        logger.info("Deleting the Data Gate API key on disk")
-        configuration_manager.store_credentials({INTERNAL_IBM_CLOUD_API_KEY_NAME: ""})
-
-    if is_logged_in():
-        _perform_logout()
-
-
-def _perform_logout():
-    logout_command = execute_ibmcloud_command_without_check(["logout"], capture_output=True)
-
-    if logout_command.return_code != 0:
-        raise IBMCloudException("'ibmcloud logout' failed", logout_command.stderr)
+    ibm_cloud_api_manager.log_out()
