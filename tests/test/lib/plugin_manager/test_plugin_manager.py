@@ -20,13 +20,15 @@ import unittest.mock
 if sys.version_info < (3, 10):
     from importlib.metadata import EntryPoint
 else:
-    from importlib.metadata import EntryPoint, EntryPoints  # type: ignore
+    from importlib.metadata import EntryPoint, EntryPoints
 
 from types import ModuleType
 from typing import Dict, List, Optional, Tuple
 from unittest.mock import Mock, patch
 
 import click
+
+import cpo
 import tests.test.lib.plugin_manager.builtin_commands
 import tests.test.lib.plugin_manager.plugin_1.package_1
 import tests.test.lib.plugin_manager.plugin_1.package_2
@@ -37,11 +39,9 @@ import tests.test.lib.plugin_manager.plugin_2.package_2
 import tests.test.lib.plugin_manager.plugin_2.package_3
 import tests.test.lib.plugin_manager.plugin_2.package_4
 
-import cpo
-
 from cpo.lib.click.lazy_loading_multi_command import LazyLoadingMultiCommand
-from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.lib.plugin_manager.plugin_manager import plugin_manager
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 def create_entry_point_mock_objects(entry_points: List[Tuple[str, ModuleType]]) -> List[Mock]:
@@ -71,7 +71,7 @@ def create_entry_points_result(entry_point_dicts: List[Dict[str, str]]) -> Dict[
             for entry_point in EntryPoint._from_text(text):  # type: ignore
                 merged_entry_points.append(entry_point)
         else:
-            for entry_point in EntryPoints._from_text(text):
+            for entry_point in EntryPoints._from_text(text):  # type: ignore
                 merged_entry_points.append(entry_point)
 
     return {

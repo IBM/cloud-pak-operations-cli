@@ -23,15 +23,22 @@ from cpo.utils.logging import loglevel_command
 
 @loglevel_command()
 @click.argument("alias_or_server")
-@click.option("--alias", help="Alias")
+@click.option("--alias", help="Alias used to reference a cluster instead of its server URL")
+@click.option("--username", help="OpenShift username")
+@click.option("--password", help="OpenShift password")
 @click.option(
     "--insecure-skip-tls-verify/--no-insecure-skip-tls-verify",
     default=None,
     help="Disables or enables checking the server's certificate for validity",
     is_flag=True,
 )
-@click.option("--password", help="kubeadmin password")
-def edit(alias_or_server: str, alias: Optional[str], insecure_skip_tls_verify: Optional[bool], password: Optional[str]):
+def edit(
+    alias_or_server: str,
+    alias: Optional[str],
+    username: Optional[str],
+    password: Optional[str],
+    insecure_skip_tls_verify: Optional[bool],
+):
     """Edit metadata of a registered OpenShift cluster"""
 
     metadata_to_be_edited = locals().copy()

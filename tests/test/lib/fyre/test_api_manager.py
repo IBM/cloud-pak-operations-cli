@@ -14,9 +14,9 @@
 
 import unittest
 
-from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.lib.fyre.data.ocpplus_cluster_specification import HAProxyTimoutSettings
 from cpo.lib.fyre.types.ocp_post_request import HAProxyTimeoutData, OCPPostRequest
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class TestHAProxyTimoutSettings(unittest.TestCase):

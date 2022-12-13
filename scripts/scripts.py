@@ -87,7 +87,8 @@ class CopyrightHeaderManager:
     """Checks and corrects copyright headers of Python files"""
 
     def __init__(self, repo_path: pathlib.Path):
-        self._repo = Repo(repo_path)
+        self._repo = Repo(str(repo_path))
+        self._repo_path = repo_path
 
     def process(self):
         """Iterates over all files of the Git repository given in the
@@ -95,7 +96,7 @@ class CopyrightHeaderManager:
         required"""
 
         for binary_file_name in porcelain.ls_files(self._repo):
-            input_file_path = self._repo.path / binary_file_name.decode("utf-8")
+            input_file_path = self._repo_path / binary_file_name.decode("utf-8")
 
             if (input_file_path.name.endswith(".py") and os.stat(input_file_path).st_size > 0) and (
                 (commit_year_range := self._get_commit_year_range(binary_file_name)) is not None
