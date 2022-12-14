@@ -12,9 +12,24 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import os
+import pathlib
+
 from enum import Enum
+from typing import Optional
 
 
 class FileType(Enum):
     Directory = 1
     RegularFile = 2
+
+
+def get_relative_path(path: os.PathLike, subpath: pathlib.Path) -> Optional[pathlib.Path]:
+    relative_path: Optional[pathlib.Path] = None
+
+    try:
+        relative_path = subpath.relative_to(path)
+    except ValueError:
+        pass
+
+    return relative_path

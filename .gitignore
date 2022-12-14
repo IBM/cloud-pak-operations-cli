@@ -1,7 +1,5 @@
-__pycache__/
-.idea/
-.venv/
+.venv
 .vscode/.ropeproject/
+**/__pycache__/
 **/*.egg-info/
-build/
 dist/

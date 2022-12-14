@@ -115,17 +115,16 @@ class ClusterCredentialsManager:
             server URL or None if no cluster was found
         """
 
-        cluster: Optional[AbstractCluster] = None
-        clusters = self._get_clusters()
+        result: Optional[AbstractCluster] = None
 
-        for server, cluster_data in clusters.items():
+        for server, cluster_data in self._get_clusters().items():
             if (server == alias_or_server) or (
                 ("alias" in cluster_data) and (cluster_data["alias"] == alias_or_server)
             ):
                 cluster_factory = cpo.lib.cluster.cluster_factories[cluster_data["type"]]
-                cluster = cluster_factory.create_cluster(server, cluster_data)
+                result = cluster_factory.create_cluster(server, cluster_data)
 
-        return cluster
+        return result
 
     def get_cluster_or_raise_exception(self, alias_or_server) -> AbstractCluster:
         """Returns metadata of the registered OpenShift cluster with the given
@@ -214,6 +213,17 @@ class ClusterCredentialsManager:
 
         return clusters_file_contents
 
+    def get_clusters_file_path(self) -> pathlib.Path:
+        """Returns the path of the clusters file
+
+        Returns
+        -------
+        str
+            path of the clusters file
+        """
+
+        return configuration_manager.get_cli_data_directory_path() / "clusters.json"
+
     def get_current_cluster(self) -> Optional[AbstractCluster]:
         """Returns metadata of the current registered OpenShift cluster
 
@@ -264,17 +274,6 @@ class ClusterCredentialsManager:
 
         return result
 
-    def get_clusters_file_path(self) -> pathlib.Path:
-        """Returns the path of the clusters file
-
-        Returns
-        -------
-        str
-            path of the clusters file
-        """
-
-        return configuration_manager.get_cli_data_directory_path() / "clusters.json"
-
     def raise_if_alias_exists(self, alias_to_be_searched: str):
         """Raises an exception if the given alias is already associated with a
         registered OpenShift cluster
@@ -297,8 +296,8 @@ class ClusterCredentialsManager:
         self._clusters_file_contents = self.get_clusters_file_contents_with_default()
 
     def remove_cluster(self, alias_or_server: str):
-        """Removes the registered OpenShift with the given alias or server
-        URL
+        """Removes the registered OpenShift cluster with the given alias or
+        server URL
 
         Parameters
         ----------

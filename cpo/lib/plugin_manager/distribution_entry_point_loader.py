@@ -12,12 +12,36 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import json
+import os
 import pathlib
 import sys
+import urllib.parse
 
+from dataclasses import dataclass
 from importlib.metadata import Distribution, EntryPoint, distributions
 from types import ModuleType
-from typing import Any, Optional
+from typing import Any, Optional, TypedDict
+
+from jsonschema import validate
+
+from cpo.utils.file import get_relative_path
+
+
+class DirInfoJSONDocumentDirInfo(TypedDict):
+    editable: bool
+
+
+class DirInfoJSONDocument(TypedDict):
+    dir_info: DirInfoJSONDocumentDirInfo
+    subdirectory: str
+    url: str
+
+
+@dataclass
+class DistributionData:
+    editable: bool
+    path: os.PathLike
 
 
 class DistributionEntryPointLoader:
@@ -37,6 +61,93 @@ class DistributionEntryPointLoader:
     def __init__(self, entry_point: EntryPoint):
         loaded_entry_point = entry_point.load()
 
+        # https://packaging.python.org/en/latest/specifications/direct-url/
+        self._direct_url_json_schema = {
+            "$defs": {
+                "archive_info": {
+                    "additionalProperties": False,
+                    "properties": {
+                        "archive_info": {
+                            "properties": {
+                                "hash": {
+                                    "type": "boolean",
+                                }
+                            },
+                            "type": "object",
+                        },
+                        "subdirectory": {
+                            "type": "string",
+                        },
+                        "url": {
+                            "type": "string",
+                        },
+                    },
+                    "required": [
+                        "archive_info",
+                        "url",
+                    ],
+                },
+                "dir_info": {
+                    "additionalProperties": False,
+                    "properties": {
+                        "dir_info": {
+                            "properties": {
+                                "editable": {
+                                    "type": "boolean",
+                                }
+                            },
+                            "type": "object",
+                        },
+                        "subdirectory": {
+                            "type": "string",
+                        },
+                        "url": {
+                            "type": "string",
+                        },
+                    },
+                    "required": [
+                        "dir_info",
+                        "url",
+                    ],
+                },
+                "vcs_info": {
+                    "additionalProperties": False,
+                    "properties": {
+                        "subdirectory": {
+                            "type": "string",
+                        },
+                        "url": {
+                            "type": "string",
+                        },
+                        "vcs_info": {
+                            "properties": {
+                                "commit_id": {
+                                    "type": "string",
+                                },
+                                "requested_revision": {
+                                    "type": "string",
+                                },
+                                "vcs": {
+                                    "type": "string",
+                                },
+                            },
+                            "required": ["commit_id", "vcs"],
+                            "type": "object",
+                        },
+                    },
+                    "required": [
+                        "url",
+                        "vcs_info",
+                    ],
+                },
+            },
+            "oneOf": [
+                {"$ref": "#/$defs/archive_info"},
+                {"$ref": "#/$defs/dir_info"},
+                {"$ref": "#/$defs/vcs_info"},
+            ],
+        }
+
         self._distribution: Optional[Distribution] = self._get_distribution_from_loaded_entry_point(loaded_entry_point)
         self._loaded_entry_point = loaded_entry_point
 
@@ -47,6 +158,67 @@ class DistributionEntryPointLoader:
     @property
     def loaded_entry_point(self) -> Any:
         return self._loaded_entry_point
+
+    def _get_direct_url_origin_file_contents(self, distribution: Distribution) -> Any:
+        """Returns the contents of the direct_url.json file of the given
+        distribution or None if the file does not exist
+
+        Parameters
+        ----------
+        distribution
+            distribution to be searched
+
+        Returns
+        -------
+        Any
+            contents of the direct_url.json file of the given distribution or None
+            if the file does not exist
+        """
+
+        result: Any = None
+
+        assert distribution.files is not None
+
+        for package_path in distribution.files:
+            if package_path.name == "direct_url.json":
+                file_contents = distribution.read_text(package_path.name)
+
+                if file_contents is None:
+                    break
+
+                result = json.loads(file_contents)
+
+                validate(result, self._direct_url_json_schema)
+
+        return result
+
+    def _get_distribution_data(self, distribution: Distribution) -> DistributionData:
+        """Returns installation information about the given distribution
+
+        Parameters
+        ----------
+        distribution
+            distribution to be analyzed
+
+        Returns
+        -------
+        DistributionData
+            installation information about the given distribution
+        """
+
+        direct_url_origin_file_contents = self._get_direct_url_origin_file_contents(distribution)
+        result: Optional[DistributionData] = None
+
+        if (direct_url_origin_file_contents is not None) and ("dir_info" in direct_url_origin_file_contents):
+            dir_info: DirInfoJSONDocument = direct_url_origin_file_contents
+
+            if dir_info["dir_info"]["editable"]:
+                result = DistributionData(editable=True, path=self._get_path_for_file_uri(dir_info["url"]))
+
+        if result is None:
+            result = DistributionData(editable=False, path=distribution.locate_file(""))
+
+        return result
 
     def _get_distribution_from_loaded_entry_point(self, loaded_entry_point: Any) -> Optional[Distribution]:
         """Determines the corresponding distribution package for a loaded entry
@@ -64,10 +236,11 @@ class DistributionEntryPointLoader:
             None if it could not be determined
         """
 
-        if isinstance(loaded_entry_point, ModuleType):
-            module_path = loaded_entry_point.__file__
-        else:
-            module_path = sys.modules[loaded_entry_point.__module__].__file__
+        module_path = (
+            loaded_entry_point.__file__
+            if isinstance(loaded_entry_point, ModuleType)
+            else sys.modules[loaded_entry_point.__module__].__file__
+        )
 
         if module_path is None:
             return None
@@ -78,14 +251,50 @@ class DistributionEntryPointLoader:
             if distribution.files is None:
                 continue
 
-            try:
-                relative_path = pathlib.Path(module_path).relative_to(distribution.locate_file(""))
-            except ValueError:
-                pass
-            else:
-                if relative_path in distribution.files:
+            distribution_data = self._get_distribution_data(distribution)
+
+            if distribution_data.editable:
+                if get_relative_path(distribution_data.path, pathlib.Path(module_path)) is not None:
                     result = distribution
 
                     break
+            else:
+                relative_path = get_relative_path(distribution_data.path, pathlib.Path(module_path))
+
+                if (relative_path is not None) and (relative_path in distribution.files):
+                    result = distribution
+
+                    break
+
+        return result
+
+    def _get_path_for_file_uri(self, file_uri: str) -> pathlib.PurePath:
+        """Returns the path for the given file URI
+
+        Parameters
+        ----------
+        file_uri
+            file URI
+
+        Returns
+        -------
+        pathlib.PurePath
+            path for the given file URI
+        """
+
+        if not file_uri.startswith("file:"):
+            raise ValueError(f"Invalid file URI: {file_uri}")
+
+        parse_result = urllib.parse.urlparse(file_uri)
+        file_path_str = urllib.parse.unquote(parse_result.path)
+        path_class = pathlib.PurePath
+
+        if isinstance(path_class(), pathlib.PureWindowsPath) and file_path_str.startswith("/"):
+            result = path_class(file_path_str[1:])
+        else:
+            result = path_class(file_path_str)
+
+        if not result.is_absolute():
+            raise ValueError(f"Invalid file URI: {file_uri}")
 
         return result

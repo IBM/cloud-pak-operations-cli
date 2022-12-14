@@ -8,20 +8,9 @@
 		".vscode/.ropeproject": true,
 		"**/__pycache__": true,
 		"**/*.egg-info": true,
-		"build": true,
 		"dist": true
 	},
-	"python.analysis.typeCheckingMode": "basic",
-	"python.defaultInterpreterPath": "${workspaceFolder}/.venv",
-	"python.formatting.blackArgs": [
-		"--line-length",
-		"120"
-	],
-	"python.formatting.provider": "black",
-	"python.linting.enabled": true,
-	"python.linting.flake8Enabled": true,
-	"python.linting.pylintEnabled": false,
-	"python.sortImports.args": [
+	"isort.args": [
 		"--lines-between-types",
 		"1",
 		"--line-length",
@@ -34,6 +23,16 @@
 		"click",
 		"--trailing-comma"
 	],
+	"python.analysis.typeCheckingMode": "basic",
+	"python.defaultInterpreterPath": "${workspaceFolder}/.venv",
+	"python.formatting.blackArgs": [
+		"--line-length",
+		"120"
+	],
+	"python.formatting.provider": "black",
+	"python.linting.enabled": true,
+	"python.linting.flake8Enabled": true,
+	"python.linting.pylintEnabled": false,
 	"python.testing.pytestEnabled": false,
 	"python.testing.unittestArgs": [
 		"--start-directory",
@@ -43,5 +42,5 @@
 	"search.exclude": {
 		".git": true,
 		".venv": true
-	},
+	}
 }
