@@ -8,6 +8,7 @@
 		".vscode/.ropeproject": true,
 		"**/__pycache__": true,
 		"**/*.egg-info": true,
+		"build": true,
 		"dist": true
 	},
 	"isort.args": [
