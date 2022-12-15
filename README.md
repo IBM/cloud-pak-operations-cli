@@ -20,7 +20,7 @@ For IBM-internal users, the IBM Cloud Pak Operations CLI additionally supports m
 
 #### Python installation (3.8 or higher)
 
-- macOS (requires [Homebrew](https://brew.sh/)):
+- macOS (requires [Homebrew](https://brew.sh)):
 
   ```shell
   brew install python
@@ -28,13 +28,13 @@ For IBM-internal users, the IBM Cloud Pak Operations CLI additionally supports m
 
 - Windows:
 
-  - Winget:
+  - [Winget](https://github.com/microsoft/winget-cli):
 
     ```shell
-    winget install --exact --id=Python.Python.3.12
+    winget install --exact --id=Python.Python.3.11
     ```
 
-  - [Chocolatey](https://chocolatey.org/)
+  - [Chocolatey](https://chocolatey.org)
 
     ```shell
     choco install python
