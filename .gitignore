@@ -2,4 +2,5 @@
 .vscode/.ropeproject/
 **/__pycache__/
 **/*.egg-info/
+build/
 dist/

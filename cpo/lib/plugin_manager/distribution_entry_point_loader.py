@@ -209,13 +209,11 @@ class DistributionEntryPointLoader:
         direct_url_origin_file_contents = self._get_direct_url_origin_file_contents(distribution)
         result: Optional[DistributionData] = None
 
-        if (direct_url_origin_file_contents is not None) and ("dir_info" in direct_url_origin_file_contents):
-            dir_info: DirInfoJSONDocument = direct_url_origin_file_contents
-
-            if dir_info["dir_info"]["editable"]:
-                result = DistributionData(editable=True, path=self._get_path_for_file_uri(dir_info["url"]))
-
-        if result is None:
+        if self._is_editable_install(direct_url_origin_file_contents):
+            result = DistributionData(
+                editable=True, path=self._get_path_for_file_uri(direct_url_origin_file_contents["url"])
+            )
+        else:
             result = DistributionData(editable=False, path=distribution.locate_file(""))
 
         return result
@@ -298,3 +296,12 @@ class DistributionEntryPointLoader:
             raise ValueError(f"Invalid file URI: {file_uri}")
 
         return result
+
+    def _is_editable_install(self, direct_url_origin_file_contents: Any) -> bool:
+        if (direct_url_origin_file_contents is not None) and ("dir_info" in direct_url_origin_file_contents):
+            dir_info: DirInfoJSONDocument = direct_url_origin_file_contents
+            editable = dir_info["dir_info"]["editable"] if "editable" in dir_info["dir_info"] else False
+        else:
+            editable = False
+
+        return editable
