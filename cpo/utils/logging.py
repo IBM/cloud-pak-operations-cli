@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 import logging
+import time
 
 from typing import Any, Callable, Optional, Type
 
@@ -36,8 +37,8 @@ class ClickLoggingFormatter(logging.Formatter):
 
     def __init__(self):
         super().__init__(
-            datefmt="%Y-%m-%dT%H:%M:%S%z",
-            fmt="%(asctime)s [%(levelname)8s]: %(message)s",
+            datefmt="%Y-%m-%dT%H:%M:%S",
+            fmt=f"%(asctime)s.%(msecs)03d{time.strftime('%z')} [%(levelname)8s]: %(message)s",
         )
 
     def format(self, record: logging.LogRecord) -> str:
