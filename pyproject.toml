@@ -24,6 +24,7 @@ dependencies = [
 	"jsonschema",
 	"kubernetes >= 12",
 	"netifaces",
+	"pytest",
 	"pyyaml",
 	"q",
 	"requests",
@@ -43,6 +44,12 @@ cpo = "cpo.cpo:cli"
 
 [project.urls]
 repository = "https://github.com/IBM/cloud-pak-operations-cli"
+
+[tool.pytest.ini_options]
+filterwarnings = [
+	# https://setuptools.pypa.io/en/latest/history.html#v67-3-2
+	"ignore::DeprecationWarning",
+]
 
 [tool.setuptools-git-versioning]
 enabled = true

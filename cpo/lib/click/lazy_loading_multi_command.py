@@ -66,7 +66,9 @@ class LazyLoadingMultiCommand(click.MultiCommand):
                 # print stack trace
                 raise exception
             else:
-                click.ClickException(str(exception)).show()
+                error_message = str(exception)
+
+                click.ClickException(error_message[7:] if error_message.startswith("Error: ") else error_message).show()
 
                 return 1
 

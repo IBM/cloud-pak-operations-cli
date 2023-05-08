@@ -5,8 +5,7 @@
         <a href="https://github.com/IBM/cloud-pak-operations-cli/blob/master/LICENSE"><img alt="GitHub license" src="https://img.shields.io/github/license/IBM/cloud-pak-operations-cli?style=for-the-badge"></a>
 	    <a href="https://github.com/IBM/cloud-pak-operations-cli/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/IBM/cloud-pak-operations-cli?style=for-the-badge"></a>
         <a href="https://github.com/IBM/cloud-pak-operations-cli/stargazers"><img alt="GitHub stars" src="https://img.shields.io/github/stars/IBM/cloud-pak-operations-cli?style=for-the-badge"></a>
-        <a href="https://twitter.com/intent/tweet?text=Wow:&url=https%3A%2F%2Fgithub.com%2FIBM%2Fcloud-pak-operations-cli"><img alt="Twitter URL" src="https://img.shields.io/twitter/url?color=blue&style=for-the-badge&url=https%3A%2F%2Fgithub.com%2FIBM%2Fcloud-pak-operations-cli"></a>
-        <a href="https://github.com/IBM/cloud-pak-operations-cli/actions?query=workflow%3A%22Python+Testing%22+branch%3Amaster"><img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/workflow/status/IBM/cloud-pak-operations-cli/Python%20Testing/master?label=Python%20Testing&style=for-the-badge"></a>
+        <a href="https://github.com/IBM/cloud-pak-operations-cli/actions?query=workflow%3A%22Python+Testing%22+branch%3Amaster"><img alt="GitHub Workflow Status (branch)" src="https://img.shields.io/github/actions/workflow/status/IBM/cloud-pak-operations-cli/python-package.yml?branch=master&style=for-the-badge"></a>
     </p>
 </div>
 
