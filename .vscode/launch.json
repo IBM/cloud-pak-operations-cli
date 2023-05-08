@@ -24,12 +24,11 @@
 			"name": "Python: unit tests (cpo)",
 			"type": "python",
 			"request": "launch",
-			"module": "unittest",
+			"module": "pytest",
 			"console": "internalConsole",
 			"internalConsoleOptions": "openOnSessionStart",
 			"args": [
-				"discover",
-				"tests.test"
+				"tests/test"
 			],
 			// required as virtual environment is not activated by Python debugger
 			// and, for example, ansible-playbook is not found otherwise
@@ -41,12 +40,11 @@
 			"name": "Python: unit tests (scripts)",
 			"type": "python",
 			"request": "launch",
-			"module": "unittest",
+			"module": "pytest",
 			"console": "internalConsole",
 			"internalConsoleOptions": "openOnSessionStart",
 			"args": [
-				"discover",
-				"tests.test_scripts"
+				"tests/test_scripts"
 			]
 		}
 	],
