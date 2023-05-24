@@ -26,15 +26,28 @@ from ansible_runner.streaming import Processor, Transmitter, Worker
 from cpo.config import configuration_manager
 from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.string import removeprefix, removesuffix
+from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
 
 
-class PlaybookRunner:
+class PlaybookRunner(ABC):
     """Base class to be inherited by all playbook runners"""
 
     def __init__(self, playbook_name: str):
         self._playbook_name = playbook_name
+
+    @abstractmethod
+    def get_private_data_dir(self) -> pathlib.Path:
+        """Returns the private data directory used by Ansible Runner
+
+        Returns
+        -------
+        str
+            private data directory used by Ansible Runner
+        """
+
+        return configuration_manager.get_deps_directory_path() / "playbooks"
 
     def run_playbook(self):
         """Runs a playbook"""
@@ -94,17 +107,6 @@ class PlaybookRunner:
 
         return playbook_name
 
-    def _get_private_data_dir(self) -> pathlib.Path:
-        """Returns the private data directory used by Ansible Runner
-
-        Returns
-        -------
-        str
-            private data directory used by Ansible Runner
-        """
-
-        return configuration_manager.get_deps_directory_path() / "playbooks"
-
     def _run_playbook(self) -> Union[Processor, Runner, Transmitter, Worker]:
         """Runs the playbook with the name passed in the constructor
 
@@ -122,7 +124,7 @@ class PlaybookRunner:
             extravars=self._sanitize_extra_vars(self._get_extra_vars()),
             event_handler=self._event_handler,
             playbook=self._playbook_name,
-            private_data_dir=self._get_private_data_dir(),
+            private_data_dir=self.get_private_data_dir(),
             quiet=True,
             suppress_env_files=True,
         )
