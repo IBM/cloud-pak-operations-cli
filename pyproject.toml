@@ -41,6 +41,7 @@ requires-python = ">=3.8"
 
 [project.scripts]
 cpo = "cpo.cpo:cli"
+cpo-get-current-cluster-alias = "cpo.scripts.get_current_cluster_alias:get_current_cluster_alias"
 
 [project.urls]
 repository = "https://github.com/IBM/cloud-pak-operations-cli"
