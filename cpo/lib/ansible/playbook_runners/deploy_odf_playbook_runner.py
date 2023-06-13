@@ -12,6 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import pathlib
+
 from cpo.lib.ansible.openshift_playbook_runner import OpenShiftPlaybookRunner
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 
@@ -23,3 +25,6 @@ class DeployODFPlaybookRunner(OpenShiftPlaybookRunner):
         version = self._openshift_api_manager.get_version()
 
         self.openshift_server_version = f"{version.major}.{version.minor}"
+
+    def get_private_data_dir(self) -> pathlib.Path:
+        return super().get_private_data_dir()
