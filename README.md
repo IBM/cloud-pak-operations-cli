@@ -17,7 +17,7 @@ For IBM-internal users, the IBM Cloud Pak Operations CLI additionally supports m
 
 ### Installation
 
-#### Python installation (3.8 or higher)
+#### Python installation (3.10 or higher)
 
 - macOS (requires [Homebrew](https://brew.sh)):
 
