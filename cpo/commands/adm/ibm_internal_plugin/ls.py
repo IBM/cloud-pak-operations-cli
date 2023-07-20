@@ -1,4 +1,4 @@
-#  Copyright 2022 IBM Corporation
+#  Copyright 2022, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,10 +14,12 @@
 
 import click
 
+from tabulate import tabulate
+
 import cpo.config.cluster_credentials_manager
 import cpo.lib.click.utils
-import cpo.lib.ibm_internal_plugin.list
 
+from cpo.lib.ibm_internal_plugin.ibm_internal_plugin_manager import IBMInternalPluginInstaller
 from cpo.utils.logging import loglevel_command
 
 
@@ -28,15 +30,24 @@ from cpo.utils.logging import loglevel_command
 )
 @click.option(
     "--artifactory-username",
-    help="Artifactory username. The username is usually the IBM e-mail address.",
+    help="Artifactory username (IBM e-mail address)",
     required=True,
 )
 @click.option(
     "--artifactory-password",
-    help="Artifactory password. The password is usually the API key located in the 'Edit Profile' page in Artifactory.",
+    help="Artifactory identitiy token (Artifactory website → 'Edit Profile' → 'Identity Tokens')",
     required=True,
 )
-def ls(artifactory_username, artifactory_password):
+@click.option(
+    "--repository-url",
+    default="https://na.artifactory.swg-devops.com/artifactory/api/pypi/hyc-ibm-sap-cp4d-team-pypi-local/simple",
+)
+def ls(artifactory_username: str, artifactory_password: str, repository_url: str):
     """List available IBM-internal CLI plug-ins"""
 
-    cpo.lib.ibm_internal_plugin.list.list(artifactory_username, artifactory_password)
+    click.echo(
+        tabulate(
+            IBMInternalPluginInstaller(artifactory_username, artifactory_password, repository_url).get_packages(),
+            headers=["name", "version"],
+        )
+    )
