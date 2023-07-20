@@ -708,6 +708,7 @@ class OpenShiftAPIManager:
             raise CloudPakOperationsCLIException("OAuth access token expired and cannot be refreshed")
 
         self._credentials.refresh_access_token()
+        self._kube_config_initialized = False
 
     def role_binding_exists(self, project: str, name: str) -> bool:
         """Returns whether the role binding with the given name exists in the

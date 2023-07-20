@@ -66,12 +66,20 @@ class OpenShiftPlaybookRunner(PlaybookRunner):
         try:
             event = cpo.lib.jmespath.get_jmespath_string("event", event_data)
 
-            if event == "runner_on_failed":
-                msg = cpo.lib.jmespath.get_jmespath_string("event_data.res.msg", event_data)
-
-                if msg.startswith("Failed to get client due to 401"):
-                    self._token_expired = True
+            if (event == "runner_on_failed") and self._check_if_unauthorized(event_data):
+                self._token_expired = True
         except cpo.lib.jmespath.JmespathPathExpressionNotFoundException:
             pass
 
         super()._event_handler(event_data)
+
+    def _check_if_unauthorized(self, event_data: Any) -> bool:
+        msg = cpo.lib.jmespath.get_jmespath_string("event_data.res.msg", event_data)
+
+        return msg.startswith("Failed to get client due to 401") or (
+            (msg == "MODULE FAILURE\nSee stdout/stderr for the exact error")
+            and (
+                "kubernetes.dynamic.exceptions.UnauthorizedError: 401\nReason: Unauthorized"
+                in cpo.lib.jmespath.get_jmespath_string("event_data.res.module_stderr", event_data)
+            )
+        )
