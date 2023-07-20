@@ -61,6 +61,50 @@ class OCPGetResponseManager(AbstractJSONResponseManager):
                         "platform": {"type": "string"},
                         "product_group_id": {"type": "string"},
                         "product_group": {"type": "string"},
+                        "properties": {
+                            "additionalProperties": self._disable_strict_response_schema_check,
+                            "properties": {
+                                "caching": {
+                                    "additionalProperties": self._disable_strict_response_schema_check,
+                                    "properties": {
+                                        "updated": {"type": "string"},
+                                        "value": {"type": "string"},
+                                    },
+                                    "required": [
+                                        "updated",
+                                        "value",
+                                    ],
+                                    "type": "object",
+                                },
+                                "cordoned": {
+                                    "additionalProperties": self._disable_strict_response_schema_check,
+                                    "properties": {
+                                        "updated": {"type": "string"},
+                                        "value": {
+                                            "additionalProperties": self._disable_strict_response_schema_check,
+                                            "properties": {
+                                                "nodes": {"items": {"type": "string"}, "type": "array"},
+                                                "status": {"type": "string"},
+                                            },
+                                        },
+                                        "required": [
+                                            "nodes",
+                                            "status",
+                                        ],
+                                        "type": "object",
+                                    },
+                                    "required": [
+                                        "updated",
+                                        "value",
+                                    ],
+                                    "type": "object",
+                                },
+                            },
+                            "required": [
+                                "caching",
+                            ],
+                            "type": "object",
+                        },
                         "vm_count": {"type": "integer"},
                         "vms": {
                             "items": {"$ref": "#/$defs/vm"},
