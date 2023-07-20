@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import pathlib
 
 from dataclasses import dataclass, field
 from types import ModuleType
-from typing import Dict, List, Optional
+from typing import Optional
 
 import click
 
@@ -44,8 +44,8 @@ class CommandDetails:
 
 @dataclass
 class CommandData:
-    command_names: List[str] = field(default_factory=list)
-    commands: Dict[str, CommandDetails] = field(default_factory=dict)
+    command_names: list[str] = field(default_factory=list)
+    commands: dict[str, CommandDetails] = field(default_factory=dict)
 
 
 class LazyLoadingMultiCommand(click.MultiCommand):
@@ -94,7 +94,7 @@ class LazyLoadingMultiCommand(click.MultiCommand):
         return command
 
     # override
-    def list_commands(self, ctx: click.Context) -> List[str]:
+    def list_commands(self, ctx: click.Context) -> list[str]:
         self._initialize_command_data_if_required()
 
         return self._command_data.command_names if self._command_data is not None else []
@@ -132,7 +132,7 @@ class LazyLoadingMultiCommand(click.MultiCommand):
 
         return module
 
-    def _import_modules(self, command_data: CommandData, modules: List[PackageElementDescriptor]):
+    def _import_modules(self, command_data: CommandData, modules: list[PackageElementDescriptor]):
         """Imports the given modules and updates the given command data object
 
         Parameters
@@ -160,7 +160,7 @@ class LazyLoadingMultiCommand(click.MultiCommand):
 
             command_data.commands.update(command_dict)
 
-    def _import_subpackages(self, command_data: CommandData, subpackages: List[PackageElementDescriptor]):
+    def _import_subpackages(self, command_data: CommandData, subpackages: list[PackageElementDescriptor]):
         """Imports the given subpackages and updates the given command data
         object
 
@@ -276,7 +276,7 @@ class LazyLoadingMultiCommand(click.MultiCommand):
 
     def _search_for_commands(
         self, package_element_descriptor: PackageElementDescriptor, module: ModuleType
-    ) -> Dict[str, CommandDetails]:
+    ) -> dict[str, CommandDetails]:
         """Searches the given module for Click commands
 
         Parameters
@@ -292,7 +292,7 @@ class LazyLoadingMultiCommand(click.MultiCommand):
             dictionary associating Click command names with Click commands
         """
 
-        commands: Dict[str, CommandDetails] = {}
+        commands: dict[str, CommandDetails] = {}
 
         for attribute_name in dir(module):
             attribute = getattr(module, attribute_name)

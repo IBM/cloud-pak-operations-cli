@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 import collections
 import importlib.metadata
 
-from typing import List
-
 import cpo
 
 from cpo.utils.error import CloudPakOperationsCLIException
@@ -31,7 +29,7 @@ def get_distribution_package_name() -> str:
         name of the distribution package providing the "cpo" top-level package
     """
 
-    packages_to_distribution_packages_dict: collections.defaultdict[str, List[str]] = collections.defaultdict(list)
+    packages_to_distribution_packages_dict: collections.defaultdict[str, list[str]] = collections.defaultdict(list)
 
     for distribution in importlib.metadata.distributions():
         file_contents = distribution.read_text("top_level.txt")

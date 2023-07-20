@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from io import TextIOWrapper
-from typing import Final, List, Optional
+from typing import Final, Optional
 
 import click
 
@@ -80,7 +80,7 @@ class CopyrightYearRange:
 @dataclass
 class CopyrightYearExtractionResult:
     copyright_year_range: Optional[CopyrightYearRange]
-    input_file_lines: List[str]
+    input_file_lines: list[str]
 
 
 class CopyrightHeaderManager:
@@ -146,7 +146,7 @@ class CopyrightHeaderManager:
         if input_file_line == "":
             return CopyrightYearExtractionResult(None, [])
 
-        input_file_lines: List[str] = []
+        input_file_lines: list[str] = []
         input_file_lines.append(input_file_line)
 
         regex_result = regex.match(CopyrightHeaderManager._COPYRIGHT_REGEX, input_file_line)
@@ -216,10 +216,10 @@ class CopyrightHeaderManager:
 
         return result
 
-    def _newline_after_copyright_header(self, input_file_lines: List[str]) -> bool:
+    def _newline_after_copyright_header(self, input_file_lines: list[str]) -> bool:
         return (len(input_file_lines) != 0) and (input_file_lines[0] == "\n")
 
-    def _remove_leading_empty_lines(self, input_file_lines: List[str]):
+    def _remove_leading_empty_lines(self, input_file_lines: list[str]):
         while len(input_file_lines) != 0 and (input_file_lines[0].strip() + "\n") == "\n":
             input_file_lines.pop(0)
 
@@ -238,7 +238,7 @@ class CopyrightHeaderManager:
             break
 
     def _write_output_file(
-        self, input_file: TextIOWrapper, input_file_lines: List[str], commit_year_range: CommitYearRange
+        self, input_file: TextIOWrapper, input_file_lines: list[str], commit_year_range: CommitYearRange
     ) -> pathlib.Path:
         """Writes the given input file with the corrected copyright header to a
         temporary file
@@ -295,7 +295,7 @@ class CopyrightHeaderManager:
         return pathlib.Path(output_file_name)
 
     _COPYRIGHT_HEADER_FIRST_LINE: Final[str] = "#  Copyright {first_year}{separator}{last_year} IBM Corporation\n"
-    _COPYRIGHT_HEADER_REMAINING_LINES: Final[List[str]] = [
+    _COPYRIGHT_HEADER_REMAINING_LINES: Final[list[str]] = [
         "#\n",
         '#  Licensed under the Apache License, Version 2.0 (the "License");\n',
         "#  you may not use this file except in compliance with the License.\n",

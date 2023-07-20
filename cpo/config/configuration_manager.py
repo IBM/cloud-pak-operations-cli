@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import json
 import pathlib
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import cpo
 
@@ -239,7 +239,7 @@ class ConfigurationManager:
 
     def store_credentials(
         self,
-        credentials_to_be_stored: Dict[str, Any],
+        credentials_to_be_stored: dict[str, Any],
     ):
         """Stores credentials in a configuration file
 
@@ -253,7 +253,7 @@ class ConfigurationManager:
         if all(value is None for value in credentials_to_be_stored.values()):
             return
 
-        credentials: Optional[Dict[Any, Any]] = None
+        credentials: Optional[dict[Any, Any]] = None
         credentials_file_path = self.get_credentials_file_path()
 
         if credentials_file_path.exists():

@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 import re as regex
 
-from typing import List, Optional
+from typing import Optional
 
 import click
 
@@ -53,7 +53,7 @@ def edit_worker_node(
     fyre_api_user_name: str,
     fyre_api_key: str,
     disable_strict_response_schema_check: bool,
-    additional_disk_size: List[int],
+    additional_disk_size: list[int],
     cluster_name: str,
     force: bool,
     node_name: str,

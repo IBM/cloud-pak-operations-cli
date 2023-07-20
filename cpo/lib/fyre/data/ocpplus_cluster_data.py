@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 import json
 
-from typing import List, Optional
+from typing import Optional
 
 import click
 
@@ -36,7 +36,7 @@ class OCPPlusClusterData:
                 clusters = self._ocp_get_response["clusters"]
                 clusters.sort(key=lambda cluster: cluster["cluster_name"])
 
-                cluster_list: List[List[str]] = []
+                cluster_list: list[list[str]] = []
                 headers = [
                     "cluster name",
                     "cluster ID",
@@ -70,7 +70,7 @@ class OCPPlusClusterData:
 
     def format_details(self, cluster_name: str):
         cluster = self.get_cluster(cluster_name)
-        vm_list: List[List[str]] = []
+        vm_list: list[list[str]] = []
         headers = [
             "VM ID",
             "hostname",

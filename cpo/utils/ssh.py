@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import logging
 import pathlib
 
 from abc import ABC, abstractmethod
-from typing import Optional, Type
+from typing import Optional
 
 import asyncssh
 import click
@@ -118,7 +118,7 @@ class RemoteClient:
         await asyncssh.scp(str(path), self._connection)
 
 
-def create_remote_client_ssh_session(print_output: bool) -> Type[asyncssh.SSHClientSession]:
+def create_remote_client_ssh_session(print_output: bool) -> type[asyncssh.SSHClientSession]:
     """Returns a parameterized subclass of asyncssh.SSHClientSession that
     may be passed to asyncssh.SSHClientConnection.create_session()
 

@@ -1,4 +1,4 @@
-#  Copyright 2022 IBM Corporation
+#  Copyright 2022, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,7 +19,7 @@ import re as regex
 import subprocess
 
 from dataclasses import dataclass
-from typing import Any, Final, List, Optional
+from typing import Any, Final, Optional
 
 import cpo.utils.process
 
@@ -148,7 +148,7 @@ class IBMCloudAPIManager:
         self._execute_ibmcloud_command(["config", "--check-version=false"], capture_output=True)
 
     def execute_ibmcloud_command(
-        self, args: List[str], capture_output=False, check=True, print_captured_output=False, skip_login=False
+        self, args: list[str], capture_output=False, check=True, print_captured_output=False, skip_login=False
     ) -> cpo.utils.process.ProcessResult:
         """Executes the IBM Cloud CLI
 
@@ -203,7 +203,7 @@ class IBMCloudAPIManager:
         return result
 
     def execute_ibmcloud_command_without_check(
-        self, args: List[str], capture_output=False, print_captured_output=False
+        self, args: list[str], capture_output=False, print_captured_output=False
     ) -> cpo.utils.process.ProcessResult:
         """Executes the IBM Cloud CLI without checking its return code
 
@@ -428,7 +428,7 @@ class IBMCloudAPIManager:
         )
 
     def _execute_ibmcloud_command(
-        self, args: List[str], capture_output=False, check=True, print_captured_output=False
+        self, args: list[str], capture_output=False, check=True, print_captured_output=False
     ) -> cpo.utils.process.ProcessResult:
         """Executes the IBM Cloud CLI
 
@@ -464,7 +464,7 @@ class IBMCloudAPIManager:
             print_captured_output=print_captured_output,
         )
 
-    def _execute_ibmcloud_command_interactively(self, args: List[str]) -> int:
+    def _execute_ibmcloud_command_interactively(self, args: list[str]) -> int:
         command = [str(dependency_manager.get_binary_path(IBMCloudCLIPlugIn))] + args
 
         logging.debug(f"Executing command: {' '.join(command)}")
@@ -478,7 +478,7 @@ class IBMCloudAPIManager:
         return proc.returncode
 
     def _execute_ibmcloud_command_without_check(
-        self, args: List[str], capture_output=False, print_captured_output=False
+        self, args: list[str], capture_output=False, print_captured_output=False
     ) -> cpo.utils.process.ProcessResult:
         """Executes the IBM Cloud CLI without checking its return code
 
@@ -544,14 +544,14 @@ class PlugInManager:
     def refresh(self):
         self._plug_ins = self._get_plug_ins()
 
-    def _get_plug_ins(self) -> List[str]:
+    def _get_plug_ins(self) -> list[str]:
         ibmcloud_plugin_list_command_args = ["plugin", "list", "--output", "json"]
         ibmcloud_plugin_list_command_result = self._ibm_cloud_api_manager.execute_ibmcloud_command(
             ibmcloud_plugin_list_command_args, capture_output=True
         )
 
         ibmcloud_plugin_list_command_result_json = json.loads(ibmcloud_plugin_list_command_result.stdout)
-        plug_ins: List[str] = []
+        plug_ins: list[str] = []
 
         for plugin in ibmcloud_plugin_list_command_result_json:
             if "Name" in plugin:

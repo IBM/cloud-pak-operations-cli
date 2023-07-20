@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List, TypedDict
+from typing import TypedDict
 
 HAProxyTimeoutData = TypedDict(
     "HAProxyTimeoutData",
@@ -32,7 +32,7 @@ HAProxyData = TypedDict("HAProxyData", {"timeout": HAProxyTimeoutData})
 
 
 class WorkerData(TypedDict, total=False):
-    additional_disk: List[str]
+    additional_disk: list[str]
     count: str
     cpu: str
     memory: str
@@ -53,4 +53,4 @@ class OCPPostRequest(TypedDict, total=False):
     size: str
     ssh_key: str
     time_to_live: str
-    worker: List[WorkerData]
+    worker: list[WorkerData]

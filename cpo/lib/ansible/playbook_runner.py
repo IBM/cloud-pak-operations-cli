@@ -1,4 +1,4 @@
-#  Copyright 2022 IBM Corporation
+#  Copyright 2022, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,7 +16,8 @@ import logging
 import pathlib
 import re as regex
 
-from typing import Any, Union
+from abc import ABC, abstractmethod
+from typing import Any
 
 import ansible_runner
 
@@ -25,8 +26,6 @@ from ansible_runner.streaming import Processor, Transmitter, Worker
 
 from cpo.config import configuration_manager
 from cpo.utils.error import CloudPakOperationsCLIException
-from cpo.utils.string import removeprefix, removesuffix
-from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
 
@@ -69,9 +68,9 @@ class PlaybookRunner(ABC):
 
         if ("stdout" in event_data) and (event_data["stdout"] != ""):
             if ("event" in event_data) and (event_data["event"] == "runner_on_failed"):
-                logger.log(logging.ERROR, removeprefix(event_data["stdout"], "\r\n"))
+                logger.log(logging.ERROR, event_data["stdout"].removeprefix("\r\n"))
             else:
-                logger.log(logging.DEBUG, removeprefix(event_data["stdout"], "\r\n"))
+                logger.log(logging.DEBUG, event_data["stdout"].removeprefix("\r\n"))
 
     def _get_extra_vars(self) -> dict:
         """Returns extra vars/additional variables
@@ -97,7 +96,7 @@ class PlaybookRunner(ABC):
             playbook name
         """
 
-        class_name_without_runner_suffix = removesuffix(self.__class__.__name__, "Runner")
+        class_name_without_runner_suffix = self.__class__.__name__.removesuffix("Runner")
         # AAABbbbCccc → AAA_BbbbCccc
         class_name_using_snake_case = regex.sub("([0-9A-Z])([A-Z][a-z]+)", r"\1_\2", class_name_without_runner_suffix)
         # AAA_BbbbCccc → AAA_Bbbb_Cccc
@@ -107,12 +106,12 @@ class PlaybookRunner(ABC):
 
         return playbook_name
 
-    def _run_playbook(self) -> Union[Processor, Runner, Transmitter, Worker]:
+    def _run_playbook(self) -> Processor | Runner | Transmitter | Worker:
         """Runs the playbook with the name passed in the constructor
 
         Returns
         -------
-        Union[Processor, Runner, Transmitter, Worker]
+        Processor | Runner | Transmitter | Worker
             object returned by Ansible Runner for post-processing purposes"""
 
         runner = ansible_runner.run(

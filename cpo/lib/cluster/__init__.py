@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Dict
-
 import cpo.lib.cluster.cluster_factory
 import cpo.lib.fyre.cluster
 import cpo.lib.fyre.cluster.ocpplus_cluster_factory
@@ -24,7 +22,7 @@ import cpo.lib.openshift.cluster.generic_cluster_factory
 
 from cpo.lib.cluster.cluster_factory import AbstractClusterFactory
 
-cluster_factories: Dict[str, AbstractClusterFactory] = {}
+cluster_factories: dict[str, AbstractClusterFactory] = {}
 cluster_factories[
     cpo.lib.ibmcloud.oc.cluster.CLUSTER_TYPE_ID
 ] = cpo.lib.ibmcloud.oc.cluster.roks_cluster_factory.roks_cluster_factory

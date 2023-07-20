@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import json
 import pathlib
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import click
 
@@ -28,7 +28,7 @@ from cpo.lib.openshift.credentials.token_credentials import TokenCredentials
 from cpo.lib.openshift.credentials.user_credentials import UserCredentials
 
 
-def create_default_map_from_dict(dict: Dict[str, Any]):
+def create_default_map_from_dict(dict: dict[str, Any]):
     default_map_dict = {}
     default_map_dict["default_map"] = dict
 
@@ -47,7 +47,7 @@ def create_default_map_from_json_file(path: pathlib.Path):
     return default_map_dict
 
 
-def get_cluster_credentials(ctx: click.Context, options: Dict[str, Any]) -> AbstractCredentials:
+def get_cluster_credentials(ctx: click.Context, options: dict[str, Any]) -> AbstractCredentials:
     """Returns cluster credentials based on the options passed to a Click
     command or the current cluster
 
@@ -111,7 +111,7 @@ def get_cluster_credentials(ctx: click.Context, options: Dict[str, Any]) -> Abst
     return result
 
 
-def get_oc_login_command_for_remote_host(ctx: click.Context, options: Dict[str, Any]) -> str:
+def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, Any]) -> str:
     result: Optional[str] = None
 
     if (
@@ -152,7 +152,7 @@ def get_oc_login_command_for_remote_host(ctx: click.Context, options: Dict[str, 
     return result
 
 
-def log_in_to_openshift_cluster(ctx: click.Context, options: Dict[str, Any]):
+def log_in_to_openshift_cluster(ctx: click.Context, options: dict[str, Any]):
     if (
         ("server" in options)
         and (options["server"] is not None)

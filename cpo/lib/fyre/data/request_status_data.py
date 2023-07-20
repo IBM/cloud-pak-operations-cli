@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 #  limitations under the License.
 
 import json
-
-from typing import List
 
 import click
 
@@ -31,8 +29,8 @@ class RequestStatusData:
         if use_json:
             click.echo(json.dumps(self._ocp_request_get_response, indent="\t", sort_keys=True))
         else:
-            headers: List[str] = []
-            tabular_data: List[str] = []
+            headers: list[str] = []
+            tabular_data: list[str] = []
 
             for key in self._ocp_request_get_response["request"].keys():
                 self._add_value(headers, tabular_data, key)
@@ -42,7 +40,7 @@ class RequestStatusData:
     def get_status(self) -> OCPRequestGetResponse:
         return self._ocp_request_get_response
 
-    def _add_value(self, headers: List[str], tabular_data: List[str], value: str):
+    def _add_value(self, headers: list[str], tabular_data: list[str], value: str):
         headers.append(value.replace("_", " "))
         value = str(self._ocp_request_get_response["request"][value])
         tabular_data.append(value)

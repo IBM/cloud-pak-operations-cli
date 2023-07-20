@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,12 +12,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Dict, Optional, TypedDict
+from typing import Optional, TypedDict
 
 
 class ObjectMetaOptional(TypedDict, total=False):
     creationTimestamp: Optional[str]
-    labels: Dict[str, str]
+    labels: dict[str, str]
     namespace: str
 
 

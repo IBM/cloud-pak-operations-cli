@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import os
 import pathlib
 
-from typing import Dict, List, Optional, Type
+from typing import Optional
 
 import cpo.utils.process
 
@@ -28,14 +28,14 @@ class DependencyManager:
     """Responsible for managing dependencies"""
 
     def __init__(self):
-        self._download_manager_dict: Dict[Type[AbstractDependencyManagerPlugIn], AbstractDependencyManagerPlugIn] = {}
-        self._download_manager_plugins: List[AbstractDependencyManagerPlugIn] = []
+        self._download_manager_dict: dict[type[AbstractDependencyManagerPlugIn], AbstractDependencyManagerPlugIn] = {}
+        self._download_manager_plugins: list[AbstractDependencyManagerPlugIn] = []
 
     def execute_binary(
         self,
-        cls: Type[AbstractDependencyManagerPlugIn],
-        args: List[str],
-        env: Dict[str, str] = os.environ.copy(),
+        cls: type[AbstractDependencyManagerPlugIn],
+        args: list[str],
+        env: dict[str, str] = os.environ.copy(),
         capture_output=False,
         check=True,
         print_captured_output=False,
@@ -92,7 +92,7 @@ class DependencyManager:
             args, env, capture_output=capture_output, check=check, print_captured_output=print_captured_output
         )
 
-    def get_binary_path(self, cls: Type[AbstractDependencyManagerPlugIn]) -> Optional[pathlib.Path]:
+    def get_binary_path(self, cls: type[AbstractDependencyManagerPlugIn]) -> Optional[pathlib.Path]:
         """Returns the path of the binary provided by the dependency
         corresponding to the dependency manager plug-in of the given type
 
@@ -113,7 +113,7 @@ class DependencyManager:
 
         return plugin.get_binary_path()
 
-    def register_plugin(self, cls: Type[AbstractDependencyManagerPlugIn]):
+    def register_plugin(self, cls: type[AbstractDependencyManagerPlugIn]):
         """Registers a dependency manager plug-in of the given type
 
         Parameters

@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 from abc import ABC, abstractmethod
-from typing import Any, List, Optional, Type
+from typing import Any, Optional
 
 import jsonschema
 
@@ -66,7 +66,7 @@ class AbstractJSONResponseManager(ABC):
 
         validate(json_error_response, self.get_default_error_response_schema())
 
-        error_messages: List[str] = []
+        error_messages: list[str] = []
         error_response: DefaulErrorResponse = json_error_response
         details = error_response["details"]
 
@@ -182,12 +182,12 @@ class AbstractJSONResponseManager(ABC):
         pass
 
     @abstractmethod
-    def get_response_type(self) -> Type:
+    def get_response_type(self) -> type:
         """Returns the response type
 
         Returns
         -------
-        Type
+        type
             response type
         """
 

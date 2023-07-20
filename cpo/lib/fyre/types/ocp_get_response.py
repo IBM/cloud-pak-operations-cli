@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,16 +12,16 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List, Optional, TypedDict
+from typing import Optional, TypedDict
 
 from cpo.lib.fyre.types.shared import IP
 
 
 class VM(TypedDict):
-    additional_disk: List[str]
+    additional_disk: list[str]
     cpu: str
     hostname: str
-    ips: List[IP]
+    ips: list[IP]
     memory: str
     os_disk: str
     os_state: str
@@ -51,11 +51,11 @@ class Cluster(TypedDict):
     product_group: str
     product_group_id: str
     vm_count: int
-    vms: List[VM]
+    vms: list[VM]
 
 
 class OCPGetResponse(TypedDict):
     cluster_count: int
-    clusters: List[Cluster]
+    clusters: list[Cluster]
     details: str
     status: str

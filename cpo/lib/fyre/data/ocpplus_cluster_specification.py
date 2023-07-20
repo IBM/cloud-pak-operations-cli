@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,11 +14,10 @@
 
 import re as regex
 
-from typing import List, Optional
+from typing import Optional
 
 from cpo.lib.fyre.types.ocp_post_request import HAProxyData, HAProxyTimeoutData, OCPPostRequest
 from cpo.utils.error import CloudPakOperationsCLIException
-from cpo.utils.string import removeprefix
 
 
 class HAProxyTimoutSettings:
@@ -47,7 +46,7 @@ class HAProxyTimoutSettings:
             value = getattr(self, name)
 
             if not name.startswith("__") and not callable(getattr(self, name)) and value is not None:
-                timeout_dict[removeprefix(name, "_").replace("_", "-")] = value
+                timeout_dict[name.removeprefix("_").replace("_", "-")] = value
 
         haproxy_dict: HAProxyData = {"timeout": timeout_dict}
 
@@ -73,7 +72,7 @@ class QuickBurnSettings:
 class WorkerNodeSettings:
     def __init__(
         self,
-        worker_node_additional_disk_size: List[int],
+        worker_node_additional_disk_size: list[int],
         worker_node_count: Optional[int] = None,
         worker_node_num_cpus: Optional[int] = None,
         worker_node_ram_size: Optional[int] = None,

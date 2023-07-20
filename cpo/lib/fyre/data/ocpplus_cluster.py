@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 import json
 
-from typing import List, Optional
+from typing import Optional
 
 import click
 
@@ -33,7 +33,7 @@ class OCPPlusCluster:
             click.echo(json.dumps(self._ocp_get_response_for_single_cluster, indent="\t", sort_keys=True))
         else:
             cluster = self._ocp_get_response_for_single_cluster["clusters"][0]
-            vm_list: List[List[str]] = []
+            vm_list: list[list[str]] = []
             headers = [
                 "VM ID",
                 "hostname",

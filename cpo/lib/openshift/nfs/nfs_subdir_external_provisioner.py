@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 #  limitations under the License.
 
 import logging
-
-from typing import List
 
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.openshift_api_manager import OpenShiftAPIManager
@@ -66,7 +64,7 @@ class NFSSubdirExternalProvisioner:
         if not self._openshift_api_manager.cluster_role_exists(cluster_role_name):
             logger.info(f"Creating cluster role '{cluster_role_name}'")
 
-            rules: List[RoleRule] = [
+            rules: list[RoleRule] = [
                 {
                     "apiGroups": [
                         "security.openshift.io",
@@ -90,7 +88,7 @@ class NFSSubdirExternalProvisioner:
         if not self._openshift_api_manager.cluster_role_binding_exists(cluster_role_binding_name):
             logger.info(f"Creating cluster role binding '{cluster_role_binding_name}'")
 
-            subjects: List[ObjectMeta] = [
+            subjects: list[ObjectMeta] = [
                 {
                     "name": "nfs-client-provisioner",
                     "namespace": self._project,
@@ -111,7 +109,7 @@ class NFSSubdirExternalProvisioner:
         if not self._openshift_api_manager.cluster_role_exists(cluster_role_name):
             logger.info(f"Creating cluster role '{cluster_role_name}'")
 
-            rules: List[RoleRule] = [
+            rules: list[RoleRule] = [
                 {
                     "apiGroups": [""],
                     "resources": ["events"],
@@ -179,7 +177,7 @@ class NFSSubdirExternalProvisioner:
         if not self._openshift_api_manager.cluster_role_binding_exists(cluster_role_binding_name):
             logger.info(f"Creating cluster role binding '{cluster_role_binding_name}'")
 
-            subjects: List[ObjectMeta] = [
+            subjects: list[ObjectMeta] = [
                 {
                     "name": "nfs-client-provisioner",
                     "namespace": self._project,
@@ -283,7 +281,7 @@ class NFSSubdirExternalProvisioner:
         if not self._openshift_api_manager.role_exists(self._project, role_name):
             logger.info(f"Creating role '{role_name}'")
 
-            rules: List[RoleRule] = [
+            rules: list[RoleRule] = [
                 {
                     "apiGroups": [""],
                     "resources": ["endpoints"],
@@ -316,7 +314,7 @@ class NFSSubdirExternalProvisioner:
         if not self._openshift_api_manager.role_binding_exists(self._project, role_binding_name):
             logger.info(f"Creating role binding '{role_binding_name}'")
 
-            subjects: List[ObjectMeta] = [
+            subjects: list[ObjectMeta] = [
                 {
                     "name": "nfs-client-provisioner",
                     "namespace": self._project,

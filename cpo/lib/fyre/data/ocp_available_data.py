@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 #  limitations under the License.
 
 import json
-
-from typing import List
 
 import click
 import semver
@@ -32,17 +30,17 @@ class OCPAvailableData:
         if use_json:
             click.echo(json.dumps(self._ocp_available_get_response, indent="\t", sort_keys=True))
         else:
-            keys_union: List[str] = []
+            keys_union: list[str] = []
             keys_union += self._ocp_available_get_response["default_size"]["inf"].keys()
             keys_union += self._ocp_available_get_response["default_size"]["master"].keys()
             keys_union += self._ocp_available_get_response["default_size"]["worker"].keys()
             keys_union = list(dict.fromkeys(keys_union))
             keys_union.sort()
 
-            default_sizes_list: List[List[str]] = []
+            default_sizes_list: list[list[str]] = []
 
             for key in keys_union:
-                default_size_list: List[str] = [key]
+                default_size_list: list[str] = [key]
 
                 default_size_list.append(
                     self._ocp_available_get_response["default_size"]["inf"][key]
@@ -81,7 +79,7 @@ class OCPAvailableData:
                 )
             )
 
-    def get_openshift_versions(self) -> List[semver.VersionInfo]:
+    def get_openshift_versions(self) -> list[semver.VersionInfo]:
         ocp_versions = list(
             map(
                 lambda ocp_version: semver.VersionInfo.parse(ocp_version),

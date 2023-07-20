@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,9 +13,9 @@
 #  limitations under the License.
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any
 
-ClusterData = Dict[str, Any]
+ClusterData = dict[str, Any]
 
 
 class AbstractCluster(ABC):

@@ -1,4 +1,4 @@
-#  Copyright 2022 IBM Corporation
+#  Copyright 2022, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import logging
 
 from dataclasses import dataclass, field
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Optional
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -27,8 +27,8 @@ from cpo.lib.openshift.types.kind_metadata import KindMetadata
 
 @dataclass
 class CustomResourceDefinitionsEventData:
-    expected_crd_kinds: Set[str]
-    encountered_crd_kinds: Set[str] = field(default_factory=set)
+    expected_crd_kinds: set[str]
+    encountered_crd_kinds: set[str] = field(default_factory=set)
 
 
 class WaitForCustomResourceDefinitionsModule(AbstractModule):
@@ -48,7 +48,7 @@ class WaitForCustomResourceDefinitionsModule(AbstractModule):
 
         super().__init__(self._module.params["kubeconfig"])  # type: ignore
 
-        self._custom_resource_definitions: List[str] = self._module.params[
+        self._custom_resource_definitions: list[str] = self._module.params[
             "custom_resource_definitions"
         ]  # type: ignore
 
@@ -58,7 +58,7 @@ class WaitForCustomResourceDefinitionsModule(AbstractModule):
 
     # override
     def run(self):
-        result: Optional[Dict]
+        result: Optional[dict]
 
         try:
             self._wait_for_custom_resource(

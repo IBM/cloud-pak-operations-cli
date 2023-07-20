@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 import logging
 
-from typing import Any, Callable, Dict, List, Optional
+from typing import Any, Callable, Optional
 
 import semver
 import urllib3.exceptions
@@ -54,7 +54,7 @@ class OpenShiftAPIManager:
 
     def __init__(self, credentials: AbstractCredentials):
         self._credentials = credentials
-        self._kube_config_dict: Dict[str, Any] = {}
+        self._kube_config_dict: dict[str, Any] = {}
         self._kube_config_initialized = False
 
     def cluster_role_exists(self, name: str) -> bool:
@@ -110,7 +110,7 @@ class OpenShiftAPIManager:
 
         self.execute_kubernetes_client(self._create_catalog_source, catalog_source=catalog_source, project=project)
 
-    def create_cluster_role(self, name: str, rules: List[RoleRule]):
+    def create_cluster_role(self, name: str, rules: list[RoleRule]):
         """Creates a cluster role
 
         Parameters
@@ -129,7 +129,7 @@ class OpenShiftAPIManager:
             rules=rules,
         )
 
-    def create_cluster_role_binding(self, name: str, subjects: List[ObjectMeta], role_ref_name: str):
+    def create_cluster_role_binding(self, name: str, subjects: list[ObjectMeta], role_ref_name: str):
         """Creates a cluster role binding
 
         Parameters
@@ -204,7 +204,7 @@ class OpenShiftAPIManager:
 
         self.execute_kubernetes_client(self._create_project, name=name)
 
-    def create_role(self, project: str, name: str, rules: List[RoleRule]):
+    def create_role(self, project: str, name: str, rules: list[RoleRule]):
         """Creates a role
 
         Parameters
@@ -219,7 +219,7 @@ class OpenShiftAPIManager:
 
         self.execute_kubernetes_client(self._create_role, name=name, project=project, rules=rules)
 
-    def create_role_binding(self, project: str, name: str, subjects: List[ObjectMeta], role_ref_name: str):
+    def create_role_binding(self, project: str, name: str, subjects: list[ObjectMeta], role_ref_name: str):
         """Creates a role binding
 
         Parameters
@@ -239,7 +239,7 @@ class OpenShiftAPIManager:
             self._create_role_binding, name=name, project=project, role_ref_name=role_ref_name, subjects=subjects
         )
 
-    def create_storage_class(self, name: str, provisioner: str, parameters: Dict[str, str]):
+    def create_storage_class(self, name: str, provisioner: str, parameters: dict[str, str]):
         """Creates a storage class
 
         Parameters
@@ -272,7 +272,7 @@ class OpenShiftAPIManager:
 
         self.execute_kubernetes_client(self._create_subscription, project=project, subscription=subscription)
 
-    def create_system_cluster_role(self, name: str, rules: List[RoleRule]):
+    def create_system_cluster_role(self, name: str, rules: list[RoleRule]):
         """Creates a system cluster role
 
         Parameters
@@ -292,7 +292,7 @@ class OpenShiftAPIManager:
             rules=rules,
         )
 
-    def create_system_cluster_role_binding(self, name: str, subjects: List[ObjectMeta], role_ref_name: str):
+    def create_system_cluster_role_binding(self, name: str, subjects: list[ObjectMeta], role_ref_name: str):
         """Creates a system cluster role binding
 
         Parameters
@@ -475,7 +475,7 @@ class OpenShiftAPIManager:
             project=project,
         )
 
-    def get_kube_config(self) -> Dict[str, Any]:
+    def get_kube_config(self) -> dict[str, Any]:
         if not self._kube_config_initialized:
             self._set_kube_config()
 
@@ -595,7 +595,7 @@ class OpenShiftAPIManager:
 
         return self.execute_kubernetes_client(self._get_custom_resource_definitions)
 
-    def get_custom_resources(self, kind_metadata: KindMetadata) -> List[Any]:
+    def get_custom_resources(self, kind_metadata: KindMetadata) -> list[Any]:
         """Returns custom resources of the given kind
 
         Parameters
@@ -605,7 +605,7 @@ class OpenShiftAPIManager:
 
         Returns
         -------
-        List[Any]
+        list[Any]
             custom resources of the given kind
         """
 
@@ -845,7 +845,7 @@ class OpenShiftAPIManager:
         kind_metadata: KindMetadata,
         log_callback: Callable[[str], None],
         success_callback: Callable[..., bool],
-        **kwargs
+        **kwargs,
     ):
         """Waits for a specific custom resource of the given kind to be created
 
@@ -869,7 +869,7 @@ class OpenShiftAPIManager:
             kind_metadata=kind_metadata,
             log_callback=log_callback,
             success_callback=success_callback,
-            **kwargs
+            **kwargs,
         )
 
     def wait_for_namespaced_custom_resource(
@@ -878,7 +878,7 @@ class OpenShiftAPIManager:
         kind_metadata: KindMetadata,
         log_callback: Callable[[str], None],
         success_callback: Callable[..., Optional[CustomResourceEventResult]],
-        **kwargs
+        **kwargs,
     ) -> CustomResourceEventResult:
         """Waits for a specific custom resource of the given kind to be created in
         the given project
@@ -906,7 +906,7 @@ class OpenShiftAPIManager:
             log_callback=log_callback,
             project=project,
             success_callback=success_callback,
-            **kwargs
+            **kwargs,
         )
 
     def _create_catalog_source(self, project: str, catalog_source: CatalogSource):
@@ -915,7 +915,7 @@ class OpenShiftAPIManager:
             "operators.coreos.com", "v1alpha1", project, "catalogsources", catalog_source
         )
 
-    def _create_cluster_role(self, metadata: ObjectMeta, rules: List[RoleRule]):
+    def _create_cluster_role(self, metadata: ObjectMeta, rules: list[RoleRule]):
         cluster_role: Role = {
             "kind": "ClusterRole",
             "apiVersion": "rbac.authorization.k8s.io/v1",
@@ -926,7 +926,7 @@ class OpenShiftAPIManager:
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api.create_cluster_custom_object("rbac.authorization.k8s.io", "v1", "clusterroles", cluster_role)
 
-    def _create_cluster_role_binding(self, metadata: ObjectMeta, subjects: List[ObjectMeta], role_ref_name: str):
+    def _create_cluster_role_binding(self, metadata: ObjectMeta, subjects: list[ObjectMeta], role_ref_name: str):
         cluster_role_binding: RoleBinding = {
             "apiVersion": "rbac.authorization.k8s.io/v1",
             "kind": "ClusterRoleBinding",
@@ -1015,7 +1015,7 @@ class OpenShiftAPIManager:
             }
         )
 
-    def _create_role(self, project: str, name: str, rules: List[RoleRule]):
+    def _create_role(self, project: str, name: str, rules: list[RoleRule]):
         role: Role = {
             "apiVersion": "rbac.authorization.k8s.io/v1",
             "kind": "Role",
@@ -1029,7 +1029,7 @@ class OpenShiftAPIManager:
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api.create_namespaced_custom_object("rbac.authorization.k8s.io", "v1", project, "roles", role)
 
-    def _create_role_binding(self, project: str, name: str, subjects: List[ObjectMeta], role_ref_name: str):
+    def _create_role_binding(self, project: str, name: str, subjects: list[ObjectMeta], role_ref_name: str):
         role_binding: RoleBinding = {
             "apiVersion": "rbac.authorization.k8s.io/v1",
             "kind": "RoleBinding",
@@ -1072,7 +1072,7 @@ class OpenShiftAPIManager:
         core_v1_api = client.CoreV1Api()
         core_v1_api.create_namespaced_service_account(project, service_account)
 
-    def _create_storage_class(self, name: str, provisioner: str, parameters: Dict[str, str]):
+    def _create_storage_class(self, name: str, provisioner: str, parameters: dict[str, str]):
         storage_class = {
             "apiVersion": "storage.k8s.io/v1",
             "kind": "StorageClass",
@@ -1158,14 +1158,14 @@ class OpenShiftAPIManager:
 
         return GlobalPullSecretData(core_v1_api_result.data)
 
-    def _get_custom_resources(self, kind_metadata: KindMetadata) -> List[Any]:
+    def _get_custom_resources(self, kind_metadata: KindMetadata) -> list[Any]:
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api_result: Any = custom_objects_api.list_cluster_custom_object(
             kind_metadata.group, kind_metadata.version, kind_metadata.plural
         )
 
         assert "items" in custom_objects_api_result
-        assert isinstance(custom_objects_api_result["items"], List)
+        assert isinstance(custom_objects_api_result["items"], list)
 
         return custom_objects_api_result["items"]
 
@@ -1331,7 +1331,7 @@ class OpenShiftAPIManager:
         kind_metadata: KindMetadata,
         log_callback: Callable[[str], None],
         success_callback: Callable[..., bool],
-        **kwargs
+        **kwargs,
     ):
         custom_objects_api = client.CustomObjectsApi()
         succeeded = False
@@ -1365,7 +1365,7 @@ class OpenShiftAPIManager:
         kind_metadata: KindMetadata,
         log_callback: Callable[[str], None],
         success_callback: Callable[..., Optional[CustomResourceEventResult]],
-        **kwargs
+        **kwargs,
     ) -> CustomResourceEventResult:
         custom_objects_api = client.CustomObjectsApi()
         custom_resource_event_result: Optional[CustomResourceEventResult] = None
