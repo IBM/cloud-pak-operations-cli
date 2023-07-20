@@ -1,4 +1,4 @@
-#  Copyright 2022 IBM Corporation
+#  Copyright 2022, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,8 +16,8 @@ import click
 
 import cpo.config.cluster_credentials_manager
 import cpo.lib.click.utils
-import cpo.lib.ibm_internal_plugin.install
 
+from cpo.lib.ibm_internal_plugin.ibm_internal_plugin_manager import IBMInternalPluginInstaller
 from cpo.utils.logging import loglevel_command
 
 
@@ -26,18 +26,31 @@ from cpo.utils.logging import loglevel_command
         cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-@click.argument("distribution-package-name")
 @click.option(
     "--artifactory-username",
-    help="Artifactory username. The username is usually the IBM e-mail address.",
+    help="Artifactory username (IBM e-mail address)",
     required=True,
 )
 @click.option(
     "--artifactory-password",
-    help="Artifactory password. The password is usually the API key located in the 'Edit Profile' page in Artifactory.",
+    help="Artifactory identitiy token (Artifactory website → 'Edit Profile' → 'Identity Tokens')",
     required=True,
 )
-def install(distribution_package_name: str, artifactory_username: str, artifactory_password: str):
+@click.option(
+    "--repository-url",
+    default="https://na.artifactory.swg-devops.com/artifactory/api/pypi/hyc-ibm-sap-cp4d-team-pypi-local/simple",
+)
+@click.option("--user", help="Install to user site-packages directory", is_flag=True)
+@click.argument("distribution-package-name")
+def install(
+    artifactory_username: str,
+    artifactory_password: str,
+    distribution_package_name: str,
+    repository_url: str,
+    user: bool,
+):
     """Install an IBM-internal CLI plug-in"""
 
-    cpo.lib.ibm_internal_plugin.install.install(distribution_package_name, artifactory_username, artifactory_password)
+    IBMInternalPluginInstaller(artifactory_username, artifactory_password, repository_url).install(
+        distribution_package_name, user
+    )
