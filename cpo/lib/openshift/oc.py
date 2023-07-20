@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import json
 import tempfile
 
-from typing import Final, List
+from typing import Final
 
 import semver
 
@@ -27,7 +27,6 @@ from cpo.lib.dependency_manager import dependency_manager
 from cpo.lib.dependency_manager.plugins.openshift_cli_plugin import OpenShiftCLIPlugIn
 from cpo.lib.openshift.types.get_pod_entry import GetPodEntry
 from cpo.utils.error import CloudPakOperationsCLIException
-from cpo.utils.string import removeprefix, removesuffix
 
 OPENSHIFT_REST_API_VERSION: Final[str] = "v1"
 
@@ -52,7 +51,7 @@ def enable_image_registry_default_route():
 
 
 def execute_oc_command(
-    args: List[str],
+    args: list[str],
     capture_output=False,
     check=True,
     print_captured_output=False,
@@ -109,7 +108,7 @@ def get_current_token() -> str:
     return oc_whoami_command_result.stdout.rstrip()
 
 
-def get_oc_login_args_with_password(server: str, username: str, password: str) -> List[str]:
+def get_oc_login_args_with_password(server: str, username: str, password: str) -> list[str]:
     return [
         "login",
         "--insecure-skip-tls-verify",
@@ -122,7 +121,7 @@ def get_oc_login_args_with_password(server: str, username: str, password: str) -
     ]
 
 
-def get_oc_login_args_with_token(server: str, token: str) -> List[str]:
+def get_oc_login_args_with_token(server: str, token: str) -> list[str]:
     return [
         "login",
         "--insecure-skip-tls-verify",
@@ -164,8 +163,8 @@ def get_image_registry_hostname(route_name: str = "default-route") -> str:
         "jsonpath='{.items[?(@.metadata.name==\"" + route_name + "\")].spec.host}'",
     ]
 
-    oc_get_route_command_result = removesuffix(
-        removeprefix(execute_oc_command(oc_get_route_args, capture_output=True).stdout, "'"), "'"
+    oc_get_route_command_result = (
+        execute_oc_command(oc_get_route_args, capture_output=True).stdout.removeprefix("'").removesuffix("'")
     )
 
     return oc_get_route_command_result
@@ -209,8 +208,8 @@ def get_persistent_volume_id(persistent_volume_name: str):
         f"jsonpath='{{.items[?(@.metadata.name==\"{persistent_volume_name}\")].metadata.labels.volumeId}}'",
     ]
 
-    oc_get_pv_command_result = removesuffix(
-        removeprefix(execute_oc_command(oc_get_pv_args, capture_output=True).stdout, "'"), "'"
+    oc_get_pv_command_result = (
+        execute_oc_command(oc_get_pv_args, capture_output=True).stdout.removeprefix("'").removesuffix("'")
     )
 
     if oc_get_pv_command_result == "":
@@ -238,7 +237,7 @@ def log_in_to_openshift_cluster_with_token(server: str, token: str):
     execute_oc_command(oc_login_args)
 
 
-def get_deployment_name(search_string: str) -> List[str]:
+def get_deployment_name(search_string: str) -> list[str]:
     """Returns the available OpenShift deployment(s) for a given search string"""
 
     oc_get_deployments_args = ["get", "deployments"]
@@ -258,7 +257,7 @@ def get_deployment_name(search_string: str) -> List[str]:
     return result
 
 
-def get_pod_name(search_string: str) -> List[str]:
+def get_pod_name(search_string: str) -> list[str]:
     """Returns the available OpenShift pod(s) for a given search string"""
 
     oc_get_pods_args = ["get", "pods"]

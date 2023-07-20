@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 #  limitations under the License.
 
 import json
-
-from typing import List
 
 import click
 
@@ -42,8 +40,8 @@ class ProductGroupQuotaData:
                     click.echo()
                     self._format_product_group_quota(product_group)
 
-    def _add_quota_list_element(self, quota_list: List[List[str]], platform: str, product_group_quota: PlatformQuota):
-        quota_list_element: List[str] = [
+    def _add_quota_list_element(self, quota_list: list[list[str]], platform: str, product_group_quota: PlatformQuota):
+        quota_list_element: list[str] = [
             platform,
             product_group_quota["cpu"] if "cpu" in product_group_quota else "-",
             str(product_group_quota["cpu_percent"]) if "cpu" in product_group_quota else "-",
@@ -62,7 +60,7 @@ class ProductGroupQuotaData:
             bold=True,
         )
 
-        quota_list: List[List[str]] = []
+        quota_list: list[list[str]] = []
 
         if "p" in product_group_quota:
             self._add_quota_list_element(quota_list, "p", product_group_quota["p"])

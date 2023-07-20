@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 import pathlib
 
-from typing import Final, List
+from typing import Final
 
 import cpo.lib.openshift.oc
 import cpo.utils.process
@@ -115,7 +115,7 @@ async def label_storage_path_from_remote_host(remote_client: cpo.utils.ssh.Remot
     await remote_client.execute("ssh " + _join_args(_get_ssh_restorecon_storage_path_command(node)))
 
 
-def _get_oc_adm_taint_node_command(node: str, db2_edition: str) -> List[str]:
+def _get_oc_adm_taint_node_command(node: str, db2_edition: str) -> list[str]:
     return [
         "adm",
         "taint",
@@ -125,30 +125,30 @@ def _get_oc_adm_taint_node_command(node: str, db2_edition: str) -> List[str]:
     ]
 
 
-def _get_oc_label_node_command(node: str, db2_edition: str) -> List[str]:
+def _get_oc_label_node_command(node: str, db2_edition: str) -> list[str]:
     return ["label", "node", node, f"icp4data=database-{db2_edition}"]
 
 
-def _get_ssh_mkdir_storage_path_command(node: str) -> List[str]:
+def _get_ssh_mkdir_storage_path_command(node: str) -> list[str]:
     return [f"core@{node}", "mkdir", "--parents", STORAGE_PATH]
 
 
-def _get_ssh_chmod_storage_path_command(node: str) -> List[str]:
+def _get_ssh_chmod_storage_path_command(node: str) -> list[str]:
     return [f"core@{node}", "chmod", "777", STORAGE_PATH]
 
 
-def _get_ssh_restorecon_storage_path_command(node: str) -> List[str]:
+def _get_ssh_restorecon_storage_path_command(node: str) -> list[str]:
     return [f"core@{node}", "sudo", "restorecon", "-Rv", STORAGE_PATH]
 
 
-def _get_ssh_semanage_storage_path_command(node: str) -> List[str]:
+def _get_ssh_semanage_storage_path_command(node: str) -> list[str]:
     return [
         f"core@{node}",
         f'sudo semanage fcontext --add --type container_file_t "{STORAGE_PATH}(/.*)?"',
     ]
 
 
-def _get_ssh_setsebool_container_manage_cgroup_command(node: str) -> List[str]:
+def _get_ssh_setsebool_container_manage_cgroup_command(node: str) -> list[str]:
     return [
         f"core@{node}",
         "sudo",
@@ -159,7 +159,7 @@ def _get_ssh_setsebool_container_manage_cgroup_command(node: str) -> List[str]:
     ]
 
 
-def _join_args(args: List[str]) -> str:
+def _join_args(args: list[str]) -> str:
     args_copy = args.copy()
 
     for i in range(len(args_copy)):

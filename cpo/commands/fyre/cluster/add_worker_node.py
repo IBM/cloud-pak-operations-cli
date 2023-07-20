@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List, Optional
+from typing import Optional
 
 import click
 
@@ -27,7 +27,7 @@ from cpo.lib.fyre.utils.click import fyre_command_options
 from cpo.utils.logging import loglevel_command
 
 
-def validate_worker_node_additional_disk_size(ctx, param, value: Optional[List[int]]):
+def validate_worker_node_additional_disk_size(ctx, param, value: Optional[list[int]]):
     if value is not None and len(value) > 6:
         raise click.BadParameter("Each worker node can only have up to six additional disks.")
 
@@ -62,7 +62,7 @@ def add_worker_node(
     disable_scheduling: bool,
     force: bool,
     site: Optional[str],
-    worker_node_additional_disk_size: List[int],
+    worker_node_additional_disk_size: list[int],
     worker_node_count: Optional[int],
     worker_node_num_cpus: Optional[int],
     worker_node_ram_size: Optional[int],

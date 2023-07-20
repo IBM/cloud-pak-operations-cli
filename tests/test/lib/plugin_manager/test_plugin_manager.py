@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,7 +23,7 @@ else:
     from importlib.metadata import EntryPoint, EntryPoints
 
 from types import ModuleType
-from typing import Dict, List, Optional, Tuple
+from typing import Optional
 from unittest.mock import Mock, patch
 
 import click
@@ -44,8 +44,8 @@ from cpo.lib.plugin_manager.plugin_manager import plugin_manager
 from cpo.utils.error import CloudPakOperationsCLIException
 
 
-def create_entry_point_mock_objects(entry_points: List[Tuple[str, ModuleType]]) -> List[Mock]:
-    mock_objects: List[Mock] = []
+def create_entry_point_mock_objects(entry_points: list[tuple[str, ModuleType]]) -> list[Mock]:
+    mock_objects: list[Mock] = []
 
     for distribution_package_name, module in entry_points:
         mock_objects.append(
@@ -58,8 +58,8 @@ def create_entry_point_mock_objects(entry_points: List[Tuple[str, ModuleType]]) 
     return mock_objects
 
 
-def create_entry_points_result(entry_point_dicts: List[Dict[str, str]]) -> Dict[str, Tuple[EntryPoint, ...]]:
-    merged_entry_points: List[EntryPoint] = []
+def create_entry_points_result(entry_point_dicts: list[dict[str, str]]) -> dict[str, tuple[EntryPoint, ...]]:
+    merged_entry_points: list[EntryPoint] = []
 
     for entry_point_dict in entry_point_dicts:
         text = "[cloud_pak_operations_cli_plugins]\n"

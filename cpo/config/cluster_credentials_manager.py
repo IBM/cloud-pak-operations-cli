@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import json
 import pathlib
 
-from typing import Any, Dict, List, Optional, TypedDict
+from typing import Any, Optional, TypedDict
 
 from tabulate import tabulate
 
@@ -25,11 +25,11 @@ from cpo.config import configuration_manager
 from cpo.lib.cluster.cluster import AbstractCluster, ClusterData
 from cpo.utils.error import CloudPakOperationsCLIException
 
-ContextData = Dict[str, Any]
+ContextData = dict[str, Any]
 
 
 class ClustersFileContents(TypedDict):
-    clusters: Dict[str, ClusterData]
+    clusters: dict[str, ClusterData]
     current_cluster: str
 
 
@@ -159,14 +159,14 @@ class ClusterCredentialsManager:
             metadata of registered OpenShift clusters as a pretty-printed string
         """
 
-        cluster_list: List[List[str]] = []
+        cluster_list: list[list[str]] = []
         server_of_current_cluster = self._get_server_of_current_cluster()
 
         for server, cluster_data in self._get_clusters().items():
             alias = cluster_data["alias"] if "alias" in cluster_data else ""
             cluster_factory = cpo.lib.cluster.cluster_factories[cluster_data["type"]]
 
-            cluster_list_element: List[str] = [
+            cluster_list_element: list[str] = [
                 "*" if (server == server_of_current_cluster) else "",
                 server,
                 alias,
@@ -344,7 +344,7 @@ class ClusterCredentialsManager:
 
         return cluster
 
-    def _get_clusters(self) -> Dict[str, ClusterData]:
+    def _get_clusters(self) -> dict[str, ClusterData]:
         """Returns registered OpenShift clusters
 
         Returns

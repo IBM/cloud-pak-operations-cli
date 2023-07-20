@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List, TypedDict, Union
+from typing import TypedDict
 
 from cpo.lib.fyre.types.default_success_response import DefaultSuccessResponse
 
@@ -23,15 +23,15 @@ class Error(TypedDict):
 
 
 class Details(TypedDict):
-    errors: List[Union[Error, str]]
+    errors: list[Error | str]
 
 
 class OCPPostErrorResponseOptional(TypedDict, total=False):
-    build_errors: List[str]
+    build_errors: list[str]
 
 
 class OCPPostErrorResponse(OCPPostErrorResponseOptional):
-    details: Union[Details, str]
+    details: Details | str
     status: str
 
 

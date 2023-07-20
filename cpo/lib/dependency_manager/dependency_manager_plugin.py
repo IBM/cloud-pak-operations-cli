@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import pathlib
 import re as regex
 
 from abc import ABC, abstractmethod
-from typing import Dict, List, Optional
+from typing import Optional
 
 import requests
 import semver
@@ -46,8 +46,8 @@ class AbstractDependencyManagerPlugIn(ABC):
 
     def execute_binary(
         self,
-        args: List[str],
-        env: Dict[str, str] = os.environ.copy(),
+        args: list[str],
+        env: dict[str, str] = os.environ.copy(),
         capture_output=False,
         check=True,
         print_captured_output=False,

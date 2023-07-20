@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 from dataclasses import dataclass
-from typing import Any, Dict, TypedDict
+from typing import Any, TypedDict
 
 from cpo.lib.openshift.types.object_meta import ObjectMeta
 
@@ -22,7 +22,7 @@ class CustomResourceDict(TypedDict):
     apiVersion: str
     kind: str
     metadata: ObjectMeta
-    spec: Dict[str, Any]
+    spec: dict[str, Any]
 
 
 @dataclass
@@ -30,7 +30,7 @@ class CustomResource:
     group: str
     kind: str
     metadata: ObjectMeta
-    spec: Dict[str, Any]
+    spec: dict[str, Any]
     version: str
 
     def create_custom_resource_dict(self) -> CustomResourceDict:

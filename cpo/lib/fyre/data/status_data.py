@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 #  limitations under the License.
 
 import json
-
-from typing import List
 
 import click
 
@@ -34,7 +32,7 @@ class OCPPlusClusterStatus:
             self._format_internal()
 
     def _format_internal(self):
-        vm_list: List[List[str]] = []
+        vm_list: list[list[str]] = []
         headers = [
             "VM ID",
             "hostname",

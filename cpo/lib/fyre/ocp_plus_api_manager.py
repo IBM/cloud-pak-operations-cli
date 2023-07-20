@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 import logging
 
-from typing import List, Optional, Tuple, Union
+from typing import Optional
 
 import cpo.config.cluster_credentials_manager
 import cpo.lib.fyre.cluster
@@ -129,7 +129,7 @@ class OCPPlusAPIManager:
         cluster_name: str,
         disable_scheduling: bool,
         site: Optional[str],
-        worker_node_additional_disk_sizes: List[int],
+        worker_node_additional_disk_sizes: list[int],
         worker_node_count: Optional[int],
         worker_node_num_cpus: Optional[int],
         worker_node_ram_size: Optional[int],
@@ -365,7 +365,7 @@ class OCPPlusAPIManager:
             self._fyre_api_user_name, self._fyre_api_key, self._disable_strict_response_schema_check, site, cluster_name
         ).execute_put_request()
 
-    def edit_inf_node(self, cluster_name: str, additional_disk_sizes: List[int], site: Optional[str]):
+    def edit_inf_node(self, cluster_name: str, additional_disk_sizes: list[int], site: Optional[str]):
         """Edits the infrastructure node of an OCP+ cluster
 
         Parameters
@@ -407,7 +407,7 @@ class OCPPlusAPIManager:
         self,
         cluster_name: str,
         node_name: str,
-        additional_disk_sizes: Optional[List[int]],
+        additional_disk_sizes: Optional[list[int]],
         node_num_cpus: Optional[int],
         node_ram_size: Optional[int],
         site: Optional[str],
@@ -842,7 +842,7 @@ class OCPPlusAPIManager:
         cpo.lib.fyre.utils.request_status_progress_bar.wait_for_request_completion(request_id, self.get_request_status)
 
     def _add_additional_disks(
-        self, cluster_name: str, node_name: str, additional_disk_sizes: List[int], site: Optional[str]
+        self, cluster_name: str, node_name: str, additional_disk_sizes: list[int], site: Optional[str]
     ):
         if len(additional_disk_sizes) != 0:
             logger.info("Adding additional disk(s)")
@@ -882,8 +882,8 @@ class OCPPlusAPIManager:
 
     def _add_keys(
         self,
-        object: Union[OCPPostRequest, WorkerData],
-        key_value_pairs: List[Tuple[str, Optional[Union[bool, int, str]]]],
+        object: OCPPostRequest | WorkerData,
+        key_value_pairs: list[tuple[str, Optional[bool | int | str]]],
     ):
         for key, value in key_value_pairs:
             if value is not None:

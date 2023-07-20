@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,6 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List, TypedDict
+from typing import TypedDict
 
-OCPDiskPutRequest = TypedDict("OCPDiskPutRequest", {"additional_disk": List[str]})
+OCPDiskPutRequest = TypedDict("OCPDiskPutRequest", {"additional_disk": list[str]})

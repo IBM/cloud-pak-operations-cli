@@ -1,4 +1,4 @@
-#  Copyright 2022 IBM Corporation
+#  Copyright 2022, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,9 +12,8 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-
 from dataclasses import dataclass
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -88,7 +87,7 @@ class WaitForNamespacedCustomResourceModule(AbstractModule):
 
     # override
     def run(self):
-        result: Optional[Dict]
+        result: Optional[dict]
 
         try:
             self._wait_for_namespaced_custom_resource(

@@ -1,4 +1,4 @@
-#  Copyright 2022 IBM Corporation
+#  Copyright 2022, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 
 import logging
 
-from typing import Any, Dict, Optional
+from typing import Any, Optional
 
 import cpo.lib.jmespath
 
@@ -34,7 +34,7 @@ class OpenShiftPlaybookRunner(PlaybookRunner):
 
         self._openshift_api_manager = OpenShiftAPIManager(credentials)
         self._token_expired = False
-        self.kube_config: Optional[Dict[str, Any]] = None
+        self.kube_config: Optional[dict[str, Any]] = None
 
     # override
     def run_playbook(self):

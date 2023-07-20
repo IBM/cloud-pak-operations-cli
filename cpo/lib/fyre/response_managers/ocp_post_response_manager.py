@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Any, List, Optional, Type
+from typing import Any, Optional
 
 from jsonschema import validate
 
@@ -34,7 +34,7 @@ class OCPPostResponseManager(AbstractJSONResponseManager):
 
         validate(json_error_response, error_response_schema)
 
-        error_messages: List[str] = []
+        error_messages: list[str] = []
         error_response: OCPPostErrorResponse = json_error_response
         details = error_response["details"]
 
@@ -130,5 +130,5 @@ class OCPPostResponseManager(AbstractJSONResponseManager):
         }
 
     # override
-    def get_response_type(self) -> Type:
+    def get_response_type(self) -> type:
         return OCPPostResponse

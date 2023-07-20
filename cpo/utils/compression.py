@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,8 +21,6 @@ import zipfile
 from typing import Any, Callable
 
 import cpo.utils.file
-
-from cpo.utils.string import removeprefix
 
 MemberIdentificationFunc = Callable[[str, cpo.utils.file.FileType], bool]
 PostExtractionFunc = Callable[[pathlib.Path], None]
@@ -111,7 +109,7 @@ def extract_tgz_archive(archive_path: pathlib.Path, target_directory_path: pathl
                     if search_result is None:
                         continue
 
-                    member.name = removeprefix(member.name, search_result.group(1))
+                    member.name = member.name.removeprefix(search_result.group(1))
 
                 if is_directory_structure_to_be_ignored(**kwargs):
                     member.name = os.path.basename(member.name)

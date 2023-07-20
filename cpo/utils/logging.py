@@ -15,7 +15,7 @@
 import logging
 import time
 
-from typing import Any, Callable, Optional, Type
+from typing import Any, Callable, Optional
 
 import click
 
@@ -63,7 +63,7 @@ class ClickLoggingFormatter(logging.Formatter):
         }
 
         return (
-            click.style(logging.Formatter.format(self, record), **colors[record.levelname])
+            click.style(logging.Formatter.format(self, record), **colors[record.levelname])  # type: ignore
             if record.levelname in colors
             else logging.Formatter.format(self, record)
         )
@@ -187,7 +187,7 @@ def loglevel_option(default_log_level="INFO") -> Callable:
     )
 
 
-def _get_click_command_with_log_level_option(default_log_level: str) -> Type[click.Command]:
+def _get_click_command_with_log_level_option(default_log_level: str) -> type[click.Command]:
     """Creates a definition of a subclass of click.Command
 
     This method creates a definition of a subclass of click.Command. Click

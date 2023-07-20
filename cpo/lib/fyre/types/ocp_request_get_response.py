@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import TypedDict, Union
+from typing import TypedDict
 
 
 class LastStatus(TypedDict):
@@ -27,7 +27,7 @@ class RequestData(TypedDict):
     in_progress: str
     job_count: str
     last_status_time: str
-    last_status: Union[LastStatus, str]
+    last_status: LastStatus | str
     pending: str
     request_id: str
     task_count: str

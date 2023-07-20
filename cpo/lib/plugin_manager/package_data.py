@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,7 +15,7 @@
 import pathlib
 
 from dataclasses import dataclass
-from typing import List, Optional
+from typing import Optional
 
 
 @dataclass
@@ -74,13 +74,13 @@ class PackageData:
         return package_data
 
     def __init__(self):
-        self._modules: List[PackageElementDescriptor] = []
-        self._subpackages: List[PackageElementDescriptor] = []
+        self._modules: list[PackageElementDescriptor] = []
+        self._subpackages: list[PackageElementDescriptor] = []
 
     @property
-    def modules(self) -> List[PackageElementDescriptor]:
+    def modules(self) -> list[PackageElementDescriptor]:
         return self._modules
 
     @property
-    def subpackages(self) -> List[PackageElementDescriptor]:
+    def subpackages(self) -> list[PackageElementDescriptor]:
         return self._subpackages

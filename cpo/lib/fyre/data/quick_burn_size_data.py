@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
 
 import itertools
 import json
-
-from typing import List
 
 import click
 
@@ -45,12 +43,12 @@ class QuickBurnSizeData:
 
     def _add_node_size_specification_data_list_element(
         self,
-        node_size_specification_data_list: List[List[str]],
+        node_size_specification_data_list: list[list[str]],
         quick_burn_size: str,
         node: str,
         node_size_specification: NodeSizeSpecification,
     ):
-        additional_disks: List[str] = []
+        additional_disks: list[str] = []
         num_additional_disks = int(node_size_specification["additional_disk"])
 
         if num_additional_disks != 0:
@@ -78,7 +76,7 @@ class QuickBurnSizeData:
 
         click.secho(f"Platform: {platform}", bold=True)
 
-        node_size_specification_data_list: List[List[str]] = []
+        node_size_specification_data_list: list[list[str]] = []
         node_size_specification_data_list = (
             node_size_specification_data_list
             + self._format_node_size_specification_data(platform_quick_burn_size_specification_data, "medium")
@@ -106,12 +104,12 @@ class QuickBurnSizeData:
 
     def _format_node_size_specification_data(
         self, platform_quick_burn_size_specification_data: PlatformQuickBurnSizeSpecificationData, quick_burn_size: str
-    ) -> List[List[str]]:
+    ) -> list[list[str]]:
         node_size_specification_data: NodeSizeSpecificationData = platform_quick_burn_size_specification_data[
             quick_burn_size
         ]
 
-        node_size_specification_data_list: List[List[str]] = []
+        node_size_specification_data_list: list[list[str]] = []
         self._add_node_size_specification_data_list_element(
             node_size_specification_data_list,
             quick_burn_size,

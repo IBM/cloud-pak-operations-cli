@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 import ipaddress
 import socket
 import warnings
-
-from typing import List
 
 import netifaces
 import urllib3
@@ -60,7 +58,7 @@ def disable_insecure_request_warning():
     urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 
-def get_local_ipv4_addresses() -> List[ipaddress.IPv4Address]:
+def get_local_ipv4_addresses() -> list[ipaddress.IPv4Address]:
     """Returns all IPv4 addresses bound to local network interfaces
 
     Returns
@@ -69,7 +67,7 @@ def get_local_ipv4_addresses() -> List[ipaddress.IPv4Address]:
         all IPv4 addresses bound to local network interfaces
     """
 
-    result: List[ipaddress.IPv4Address] = []
+    result: list[ipaddress.IPv4Address] = []
 
     for interface in netifaces.interfaces():
         ifaddresses = netifaces.ifaddresses(interface)
@@ -110,7 +108,7 @@ def is_hostname_localhost(hostname: str) -> bool:
     return ipv4_address in local_ipv4_addresses
 
 
-def parse_hostname_result(hostname_result: str) -> List[ipaddress.IPv4Address]:
+def parse_hostname_result(hostname_result: str) -> list[ipaddress.IPv4Address]:
     """Parses the output of the hostname command (Linux)
 
     Parameters
@@ -126,7 +124,7 @@ def parse_hostname_result(hostname_result: str) -> List[ipaddress.IPv4Address]:
 
     hostnames = hostname_result.rstrip().split(" ")
     ip_addresses = list(map(lambda str: ipaddress.ip_address(str), hostnames))
-    ipv4_addresses: List[ipaddress.IPv4Address] = []
+    ipv4_addresses: list[ipaddress.IPv4Address] = []
 
     for ip_address in ip_addresses:
         if isinstance(ip_address, ipaddress.IPv4Address):

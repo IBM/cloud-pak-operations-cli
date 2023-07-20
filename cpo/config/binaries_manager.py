@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,18 +15,18 @@
 import json
 import pathlib
 
-from typing import Dict, Optional
+from typing import Optional
 
 from cpo.config import configuration_manager
 
-BinariesFileContents = Dict[str, str]
+BinariesFileContents = dict[str, str]
 
 
 class BinariesManager:
     """Manages downloaded binaries"""
 
     def __init__(self):
-        self._binaries_file_contents: Optional[Dict[str, str]] = None
+        self._binaries_file_contents: Optional[dict[str, str]] = None
 
     def get_binaries_file_contents(self) -> Optional[BinariesFileContents]:
         """Returns the contents of the binaries file
@@ -84,7 +84,7 @@ class BinariesManager:
         binary_versions[binary_alias] = version
         self._save_binaries_file()
 
-    def _get_binary_versions(self) -> Dict[str, str]:
+    def _get_binary_versions(self) -> dict[str, str]:
         """Returns versions of downloaded binaries
 
         Returns

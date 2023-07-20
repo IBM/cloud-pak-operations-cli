@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import base64
 import json
 import re as regex
 
-from typing import Any, List, Optional
+from typing import Any, Optional
 
 import click
 import jmespath
@@ -97,7 +97,7 @@ class GlobalPullSecretData:
         if use_json:
             click.echo(json.dumps(self._secret_get_response, indent="\t", sort_keys=True))
         else:
-            auth_list: List[List[str]] = []
+            auth_list: list[list[str]] = []
             auths = self._secret_get_response["auths"]
 
             for image_registry, auth in auths.items():
@@ -111,7 +111,7 @@ class GlobalPullSecretData:
                 if len(image_registry_password) > 5:
                     image_registry_password = image_registry_password[0:5] + "…"
 
-                auth_list_element: List[str] = [image_registry, search_result.group(1), image_registry_password]
+                auth_list_element: list[str] = [image_registry, search_result.group(1), image_registry_password]
 
                 auth_list.append(auth_list_element)
 

@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import pathlib
 
 from importlib.metadata import entry_points
 from types import ModuleType
-from typing import Dict, Optional
+from typing import Optional
 
 from cpo.lib.plugin_manager.distribution_entry_point_loader import DistributionEntryPointLoader
 from cpo.lib.plugin_manager.package_data import PackageData
@@ -67,7 +67,7 @@ class PluginManager:
     """
 
     def __init__(self):
-        self._package_data_dict: Optional[Dict[str, PackageData]] = None
+        self._package_data_dict: Optional[dict[str, PackageData]] = None
 
     def reload(self):
         """Reloads CLI plug-ins"""
@@ -77,7 +77,7 @@ class PluginManager:
         self._load_plugins_if_required()
 
     @property
-    def package_data_dict(self) -> Dict[str, PackageData]:
+    def package_data_dict(self) -> dict[str, PackageData]:
         self._load_plugins_if_required()
 
         assert self._package_data_dict is not None

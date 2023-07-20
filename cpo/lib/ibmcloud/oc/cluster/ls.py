@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,12 +12,12 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Any, Union
+from typing import Any
 
 from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
 
 
-def list_existing_clusters(json: bool) -> Union[str, Any]:
+def list_existing_clusters(json: bool) -> str | Any:
     """List all available clusters"""
 
     args = ["oc", "cluster", "ls"]

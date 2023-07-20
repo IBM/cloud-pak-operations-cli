@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@ import logging
 import os
 import pathlib
 
-from typing import Callable, Dict, List, Optional
+from typing import Callable, Optional
 
 import click
 
@@ -25,7 +25,7 @@ from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class ProcessResult:
-    def __init__(self, command: List[str], return_code: int, stderr: List[str], stdout: List[str]):
+    def __init__(self, command: list[str], return_code: int, stderr: list[str], stdout: list[str]):
         self.command = command
         self.return_code = return_code
         self._stderr = stderr
@@ -52,8 +52,8 @@ class ProcessResult:
 
 def execute_command(
     program: pathlib.Path,
-    args: List[str],
-    env: Dict[str, str] = os.environ.copy(),
+    args: list[str],
+    env: dict[str, str] = os.environ.copy(),
     capture_output=False,
     check=True,
     print_captured_output=False,
@@ -89,8 +89,8 @@ def execute_command(
     logging.debug(f"Executing command: {' '.join(command)}")
 
     return_code: Optional[int] = None
-    stderr_buffer: List[str] = []
-    stdout_buffer: List[str] = []
+    stderr_buffer: list[str] = []
+    stdout_buffer: list[str] = []
 
     if capture_output:
         return_code = asyncio.run(
@@ -114,7 +114,7 @@ def execute_command(
 
 
 def execute_command_without_check(
-    program: pathlib.Path, args: List[str], capture_output=True, print_captured_output=False
+    program: pathlib.Path, args: list[str], capture_output=True, print_captured_output=False
 ) -> ProcessResult:
     """Executes a process without checking its return code
 
@@ -146,7 +146,7 @@ def execute_command_without_check(
     )
 
 
-async def _create_subprocess(program: pathlib.Path, args: List[str], env: Dict[str, str]) -> int:
+async def _create_subprocess(program: pathlib.Path, args: list[str], env: dict[str, str]) -> int:
     """Executes a process
 
     Parameters
@@ -170,7 +170,7 @@ async def _create_subprocess(program: pathlib.Path, args: List[str], env: Dict[s
 
 
 async def _create_subprocess_and_capture_output(
-    program: pathlib.Path, args: List[str], env: Dict[str, str], stdout_callback, stderr_callback
+    program: pathlib.Path, args: list[str], env: dict[str, str], stdout_callback, stderr_callback
 ) -> int:
     """Executes a process and captures its output to stdout/stderr
 
@@ -210,14 +210,14 @@ async def _create_subprocess_and_capture_output(
     return await process.wait()
 
 
-def _process_stderr_output(line: str, buffer: List[str], print_captured_output: bool):
+def _process_stderr_output(line: str, buffer: list[str], print_captured_output: bool):
     if print_captured_output:
         click.echo(click.style(line, fg="red"), err=True, nl=False)
 
     buffer.append(line.rstrip())
 
 
-def _process_stdout_output(line: str, buffer: List[str], print_captured_output: bool):
+def _process_stdout_output(line: str, buffer: list[str], print_captured_output: bool):
     if print_captured_output:
         click.echo(line, nl=False)
 

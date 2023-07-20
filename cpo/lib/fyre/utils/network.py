@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,12 +15,12 @@
 import ipaddress
 import re as regex
 
-from typing import List, Optional
+from typing import Optional
 
 from cpo.utils.error import CloudPakOperationsCLIException
 
 
-def get_private_ip_address_of_infrastructure_node(ipv4_addresses: List[ipaddress.IPv4Address]) -> ipaddress.IPv4Address:
+def get_private_ip_address_of_infrastructure_node(ipv4_addresses: list[ipaddress.IPv4Address]) -> ipaddress.IPv4Address:
     """Returns the private IP address of the infrastructure node
 
     Parameters

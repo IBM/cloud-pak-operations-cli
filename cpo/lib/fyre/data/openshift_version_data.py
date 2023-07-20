@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import List
-
 import click
 import semver
 
@@ -23,23 +21,23 @@ from tabulate import tabulate
 class OpenShiftVersionData:
     def __init__(
         self,
-        openshift_versions_p: List[semver.VersionInfo],
-        openshift_versions_x: List[semver.VersionInfo],
-        openshift_versions_z: List[semver.VersionInfo],
+        openshift_versions_p: list[semver.VersionInfo],
+        openshift_versions_x: list[semver.VersionInfo],
+        openshift_versions_z: list[semver.VersionInfo],
     ):
         self._openshift_versions_p = openshift_versions_p
         self._openshift_versions_x = openshift_versions_x
         self._openshift_versions_z = openshift_versions_z
 
     def format(self):
-        openshift_versions_union: List[semver.VersionInfo] = []
+        openshift_versions_union: list[semver.VersionInfo] = []
         openshift_versions_union += self._openshift_versions_p
         openshift_versions_union += self._openshift_versions_x
         openshift_versions_union += self._openshift_versions_z
         openshift_versions_union = list(dict.fromkeys(openshift_versions_union))
         openshift_versions_union.sort()
 
-        openshift_versions_list: List[List[str]] = []
+        openshift_versions_list: list[list[str]] = []
         openshift_versions_list.append(
             self._add_openshift_versions_list_element("p", openshift_versions_union, self._openshift_versions_p)
         )
@@ -64,22 +62,22 @@ class OpenShiftVersionData:
             )
         )
 
-    def get_openshift_versions_p(self) -> List[semver.VersionInfo]:
+    def get_openshift_versions_p(self) -> list[semver.VersionInfo]:
         return self._openshift_versions_p
 
-    def get_openshift_versions_x(self) -> List[semver.VersionInfo]:
+    def get_openshift_versions_x(self) -> list[semver.VersionInfo]:
         return self._openshift_versions_x
 
-    def get_openshift_versions_z(self) -> List[semver.VersionInfo]:
+    def get_openshift_versions_z(self) -> list[semver.VersionInfo]:
         return self._openshift_versions_z
 
     def _add_openshift_versions_list_element(
         self,
         platform: str,
-        openshift_versions_union: List[semver.VersionInfo],
-        openshift_versions: List[semver.VersionInfo],
+        openshift_versions_union: list[semver.VersionInfo],
+        openshift_versions: list[semver.VersionInfo],
     ):
-        openshift_version_list: List[str] = [platform]
+        openshift_version_list: list[str] = [platform]
 
         for openshift_version in openshift_versions_union:
             openshift_version_list.append("✓" if openshift_version in openshift_versions else "-")

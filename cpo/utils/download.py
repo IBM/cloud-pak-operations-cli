@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ import re as regex
 import tempfile
 import urllib.parse
 
-from typing import Any, Dict
+from typing import Any
 
 import requests
 
@@ -53,7 +53,7 @@ def download_file(url: urllib.parse.SplitResult, **kwargs: Any) -> pathlib.Path:
         Path of the downloaded file
     """
 
-    args: Dict[str, Any] = {}
+    args: dict[str, Any] = {}
 
     if "auth" in kwargs:
         args["auth"] = kwargs["auth"]

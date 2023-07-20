@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Any, List
+from typing import Any
 
 import jmespath
 
@@ -48,7 +48,7 @@ def get_jmespath_bool(expression: str, data: Any) -> bool:
     return search_result
 
 
-def get_jmespath_list_of_strings(expression: str, data: Any) -> List[str]:
+def get_jmespath_list_of_strings(expression: str, data: Any) -> list[str]:
     """Returns a list of strings extracted from the given object based on
     the given JMESPath expression
 
@@ -61,7 +61,7 @@ def get_jmespath_list_of_strings(expression: str, data: Any) -> List[str]:
 
     Returns
     -------
-    List[str]
+    list[str]
         list of strings extracted from the given object based on the given
         JMESPath expression
     """
@@ -71,7 +71,7 @@ def get_jmespath_list_of_strings(expression: str, data: Any) -> List[str]:
     if search_result is None:
         raise JmespathPathExpressionNotFoundException(expression)
 
-    if not isinstance(search_result, List) or not all(isinstance(element, str) for element in search_result):
+    if not isinstance(search_result, list) or not all(isinstance(element, str) for element in search_result):
         raise UnexpectedTypeException(search_result)
 
     return search_result
@@ -90,7 +90,7 @@ def get_jmespath_string(expression: str, data: Any) -> str:
 
     Returns
     -------
-    List[str]
+    list[str]
         string extracted from the given object based on the given JMESPath
         expression
     """
