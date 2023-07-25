@@ -79,7 +79,7 @@ class TestAddClusterCommands(unittest.TestCase):
         ):
             runner = click.testing.CliRunner()
             result = runner.invoke(
-                cli,
+                cli,  # type: ignore
                 [
                     "ibmcloud",
                     "oc",

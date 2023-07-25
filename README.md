@@ -11,8 +11,6 @@
 
 The IBM Cloud Pak Operations CLI provides basic functionality to manage Red Hat OpenShift clusters and IBM Cloud Pak for Data on various cloud platforms on top of the OpenShift CLI (oc) and the [IBM Cloud Pak for Data CLI](https://github.com/IBM/cpd-cli) (cpd-cli).
 
-For IBM-internal users, the IBM Cloud Pak Operations CLI additionally supports managing OpenShift clusters on Fyre.
-
 ## Installation & Configuration
 
 ### Installation
@@ -208,14 +206,6 @@ docker run -it quay.io/ibm/cloud-pak-operations-cli:latest bash
   ```
 
   Note: Currently, opinionated configuration values are used for deploying the `StorageCluster` custom resource (see [Ansible playbook](cpo/deps/playbooks/deploy_odf_playbook.yaml)).
-
-### IBM-internal
-
-- Enable Fyre-specific commands:
-
-  ```shell
-  cpo adm config set --key fyre_commands --value true
-  ```
 
 ## Development
 

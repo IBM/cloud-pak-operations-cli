@@ -25,30 +25,6 @@ from cpo.utils.error import CloudPakOperationsCLIException
 class ConfigurationManager:
     """Manages the CLI configuration"""
 
-    def are_fyre_commands_hidden(self) -> bool:
-        """Returns whether Fyre options shall be displayed in help texts. The
-        functionality is always usable.
-
-        Returns
-        -------
-        bool
-            true, if Fyre options shall be hidden in help texts
-        """
-
-        return not self.get_bool_config_value("fyre_commands", False)
-
-    def are_nuclear_commands_hidden(self) -> bool:
-        """Returns whether nuclear options shall be displayed in help texts. The
-        functionality is always usable.
-
-        Returns
-        -------
-        bool
-            true, if nuclear options shall be hidden in help texts
-        """
-
-        return not self.get_bool_config_value("nuclear_commands", False)
-
     def get_bool_config_value(self, key: str, default_value: bool) -> bool:
         """Gets the value for a given key from the settings file
 

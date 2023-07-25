@@ -27,7 +27,7 @@ class TestVersionCommand(unittest.TestCase):
         """Tests that cpo --version returns a semantic version number"""
 
         runner = click.testing.CliRunner()
-        result = runner.invoke(cli, ["--version"])
+        result = runner.invoke(cli, ["--version"])  # type: ignore
 
         self.assertEqual(result.exit_code, 0)
 
