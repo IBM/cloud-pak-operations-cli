@@ -184,7 +184,7 @@ class TestClusterCommands(unittest.TestCase):
     def _edit_alias(self, alias_or_server: str, alias: str):
         runner = click.testing.CliRunner()
         result = runner.invoke(
-            cli,
+            cli,  # type: ignore
             ["cluster", "edit", "--alias", alias, alias_or_server],
         )
 
@@ -196,7 +196,7 @@ class TestClusterCommands(unittest.TestCase):
     def _edit_password(self, alias_or_server: str, password: str):
         runner = click.testing.CliRunner()
         result = runner.invoke(
-            cli,
+            cli,  # type: ignore
             ["cluster", "edit", "--password", password, alias_or_server],
         )
 
@@ -205,7 +205,7 @@ class TestClusterCommands(unittest.TestCase):
     def _get_current_cluster(self):
         runner = click.testing.CliRunner()
         result = runner.invoke(
-            cli,
+            cli,  # type: ignore
             [
                 "cluster",
                 "current",
@@ -219,7 +219,7 @@ class TestClusterCommands(unittest.TestCase):
     def _rm_cluster(self, alias_or_server: str):
         runner = click.testing.CliRunner()
         result = runner.invoke(
-            cli,
+            cli,  # type: ignore
             ["cluster", "rm", alias_or_server],
         )
 
@@ -231,7 +231,7 @@ class TestClusterCommands(unittest.TestCase):
     def _use_cluster(self, alias_or_server: str):
         runner = click.testing.CliRunner()
         result = runner.invoke(
-            cli,
+            cli,  # type: ignore
             ["cluster", "use", alias_or_server],
         )
 

@@ -13,8 +13,6 @@
 #  limitations under the License.
 
 import cpo.lib.cluster.cluster_factory
-import cpo.lib.fyre.cluster
-import cpo.lib.fyre.cluster.ocpplus_cluster_factory
 import cpo.lib.ibmcloud.oc.cluster
 import cpo.lib.ibmcloud.oc.cluster.roks_cluster_factory
 import cpo.lib.openshift.cluster
@@ -26,10 +24,6 @@ cluster_factories: dict[str, AbstractClusterFactory] = {}
 cluster_factories[
     cpo.lib.ibmcloud.oc.cluster.CLUSTER_TYPE_ID
 ] = cpo.lib.ibmcloud.oc.cluster.roks_cluster_factory.roks_cluster_factory
-
-cluster_factories[
-    cpo.lib.fyre.cluster.CLUSTER_TYPE_ID
-] = cpo.lib.fyre.cluster.ocpplus_cluster_factory.ocpplus_cluster_factory
 
 cluster_factories[
     cpo.lib.openshift.cluster.CLUSTER_TYPE_ID

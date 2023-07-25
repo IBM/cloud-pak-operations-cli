@@ -59,7 +59,7 @@ class TestDownloadDependencies(unittest.TestCase):
                 os.remove(entry)
 
         runner = click.testing.CliRunner()
-        result = runner.invoke(cli, ["adm", "download-dependencies"])
+        result = runner.invoke(cli, ["adm", "download-dependencies"])  # type: ignore
 
         self.assertEqual(result.exit_code, 0)
         self.assertGreaterEqual(

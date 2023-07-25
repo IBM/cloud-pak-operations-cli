@@ -43,7 +43,7 @@ class TestStoreCredentialsCommand(unittest.TestCase):
         # check that key-value pairs were added to credentials.json
         runner = click.testing.CliRunner()
         runner.invoke(
-            cli,
+            cli,  # type: ignore
             [
                 "adm",
                 "store-credentials",
@@ -64,7 +64,7 @@ class TestStoreCredentialsCommand(unittest.TestCase):
         # check that key-value pairs were removed from credentials.json
         runner = click.testing.CliRunner()
         runner.invoke(
-            cli,
+            cli,  # type: ignore
             [
                 "adm",
                 "store-credentials",
