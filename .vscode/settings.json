@@ -5,6 +5,7 @@
 		}
 	},
 	"files.exclude": {
+		".pytest_cache": true,
 		".vscode/.ropeproject": true,
 		"**/__pycache__": true,
 		"**/*.egg-info": true,

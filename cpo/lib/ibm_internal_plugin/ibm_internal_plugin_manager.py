@@ -14,11 +14,14 @@
 
 
 import pathlib
+import shutil
 import urllib.parse
 
 from pypi_simple import PyPISimple
 
 import cpo.utils.process
+
+from cpo.utils.error import CloudPakOperationsCLIException
 
 
 class IBMInternalPluginInstaller:
@@ -74,4 +77,12 @@ class IBMInternalPluginInstaller:
 
         args.append(distribution_package_name)
 
-        cpo.utils.process.execute_command(pathlib.Path("pip"), args)
+        program = shutil.which("pip")
+
+        if program is None:
+            program = shutil.which("pip3")
+
+        if program is None:
+            raise CloudPakOperationsCLIException("pip(3) executable not found")
+
+        cpo.utils.process.execute_command(pathlib.Path(program), args)

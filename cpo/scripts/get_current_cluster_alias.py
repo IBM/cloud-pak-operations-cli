@@ -16,10 +16,20 @@ from cpo.config.cluster_credentials_manager import cluster_credentials_manager
 
 
 def get_current_cluster_alias():
-    current_cluster = cluster_credentials_manager.get_current_cluster()
+    clusters_file_contents = cluster_credentials_manager.get_clusters_file_contents()
 
-    if current_cluster is not None:
-        cluster_data = current_cluster.get_cluster_data()
+    if (
+        (clusters_file_contents is not None)
+        and ("current_cluster" in clusters_file_contents)
+        and ((current_cluster := clusters_file_contents["current_cluster"]) != "")
+    ):
+        assert "clusters" in clusters_file_contents
 
-        if "alias" in cluster_data:
-            print(cluster_data["alias"])
+        for server, cluster_data in clusters_file_contents["clusters"].items():
+            if server == current_cluster:
+                if "alias" in cluster_data:
+                    print(cluster_data["alias"])
+                else:
+                    print(server)
+
+                break
