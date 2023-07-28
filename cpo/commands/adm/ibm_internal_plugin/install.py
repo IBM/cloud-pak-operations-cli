@@ -33,7 +33,7 @@ from cpo.utils.logging import loglevel_command
 )
 @click.option(
     "--artifactory-password",
-    help="Artifactory identitiy token (Artifactory website → 'Edit Profile' → 'Identity Tokens')",
+    help="Artifactory identity token (Artifactory website → 'Edit Profile' → 'Identity Tokens')",
     required=True,
 )
 @click.option(
