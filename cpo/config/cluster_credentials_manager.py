@@ -38,6 +38,7 @@ class ClusterCredentialsManager:
 
     def __init__(self):
         self._clusters_file_contents = self.get_clusters_file_contents_with_default()
+        self._current_credentials: Optional[ContextData] = None
 
     def add_cluster(self, alias: str, server: str, type: str, cluster_data: ClusterData):
         """Registers an existing OpenShift cluster
@@ -257,22 +258,22 @@ class ClusterCredentialsManager:
             user and current cluster credentials
         """
 
-        credentials_file_path = configuration_manager.get_credentials_file_path()
-        result: ContextData
+        if self._current_credentials is None:
+            credentials_file_path = configuration_manager.get_credentials_file_path()
 
-        if credentials_file_path.exists() and (credentials_file_path.stat().st_size != 0):
-            with open(credentials_file_path) as json_file:
-                result = json.load(json_file)
-        else:
-            result = {}
+            if credentials_file_path.exists() and (credentials_file_path.stat().st_size != 0):
+                with open(credentials_file_path) as json_file:
+                    self._current_credentials = json.load(json_file)
+            else:
+                self._current_credentials = {}
 
-        current_cluster = self.get_current_cluster()
+            current_cluster = self.get_current_cluster()
 
-        if current_cluster is not None:
-            result.update(current_cluster.get_cluster_data())
-            result["server"] = current_cluster.get_server()
+            if current_cluster is not None:
+                self._current_credentials.update(current_cluster.get_cluster_data())
+                self._current_credentials["server"] = current_cluster.get_server()
 
-        return result
+        return self._current_credentials
 
     def raise_if_alias_exists(self, alias_to_be_searched: str):
         """Raises an exception if the given alias is already associated with a
@@ -369,6 +370,11 @@ class ClusterCredentialsManager:
 
         return self._clusters_file_contents["current_cluster"]
 
+    def _invalidate_current_credentials(self):
+        """Invalidates current credentials"""
+
+        self._current_credentials = None
+
     def _raise_if_alias_exists(self, alias_to_be_searched: str):
         """Raises an exception if the given alias is already associated with a
         registered OpenShift cluster
@@ -417,6 +423,8 @@ class ClusterCredentialsManager:
                 indent="\t",
                 sort_keys=True,
             )
+
+        self._invalidate_current_credentials()
 
 
 cluster_credentials_manager = ClusterCredentialsManager()
