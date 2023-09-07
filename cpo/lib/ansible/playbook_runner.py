@@ -70,7 +70,7 @@ class PlaybookRunner(ABC):
             if ("event" in event_data) and (event_data["event"] == "runner_on_failed"):
                 logger.log(logging.ERROR, event_data["stdout"].removeprefix("\r\n"))
             else:
-                logger.log(logging.DEBUG, event_data["stdout"].removeprefix("\r\n"))
+                logger.log(logging.INFO, event_data["stdout"].removeprefix("\r\n"))
 
     def _get_extra_vars(self) -> dict:
         """Returns extra vars/additional variables
