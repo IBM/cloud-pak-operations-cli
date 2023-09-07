@@ -30,6 +30,7 @@ dependencies = [
 	"q",
 	"requests",
 	"semver",
+	"sortedcontainers",
 	"tabulate",
 	"tqdm",
 	"urllib3"

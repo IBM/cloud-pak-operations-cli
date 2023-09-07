@@ -19,7 +19,6 @@ from importlib.metadata import entry_points
 from types import ModuleType
 from typing import Optional
 
-from cpo.lib.plugin_manager.distribution_entry_point_loader import DistributionEntryPointLoader
 from cpo.lib.plugin_manager.package_data import PackageData
 from cpo.utils.error import CloudPakOperationsCLIException
 
@@ -98,20 +97,17 @@ class PluginManager:
             return
 
         for entry_point in selected_entry_points:
-            distribution_entry_point_loader = DistributionEntryPointLoader(entry_point)
-
-            if distribution_entry_point_loader.distribution is None:
+            if entry_point.dist is None:
                 raise CloudPakOperationsCLIException(f"Distribution for entry point '{entry_point.name}' not found")
 
-            distribution_package_name = distribution_entry_point_loader.distribution.metadata["name"]
+            distribution_package_name = entry_point.dist.name
+            module = entry_point.load()
 
-            if not isinstance(distribution_entry_point_loader.loaded_entry_point, ModuleType):
+            if not isinstance(module, ModuleType):
                 raise CloudPakOperationsCLIException(
                     f"Entry point '{entry_point.name}' (distribution package: {distribution_package_name}) is not "
                     f"a package"
                 )
-
-            module: ModuleType = distribution_entry_point_loader.loaded_entry_point
 
             if module.__file__ is None or pathlib.Path(module.__file__).name != "__init__.py":
                 raise CloudPakOperationsCLIException(

@@ -20,18 +20,20 @@ import pathlib
 
 from dataclasses import dataclass, field
 from types import ModuleType
-from typing import Optional
+from typing import Optional, cast
 
 import click
+
+from sortedcontainers import SortedSet
 
 import cpo
 import cpo.utils.debugger
 
 from cpo import commands_package_path
+from cpo.lib.click.package_directory_details import PackageDirectoryDetails
 from cpo.lib.plugin_manager.package_data import PackageData, PackageElementDescriptor
 from cpo.lib.plugin_manager.plugin_manager import plugin_manager
 from cpo.utils.error import CloudPakOperationsCLIException
-from cpo.utils.path import is_relative_to
 
 logger = logging.getLogger(__name__)
 
@@ -44,11 +46,11 @@ class CommandDetails:
 
 @dataclass
 class CommandData:
-    command_names: list[str] = field(default_factory=list)
+    command_names: SortedSet = field(default_factory=SortedSet)
     commands: dict[str, CommandDetails] = field(default_factory=dict)
 
 
-class LazyLoadingMultiCommand(click.MultiCommand):
+class LazyLoadingMultiCommand(click.Group):
     """Provides Click commands found within modules of the package passed to
     the constructor
 
@@ -78,9 +80,16 @@ class LazyLoadingMultiCommand(click.MultiCommand):
         assert package.__file__ is not None
 
         self._command_data: Optional[CommandData] = None
-        self._distribution_package_name = distribution_package_name
-        self._package_directory_path = pathlib.Path(package.__file__).parent
-        self._package_name = package.__name__
+        self._package_directories = SortedSet(
+            [PackageDirectoryDetails(distribution_package_name, pathlib.Path(package.__file__).parent)]
+        )
+
+    def add_package_directory_path(self, distribution_package_name: str, package: ModuleType):
+        assert package.__file__ is not None
+
+        self._package_directories.add(
+            PackageDirectoryDetails(distribution_package_name, pathlib.Path(package.__file__).parent)
+        )
 
     # override
     def get_command(self, ctx: click.Context, cmd_name: str) -> Optional[click.Command]:
@@ -156,7 +165,7 @@ class LazyLoadingMultiCommand(click.MultiCommand):
                 if command_name in command_data.command_names:
                     self._raise_registration_error(command_name, command_data, package_element_descriptor)
 
-                command_data.command_names.append(command_name)
+                command_data.command_names.add(command_name)
 
             command_data.commands.update(command_dict)
 
@@ -178,28 +187,37 @@ class LazyLoadingMultiCommand(click.MultiCommand):
             command_name = package_element_descriptor.name.replace("_", "-")
 
             if command_name in command_data.command_names:
-                self._raise_registration_error(command_name, command_data, package_element_descriptor)
+                command_details = command_data.commands[command_name]
 
-            package = self._import_module_from_file_location(package_element_descriptor)
+                if not isinstance(command_details.command, LazyLoadingMultiCommand):
+                    self._raise_registration_error(command_name, command_data, package_element_descriptor)
 
-            command_data.command_names.append(command_name)
-            command_data.commands.update(
-                {
-                    command_name: CommandDetails(
-                        LazyLoadingMultiCommand(
-                            package_element_descriptor.distribution_package_name,
-                            package,
-                            help=package.__doc__
-                            if package_element_descriptor.distribution_package_name == cpo.distribution_package_name
-                            else self._append_distribution_package_name_to_help_text(
-                                package.__doc__, package_element_descriptor.distribution_package_name
+                command_group = cast(LazyLoadingMultiCommand, command_details.command)
+                command_group.add_package_directory_path(
+                    package_element_descriptor.distribution_package_name,
+                    self._import_module_from_file_location(package_element_descriptor),
+                )
+            else:
+                package = self._import_module_from_file_location(package_element_descriptor)
+
+                command_data.command_names.add(command_name)
+                command_data.commands.update(
+                    {
+                        command_name: CommandDetails(
+                            LazyLoadingMultiCommand(
+                                package_element_descriptor.distribution_package_name,
+                                package,
+                                help=package.__doc__
+                                if package_element_descriptor.distribution_package_name == cpo.distribution_package_name
+                                else self._append_distribution_package_name_to_help_text(
+                                    package.__doc__, package_element_descriptor.distribution_package_name
+                                ),
+                                name=None,
                             ),
-                            name=None,
-                        ),
-                        package_element_descriptor.distribution_package_name,
-                    )
-                }
-            )
+                            package_element_descriptor.distribution_package_name,
+                        )
+                    }
+                )
 
     def _initialize_command_data_if_required(self):
         """Creates a data structure based on modules and subpackges of the
@@ -213,28 +231,39 @@ class LazyLoadingMultiCommand(click.MultiCommand):
             return
 
         command_data = CommandData()
-        package_data = PackageData.get_package_data(self._distribution_package_name, None, self._package_directory_path)
 
-        self._import_modules(command_data, package_data.modules)
-        self._import_subpackages(command_data, package_data.subpackages)
-
-        if is_relative_to(self._package_directory_path, commands_package_path):
-            # LazyLoadingMultiCommand instance corresponds to a built-in package
-            # (i.e., not a package provided by a plug-in)
-            relative_path_to_commands_package = self._package_directory_path.relative_to(commands_package_path)
-            command_hierarchy_path = (
-                str(relative_path_to_commands_package) if str(relative_path_to_commands_package) != "." else ""
+        for element in self._package_directories:
+            package_directory_details = cast(PackageDirectoryDetails, element)
+            package_data = PackageData.get_package_data(
+                package_directory_details.distribution_package_name,
+                None,
+                package_directory_details.package_directory_path,
             )
 
-            if command_hierarchy_path in plugin_manager.package_data_dict:
-                plugin_package_data = plugin_manager.package_data_dict[command_hierarchy_path]
+            self._import_modules(command_data, package_data.modules)
+            self._import_subpackages(command_data, package_data.subpackages)
 
-                self._import_modules(command_data, plugin_package_data.modules)
-                self._import_subpackages(command_data, plugin_package_data.subpackages)
+            if self._is_builtin_package(package_directory_details.package_directory_path):
+                # LazyLoadingMultiCommand instance corresponds to a built-in package
+                # (i.e., not a package provided by a plug-in)
+                relative_path_to_commands_package = package_directory_details.package_directory_path.relative_to(
+                    commands_package_path
+                )
 
-        command_data.command_names.sort()
+                command_hierarchy_path = (
+                    str(relative_path_to_commands_package) if str(relative_path_to_commands_package) != "." else ""
+                )
+
+                if command_hierarchy_path in plugin_manager.package_data_dict:
+                    plugin_package_data = plugin_manager.package_data_dict[command_hierarchy_path]
+
+                    self._import_modules(command_data, plugin_package_data.modules)
+                    self._import_subpackages(command_data, plugin_package_data.subpackages)
 
         self._command_data = command_data
+
+    def _is_builtin_package(self, package_directory_path: pathlib.Path) -> bool:
+        return package_directory_path.is_relative_to(commands_package_path)
 
     def _raise_registration_error(
         self, command_name: str, command_data: CommandData, package_element_descriptor: PackageElementDescriptor

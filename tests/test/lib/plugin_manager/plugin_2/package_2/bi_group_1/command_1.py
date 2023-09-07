@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,33 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import os
-import pathlib
+import click
 
 
-def is_relative_to(path1: pathlib.Path, path2: os.PathLike) -> bool:
-    """Returns whether or not `path1` is relative to `path2`.
-
-    Parameters
-    ----------
-    path1
-        path compared with `path2`
-    path2
-        path compared with `path1`
-
-    Returns
-    -------
-    bool
-        True, if `path1` is relative to `path2`
-    """
-
-    result = False
-
-    try:
-        path1.relative_to(path2)
-
-        result = True
-    except ValueError:
-        pass
-
-    return result
+@click.command()
+def command_1():
+    click.echo("command_1")
