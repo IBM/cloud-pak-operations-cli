@@ -76,8 +76,9 @@ For example, a module contained in the `cpo.config` package is allowed to import
 
 - Code: 120
 - Comments (excluding indentation, including quotation marks): 72
-- [Black (formatter) configuration](https://github.com/IBM/cloud-pak-operations-cli/blob/master/.vscode/settings.json) ("python.formatting.blackArgs")
-- [Flake8 (linter) configuration](https://github.com/IBM/cloud-pak-operations-cli/blob/master/setup.cfg)
+- Configuration of Visual Studio Code extensions:
+  - [Black Formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter) (see `black-formatter.args` in [.vscode/settings.json](https://github.com/IBM/cloud-pak-operations-cli/blob/master/.vscode/settings.json))
+  - [Flake8](https://marketplace.visualstudio.com/items?itemName=ms-python.flake8) (see `flake8.args` in [.vscode/settings.json](https://github.com/IBM/cloud-pak-operations-cli/blob/master/.vscode/settings.json))
 
 ## Logging
 
@@ -244,7 +245,8 @@ As white output is invisible when using a shell theme with a light background, `
 ### Imports
 
 - Sort imports using [isort](https://pycqa.github.io/isort/) (Visual Studio Code: Commands \| Python Refactor: Sort Imports)
-- [isort configuration](https://github.com/IBM/cloud-pak-operations-cli/blob/master/.vscode/settings.json) ("python.sortImports.args")
+- Configuration of Visual Studio Code extensions:
+  - [isort](https://marketplace.visualstudio.com/items?itemName=ms-python.isort) (see `isort.args` in [.vscode/settings.json](https://github.com/IBM/cloud-pak-operations-cli/blob/master/.vscode/settings.json))
 
 ## Vertical space
 

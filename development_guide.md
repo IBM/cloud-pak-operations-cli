@@ -20,7 +20,6 @@ nav_order: 3
     pip3 install virtualenv
     virtualenv .venv
     . .venv/bin/activate
-    pip3 install black flake8
     pip3 install --editable .
     ```
 
@@ -30,7 +29,6 @@ nav_order: 3
     pip3 install virtualenv
     virtualenv .venv
     .venv/Scripts/activate
-    pip3 install black flake8
     pip3 install --editable .
     ```
 
