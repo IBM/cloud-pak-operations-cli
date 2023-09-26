@@ -117,8 +117,10 @@ class PlaybookRunner(ABC):
         runner = ansible_runner.run(
             artifact_dir=configuration_manager.get_cli_data_directory_path() / "artifacts",
             envvars={
+                "ANSIBLE_INVENTORY_UNPARSED_WARNING": False,
                 "ANSIBLE_JINJA2_NATIVE": True,
                 "ANSIBLE_LIBRARY": configuration_manager.get_root_package_path() / "lib" / "ansible" / "modules",
+                "ANSIBLE_LOCALHOST_WARNING": False,
             },
             extravars=self._sanitize_extra_vars(self._get_extra_vars()),
             event_handler=self._event_handler,
