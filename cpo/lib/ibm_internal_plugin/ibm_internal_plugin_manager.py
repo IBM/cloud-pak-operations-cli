@@ -17,6 +17,8 @@ import pathlib
 import shutil
 import urllib.parse
 
+import semver
+
 from pypi_simple import PyPISimple
 
 import cpo.utils.process
@@ -51,7 +53,20 @@ class IBMInternalPluginInstaller:
             for project_name in client.get_index_page().projects:
                 packages = client.get_project_page(project_name).packages
                 sdists = list(filter(lambda package: package.package_type == "sdist", packages))
+                sdists.sort(
+                    key=lambda distribution_package: semver.VersionInfo.parse(distribution_package.version)
+                    if distribution_package.version is not None
+                    else semver.VersionInfo(0),
+                    reverse=True,
+                )
+
                 wheels = list(filter(lambda package: package.package_type == "wheel", packages))
+                wheels.sort(
+                    key=lambda distribution_package: semver.VersionInfo.parse(distribution_package.version)
+                    if distribution_package.version is not None
+                    else semver.VersionInfo(0),
+                    reverse=True,
+                )
 
                 if (len(wheels) != 0) and (wheels[0].version is not None):
                     package_list.append([project_name, wheels[0].version])
