@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ def set(
     password: Optional[str],
     token: Optional[str],
     insecure_skip_tls_verify: Optional[bool],
+    use_cluster: Optional[str],
     registry_location: str,
     registry_location_username: str,
     registry_location_password: str,

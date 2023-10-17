@@ -91,7 +91,7 @@ class PluginManager:
 
         self._package_data_dict = {}
 
-        selected_entry_points = entry_points().get("cloud_pak_operations_cli_plugins")
+        selected_entry_points = entry_points().select(group="cloud_pak_operations_cli_plugins")
 
         if selected_entry_points is None:
             return

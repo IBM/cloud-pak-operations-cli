@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ def ls(
     password: Optional[str],
     token: Optional[str],
     insecure_skip_tls_verify: Optional[bool],
+    use_cluster: Optional[str],
     json: bool,
 ):
     """List registry credentials stored in the global pull secret"""

@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,7 +20,7 @@ from cpo.lib.openshift.credentials.user_credentials import UserCredentials
 
 
 class ClusterBasedUserCredentials(UserCredentials):
-    def __init__(self, cluster: AbstractCluster, insecure_skip_tls_verify: Optional[bool]):
+    def __init__(self, cluster: AbstractCluster, insecure_skip_tls_verify: Optional[bool] = None):
         super().__init__(
             cluster.get_server(),
             cluster.get_username(),

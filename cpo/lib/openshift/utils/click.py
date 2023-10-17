@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -37,6 +37,7 @@ def openshift_server_command_optgroup_options(f: Callable[..., Any]) -> Callable
 
 def openshift_server_options(f: Callable[..., Any]) -> Callable[..., Any]:
     options = [
+        click.option("--use-cluster", help="Alias or server URL of a registered OpenShift cluster to be used"),
         click.option(
             "--insecure-skip-tls-verify",
             default=None,

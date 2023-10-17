@@ -51,7 +51,7 @@ def create_entry_point_mock_objects(entry_points: list[tuple[str, ModuleType]]) 
         mock_objects.append(mock_object)
 
     selectable_groups_mock_object = Mock()
-    selectable_groups_mock_object.get.return_value = mock_objects
+    selectable_groups_mock_object.select.return_value = mock_objects
 
     return selectable_groups_mock_object
 

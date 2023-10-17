@@ -319,6 +319,13 @@ class ClusterCredentialsManager:
 
         self._save_clusters_file()
 
+    def reset_current_cluster(self):
+        """Resets the current registered OpenShift cluster"""
+
+        self._clusters_file_contents["current_cluster"] = ""
+
+        self._save_clusters_file()
+
     def set_cluster(self, alias_or_server: str) -> AbstractCluster:
         """Sets the current registered OpenShift cluster
 
