@@ -19,9 +19,9 @@ from typing import Any, Optional
 
 import click
 
-import cpo.config.cluster_credentials_manager
 import cpo.lib.openshift.oc
 
+from cpo.config.cluster_credentials_manager import cluster_credentials_manager
 from cpo.lib.openshift.credentials.cluster_based_user_credentials import ClusterBasedUserCredentials
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.credentials.token_credentials import TokenCredentials
@@ -78,6 +78,7 @@ def get_cluster_credentials(ctx: click.Context, options: dict[str, Any]) -> Abst
         and ("password" in options)
         and (options["password"] is not None)
         and (("token" not in options) or (options["token"] is None))
+        and (("use_cluster" not in options) or (options["use_cluster"] is None))
     ):
         result = UserCredentials(
             options["server"],
@@ -92,19 +93,23 @@ def get_cluster_credentials(ctx: click.Context, options: dict[str, Any]) -> Abst
         and (("password" not in options) or (options["password"] is None))
         and ("token" in options)
         and (options["token"] is not None)
+        and (("use_cluster" not in options) or (options["use_cluster"] is None))
     ):
         result = TokenCredentials(
             options["server"],
             options["token"],
             insecure_skip_tls_verify if insecure_skip_tls_verify is not None else False,
         )
-    elif (
-        current_cluster := cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
-    ) is not None:
+    elif ("use_cluster" in options) and (options["use_cluster"] is not None):
+        result = ClusterBasedUserCredentials(
+            cluster_credentials_manager.get_cluster_or_raise_exception(options["use_cluster"])
+        )
+    elif (current_cluster := cluster_credentials_manager.get_current_cluster()) is not None:
         result = ClusterBasedUserCredentials(current_cluster, insecure_skip_tls_verify)
     else:
         raise click.UsageError(
-            "You must either set options --server/--username/--password, --server/--token, or set a current cluster.",
+            "You must either set options --server/--username/--password, --server/--token, --use-cluster, or set a "
+            "current cluster.",
             ctx,
         )
 
@@ -122,6 +127,7 @@ def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, 
         and ("password" in options)
         and (options["password"] is not None)
         and (("token" not in options) or (options["token"] is None))
+        and (("use_cluster" not in options) or (options["use_cluster"] is None))
     ):
         result = cpo.lib.openshift.oc.get_oc_login_command_with_password_for_remote_host(
             options["server"], options["username"], options["password"]
@@ -133,19 +139,24 @@ def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, 
         and (("password" not in options) or (options["password"] is None))
         and ("token" in options)
         and (options["token"] is not None)
+        and (("use_cluster" not in options) or (options["use_cluster"] is None))
     ):
         result = cpo.lib.openshift.oc.get_oc_login_command_with_token_for_remote_host(
             options["server"], options["token"]
         )
-    elif (
-        current_cluster := cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
-    ) is not None:
+    elif ("use_cluster" in options) and (options["use_cluster"] is not None):
+        cluster = cluster_credentials_manager.get_cluster_or_raise_exception(options["use_cluster"])
+        result = cpo.lib.openshift.oc.get_oc_login_command_with_password_for_remote_host(
+            cluster.get_server(), cluster.get_username(), cluster.get_password()
+        )
+    elif (current_cluster := cluster_credentials_manager.get_current_cluster()) is not None:
         result = cpo.lib.openshift.oc.get_oc_login_command_with_password_for_remote_host(
             current_cluster.get_server(), current_cluster.get_username(), current_cluster.get_password()
         )
     else:
         raise click.UsageError(
-            "You must either set options --server/--username/--password, --server/--token, or set a current cluster.",
+            "You must either set options --server/--username/--password, --server/--token, --use-cluster, or set a "
+            "current cluster.",
             ctx,
         )
 
@@ -161,6 +172,7 @@ def log_in_to_openshift_cluster(ctx: click.Context, options: dict[str, Any]):
         and ("password" in options)
         and (options["password"] is not None)
         and (("token" not in options) or (options["token"] is None))
+        and (("use_cluster" not in options) or (options["use_cluster"] is None))
     ):
         cpo.lib.openshift.oc.log_in_to_openshift_cluster_with_password(
             options["server"], options["username"], options["password"]
@@ -172,14 +184,16 @@ def log_in_to_openshift_cluster(ctx: click.Context, options: dict[str, Any]):
         and (("password" not in options) or (options["password"] is None))
         and ("token" in options)
         and (options["token"] is not None)
+        and (("use_cluster" not in options) or (options["use_cluster"] is None))
     ):
         cpo.lib.openshift.oc.log_in_to_openshift_cluster_with_token(options["server"], options["token"])
-    elif (
-        current_cluster := cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
-    ) is not None:
+    elif ("use_cluster" in options) and (options["use_cluster"] is not None):
+        cluster_credentials_manager.get_cluster_or_raise_exception(options["use_cluster"]).login()
+    elif (current_cluster := cluster_credentials_manager.get_current_cluster()) is not None:
         current_cluster.login()
     else:
         raise click.UsageError(
-            "You must either set options --server/--username/--password, --server/--token, or set a current cluster.",
+            "You must either set options --server/--username/--password, --server/--token, --use-cluster, or set a "
+            "current cluster.",
             ctx,
         )

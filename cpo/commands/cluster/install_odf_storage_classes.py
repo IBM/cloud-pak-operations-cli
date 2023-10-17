@@ -1,4 +1,4 @@
-#  Copyright 2022 IBM Corporation
+#  Copyright 2022, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ def install_odf_storage_classes(
     password: Optional[str],
     token: Optional[str],
     insecure_skip_tls_verify: Optional[bool],
+    use_cluster: Optional[str],
 ):
     """Install Red Hat OpenShift Data Foundation (ODF) storage classes"""
 
