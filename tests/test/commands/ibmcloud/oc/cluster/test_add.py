@@ -47,8 +47,6 @@ class TestAddClusterCommands(unittest.TestCase):
 
         cluster_credentials_manager.get_clusters_file_path = unittest.mock.MagicMock(return_value=clusters_file_path)
 
-        cluster_credentials_manager.reload()
-
         # create cluster-1 and check that the number of clusters is 1
         self._add_cluster_1()
         # create cluster-2 and check that the number of clusters is 2
