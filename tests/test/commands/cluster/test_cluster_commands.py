@@ -73,8 +73,6 @@ class TestClusterCommands(unittest.TestCase):
 
         cluster_credentials_manager.get_clusters_file_path = unittest.mock.MagicMock(return_value=clusters_file_path)
 
-        cluster_credentials_manager.reload()
-
     def test_current_and_use_commands(self):
         # create cluster-1 and check that current cluster is not set
         cluster_1_data = self._cluster_1_data()

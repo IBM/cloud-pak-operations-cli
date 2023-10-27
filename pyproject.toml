@@ -19,6 +19,7 @@ dependencies = [
 	"click",
 	"click-option-group",
 	"colorama",
+	"filelock",
 	"halo",
 	"jmespath",
 	"jsonschema",

@@ -17,6 +17,7 @@ import pathlib
 
 from typing import Any, Optional, TypedDict
 
+from filelock import FileLock
 from tabulate import tabulate
 
 import cpo.lib.cluster
@@ -26,6 +27,8 @@ from cpo.lib.cluster.cluster import AbstractCluster, ClusterData
 from cpo.utils.error import CloudPakOperationsCLIException
 
 ContextData = dict[str, Any]
+
+file_lock = FileLock(configuration_manager.get_cli_data_directory_path() / "clusters.json.lock")
 
 
 class ClustersFileContents(TypedDict):
@@ -37,9 +40,9 @@ class ClusterCredentialsManager:
     """Manages registered OpenShift clusters"""
 
     def __init__(self):
-        self._clusters_file_contents = self.get_clusters_file_contents_with_default()
         self._current_credentials: Optional[ContextData] = None
 
+    @file_lock
     def add_cluster(self, alias: str, server: str, type: str, cluster_data: ClusterData):
         """Registers an existing OpenShift cluster
 
@@ -60,11 +63,12 @@ class ClusterCredentialsManager:
         cluster_data_copy["alias"] = alias
         cluster_data_copy["type"] = type
 
-        clusters = self._get_clusters()
-        clusters[server] = cluster_data_copy
+        clusters_file_contents = self.get_clusters_file_contents_with_default()
+        clusters_file_contents["clusters"][server] = cluster_data_copy
 
-        self._save_clusters_file()
+        self._save_clusters_file(clusters_file_contents)
 
+    @file_lock
     def edit_cluster(self, alias_or_server, cluster_data_to_be_added: ClusterData) -> AbstractCluster:
         """Edits metadata of a registered OpenShift cluster
 
@@ -82,7 +86,8 @@ class ClusterCredentialsManager:
             server URL
         """
 
-        cluster = self.get_cluster(alias_or_server)
+        clusters_file_contents = self.get_clusters_file_contents_with_default()
+        cluster = self.get_cluster_from_clusters_file_contents(clusters_file_contents, alias_or_server)
 
         if cluster is None:
             raise CloudPakOperationsCLIException(f"Cluster not found ({alias_or_server})")
@@ -95,10 +100,11 @@ class ClusterCredentialsManager:
         for key, value in cluster_data_to_be_added.items():
             cluster_data[key] = value
 
-        self._save_clusters_file()
+        self._save_clusters_file(clusters_file_contents)
 
         return cluster
 
+    @file_lock
     def get_cluster(self, alias_or_server) -> Optional[AbstractCluster]:
         """Returns metadata of the registered OpenShift cluster with the given
         alias or server URL
@@ -116,9 +122,34 @@ class ClusterCredentialsManager:
             server URL or None if no cluster was found
         """
 
+        return self.get_cluster_from_clusters_file_contents(
+            self.get_clusters_file_contents_with_default(), alias_or_server
+        )
+
+    def get_cluster_from_clusters_file_contents(
+        self, clusters_file_contents: ClustersFileContents, alias_or_server
+    ) -> Optional[AbstractCluster]:
+        """Returns metadata of the registered OpenShift cluster with the given
+        alias or server URL
+
+        Parameters
+        ----------
+        clusters_file_contents
+            contents of the clusters file or a default value if it does not exist
+        alias_or_server
+            alias or server URL of the registered OpenShift cluster for which
+            metadata shall be returned
+
+        Returns
+        -------
+        Optional[AbstractCluster]
+            metadata of the registered OpenShift cluster with the given alias or
+            server URL or None if no cluster was found
+        """
+
         result: Optional[AbstractCluster] = None
 
-        for server, cluster_data in self._get_clusters().items():
+        for server, cluster_data in clusters_file_contents["clusters"].items():
             if (server == alias_or_server) or (
                 ("alias" in cluster_data) and (cluster_data["alias"] == alias_or_server)
             ):
@@ -161,14 +192,14 @@ class ClusterCredentialsManager:
         """
 
         cluster_list: list[list[str]] = []
-        server_of_current_cluster = self._get_server_of_current_cluster()
+        clusters_file_contents = self.get_clusters_file_contents_with_default()
 
-        for server, cluster_data in self._get_clusters().items():
+        for server, cluster_data in clusters_file_contents["clusters"].items():
             alias = cluster_data["alias"] if "alias" in cluster_data else ""
             cluster_factory = cpo.lib.cluster.cluster_factories[cluster_data["type"]]
 
             cluster_list_element: list[str] = [
-                "*" if (server == server_of_current_cluster) else "",
+                "*" if (server == clusters_file_contents["current_cluster"]) else "",
                 server,
                 alias,
                 cluster_factory.get_cluster_type_name(),
@@ -180,6 +211,7 @@ class ClusterCredentialsManager:
 
         return result
 
+    @file_lock
     def get_clusters_file_contents(self) -> Optional[ClustersFileContents]:
         """Returns the contents of the clusters file
 
@@ -198,6 +230,7 @@ class ClusterCredentialsManager:
 
         return clusters_file_contents
 
+    @file_lock
     def get_clusters_file_contents_with_default(self) -> ClustersFileContents:
         """Returns the contents of the clusters file or a default value
 
@@ -211,6 +244,9 @@ class ClusterCredentialsManager:
 
         if clusters_file_contents is None:
             clusters_file_contents = {"clusters": {}, "current_cluster": ""}
+        elif "clusters" not in clusters_file_contents:
+            # TODO: check JSON schema
+            raise CloudPakOperationsCLIException("Corrupt configuration file")
 
         return clusters_file_contents
 
@@ -225,6 +261,7 @@ class ClusterCredentialsManager:
 
         return configuration_manager.get_cli_data_directory_path() / "clusters.json"
 
+    @file_lock
     def get_current_cluster(self) -> Optional[AbstractCluster]:
         """Returns metadata of the current registered OpenShift cluster
 
@@ -236,10 +273,11 @@ class ClusterCredentialsManager:
         """
 
         cluster: Optional[AbstractCluster] = None
-        server_of_current_cluster = self._get_server_of_current_cluster()
+        clusters_file_contents = self.get_clusters_file_contents_with_default()
+        server_of_current_cluster = clusters_file_contents["current_cluster"]
 
         if server_of_current_cluster != "":
-            cluster = self.get_cluster(server_of_current_cluster)
+            cluster = self.get_cluster_from_clusters_file_contents(clusters_file_contents, server_of_current_cluster)
 
             if cluster is None:
                 raise CloudPakOperationsCLIException("Current cluster not found")
@@ -291,11 +329,7 @@ class ClusterCredentialsManager:
             if ("alias" in cluster_data) and (cluster_data["alias"] == alias_to_be_searched):
                 raise CloudPakOperationsCLIException("Alias already exists")
 
-    def reload(self):
-        """Reloads the clusters file"""
-
-        self._clusters_file_contents = self.get_clusters_file_contents_with_default()
-
+    @file_lock
     def remove_cluster(self, alias_or_server: str):
         """Removes the registered OpenShift cluster with the given alias or
         server URL
@@ -306,26 +340,30 @@ class ClusterCredentialsManager:
             alias or server URL of the registered OpenShift cluster to be removed
         """
 
-        cluster = self.get_cluster(alias_or_server)
+        clusters_file_contents = self.get_clusters_file_contents_with_default()
+        cluster = self.get_cluster_from_clusters_file_contents(clusters_file_contents, alias_or_server)
 
         if cluster is None:
             raise CloudPakOperationsCLIException(f"Cluster not found ({alias_or_server})")
 
-        clusters = self._get_clusters()
+        clusters = clusters_file_contents["clusters"]
         clusters.pop(cluster.get_server())
 
-        if self._get_server_of_current_cluster() == cluster.get_server():
-            self._clusters_file_contents["current_cluster"] = ""
+        if clusters_file_contents["current_cluster"] == cluster.get_server():
+            clusters_file_contents["current_cluster"] = ""
 
-        self._save_clusters_file()
+        self._save_clusters_file(clusters_file_contents)
 
+    @file_lock
     def reset_current_cluster(self):
         """Resets the current registered OpenShift cluster"""
 
-        self._clusters_file_contents["current_cluster"] = ""
+        clusters_file_contents = self.get_clusters_file_contents_with_default()
+        clusters_file_contents["current_cluster"] = ""
 
-        self._save_clusters_file()
+        self._save_clusters_file(clusters_file_contents)
 
+    @file_lock
     def set_cluster(self, alias_or_server: str) -> AbstractCluster:
         """Sets the current registered OpenShift cluster
 
@@ -342,16 +380,19 @@ class ClusterCredentialsManager:
             server URL
         """
 
-        cluster = self.get_cluster(alias_or_server)
+        clusters_file_contents = self.get_clusters_file_contents_with_default()
+        cluster = self.get_cluster_from_clusters_file_contents(clusters_file_contents, alias_or_server)
 
         if cluster is None:
             raise CloudPakOperationsCLIException(f"Cluster not found ({alias_or_server})")
 
-        self._clusters_file_contents["current_cluster"] = cluster.get_server()
-        self._save_clusters_file()
+        clusters_file_contents["current_cluster"] = cluster.get_server()
+
+        self._save_clusters_file(clusters_file_contents)
 
         return cluster
 
+    @file_lock
     def _get_clusters(self) -> dict[str, ClusterData]:
         """Returns registered OpenShift clusters
 
@@ -361,21 +402,9 @@ class ClusterCredentialsManager:
             registered OpenShift clusters
         """
 
-        if "clusters" not in self._clusters_file_contents:
-            raise CloudPakOperationsCLIException("Corrupt configuration file")
+        clusters_file_contents = self.get_clusters_file_contents_with_default()
 
-        return self._clusters_file_contents["clusters"]
-
-    def _get_server_of_current_cluster(self) -> str:
-        """Returns the server URL of the current registered OpenShift cluster
-
-        Returns
-        -------
-        str
-            server URL of the current registered OpenShift cluster
-        """
-
-        return self._clusters_file_contents["current_cluster"]
+        return clusters_file_contents["clusters"]
 
     def _invalidate_current_credentials(self):
         """Invalidates current credentials"""
@@ -418,14 +447,15 @@ class ClusterCredentialsManager:
             elif ("alias" in cluster_data) and (cluster_data["alias"] == alias_to_be_searched):
                 raise CloudPakOperationsCLIException("Alias already exists")
 
-    def _save_clusters_file(self):
+    @file_lock
+    def _save_clusters_file(self, clusters_file_contents: ClustersFileContents):
         """Stores registered OpenShift clusters in a configuration file"""
 
         configuration_manager.get_cli_data_directory_path().mkdir(exist_ok=True)
 
         with open(self.get_clusters_file_path(), "w") as clusters_file:
             json.dump(
-                self._clusters_file_contents,
+                clusters_file_contents,
                 clusters_file,
                 indent="\t",
                 sort_keys=True,
