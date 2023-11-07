@@ -13,8 +13,6 @@
 #  limitations under the License.
 
 import json
-import os
-import pathlib
 import re as regex
 
 from abc import ABC, abstractmethod
@@ -23,17 +21,14 @@ from typing import Optional
 import requests
 import semver
 
-import cpo.utils.process
-
-from cpo.config import configuration_manager
-from cpo.utils.error import CloudPakOperationsCLIException
+from cpo.utils.operating_system import OperatingSystem
 
 
 class AbstractDependencyManagerPlugIn(ABC):
     """Base class of all dependency manager plug-in classes"""
 
     @abstractmethod
-    def download_dependency_version(self, version: semver.VersionInfo):
+    def download_dependency_version(self, version: semver.Version):
         """Downloads the given version of the dependency
 
         Parameters
@@ -43,80 +38,6 @@ class AbstractDependencyManagerPlugIn(ABC):
         """
 
         pass
-
-    def execute_binary(
-        self,
-        args: list[str],
-        env: dict[str, str] = os.environ.copy(),
-        capture_output=False,
-        check=True,
-        print_captured_output=False,
-    ) -> cpo.utils.process.ProcessResult:
-        """Executes the binary associated with the dependency
-
-        If the dependency does not provide a binary, an exception is raised.
-
-        Parameters
-        ----------
-        args
-            arguments to be passed to the binary
-        env
-            dictionary of environment variables passed to the process
-        capture_output
-            flag indicating whether process output shall be captured
-        check
-            flag indicating whether an exception shall be thrown if the binary
-            returns with a nonzero return code
-        print_captured_output
-            flag indicating whether captured process output shall also be written to
-            stdout/stderr
-
-        Returns
-        -------
-        ProcessResult
-            object storing the return code and captured process output (if
-            requested)
-        """
-
-        binary_path = self.get_binary_path()
-
-        if binary_path is None:
-            raise CloudPakOperationsCLIException(f"Dependency '{self.get_dependency_name()} does not provide a binary'")
-
-        return cpo.utils.process.execute_command(
-            binary_path,
-            args,
-            env,
-            capture_output=capture_output,
-            check=check,
-            print_captured_output=print_captured_output,
-        )
-
-    def get_binary_name(self) -> Optional[str]:
-        """Returns the name of the binary associated with the dependency
-
-        Returns
-        -------
-        Optional[str]
-            name of the binary associated with the dependency or None if the
-            dependency does not provide a binary
-        """
-
-        return None
-
-    def get_binary_path(self) -> Optional[pathlib.Path]:
-        """Returns the path of the binary associated with the dependency
-
-        Returns
-        -------
-        Optional[pathlib.Path]
-            path of the binary associated with the dependency or None if the
-            dependency does not provide a binary
-        """
-
-        binary_name = self.get_binary_name()
-
-        return configuration_manager.get_bin_directory_path() / binary_name if binary_name is not None else None
 
     @abstractmethod
     def get_dependency_alias(self) -> str:
@@ -154,20 +75,24 @@ class AbstractDependencyManagerPlugIn(ABC):
         pass
 
     @abstractmethod
-    def get_latest_dependency_version(self) -> semver.VersionInfo:
+    def get_latest_dependency_version(self) -> semver.Version:
         """Returns the latest version of the dependency available at the
         official download location
 
         Returns
         -------
-        semver.VersionInfo
+        semver.Version
             latest version of the dependency available at the official download
             location
         """
 
         pass
 
-    def _get_latest_dependency_version_on_github(self, owner: str, repo: str) -> Optional[semver.VersionInfo]:
+    @abstractmethod
+    def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:
+        pass
+
+    def _get_latest_dependency_version_on_github(self, owner: str, repo: str) -> Optional[semver.Version]:
         """Returns the latest version of the dependency on GitHub
 
         This method parses the "name" key of the JSON document returned by the
@@ -217,7 +142,7 @@ class AbstractDependencyManagerPlugIn(ABC):
 
         Returns
         -------
-        Optional[semver.VersionInfo]
+        Optional[semver.Version]
             latest version of the dependency or None if no release was found
         """
 
@@ -225,7 +150,7 @@ class AbstractDependencyManagerPlugIn(ABC):
         response.raise_for_status()
 
         response_json = json.loads(response.content)
-        result: Optional[semver.VersionInfo] = None
+        result: Optional[semver.Version] = None
 
         for release in response_json:
             search_result = regex.search(
@@ -234,7 +159,7 @@ class AbstractDependencyManagerPlugIn(ABC):
             )
 
             if search_result is not None:
-                result = semver.VersionInfo.parse(search_result.group(1))
+                result = semver.Version.parse(search_result.group(1))
 
                 break
 

@@ -311,7 +311,10 @@ class ClusterCredentialsManager:
                 self._current_credentials.update(current_cluster.get_cluster_data())
                 self._current_credentials["server"] = current_cluster.get_server()
 
-        return self._current_credentials
+        current_credentials = self._current_credentials.copy()
+        current_credentials.pop("alias", None)
+
+        return current_credentials
 
     def raise_if_alias_exists(self, alias_to_be_searched: str):
         """Raises an exception if the given alias is already associated with a

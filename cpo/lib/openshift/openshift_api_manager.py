@@ -641,12 +641,12 @@ class OpenShiftAPIManager:
 
         return self.execute_kubernetes_client(self._get_subscription, name=name, project=project)
 
-    def get_version(self) -> semver.VersionInfo:
+    def get_version(self) -> semver.Version:
         """Returns the OpenShift server version
 
         Returns
         -------
-        semver.VersionInfo:
+        semver.Version:
             OpenShift server version
         """
 
@@ -1196,7 +1196,7 @@ class OpenShiftAPIManager:
             "operators.coreos.com", "v1alpha1", project, "subscriptions", name
         )
 
-    def _get_version(self) -> semver.VersionInfo:
+    def _get_version(self) -> semver.Version:
         custom_objects_api = client.CustomObjectsApi()
         custom_objects_api_result = custom_objects_api.get_cluster_custom_object(
             "config.openshift.io", "v1", "clusteroperators", "openshift-apiserver"
@@ -1206,7 +1206,7 @@ class OpenShiftAPIManager:
             "status.versions[?name=='openshift-apiserver'].version", custom_objects_api_result
         )
 
-        return semver.VersionInfo.parse(path[0])
+        return semver.Version.parse(path[0])
 
     def _handle_api_exception(self, exception: client.ApiException, log_callback: Callable[[str], None]):
         """Handles Kubernetes Python client API exceptions

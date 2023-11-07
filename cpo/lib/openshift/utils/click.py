@@ -13,6 +13,7 @@
 #  limitations under the License.
 
 import functools
+import re as regex
 
 from typing import Any, Callable
 
@@ -51,3 +52,10 @@ def openshift_server_options(f: Callable[..., Any]) -> Callable[..., Any]:
     ]
 
     return functools.reduce(lambda result, option: option(result), options, f)
+
+
+def validate_ocp_version(ctx, param, value):
+    if value is not None and regex.match("\\d+\\.\\d+(\\.\\d)*", value) is None:
+        raise click.BadParameter("Invalid OpenShift Container Platform version")
+
+    return value

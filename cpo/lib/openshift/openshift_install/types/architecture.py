@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,24 +12,9 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import inspect
-import os
+from enum import Enum
 
 
-def is_debugpy_running() -> bool:
-    """Returns whether debugpy is running
-
-    Visual Studio Code uses debugpy (https://github.com/microsoft/debugpy)
-    as the default Python debugger.
-
-    Returns
-    -------
-    bool
-        True, if debugpy is running
-    """
-
-    for frame in inspect.stack():
-        if frame.filename.endswith(f"debugpy{os.sep}__main__.py"):
-            return True
-
-    return False
+class Architecture(Enum):
+    amd64 = 1
+    arm64 = 2

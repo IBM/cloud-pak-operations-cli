@@ -54,17 +54,17 @@ class IBMInternalPluginInstaller:
                 packages = client.get_project_page(project_name).packages
                 sdists = list(filter(lambda package: package.package_type == "sdist", packages))
                 sdists.sort(
-                    key=lambda distribution_package: semver.VersionInfo.parse(distribution_package.version)
+                    key=lambda distribution_package: semver.Version.parse(distribution_package.version)
                     if distribution_package.version is not None
-                    else semver.VersionInfo(0),
+                    else semver.Version(0),
                     reverse=True,
                 )
 
                 wheels = list(filter(lambda package: package.package_type == "wheel", packages))
                 wheels.sort(
-                    key=lambda distribution_package: semver.VersionInfo.parse(distribution_package.version)
+                    key=lambda distribution_package: semver.Version.parse(distribution_package.version)
                     if distribution_package.version is not None
-                    else semver.VersionInfo(0),
+                    else semver.Version(0),
                     reverse=True,
                 )
 

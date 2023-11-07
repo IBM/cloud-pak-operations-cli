@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,8 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-import cpo.lib.dependency_manager
-
+from cpo.lib.dependency_manager.dependency_manager import DependencyManager
 from cpo.utils.logging import loglevel_command
 
 
@@ -21,4 +20,4 @@ from cpo.utils.logging import loglevel_command
 def download_dependencies():
     """Download dependencies"""
 
-    cpo.lib.dependency_manager.dependency_manager.download_dependencies_if_required()
+    DependencyManager.get_instance().download_latest_dependencies_if_required()

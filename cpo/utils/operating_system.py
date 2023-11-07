@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,9 +18,9 @@ from enum import Enum
 
 
 class OperatingSystem(Enum):
-    LINUX_X86_64 = 1
-    MAC_OS = 2
-    WINDOWS = 3
+    LINUX_X86_64 = "Linux"
+    MAC_OS = "macOS"
+    WINDOWS = "Windows"
 
 
 def get_operating_system():
