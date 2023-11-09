@@ -25,7 +25,7 @@ import cpo.utils.process
 
 from cpo.config import configuration_manager
 from cpo.config.cluster_credentials_manager import cluster_credentials_manager
-from cpo.lib.dependency_manager import dependency_manager
+from cpo.lib.dependency_manager.dependency_manager import DependencyManager
 from cpo.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import IBMCloudCLIPlugIn
 from cpo.lib.ibmcloud import (
     EXTERNAL_IBM_CLOUD_API_KEY_NAME,
@@ -455,8 +455,9 @@ class IBMCloudAPIManager:
         env = os.environ.copy()
         env["IBMCLOUD_HOME"] = str(configuration_manager.get_cli_data_directory_path())
 
-        return dependency_manager.execute_binary(
+        return DependencyManager.get_instance().execute_binary(
             IBMCloudCLIPlugIn,
+            None,
             args,
             env,
             capture_output=capture_output,
@@ -465,7 +466,9 @@ class IBMCloudAPIManager:
         )
 
     def _execute_ibmcloud_command_interactively(self, args: list[str]) -> int:
-        command = [str(dependency_manager.get_binary_path(IBMCloudCLIPlugIn))] + args
+        dependency_manager = DependencyManager.get_instance()
+        latest_downloaded_binary_version = dependency_manager.download_dependency_if_required(IBMCloudCLIPlugIn)
+        command = [str(dependency_manager.get_binary_path(IBMCloudCLIPlugIn, latest_downloaded_binary_version))] + args
 
         logging.debug(f"Executing command: {' '.join(command)}")
 

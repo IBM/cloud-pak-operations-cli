@@ -15,25 +15,97 @@
 import os
 import pathlib
 
-from typing import Optional
+from typing import Optional, TypeVar
 
+import semver
+
+import cpo.utils.operating_system
 import cpo.utils.process
 
 from cpo.config.binaries_manager import binaries_manager
+from cpo.lib.dependency_manager.dependency_manager_binary_plugin import DependencyManagerBinaryPlugIn
 from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn
+from cpo.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import IBMCloudCLIPlugIn
+from cpo.lib.dependency_manager.plugins.openshift.openshift_cli_plugin import OpenShiftCLIPlugIn
+from cpo.lib.dependency_manager.plugins.openshift.openshift_install_plugin import OpenShiftInstallPlugIn
 from cpo.utils.error import CloudPakOperationsCLIException
+
+T = TypeVar("T", bound=AbstractDependencyManagerPlugIn)
 
 
 class DependencyManager:
     """Responsible for managing dependencies"""
 
+    @classmethod
+    def get_instance(cls) -> "DependencyManager":
+        """Returns the singleton instance of this class
+
+        Returns
+        -------
+        DependencyManager
+            singleton instance of this class
+        """
+
+        if DependencyManager._instance is None:
+            DependencyManager._instance = DependencyManager()
+            DependencyManager._instance.register_plugin(IBMCloudCLIPlugIn)
+            DependencyManager._instance.register_plugin(OpenShiftCLIPlugIn)
+            DependencyManager._instance.register_plugin(OpenShiftInstallPlugIn)
+
+        return DependencyManager._instance
+
     def __init__(self):
-        self._download_manager_dict: dict[type[AbstractDependencyManagerPlugIn], AbstractDependencyManagerPlugIn] = {}
-        self._download_manager_plugins: list[AbstractDependencyManagerPlugIn] = []
+        self._dependency_manager_dict: dict[type[AbstractDependencyManagerPlugIn], AbstractDependencyManagerPlugIn] = {}
+        self._dependency_manager_plugins: list[AbstractDependencyManagerPlugIn] = []
+
+    def download_dependency_if_required(self, cls: type[AbstractDependencyManagerPlugIn]) -> semver.Version:
+        """Downloads a dependency if required
+
+        Parameters
+        ----------
+        cls
+            dependency manager plug-in type
+
+        Returns
+        -------
+        semver.Version
+            version of the downloaded dependency
+        """
+
+        plugin = self.get_plugin_for_plugin_class(cls)
+        latest_downloaded_binary_version = binaries_manager.get_latest_downloaded_binary_version(
+            plugin.get_dependency_alias()
+        )
+
+        if latest_downloaded_binary_version is None:
+            latest_downloaded_binary_version = self._download_dependency(plugin)
+
+        return latest_downloaded_binary_version
+
+    def download_latest_dependencies_if_required(self):
+        """Downloads latest dependencies if required
+
+        The versions of the downloaded dependencies are stored in
+        ~/.cpo/binaries.json.
+        """
+
+        for dependency_manager_plugin in self._dependency_manager_plugins:
+            if dependency_manager_plugin.is_operating_system_supported(
+                cpo.utils.operating_system.get_operating_system()
+            ):
+                binary_alias = dependency_manager_plugin.get_dependency_alias()
+                latest_downloaded_binary_version = binaries_manager.get_latest_downloaded_binary_version(binary_alias)
+                latest_dependency_version = dependency_manager_plugin.get_latest_dependency_version()
+
+                if (latest_downloaded_binary_version is None) or (
+                    latest_dependency_version.compare(latest_downloaded_binary_version) == 1
+                ):
+                    self._download_dependency(dependency_manager_plugin, latest_dependency_version)
 
     def execute_binary(
         self,
-        cls: type[AbstractDependencyManagerPlugIn],
+        cls: type[DependencyManagerBinaryPlugIn],
+        version: semver.Version | None,
         args: list[str],
         env: dict[str, str] = os.environ.copy(),
         capture_output=False,
@@ -50,6 +122,8 @@ class DependencyManager:
         ----------
         cls
             dependency manager plug-in type
+        version
+            version of the dependency
         args
             arguments to be passed to the binary
         env
@@ -70,48 +144,88 @@ class DependencyManager:
             requested)
         """
 
-        plugin = self._download_manager_dict.get(cls)
+        plugin = self.get_plugin_for_plugin_class(cls)
 
-        if plugin is None:
-            raise CloudPakOperationsCLIException(f"Plug-in with class name '{cls.__name__} was not registered")
+        assert isinstance(plugin, DependencyManagerBinaryPlugIn)
 
-        binary_path = plugin.get_binary_path()
-
-        if binary_path is None:
-            raise CloudPakOperationsCLIException(
-                f"Dependency '{plugin.get_dependency_name()} does not provide a binary'"
-            )
-
-        if not binary_path.exists():
-            latest_dependency_version = plugin.get_latest_dependency_version()
-
-            plugin.download_dependency_version(latest_dependency_version)
-            binaries_manager.set_binary_version(plugin.get_dependency_alias(), str(latest_dependency_version))
-
-        return plugin.execute_binary(
-            args, env, capture_output=capture_output, check=check, print_captured_output=print_captured_output
+        latest_downloaded_binary_version = binaries_manager.get_latest_downloaded_binary_version(
+            plugin.get_dependency_alias()
         )
 
-    def get_binary_path(self, cls: type[AbstractDependencyManagerPlugIn]) -> Optional[pathlib.Path]:
+        if version is None:
+            if latest_downloaded_binary_version is None:
+                latest_dependency_version = plugin.get_latest_dependency_version()
+
+                plugin.download_dependency_version(latest_dependency_version)
+                binaries_manager.set_latest_downloaded_binary_version(
+                    plugin.get_dependency_alias(), latest_dependency_version
+                )
+
+                latest_downloaded_binary_version = latest_dependency_version
+
+            version = latest_downloaded_binary_version
+        elif not plugin.get_binary_path(version).exists():
+            plugin.download_dependency_version(version)
+
+            if (latest_downloaded_binary_version is None) or (
+                latest_downloaded_binary_version is not None and version > latest_downloaded_binary_version
+            ):
+                binaries_manager.set_latest_downloaded_binary_version(plugin.get_dependency_alias(), version)
+
+        return plugin.execute_binary(
+            version, args, env, capture_output=capture_output, check=check, print_captured_output=print_captured_output
+        )
+
+    def get_binary_path(self, cls: type[DependencyManagerBinaryPlugIn], version: semver.Version) -> pathlib.Path | None:
         """Returns the path of the binary provided by the dependency
         corresponding to the dependency manager plug-in of the given type
 
-        Returns
-        -------
+        Parameters
+        ----------
         cls
             dependency manager plug-in type
+        version
+            version of the dependency
+
+        Returns
+        -------
         Optional[pathlib.Path]
             path of the binary provided by the dependency corresponding to the
             dependency manager plug-in of the given type or None if the dependency
             does not provide a binary
         """
 
-        plugin = self._download_manager_dict.get(cls)
+        plugin = self.get_plugin_for_plugin_class(cls)
+
+        assert isinstance(plugin, DependencyManagerBinaryPlugIn)
+
+        return plugin.get_binary_path(version)
+
+    def get_plugin_for_plugin_class(self, cls: type[T]) -> T:
+        """Returns an instance of the given plug-in class
+
+        Parameters
+        ----------
+        cls
+            dependency manager plug-in type
+
+        Returns
+        -------
+        T
+            instance of the given plug-in class
+        """
+
+        plugin = self._dependency_manager_dict.get(cls)
 
         if plugin is None:
-            raise CloudPakOperationsCLIException(f"Plug-in with class name '{cls.__name__} was not registered")
+            raise CloudPakOperationsCLIException(f"Plug-in for class name '{cls.__name__}' is not registered")
 
-        return plugin.get_binary_path()
+        if not isinstance(plugin, cls):
+            raise CloudPakOperationsCLIException(
+                f"Plug-in for class name '{cls.__name__}' is not a subclass of this class"
+            )
+
+        return plugin
 
     def register_plugin(self, cls: type[AbstractDependencyManagerPlugIn]):
         """Registers a dependency manager plug-in of the given type
@@ -124,21 +238,18 @@ class DependencyManager:
 
         plugin = cls()
 
-        self._download_manager_dict[cls] = plugin
-        self._download_manager_plugins.append(plugin)
+        self._dependency_manager_dict[cls] = plugin
+        self._dependency_manager_plugins.append(plugin)
 
-    def download_dependencies_if_required(self):
-        """Downloads dependencies if required
+    def _download_dependency(
+        self, plugin: AbstractDependencyManagerPlugIn, dependency_version: semver.Version | None = None
+    ) -> semver.Version:
+        if dependency_version is None:
+            dependency_version = plugin.get_latest_dependency_version()
 
-        The versions of the downloaded dependencies are stored in
-        ~/.cpo/binaries.json.
-        """
+        plugin.download_dependency_version(dependency_version)
+        binaries_manager.set_latest_downloaded_binary_version(plugin.get_dependency_alias(), dependency_version)
 
-        for dependency_manager_plugin in self._download_manager_plugins:
-            binary_alias = dependency_manager_plugin.get_dependency_alias()
-            current_version = binaries_manager.get_binary_version(binary_alias)
-            latest_dependency_version = dependency_manager_plugin.get_latest_dependency_version()
+        return dependency_version
 
-            if (current_version is None) or (latest_dependency_version.compare(current_version) == 1):
-                dependency_manager_plugin.download_dependency_version(latest_dependency_version)
-                binaries_manager.set_binary_version(binary_alias, str(latest_dependency_version))
+    _instance: Optional["DependencyManager"] = None

@@ -17,6 +17,8 @@ import pathlib
 
 from typing import Optional
 
+import semver
+
 from cpo.config import configuration_manager
 
 BinariesFileContents = dict[str, str]
@@ -73,15 +75,15 @@ class BinariesManager:
 
         return configuration_manager.get_cli_data_directory_path() / "binaries.json"
 
-    def get_binary_version(self, binary_alias: str) -> Optional[str]:
+    def get_latest_downloaded_binary_version(self, binary_alias: str) -> Optional[semver.Version]:
         binaries = self._get_binary_versions()
 
-        return binaries[binary_alias] if binary_alias in binaries else None
+        return semver.Version.parse(binaries[binary_alias]) if binary_alias in binaries else None
 
-    def set_binary_version(self, binary_alias: str, version: str):
+    def set_latest_downloaded_binary_version(self, binary_alias: str, version: semver.Version):
         binary_versions = self._get_binary_versions()
 
-        binary_versions[binary_alias] = version
+        binary_versions[binary_alias] = str(version)
         self._save_binaries_file()
 
     def _get_binary_versions(self) -> dict[str, str]:

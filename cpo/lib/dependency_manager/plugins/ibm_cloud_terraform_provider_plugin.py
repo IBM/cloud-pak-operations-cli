@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ class IBMCloudTerraformProviderPlugIn(AbstractDependencyManagerPlugIn):
         }
 
     # override
-    def download_dependency_version(self, version: semver.VersionInfo):
+    def download_dependency_version(self, version: semver.Version):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name = self._ibmcloud_terraform_provider_plugin_configuration_data_dict[operating_system][
             "ibm_cloud_terraform_provider_file_name"
@@ -67,7 +67,7 @@ class IBMCloudTerraformProviderPlugIn(AbstractDependencyManagerPlugIn):
         return "IBM Cloud Terraform Provider"
 
     # override
-    def get_latest_dependency_version(self) -> semver.VersionInfo:
+    def get_latest_dependency_version(self) -> semver.Version:
         latest_version = self._get_latest_dependency_version_on_github("IBM-Cloud", "terraform-provider-ibm")
 
         if latest_version is None:
@@ -92,6 +92,10 @@ class IBMCloudTerraformProviderPlugIn(AbstractDependencyManagerPlugIn):
                 "terraform_plugins_directory_path"
             ]
         )
+
+    # override
+    def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:
+        return operating_system in self._ibmcloud_terraform_provider_plugin_configuration_data_dict
 
     def _extract_archive(self, archive_path: pathlib.Path, target_directory_path: pathlib.Path):
         """Extracts the given archive in a dependency-specific manner

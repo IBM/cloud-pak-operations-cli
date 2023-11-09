@@ -23,8 +23,8 @@ import cpo.config
 import cpo.utils.network
 import cpo.utils.process
 
-from cpo.lib.dependency_manager import dependency_manager
-from cpo.lib.dependency_manager.plugins.openshift_cli_plugin import OpenShiftCLIPlugIn
+from cpo.lib.dependency_manager.dependency_manager import DependencyManager
+from cpo.lib.dependency_manager.plugins.openshift.openshift_cli_plugin import OpenShiftCLIPlugIn
 from cpo.lib.openshift.types.get_pod_entry import GetPodEntry
 from cpo.utils.error import CloudPakOperationsCLIException
 
@@ -80,8 +80,9 @@ def execute_oc_command(
         requested)
     """
 
-    return dependency_manager.execute_binary(
+    return DependencyManager.get_instance().execute_binary(
         OpenShiftCLIPlugIn,
+        None,
         args,
         capture_output=capture_output,
         check=check,
@@ -170,11 +171,11 @@ def get_image_registry_hostname(route_name: str = "default-route") -> str:
     return oc_get_route_command_result
 
 
-def get_openshift_version() -> semver.VersionInfo:
+def get_openshift_version() -> semver.Version:
     oc_version_args = ["version", "--output", "json"]
     oc_version_command_result = json.loads(execute_oc_command(oc_version_args, capture_output=True).stdout)
 
-    return semver.VersionInfo.parse(oc_version_command_result["openshiftVersion"])
+    return semver.Version.parse(oc_version_command_result["openshiftVersion"])
 
 
 def get_persistent_volume_name(namespace: str, persistent_volume_claim_name: str) -> str:

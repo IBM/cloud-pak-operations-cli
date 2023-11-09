@@ -22,7 +22,6 @@ from typing import Any
 import ansible_runner
 
 from ansible_runner.runner import Runner
-from ansible_runner.streaming import Processor, Transmitter, Worker
 
 from cpo.config import configuration_manager
 from cpo.utils.error import CloudPakOperationsCLIException
@@ -48,13 +47,21 @@ class PlaybookRunner(ABC):
 
         return configuration_manager.get_deps_directory_path() / "playbooks"
 
-    def run_playbook(self):
-        """Runs a playbook"""
+    def run_playbook(self) -> dict[str, Any]:
+        """Runs a playbook
+
+        Returns
+        -------
+        dict[str, str]
+            fact cache
+        """
 
         runner = self._run_playbook()
 
         if runner.status == "failed":
             raise CloudPakOperationsCLIException("Ansible playbook failed")
+
+        return runner.get_fact_cache("localhost")
 
     def _event_handler(self, event_data: Any):
         """Callback invoked by Ansible Runner in case Ansible Runner itself
@@ -106,12 +113,12 @@ class PlaybookRunner(ABC):
 
         return playbook_name
 
-    def _run_playbook(self) -> Processor | Runner | Transmitter | Worker:
+    def _run_playbook(self) -> Runner:
         """Runs the playbook with the name passed in the constructor
 
         Returns
         -------
-        Processor | Runner | Transmitter | Worker
+        Runner
             object returned by Ansible Runner for post-processing purposes"""
 
         runner = ansible_runner.run(
@@ -129,6 +136,8 @@ class PlaybookRunner(ABC):
             quiet=True,
             suppress_env_files=True,
         )
+
+        assert isinstance(runner, Runner)
 
         return runner
 
