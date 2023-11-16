@@ -47,6 +47,18 @@ def create_default_map_from_json_file(path: pathlib.Path):
     return default_map_dict
 
 
+def get_alias_or_server(ctx: click.Context, options: dict[str, Any]) -> str:
+    result = options.get("use_cluster")
+
+    if result is None:
+        if (current_cluster := cluster_credentials_manager.get_current_cluster()) is not None:
+            result = current_cluster.get_server()
+        else:
+            raise click.UsageError("You must either set option --use-cluster or set a current cluster.", ctx)
+
+    return result
+
+
 def get_cluster_credentials(ctx: click.Context, options: dict[str, Any]) -> AbstractCredentials:
     """Returns cluster credentials based on the options passed to a Click
     command or the current cluster
@@ -108,8 +120,8 @@ def get_cluster_credentials(ctx: click.Context, options: dict[str, Any]) -> Abst
         result = ClusterBasedUserCredentials(current_cluster, insecure_skip_tls_verify)
     else:
         raise click.UsageError(
-            "You must either set options --server/--username/--password, --server/--token, --use-cluster, or set a "
-            "current cluster.",
+            "You must either set options --server/--username/--password, set options --server/--token, set option "
+            "--use-cluster, or set a current cluster.",
             ctx,
         )
 
@@ -155,8 +167,8 @@ def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, 
         )
     else:
         raise click.UsageError(
-            "You must either set options --server/--username/--password, --server/--token, --use-cluster, or set a "
-            "current cluster.",
+            "You must either set options --server/--username/--password, set options --server/--token, set option "
+            "--use-cluster, or set a current cluster.",
             ctx,
         )
 
