@@ -72,6 +72,7 @@ class OpenShiftInstallationManager(ABC):
         insecure_skip_tls_verify: bool | None,
         ocp_version: semver.Version,
         configuration: Any,
+        additional_cluster_data: dict[str, Any] | None = None,
     ) -> str:
         OpenShiftInstallationManager._OPENSHIFT_INSTALL_PATH.mkdir(exist_ok=True)
 
@@ -99,6 +100,7 @@ class OpenShiftInstallationManager(ABC):
             print_captured_output=True,
         )
 
+        openshift_install_cluster_id = self._get_cluster_id(assets_directory)
         search_result = regex.search(
             'Login to the console with user: "(.+)", and password: "(.+)"', process_result.stderr
         )
@@ -107,12 +109,16 @@ class OpenShiftInstallationManager(ABC):
             raise CloudPakOperationsCLIException("Credentials could not be extracted from openshift-install output")
 
         cluster_data = {
+            "openshift_install_cluster_id": openshift_install_cluster_id,
             "password": search_result.group(2),
             "username": search_result.group(1),
         }
 
         if insecure_skip_tls_verify is not None:
             cluster_data["insecure_skip_tls_verify"] = insecure_skip_tls_verify
+
+        if additional_cluster_data is not None:
+            cluster_data.update(additional_cluster_data)
 
         cluster_credentials_manager.add_cluster(
             alias if (alias is not None) else "",
@@ -121,12 +127,7 @@ class OpenShiftInstallationManager(ABC):
             cluster_data,
         )
 
-        with open(assets_directory / "terraform.tfvars.json") as terraform_tfvars_file:
-            terraform_tfvars_file_contents = json.load(terraform_tfvars_file)
-
-            assert "cluster_id" in terraform_tfvars_file_contents
-
-            return terraform_tfvars_file_contents["cluster_id"]
+        return openshift_install_cluster_id
 
     def destroy_cluster(self, name: str, base_domain: str):
         """Destroys the OpenShift cluster with the given name and base domain
@@ -174,6 +175,14 @@ class OpenShiftInstallationManager(ABC):
         assets_directory.mkdir()
 
         return assets_directory
+
+    def _get_cluster_id(self, assets_directory: pathlib.Path) -> str:
+        with open(assets_directory / "terraform.tfvars.json") as terraform_tfvars_file:
+            terraform_tfvars_file_contents = json.load(terraform_tfvars_file)
+
+            assert "cluster_id" in terraform_tfvars_file_contents
+
+            return terraform_tfvars_file_contents["cluster_id"]
 
     @abstractmethod
     def _get_environment(self) -> dict[str, str]:
