@@ -41,7 +41,7 @@ class ClusterBasedUserCredentials(UserCredentials):
 
     # override
     def persist_access_token(self, token: str):
-        self._cluster = cluster_credentials_manager.edit_cluster(self._cluster.get_server(), {"token": token})
+        self._cluster = cluster_credentials_manager.add_cluster_data(self._cluster.get_server(), {"token": token})
 
     def _get_insecure_skip_tls_verify_from_cluster_data(self, cluster: AbstractCluster) -> bool:
         cluster_data = cluster.get_cluster_data()
