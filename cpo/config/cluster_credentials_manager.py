@@ -69,15 +69,15 @@ class ClusterCredentialsManager:
         self._save_clusters_file(clusters_file_contents)
 
     @file_lock
-    def edit_cluster(self, alias_or_server, cluster_data_to_be_added: ClusterData) -> AbstractCluster:
-        """Edits metadata of a registered OpenShift cluster
+    def add_cluster_data(self, alias_or_server, cluster_data_to_be_added: dict[str, Any]) -> AbstractCluster:
+        """Adds key-value pairs to the metadata of a registered OpenShift cluster
 
         Parameters
         ----------
         alias_or_server
             alias or server URL of the registered OpenShift cluster to be edited
         cluster_data_to_be_added
-            cluster data to be added to existing cluster data
+            key-value pairs to be added to existing cluster data
 
         Returns
         -------
@@ -100,6 +100,40 @@ class ClusterCredentialsManager:
         for key, value in cluster_data_to_be_added.items():
             cluster_data[key] = value
 
+        self._save_clusters_file(clusters_file_contents)
+
+        return cluster
+
+    @file_lock
+    def set_cluster_data(self, alias_or_server, cluster_data: ClusterData) -> AbstractCluster:
+        """Sets metadata of a registered OpenShift cluster
+
+        Parameters
+        ----------
+        alias_or_server
+            alias or server URL of the registered OpenShift cluster to be edited
+        cluster_data
+            cluster data to be set
+
+        Returns
+        -------
+        AbstractCluster
+            metadata of the registered OpenShift cluster with the given alias or
+            server URL
+        """
+
+        clusters_file_contents = self.get_clusters_file_contents_with_default()
+        cluster = self.get_cluster_from_clusters_file_contents(clusters_file_contents, alias_or_server)
+
+        if cluster is None:
+            raise CloudPakOperationsCLIException(f"Cluster not found ({alias_or_server})")
+
+        current_alias = cluster.get_cluster_data().get("alias")
+
+        if ("alias" in cluster_data) and ((new_alias := cluster_data["alias"]) != current_alias):
+            self._raise_if_alias_exists(new_alias)
+
+        clusters_file_contents["clusters"][cluster.get_server()] = cluster_data
         self._save_clusters_file(clusters_file_contents)
 
         return cluster

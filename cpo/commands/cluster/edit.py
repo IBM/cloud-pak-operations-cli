@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2023 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -49,6 +49,6 @@ def edit(
 
     metadata_to_be_edited = dict(filter(lambda pair: pair[1] is not None, metadata_to_be_edited.items()))
 
-    cpo.config.cluster_credentials_manager.cluster_credentials_manager.edit_cluster(
+    cpo.config.cluster_credentials_manager.cluster_credentials_manager.add_cluster_data(
         alias_or_server, metadata_to_be_edited
     )
