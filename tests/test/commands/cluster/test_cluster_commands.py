@@ -117,9 +117,7 @@ class TestClusterCommands(unittest.TestCase):
 
         self.assertIsNotNone(cluster)
 
-        # prevent Pylance error ("get_cluster_data" is not a known member of "None")
-        if cluster is None:
-            raise TypeError()
+        assert cluster is not None
 
         cluster_data = cluster.get_cluster_data()
 
