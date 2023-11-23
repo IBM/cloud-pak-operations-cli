@@ -75,7 +75,7 @@ class IBMInternalPluginInstaller:
 
         return package_list
 
-    def install(self, distribution_package_name: str, user: bool):
+    def install(self, distribution_package_name: str, **kwargs):
         """Install IBM-internal CLI plug-in"""
 
         args = [
@@ -87,10 +87,15 @@ class IBMInternalPluginInstaller:
             f"{urllib.parse.quote(self._artifactory_password)}@{self._repository_url}",
         ]
 
-        if user:
+        if ((upgrade := kwargs.get("upgrade")) is not None) and upgrade:
+            args.append("--upgrade")
+
+        if ((user := kwargs.get("user")) is not None) and user:
             args.append("--user")
 
-        args.append(distribution_package_name)
+        version = kwargs.get("version")
+
+        args.append(distribution_package_name if version is None else f"{distribution_package_name}=={version}")
 
         program = shutil.which("pip")
 

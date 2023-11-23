@@ -18,6 +18,7 @@ import pathlib
 from typing import Any, Optional
 
 import click
+import semver
 
 import cpo.lib.openshift.oc
 
@@ -173,6 +174,13 @@ def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, 
         )
 
     return result
+
+
+def get_semver_version(ctx, param, value: str | None) -> semver.Version | None:
+    try:
+        return semver.Version.parse(value) if value is not None else None
+    except Exception as exception:
+        raise click.BadParameter(str(exception))
 
 
 def log_in_to_openshift_cluster(ctx: click.Context, options: dict[str, Any]):
