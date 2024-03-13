@@ -1,4 +1,4 @@
-#  Copyright 2022, 2023 IBM Corporation
+#  Copyright 2022, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,6 +22,7 @@ from ansible.module_utils.basic import AnsibleModule
 import cpo.lib.jmespath
 
 from cpo.lib.ansible.modules.abstract_module import AbstractModule
+from cpo.lib.ansible.modules.custom_resource_event_result import CustomResourceEventResult
 from cpo.lib.openshift.types.kind_metadata import KindMetadata
 
 
@@ -77,14 +78,19 @@ class WaitForCustomResourceDefinitionsModule(AbstractModule):
             )
 
             result = {"changed": False}
-        except Exception:
+        except Exception as exception:
+            self._log(logging.ERROR, str(exception))
+
             result = {"changed": False, "failed": True}
 
         self._module.exit_json(**result)
 
     def _add_event_indicates_custom_resource_definitions_are_created(
-        self, event: Any, custom_resource_definitions_event_data: CustomResourceDefinitionsEventData
-    ) -> bool:
+        self,
+        event: Any,
+        kind_metadata: KindMetadata,
+        custom_resource_definitions_event_data: CustomResourceDefinitionsEventData,
+    ) -> Optional[CustomResourceEventResult]:
         """Callback for checking whether the given set of expected custom
         resource definitions was created
 
@@ -106,7 +112,7 @@ class WaitForCustomResourceDefinitionsModule(AbstractModule):
             created
         """
 
-        custom_resource_definitions_are_created = False
+        custom_resource_event_result: Optional[CustomResourceEventResult] = None
 
         if event["type"] == "ADDED":
             encountered_crd_kind = cpo.lib.jmespath.get_jmespath_string("object.spec.names.kind", event)
@@ -115,12 +121,13 @@ class WaitForCustomResourceDefinitionsModule(AbstractModule):
                 self._log(logging.DEBUG, f"Detected creation of custom resource definition '{encountered_crd_kind}'")
                 custom_resource_definitions_event_data.encountered_crd_kinds.add(encountered_crd_kind)
 
-            custom_resource_definitions_are_created = (
+            if (
                 custom_resource_definitions_event_data.encountered_crd_kinds
                 == custom_resource_definitions_event_data.expected_crd_kinds
-            )
+            ):
+                custom_resource_event_result = CustomResourceEventResult(True)
 
-        return custom_resource_definitions_are_created
+        return custom_resource_event_result
 
 
 def main():
