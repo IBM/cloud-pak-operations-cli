@@ -1,4 +1,4 @@
-#  Copyright 2022 IBM Corporation
+#  Copyright 2022, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -87,13 +87,13 @@ class AbstractModule(ABC):
         self,
         kind_metadata: KindMetadata,
         log_callback: Callable[[int, str], None],
-        success_callback: Callable[..., bool],
+        success_callback: Callable[..., Optional[CustomResourceEventResult]],
         **kwargs,
-    ):
+    ) -> CustomResourceEventResult:
         custom_objects_api = client.CustomObjectsApi()
-        succeeded = False
+        custom_resource_event_result: Optional[CustomResourceEventResult] = None
 
-        while not succeeded:
+        while custom_resource_event_result is None:
             try:
                 resource_version: Optional[str] = None
                 w = watch.Watch()
@@ -106,15 +106,17 @@ class AbstractModule(ABC):
                     resource_version=resource_version,
                 ):
                     resource_version = cpo.lib.jmespath.get_jmespath_string("object.metadata.resourceVersion", event)
-                    succeeded = success_callback(event, **kwargs)
+                    custom_resource_event_result = success_callback(event, kind_metadata=kind_metadata, **kwargs)
 
-                    if succeeded:
+                    if custom_resource_event_result is not None:
                         w.stop()
             except client.ApiException as exception:
                 self._handle_api_exception(exception, log_callback)
                 resource_version = None
             except urllib3.exceptions.ProtocolError as exception:
                 self._handle_protocol_error(exception, log_callback)
+
+        return custom_resource_event_result
 
     def _wait_for_namespaced_custom_resource(
         self,
