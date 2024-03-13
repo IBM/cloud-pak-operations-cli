@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ def extract_archive(archive_path: pathlib.Path, target_directory_path: pathlib.P
             post-extraction actions
     """
 
-    if (archive_path.suffixes == [".tar", ".gz"]) or (archive_path.suffix == ".tgz"):
+    if (archive_path.suffixes[-2:] == [".tar", ".gz"]) or (archive_path.suffix == ".tgz"):
         extract_tgz_archive(archive_path, target_directory_path, **kwargs)
     elif archive_path.suffix == ".zip":
         extract_zip_archive(archive_path, target_directory_path, **kwargs)
