@@ -20,6 +20,7 @@ import jmespath
 
 import cpo.lib.jmespath
 
+from cpo.config import configuration_manager
 from cpo.lib.ansible.playbook_runner import PlaybookRunner
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.openshift_api_manager import OpenShiftAPIManager
@@ -31,8 +32,15 @@ logger = logging.getLogger(__name__)
 class OpenShiftPlaybookRunner(PlaybookRunner):
     """Base class to be inherited by all OpenShift-based playbook runners"""
 
-    def __init__(self, playbook_name: str, credentials: AbstractCredentials):
-        super().__init__(playbook_name)
+    def __init__(
+        self,
+        playbook_name: str,
+        credentials: AbstractCredentials,
+        *,
+        private_data_dir=configuration_manager.get_deps_directory_path() / "playbooks",
+        variables: dict[str, Any] = {},
+    ):
+        super().__init__(playbook_name, private_data_dir=private_data_dir, variables=variables)
 
         self._openshift_api_manager = OpenShiftAPIManager(credentials)
         self._token_expired = False
