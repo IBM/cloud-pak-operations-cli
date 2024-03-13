@@ -1,4 +1,4 @@
-#  Copyright 2022, 2023 IBM Corporation
+#  Copyright 2022, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,6 +15,8 @@
 import logging
 
 from typing import Any, Optional
+
+import jmespath
 
 import cpo.lib.jmespath
 
@@ -74,12 +76,17 @@ class OpenShiftPlaybookRunner(PlaybookRunner):
         super()._event_handler(event_data)
 
     def _check_if_unauthorized(self, event_data: Any) -> bool:
-        msg = cpo.lib.jmespath.get_jmespath_string("event_data.res.msg", event_data)
+        unauthorized = jmespath.search("event_data.res.reason", event_data) == "Unauthorized"
 
-        return msg.startswith("Failed to get client due to 401") or (
-            (msg == "MODULE FAILURE\nSee stdout/stderr for the exact error")
-            and (
-                "kubernetes.dynamic.exceptions.UnauthorizedError: 401\nReason: Unauthorized"
-                in cpo.lib.jmespath.get_jmespath_string("event_data.res.module_stderr", event_data)
+        if not unauthorized:
+            msg = cpo.lib.jmespath.get_jmespath_string("event_data.res.msg", event_data)
+
+            unauthorized = msg.startswith("Failed to get client due to 401") or (
+                (msg == "MODULE FAILURE\nSee stdout/stderr for the exact error")
+                and (
+                    "kubernetes.dynamic.exceptions.UnauthorizedError: 401\nReason: Unauthorized"
+                    in cpo.lib.jmespath.get_jmespath_string("event_data.res.module_stderr", event_data)
+                )
             )
-        )
+
+        return unauthorized
