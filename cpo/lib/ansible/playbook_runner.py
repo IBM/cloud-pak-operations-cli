@@ -1,4 +1,4 @@
-#  Copyright 2022, 2023 IBM Corporation
+#  Copyright 2022, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,10 +13,9 @@
 #  limitations under the License.
 
 import logging
-import pathlib
 import re as regex
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Any
 
 import ansible_runner
@@ -32,20 +31,18 @@ logger = logging.getLogger(__name__)
 class PlaybookRunner(ABC):
     """Base class to be inherited by all playbook runners"""
 
-    def __init__(self, playbook_name: str):
+    def __init__(
+        self,
+        playbook_name: str,
+        *,
+        private_data_dir=configuration_manager.get_deps_directory_path() / "playbooks",
+        variables: dict[str, Any] = {},
+    ):
         self._playbook_name = playbook_name
+        self._private_data_dir = private_data_dir
 
-    @abstractmethod
-    def get_private_data_dir(self) -> pathlib.Path:
-        """Returns the private data directory used by Ansible Runner
-
-        Returns
-        -------
-        str
-            private data directory used by Ansible Runner
-        """
-
-        return configuration_manager.get_deps_directory_path() / "playbooks"
+        for name, value in variables.items():
+            setattr(self, name, value)
 
     def run_playbook(self) -> dict[str, Any]:
         """Runs a playbook
@@ -132,7 +129,7 @@ class PlaybookRunner(ABC):
             extravars=self._sanitize_extra_vars(self._get_extra_vars()),
             event_handler=self._event_handler,
             playbook=self._playbook_name,
-            private_data_dir=self.get_private_data_dir(),
+            private_data_dir=self._private_data_dir,
             quiet=True,
             suppress_env_files=True,
         )
