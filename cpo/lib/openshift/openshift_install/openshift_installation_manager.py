@@ -1,4 +1,4 @@
-#  Copyright 2023 IBM Corporation
+#  Copyright 2023, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import semver
 import yaml
 
 from filelock import FileLock
-
-import cpo.lib.openshift.cluster
 
 from cpo.config import configuration_manager
 from cpo.config.cluster_credentials_manager import cluster_credentials_manager
@@ -66,6 +64,7 @@ class OpenShiftInstallationManager(ABC):
 
     def create_cluster(
         self,
+        cluster_type: str,
         cluster_name: str,
         base_domain: str,
         alias: str | None,
@@ -100,7 +99,7 @@ class OpenShiftInstallationManager(ABC):
             print_captured_output=True,
         )
 
-        openshift_install_cluster_id = self._get_cluster_id(assets_directory)
+        cluster_id = self._get_cluster_id(assets_directory)
         search_result = regex.search(
             'Login to the console with user: "(.+)", and password: "(.+)"', process_result.stderr
         )
@@ -109,7 +108,7 @@ class OpenShiftInstallationManager(ABC):
             raise CloudPakOperationsCLIException("Credentials could not be extracted from openshift-install output")
 
         cluster_data = {
-            "openshift_install_cluster_id": openshift_install_cluster_id,
+            "cluster_id": cluster_id,
             "password": search_result.group(2),
             "username": search_result.group(1),
         }
@@ -123,11 +122,11 @@ class OpenShiftInstallationManager(ABC):
         cluster_credentials_manager.add_cluster(
             alias if (alias is not None) else "",
             f"https://api.{cluster_name}.{base_domain}:6443",
-            cpo.lib.openshift.cluster.CLUSTER_TYPE_ID,
+            cluster_type,
             cluster_data,
         )
 
-        return openshift_install_cluster_id
+        return cluster_id
 
     def destroy_cluster(self, name: str, base_domain: str):
         """Destroys the OpenShift cluster with the given name and base domain
