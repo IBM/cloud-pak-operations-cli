@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,14 +16,12 @@ import os
 import pathlib
 import urllib.parse
 
-import semver
-
 import cpo.config
 import cpo.utils.compression
 import cpo.utils.download
 import cpo.utils.operating_system
 
-from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn
+from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn, DependencyVersion
 from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.operating_system import OperatingSystem
 
@@ -46,13 +44,17 @@ class IBMCloudTerraformProviderPlugIn(AbstractDependencyManagerPlugIn):
         }
 
     # override
-    def download_dependency_version(self, version: semver.Version):
+    def download_dependency_version(self, dependency_version: DependencyVersion):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name = self._ibmcloud_terraform_provider_plugin_configuration_data_dict[operating_system][
             "ibm_cloud_terraform_provider_file_name"
-        ].format(version=str(version))
+        ].format(version=str(dependency_version))
 
-        url = f"https://github.com/IBM-Cloud/terraform-provider-ibm/releases/download/v{str(version)}/{file_name}"
+        url = (
+            f"https://github.com/IBM-Cloud/terraform-provider-ibm/releases/download/v"
+            f"{str(dependency_version)}/{file_name}"
+        )
+
         archive_path = cpo.utils.download.download_file(urllib.parse.urlsplit(url))
         target_directory_path = self.get_terraform_plugins_directory_path()
 
@@ -67,7 +69,7 @@ class IBMCloudTerraformProviderPlugIn(AbstractDependencyManagerPlugIn):
         return "IBM Cloud Terraform Provider"
 
     # override
-    def get_latest_dependency_version(self) -> semver.Version:
+    def get_latest_dependency_version(self) -> DependencyVersion:
         latest_version = self._get_latest_dependency_version_on_github("IBM-Cloud", "terraform-provider-ibm")
 
         if latest_version is None:

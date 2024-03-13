@@ -1,4 +1,4 @@
-#  Copyright 2023 IBM Corporation
+#  Copyright 2023, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -30,13 +30,14 @@ import cpo.utils.file
 import cpo.utils.operating_system
 
 from cpo.lib.dependency_manager.dependency_manager_binary_plugin import DependencyManagerBinaryPlugIn
+from cpo.lib.dependency_manager.dependency_manager_plugin import DependencyVersion
 from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.operating_system import OperatingSystem
 
 
 class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
     # override
-    def download_dependency_version(self, version: semver.Version):
+    def download_dependency_version(self, dependency_version: DependencyVersion):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name = self._get_operating_system_file_name_dict().get(operating_system)
 
@@ -45,20 +46,22 @@ class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
                 f"{self.get_dependency_name()} does not support {operating_system.value}"
             )
 
-        url = f"https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{str(version)}/{file_name}"
+        url = f"https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{str(dependency_version)}/{file_name}"
 
         try:
             archive_path = cpo.utils.download.download_file(urllib.parse.urlsplit(url))
         except requests.exceptions.HTTPError as exception:
             if (exception.response is not None) and (exception.response.status_code == 404):
-                raise CloudPakOperationsCLIException(f"{self.get_dependency_name()} {version} does not exist")
+                raise CloudPakOperationsCLIException(
+                    f"{self.get_dependency_name()} {dependency_version} does not exist"
+                )
             else:
                 raise
 
-        self._extract_archive(archive_path, version, operating_system)
+        self._extract_archive(archive_path, dependency_version.version, operating_system)
 
     # override
-    def get_latest_dependency_version(self) -> semver.Version:
+    def get_latest_dependency_version(self) -> DependencyVersion:
         """Returns the latest version of the OpenShift CLI
 
         Returns
@@ -74,7 +77,7 @@ class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
 
             latest_version = self._parse_version_from_versions_file(buffer.getvalue().decode("utf-8"))
 
-            return latest_version
+            return DependencyVersion(latest_version)
 
     # override
     def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:

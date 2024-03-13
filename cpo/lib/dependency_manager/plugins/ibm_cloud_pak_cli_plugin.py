@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -25,6 +25,7 @@ import cpo.utils.download
 import cpo.utils.operating_system
 
 from cpo.lib.dependency_manager.dependency_manager_binary_plugin import DependencyManagerBinaryPlugIn
+from cpo.lib.dependency_manager.dependency_manager_plugin import DependencyVersion
 from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.operating_system import OperatingSystem
 
@@ -38,14 +39,14 @@ class IBMCloudPakCLIPlugIn(DependencyManagerBinaryPlugIn):
         }
 
     # override
-    def download_dependency_version(self, version: semver.Version):
+    def download_dependency_version(self, dependency_version: DependencyVersion):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name_infix = self._operating_system_to_file_name_infix_dict[operating_system]
         file_name = f"cloudctl-{file_name_infix}-amd64.tar.gz"
-        url = f"https://github.com/IBM/cloud-pak-cli/releases/download/v{str(version)}/{file_name}"
+        url = f"https://github.com/IBM/cloud-pak-cli/releases/download/v{str(dependency_version)}/{file_name}"
         archive_path = cpo.utils.download.download_file(urllib.parse.urlsplit(url))
 
-        self._extract_archive(archive_path, version, operating_system)
+        self._extract_archive(archive_path, dependency_version.version, operating_system)
 
     # override
     def get_binary_name(self) -> Optional[str]:
@@ -60,7 +61,7 @@ class IBMCloudPakCLIPlugIn(DependencyManagerBinaryPlugIn):
         return "IBM Cloud Pak CLI"
 
     # override
-    def get_latest_dependency_version(self) -> semver.Version:
+    def get_latest_dependency_version(self) -> DependencyVersion:
         latest_version = self._get_latest_dependency_version_on_github("IBM", "cloud-pak-cli")
 
         if latest_version is None:

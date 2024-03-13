@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -24,7 +24,7 @@ import cpo.utils.process
 
 from cpo.config.binaries_manager import binaries_manager
 from cpo.lib.dependency_manager.dependency_manager_binary_plugin import DependencyManagerBinaryPlugIn
-from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn
+from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDependencyManagerPlugIn, DependencyVersion
 from cpo.lib.dependency_manager.plugins.ibm_cloud_cli_plugin import IBMCloudCLIPlugIn
 from cpo.lib.dependency_manager.plugins.openshift.openshift_cli_plugin import OpenShiftCLIPlugIn
 from cpo.lib.dependency_manager.plugins.openshift.openshift_install_plugin import OpenShiftInstallPlugIn
@@ -80,7 +80,7 @@ class DependencyManager:
         if latest_downloaded_binary_version is None:
             latest_downloaded_binary_version = self._download_dependency(plugin)
 
-        return latest_downloaded_binary_version
+        return latest_downloaded_binary_version.version
 
     def download_latest_dependencies_if_required(self):
         """Downloads latest dependencies if required
@@ -98,14 +98,14 @@ class DependencyManager:
                 latest_dependency_version = dependency_manager_plugin.get_latest_dependency_version()
 
                 if (latest_downloaded_binary_version is None) or (
-                    latest_dependency_version.compare(latest_downloaded_binary_version) == 1
+                    latest_dependency_version.version.compare(latest_downloaded_binary_version.version) == 1
                 ):
                     self._download_dependency(dependency_manager_plugin, latest_dependency_version)
 
     def execute_binary(
         self,
         cls: type[DependencyManagerBinaryPlugIn],
-        version: semver.Version | None,
+        version: semver.Version | str | None,
         args: list[str],
         env: dict[str, str] = os.environ.copy(),
         capture_output=False,
@@ -144,6 +144,13 @@ class DependencyManager:
             requested)
         """
 
+        dependency_version: Optional[DependencyVersion] = None
+
+        if isinstance(version, semver.Version):
+            dependency_version = DependencyVersion(version)
+        elif isinstance(version, str):
+            dependency_version = AbstractDependencyManagerPlugIn.parse_as_semantic_version(version)
+
         plugin = self.get_plugin_for_plugin_class(cls)
 
         assert isinstance(plugin, DependencyManagerBinaryPlugIn)
@@ -152,28 +159,36 @@ class DependencyManager:
             plugin.get_dependency_alias()
         )
 
-        if version is None:
+        if dependency_version is None:
             if latest_downloaded_binary_version is None:
                 latest_dependency_version = plugin.get_latest_dependency_version()
 
                 plugin.download_dependency_version(latest_dependency_version)
                 binaries_manager.set_latest_downloaded_binary_version(
-                    plugin.get_dependency_alias(), latest_dependency_version
+                    plugin.get_dependency_alias(), latest_dependency_version.version
                 )
 
                 latest_downloaded_binary_version = latest_dependency_version
 
-            version = latest_downloaded_binary_version
-        elif not plugin.get_binary_path(version).exists():
-            plugin.download_dependency_version(version)
+            dependency_version = latest_downloaded_binary_version
+        elif not plugin.get_binary_path(dependency_version.version).exists():
+            plugin.download_dependency_version(dependency_version)
 
             if (latest_downloaded_binary_version is None) or (
-                latest_downloaded_binary_version is not None and version > latest_downloaded_binary_version
+                latest_downloaded_binary_version is not None
+                and dependency_version.version > latest_downloaded_binary_version.version
             ):
-                binaries_manager.set_latest_downloaded_binary_version(plugin.get_dependency_alias(), version)
+                binaries_manager.set_latest_downloaded_binary_version(
+                    plugin.get_dependency_alias(), dependency_version.version
+                )
 
         return plugin.execute_binary(
-            version, args, env, capture_output=capture_output, check=check, print_captured_output=print_captured_output
+            dependency_version.version,
+            args,
+            env,
+            capture_output=capture_output,
+            check=check,
+            print_captured_output=print_captured_output,
         )
 
     def get_binary_path(self, cls: type[DependencyManagerBinaryPlugIn], version: semver.Version) -> pathlib.Path | None:
@@ -242,13 +257,13 @@ class DependencyManager:
         self._dependency_manager_plugins.append(plugin)
 
     def _download_dependency(
-        self, plugin: AbstractDependencyManagerPlugIn, dependency_version: semver.Version | None = None
-    ) -> semver.Version:
+        self, plugin: AbstractDependencyManagerPlugIn, dependency_version: DependencyVersion | None = None
+    ) -> DependencyVersion:
         if dependency_version is None:
             dependency_version = plugin.get_latest_dependency_version()
 
         plugin.download_dependency_version(dependency_version)
-        binaries_manager.set_latest_downloaded_binary_version(plugin.get_dependency_alias(), dependency_version)
+        binaries_manager.set_latest_downloaded_binary_version(plugin.get_dependency_alias(), dependency_version.version)
 
         return dependency_version
 
