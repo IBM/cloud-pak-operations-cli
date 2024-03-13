@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -102,5 +102,31 @@ def get_jmespath_string(expression: str, data: Any) -> str:
 
     if not isinstance(search_result, str):
         raise UnexpectedTypeException(search_result)
+
+    return search_result
+
+
+def get_jmespath_value(expression: str, data: Any) -> Any:
+    """Returns extracted elements from the given object based on the given
+    JMESPath expression
+
+    Parameters
+    ----------
+    expression
+        JMESPath expression
+    data
+        object to be searched
+
+    Returns
+    -------
+    Any
+        extracted elements from the given object based on the given JMESPath
+        expression
+    """
+
+    search_result = jmespath.search(expression, data)
+
+    if search_result is None:
+        raise JmespathPathExpressionNotFoundException(expression)
 
     return search_result
