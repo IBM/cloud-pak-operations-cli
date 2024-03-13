@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -622,6 +622,17 @@ class OpenShiftAPIManager:
 
         return self.execute_kubernetes_client(self._get_credentials)
 
+    def get_kubernetes_version(self) -> semver.Version:
+        """Returns the Kubernetes version
+
+        Returns
+        -------
+        semver.Version:
+            Kubernetes version
+        """
+
+        return self.execute_kubernetes_client(self._get_kubernetes_version)
+
     def get_subscription(self, project: str, name: str) -> Any:
         """Returns OpenShift subscription with the given name in the given
         project
@@ -1169,6 +1180,16 @@ class OpenShiftAPIManager:
         assert isinstance(custom_objects_api_result["items"], list)
 
         return custom_objects_api_result["items"]
+
+    def _get_kubernetes_version(self) -> semver.Version:
+        version_api = client.VersionApi()
+        version_info = version_api.get_code()
+
+        assert isinstance(version_info, client.VersionInfo)
+        assert isinstance(version_info.major, str)
+        assert isinstance(version_info.minor, str)
+
+        return semver.Version(int(version_info.major), int(version_info.minor))
 
     def _get_namespaced_custom_resource_if_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> Any:
         custom_objects_api = client.CustomObjectsApi()
