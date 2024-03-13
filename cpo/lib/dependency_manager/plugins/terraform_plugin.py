@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@ import cpo.utils.download
 import cpo.utils.operating_system
 
 from cpo.lib.dependency_manager.dependency_manager_binary_plugin import DependencyManagerBinaryPlugIn
+from cpo.lib.dependency_manager.dependency_manager_plugin import DependencyVersion
 from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.operating_system import OperatingSystem
 
@@ -40,7 +41,7 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
         }
 
     # override
-    def download_dependency_version(self, version: semver.Version):
+    def download_dependency_version(self, dependency_version: DependencyVersion):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name_suffix = self._operating_system_to_file_name_suffix_dict.get(operating_system)
 
@@ -49,11 +50,11 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
                 f"{self.get_dependency_name()} does not support {operating_system.value}"
             )
 
-        file_name = f"terraform_{str(version)}_{file_name_suffix}"
-        url = f"https://releases.hashicorp.com/terraform/{str(version)}/{file_name}"
+        file_name = f"terraform_{str(dependency_version)}_{file_name_suffix}"
+        url = f"https://releases.hashicorp.com/terraform/{str(dependency_version)}/{file_name}"
         archive_path = cpo.utils.download.download_file(urllib.parse.urlsplit(url))
 
-        self._extract_archive(archive_path, version, operating_system)
+        self._extract_archive(archive_path, dependency_version.version, operating_system)
 
     # override
     def get_binary_name(self) -> Optional[str]:
@@ -68,7 +69,7 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
         return "Terraform"
 
     # override
-    def get_latest_dependency_version(self) -> semver.Version:
+    def get_latest_dependency_version(self) -> DependencyVersion:
         latest_version = self._get_latest_dependency_version_on_github("hashicorp", "terraform")
 
         if latest_version is None:

@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import cpo.utils.operating_system
 import cpo.utils.process
 
 from cpo.lib.dependency_manager.dependency_manager_binary_plugin import DependencyManagerBinaryPlugIn
+from cpo.lib.dependency_manager.dependency_manager_plugin import DependencyVersion
 from cpo.utils.error import CloudPakOperationsCLIException, IBMCloudException
 from cpo.utils.operating_system import OperatingSystem
 
@@ -41,7 +42,7 @@ class IBMCloudCLIPlugIn(DependencyManagerBinaryPlugIn):
         }
 
     # override
-    def download_dependency_version(self, version: semver.Version):
+    def download_dependency_version(self, dependency_version: DependencyVersion):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name_suffix = self._operating_system_to_file_name_suffix_dict.get(operating_system)
 
@@ -50,11 +51,11 @@ class IBMCloudCLIPlugIn(DependencyManagerBinaryPlugIn):
                 f"{self.get_dependency_name()} does not support {operating_system.value}"
             )
 
-        file_name = f"IBM_Cloud_CLI_{str(version)}_{file_name_suffix}"
-        url = f"https://download.clis.cloud.ibm.com/ibm-cloud-cli/{str(version)}/binaries/{file_name}"
+        file_name = f"IBM_Cloud_CLI_{str(dependency_version)}_{file_name_suffix}"
+        url = f"https://download.clis.cloud.ibm.com/ibm-cloud-cli/{str(dependency_version)}/binaries/{file_name}"
         archive_path = cpo.utils.download.download_file(urllib.parse.urlsplit(url))
 
-        self._extract_archive(archive_path, version, operating_system)
+        self._extract_archive(archive_path, dependency_version.version, operating_system)
 
     # override
     def execute_binary(
@@ -94,7 +95,7 @@ class IBMCloudCLIPlugIn(DependencyManagerBinaryPlugIn):
         return "IBM Cloud CLI"
 
     # override
-    def get_latest_dependency_version(self) -> semver.Version:
+    def get_latest_dependency_version(self) -> DependencyVersion:
         latest_version = self._get_latest_dependency_version_on_github("IBM-Cloud", "ibm-cloud-cli-release")
 
         if latest_version is None:
