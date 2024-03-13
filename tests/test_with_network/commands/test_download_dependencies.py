@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,6 +14,7 @@
 
 import os
 import pathlib
+import re as regex
 import tempfile
 import unittest
 
@@ -25,8 +26,8 @@ import cpo.config
 import cpo.utils.file
 import cpo.utils.operating_system
 
+from cpo.config.binaries_manager import binaries_manager
 from cpo.cpo import cli
-from cpo.lib.dependency_manager.plugins.ibm_cloud_terraform_provider_plugin import IBMCloudTerraformProviderPlugIn
 
 
 class TestDownloadDependencies(unittest.TestCase):
@@ -39,9 +40,22 @@ class TestDownloadDependencies(unittest.TestCase):
         return executable_name
 
     def check_executable_exists(self, bin_directory_path: pathlib.Path, executable_name: str):
-        self.assertTrue(
-            (pathlib.Path(bin_directory_path) / self.add_os_specific_executable_extension(executable_name)).exists()
+        executable_exists = False
+        executable_extension = (
+            ".exe"
+            if (cpo.utils.operating_system.get_operating_system() == cpo.utils.operating_system.OperatingSystem.WINDOWS)
+            else ""
         )
+
+        pattern = f"{executable_name}-\\d+.\\d+.\\d+{executable_extension}"
+
+        for file in pathlib.Path(bin_directory_path).iterdir():
+            if regex.match(pattern, file.name):
+                executable_exists = True
+
+                break
+
+        self.assertTrue(executable_exists)
 
     @patch(
         "cpo.config.binaries_manager.configuration_manager.get_home_directory_path",
@@ -51,10 +65,12 @@ class TestDownloadDependencies(unittest.TestCase):
         """Tests that cpo adm download-dependencies downloads
         dependencies"""
 
-        bin_directory_path = cpo.config.configuration_manager.get_bin_directory_path()
-        terraform_plugins_directory_path = IBMCloudTerraformProviderPlugIn().get_terraform_plugins_directory_path()
+        if binaries_manager.get_binaries_file_path().exists():
+            os.remove(binaries_manager.get_binaries_file_path())
 
-        for entry in bin_directory_path.glob("*"):
+        bin_directory_path = cpo.config.configuration_manager.get_bin_directory_path()
+
+        for entry in bin_directory_path.iterdir():
             if entry.is_file():
                 os.remove(entry)
 
@@ -62,14 +78,10 @@ class TestDownloadDependencies(unittest.TestCase):
         result = runner.invoke(cli, ["adm", "download-dependencies"])  # type: ignore
 
         self.assertEqual(result.exit_code, 0)
-        self.assertGreaterEqual(
-            len(list(terraform_plugins_directory_path.glob("terraform-provider-ibm*"))),
-            1,
-        )
 
         self.check_executable_exists(bin_directory_path, "ibmcloud")
         self.check_executable_exists(bin_directory_path, "oc")
-        self.check_executable_exists(bin_directory_path, "terraform")
+        self.check_executable_exists(bin_directory_path, "openshift-install")
 
 
 if __name__ == "__main__":
