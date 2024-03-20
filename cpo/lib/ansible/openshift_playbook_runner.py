@@ -60,7 +60,7 @@ class OpenShiftPlaybookRunner(PlaybookRunner):
 
         if runner.status == "failed":
             if self._token_expired:
-                logger.log(logging.DEBUG, "Refreshing OAuth access token …")
+                logger.log(logging.INFO, "Refreshing OAuth access token …")
                 self._openshift_api_manager.refresh_access_token()
                 self.kube_config = self._openshift_api_manager.get_kube_config()
 
@@ -89,7 +89,7 @@ class OpenShiftPlaybookRunner(PlaybookRunner):
         if not unauthorized:
             msg = cpo.lib.jmespath.get_jmespath_string("event_data.res.msg", event_data)
 
-            unauthorized = msg.startswith("Failed to get client due to 401") or (
+            unauthorized = msg.startswith("Exception '401\nReason: Unauthorized") or (
                 (msg == "MODULE FAILURE\nSee stdout/stderr for the exact error")
                 and (
                     "kubernetes.dynamic.exceptions.UnauthorizedError: 401\nReason: Unauthorized"

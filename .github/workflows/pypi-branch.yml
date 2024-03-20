@@ -11,14 +11,14 @@ jobs:
     name: Build Python 🐍 distribution
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         # https://github.com/actions/checkout
         with:
           fetch-depth: 0
           # https://github.com/actions/checkout/issues/299
           ref: ${{ github.event.pull_request.head.sha }}
       - name: Set up Python 3.10
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         # https://github.com/actions/setup-python
         with:
           python-version: "3.10"
@@ -32,7 +32,7 @@ jobs:
         run: >-
           python -m
           build
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         # https://github.com/actions/upload-artifact
         with:
           name: workspace
@@ -48,7 +48,7 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/download-artifact@v3
+      - uses: actions/download-artifact@v4
         # https://github.com/actions/download-artifact
         with:
           name: workspace
