@@ -17,7 +17,7 @@ import logging
 import os
 import pathlib
 
-from typing import Callable, Optional
+from typing import Callable
 
 import click
 
@@ -88,7 +88,7 @@ def execute_command(
 
     logging.debug(f"Executing command: {' '.join(command)}")
 
-    return_code: Optional[int] = None
+    return_code: int | None = None
     stderr_buffer: list[str] = []
     stdout_buffer: list[str] = []
 
@@ -224,7 +224,7 @@ def _process_stdout_output(line: str, buffer: list[str], print_captured_output: 
     buffer.append(line.rstrip())
 
 
-async def _read_stream(stream: Optional[asyncio.StreamReader], callback: Callable[[str], None]):
+async def _read_stream(stream: asyncio.StreamReader | None, callback: Callable[[str], None]):
     if stream is not None:
         while True:
             if len(line := await stream.readline()) != 0:

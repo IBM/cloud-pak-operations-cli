@@ -15,7 +15,7 @@
 import json
 import urllib.parse
 
-from typing import Final, Optional
+from typing import Final
 
 import requests
 
@@ -27,14 +27,14 @@ from cpo.utils.network import ScopedInsecureRequestWarningDisabler
 
 
 class UserCredentials(AbstractCredentials):
-    OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT: Final[
-        str
-    ] = "{authorization_endpoint}?client_id=openshift-challenging-client&response_type=token"
+    OPENSHIFT_OAUTH_AUTHORIZATION_ENDPOINT: Final[str] = (
+        "{authorization_endpoint}?client_id=openshift-challenging-client&response_type=token"
+    )
 
     def __init__(self, server: str, username: str, password: str, insecure_skip_tls_verify: bool):
         super().__init__(server, insecure_skip_tls_verify)
         self._password = password
-        self._token: Optional[str] = None
+        self._token: str | None = None
         self._username = username
 
     # override
@@ -57,7 +57,7 @@ class UserCredentials(AbstractCredentials):
     # override
     def refresh_access_token(self):
         authorization_endpoint = self._get_authorization_endpoint()
-        response: Optional[Response] = None
+        response: Response | None = None
 
         with ScopedInsecureRequestWarningDisabler(self._insecure_skip_tls_verify):
             response = requests.get(
@@ -94,7 +94,7 @@ class UserCredentials(AbstractCredentials):
             OAuth authorization endpoint returned by the OAuth server
         """
 
-        response: Optional[Response] = None
+        response: Response | None = None
 
         with ScopedInsecureRequestWarningDisabler(self._insecure_skip_tls_verify):
             response = requests.get(

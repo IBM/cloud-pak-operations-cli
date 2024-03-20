@@ -17,7 +17,6 @@ import unittest
 import unittest.mock
 
 from types import ModuleType
-from typing import Optional
 from unittest.mock import Mock, patch
 
 import click
@@ -251,7 +250,7 @@ class TestPluginManager(unittest.TestCase):
         self.assertEqual(multi_command_1_commands[1], "bi-group-1")
         self.assertEqual(multi_command_1_commands[2], "group-1")
 
-    def _assert_multi_command(self, command: Optional[click.Command]):
+    def _assert_multi_command(self, command: click.Command | None):
         self.assertIsNotNone(command)
         assert command is not None
         self.assertIsInstance(command, click.MultiCommand)

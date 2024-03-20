@@ -15,7 +15,7 @@
 import logging
 import time
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 import click
 
@@ -74,7 +74,7 @@ class ClickLoggingHandler(logging.Handler):
 
     def __init__(self):
         super().__init__()
-        self._spinner: Optional[Halo] = None
+        self._spinner: Halo | None = None
 
     def emit(self, record: logging.LogRecord):
         """Prints the given log record using click.echo()

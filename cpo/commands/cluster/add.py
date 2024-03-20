@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -33,7 +33,7 @@ from cpo.utils.logging import loglevel_command
     help="Skips checking the server's certificate for validity",
     is_flag=True,
 )
-def add(server: str, alias: Optional[str], username: str, password: str, insecure_skip_tls_verify: Optional[bool]):
+def add(server: str, alias: str | None, username: str, password: str, insecure_skip_tls_verify: bool | None):
     """Register an existing Red Hat OpenShift cluster"""
 
     data: dict[str, Any] = {

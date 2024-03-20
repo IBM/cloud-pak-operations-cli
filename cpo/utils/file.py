@@ -16,7 +16,6 @@ import os
 import pathlib
 
 from enum import Enum
-from typing import Optional
 
 
 class FileType(Enum):
@@ -24,8 +23,8 @@ class FileType(Enum):
     RegularFile = 2
 
 
-def get_relative_path(path: os.PathLike, subpath: pathlib.Path) -> Optional[pathlib.Path]:
-    relative_path: Optional[pathlib.Path] = None
+def get_relative_path(path: os.PathLike, subpath: pathlib.Path) -> pathlib.Path | None:
+    relative_path: pathlib.Path | None = None
 
     try:
         relative_path = subpath.relative_to(path)

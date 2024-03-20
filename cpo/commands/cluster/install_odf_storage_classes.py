@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional
-
 import click
 
 import cpo.config.cluster_credentials_manager
@@ -35,12 +33,12 @@ from cpo.utils.logging import loglevel_command
 @click.pass_context
 def install_odf_storage_classes(
     ctx: click.Context,
-    server: Optional[str],
-    username: Optional[str],
-    password: Optional[str],
-    token: Optional[str],
-    insecure_skip_tls_verify: Optional[bool],
-    use_cluster: Optional[str],
+    server: str | None,
+    username: str | None,
+    password: str | None,
+    token: str | None,
+    insecure_skip_tls_verify: bool | None,
+    use_cluster: str | None,
 ):
     """Install Red Hat OpenShift Data Foundation (ODF) storage classes"""
 

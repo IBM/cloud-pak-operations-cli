@@ -16,7 +16,6 @@ import logging
 import pathlib
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 import asyncssh
 import click
@@ -50,7 +49,7 @@ class RemoteClient:
             name of the remote host to which an SSH connection shall be established
         """
 
-        self._connection: Optional[asyncssh.SSHClientConnection] = None
+        self._connection: asyncssh.SSHClientConnection | None = None
         self._hostname = hostname
 
     async def __aenter__(self):
@@ -153,7 +152,7 @@ def create_remote_client_ssh_session(print_output: bool) -> type[asyncssh.SSHCli
         """
 
         def __init__(self):
-            self._channel: Optional[asyncssh.SSHClientChannel] = None
+            self._channel: asyncssh.SSHClientChannel | None = None
             self._received_data = ""
 
         # override

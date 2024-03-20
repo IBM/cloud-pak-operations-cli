@@ -16,7 +16,7 @@ import base64
 import json
 import re as regex
 
-from typing import Any, Optional
+from typing import Any
 
 import click
 import jmespath
@@ -118,7 +118,7 @@ class GlobalPullSecretData:
             auth_list.sort(key=lambda auth_list_element: auth_list_element[0])
             click.echo(tabulate(auth_list, headers=["registry location", "username", "password"]))
 
-    def get_credentials(self, registry_location: str) -> Optional[Credentials]:
+    def get_credentials(self, registry_location: str) -> Credentials | None:
         """Returns credentials for the given registry location
 
         Parameters

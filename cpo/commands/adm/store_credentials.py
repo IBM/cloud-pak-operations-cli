@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional
-
 import click
 
 import cpo.config
@@ -29,9 +27,9 @@ from cpo.utils.logging import loglevel_command
     help="IBM Cloud Pak for Data entitlement key (see https://myibm.ibm.com/products-services/containerlibrary)",
 )
 def store_credentials(
-    artifactory_password: Optional[str],
-    artifactory_username: Optional[str],
-    ibm_cloud_pak_for_data_entitlement_key: Optional[str],
+    artifactory_password: str | None,
+    artifactory_username: str | None,
+    ibm_cloud_pak_for_data_entitlement_key: str | None,
 ):
     """Store credentials in a configuration file"""
 

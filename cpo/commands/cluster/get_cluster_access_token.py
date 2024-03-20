@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional
-
 import click
 
 import cpo.config.cluster_credentials_manager
@@ -33,9 +31,9 @@ from cpo.utils.logging import loglevel_command
 @click.pass_context
 def get_cluster_access_token(
     ctx: click.Context,
-    server: Optional[str],
-    username: Optional[str],
-    password: Optional[str],
+    server: str | None,
+    username: str | None,
+    password: str | None,
     print_login_command: bool,
 ):
     """Obtain an OAuth access token for an OpenShift cluster"""

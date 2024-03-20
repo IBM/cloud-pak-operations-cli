@@ -15,12 +15,11 @@
 import pathlib
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
 class PackageElementDescriptor:
-    command_hierarchy_path: Optional[str]
+    command_hierarchy_path: str | None
     distribution_package_name: str
     name: str
     path: pathlib.Path
@@ -32,7 +31,7 @@ class PackageData:
 
     @staticmethod
     def get_package_data(
-        distribution_package_name: str, command_hierarchy_path: Optional[str], package_path: pathlib.Path
+        distribution_package_name: str, command_hierarchy_path: str | None, package_path: pathlib.Path
     ) -> "PackageData":
         """Creates an object describing modules and subpackages within the
         package with the given path

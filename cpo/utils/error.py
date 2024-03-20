@@ -14,13 +14,11 @@
 
 import re as regex
 
-from typing import Optional
-
 import colorama
 
 
 class CloudPakOperationsCLIException(Exception):
-    def __init__(self, error_message: str, stderr: Optional[str] = None, stdout: Optional[str] = None):
+    def __init__(self, error_message: str, stderr: str | None = None, stdout: str | None = None):
         super().__init__(error_message)
         self._error_message = error_message[7:] if error_message.startswith("Error: ") else error_message
         self._stderr = stderr
@@ -48,11 +46,11 @@ class CloudPakOperationsCLIException(Exception):
         return self._error_message
 
     @property
-    def stderr(self) -> Optional[str]:
+    def stderr(self) -> str | None:
         return self._stderr
 
     @property
-    def stdout(self) -> Optional[str]:
+    def stdout(self) -> str | None:
         return self._stdout
 
     def _get_highlighted_str(self, str: str) -> str:
@@ -88,7 +86,7 @@ class IBMCloudException(CloudPakOperationsCLIException):
 
         return output
 
-    def __init__(self, error_message, stderr: Optional[str] = None, stdout: Optional[str] = None):
+    def __init__(self, error_message, stderr: str | None = None, stdout: str | None = None):
         super().__init__(error_message, stderr, stdout)
 
 

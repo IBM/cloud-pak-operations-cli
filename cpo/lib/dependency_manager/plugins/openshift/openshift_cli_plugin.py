@@ -12,15 +12,13 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional
-
 from cpo.lib.dependency_manager.plugins.openshift.openshift_plugin import AbstractOpenShiftPlugIn
 from cpo.utils.operating_system import OperatingSystem
 
 
 class OpenShiftCLIPlugIn(AbstractOpenShiftPlugIn):
     # override
-    def get_binary_name(self) -> Optional[str]:
+    def get_binary_name(self) -> str | None:
         return "oc"
 
     # override

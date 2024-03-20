@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional
-
 import click
 
 import cpo.config.cluster_credentials_manager
@@ -25,7 +23,7 @@ from cpo.utils.logging import loglevel_command
 @click.option(
     "--print-alias", help="Print the alias used to reference a cluster instead of its server URL", is_flag=True
 )
-def current(print_alias: Optional[bool]):
+def current(print_alias: bool | None):
     """Get the current registered OpenShift cluster"""
 
     current_cluster = cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()

@@ -15,7 +15,7 @@
 import os
 import pathlib
 
-from typing import Optional, TypeVar
+from typing import TypeVar
 
 import semver
 
@@ -144,7 +144,7 @@ class DependencyManager:
             requested)
         """
 
-        dependency_version: Optional[DependencyVersion] = None
+        dependency_version: DependencyVersion | None = None
 
         if isinstance(version, semver.Version):
             dependency_version = DependencyVersion(version)
@@ -204,7 +204,7 @@ class DependencyManager:
 
         Returns
         -------
-        Optional[pathlib.Path]
+        pathlib.Path | None
             path of the binary provided by the dependency corresponding to the
             dependency manager plug-in of the given type or None if the dependency
             does not provide a binary
@@ -267,4 +267,4 @@ class DependencyManager:
 
         return dependency_version
 
-    _instance: Optional["DependencyManager"] = None
+    _instance: "DependencyManager | None" = None

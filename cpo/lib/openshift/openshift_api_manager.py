@@ -14,7 +14,7 @@
 
 import logging
 
-from typing import Any, Callable, Optional
+from typing import Any, Callable
 
 import semver
 import urllib3.exceptions
@@ -562,7 +562,7 @@ class OpenShiftAPIManager:
 
     def get_namespaced_custom_resource_if_exists(
         self, project: str, name: str, kind_metadata: KindMetadata
-    ) -> Optional[Any]:
+    ) -> Any | None:
         """Returns custom resource
 
         Parameters
@@ -576,7 +576,7 @@ class OpenShiftAPIManager:
 
         Returns
         -------
-        Optional[Any]
+        Any | None
             custom resource or None if it does not exist
         """
 
@@ -889,7 +889,7 @@ class OpenShiftAPIManager:
         project: str,
         kind_metadata: KindMetadata,
         log_callback: Callable[[str], None],
-        success_callback: Callable[..., Optional[CustomResourceEventResult]],
+        success_callback: Callable[..., CustomResourceEventResult | None],
         **kwargs,
     ) -> CustomResourceEventResult:
         """Waits for a specific custom resource of the given kind to be created in
@@ -1193,7 +1193,7 @@ class OpenShiftAPIManager:
 
     def _get_namespaced_custom_resource_if_exists(self, project: str, name: str, kind_metadata: KindMetadata) -> Any:
         custom_objects_api = client.CustomObjectsApi()
-        custom_resource: Optional[Any] = None
+        custom_resource: Any | None = None
 
         try:
             custom_resource = custom_objects_api.get_namespaced_custom_object(
@@ -1360,7 +1360,7 @@ class OpenShiftAPIManager:
 
         while not succeeded:
             try:
-                resource_version: Optional[str] = None
+                resource_version: str | None = None
                 w = watch.Watch()
 
                 for event in w.stream(
@@ -1386,15 +1386,15 @@ class OpenShiftAPIManager:
         project: str,
         kind_metadata: KindMetadata,
         log_callback: Callable[[str], None],
-        success_callback: Callable[..., Optional[CustomResourceEventResult]],
+        success_callback: Callable[..., CustomResourceEventResult | None],
         **kwargs,
     ) -> CustomResourceEventResult:
         custom_objects_api = client.CustomObjectsApi()
-        custom_resource_event_result: Optional[CustomResourceEventResult] = None
+        custom_resource_event_result: CustomResourceEventResult | None = None
 
         while custom_resource_event_result is None:
             try:
-                resource_version: Optional[str] = None
+                resource_version: str | None = None
                 w = watch.Watch()
 
                 for event in w.stream(

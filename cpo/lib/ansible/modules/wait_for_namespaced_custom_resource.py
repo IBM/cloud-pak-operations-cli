@@ -13,7 +13,7 @@
 #  limitations under the License.
 
 from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -71,7 +71,7 @@ class WaitForNamespacedCustomResourceModule(AbstractModule):
         super().__init__(self._module.params["kubeconfig"])  # type: ignore
 
         self._custom_resource_name: str = self._module.params["custom_resource_name"]  # type: ignore
-        self._jmespath_expression: Optional[str] = self._module.params["jmespath_expression"]  # type: ignore
+        self._jmespath_expression: str | None = self._module.params["jmespath_expression"]  # type: ignore
         self._kind_metadata = KindMetadata(
             self._module.params["group"],  # type: ignore
             self._module.params["kind"],  # type: ignore
@@ -87,7 +87,7 @@ class WaitForNamespacedCustomResourceModule(AbstractModule):
 
     # override
     def run(self):
-        result: Optional[dict]
+        result: dict | None = None
 
         try:
             self._wait_for_namespaced_custom_resource(
@@ -107,8 +107,8 @@ class WaitForNamespacedCustomResourceModule(AbstractModule):
 
     def _success_callback(
         self, event: Any, kind_metadata: KindMetadata, custom_resource_event_data: CustomResourceEventData
-    ) -> Optional[CustomResourceEventResult]:
-        custom_resource_event_result: Optional[CustomResourceEventResult] = None
+    ) -> CustomResourceEventResult | None:
+        custom_resource_event_result: CustomResourceEventResult | None = None
 
         if (event["type"] == "ADDED") or (event["type"] == "MODIFIED"):
             resource_name = cpo.lib.jmespath.get_jmespath_string("object.metadata.name", event)

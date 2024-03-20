@@ -12,7 +12,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Any, Optional
+from typing import Any
 
 import click
 
@@ -24,7 +24,7 @@ class CloudPakForDataServiceSpecParamType(click.ParamType):
     name = "VALUE"
 
     # override
-    def convert(self, value: Any, param: Optional[click.Parameter], ctx: Optional[click.Context]) -> Any:
+    def convert(self, value: Any, param: click.Parameter | None, ctx: click.Context | None) -> Any:
         try:
             return click.BOOL.convert(value, param, ctx)
         except click.BadParameter:

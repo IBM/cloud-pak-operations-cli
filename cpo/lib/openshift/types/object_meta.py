@@ -12,11 +12,11 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional, TypedDict
+from typing import TypedDict
 
 
 class ObjectMetaOptional(TypedDict, total=False):
-    creationTimestamp: Optional[str]
+    creationTimestamp: str | None
     labels: dict[str, str]
     namespace: str
 

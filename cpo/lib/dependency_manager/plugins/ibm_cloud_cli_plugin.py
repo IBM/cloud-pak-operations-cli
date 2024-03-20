@@ -16,8 +16,6 @@ import os
 import pathlib
 import urllib.parse
 
-from typing import Optional
-
 import semver
 
 import cpo.config
@@ -83,7 +81,7 @@ class IBMCloudCLIPlugIn(DependencyManagerBinaryPlugIn):
                 raise
 
     # override
-    def get_binary_name(self) -> Optional[str]:
+    def get_binary_name(self) -> str | None:
         return "ibmcloud"
 
     # override

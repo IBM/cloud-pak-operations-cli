@@ -15,8 +15,6 @@
 import json
 import pathlib
 
-from typing import Optional
-
 import semver
 
 from cpo.config import configuration_manager
@@ -29,18 +27,18 @@ class BinariesManager:
     """Manages downloaded binaries"""
 
     def __init__(self):
-        self._binaries_file_contents: Optional[dict[str, str]] = None
+        self._binaries_file_contents: dict[str, str] | None = None
 
-    def get_binaries_file_contents(self) -> Optional[BinariesFileContents]:
+    def get_binaries_file_contents(self) -> BinariesFileContents | None:
         """Returns the contents of the binaries file
 
         Returns
         -------
-        Optional[BinariesFileContents]
+        BinariesFileContents | None
             contents of the binaries file or None if it does not exist
         """
 
-        binaries_file_contents: Optional[BinariesFileContents] = None
+        binaries_file_contents: BinariesFileContents | None = None
         binaries_file_path = self.get_binaries_file_path()
 
         if binaries_file_path.exists():
@@ -58,7 +56,7 @@ class BinariesManager:
             contents of the binaries file or a default value if it does not exist
         """
 
-        binaries_file_contents: Optional[BinariesFileContents] = self.get_binaries_file_contents()
+        binaries_file_contents = self.get_binaries_file_contents()
 
         if binaries_file_contents is None:
             binaries_file_contents = {}
@@ -76,7 +74,7 @@ class BinariesManager:
 
         return configuration_manager.get_cli_data_directory_path() / "binaries.json"
 
-    def get_latest_downloaded_binary_version(self, binary_alias: str) -> Optional[DependencyVersion]:
+    def get_latest_downloaded_binary_version(self, binary_alias: str) -> DependencyVersion | None:
         binaries = self._get_binary_versions()
 
         return DependencyVersion(semver.Version.parse(binaries[binary_alias])) if binary_alias in binaries else None
