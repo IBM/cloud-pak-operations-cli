@@ -15,7 +15,7 @@
 import logging
 
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 from ansible.module_utils.basic import AnsibleModule
 
@@ -59,7 +59,7 @@ class WaitForCustomResourceDefinitionsModule(AbstractModule):
 
     # override
     def run(self):
-        result: Optional[dict]
+        result: dict | None = None
 
         try:
             self._wait_for_custom_resource(
@@ -90,7 +90,7 @@ class WaitForCustomResourceDefinitionsModule(AbstractModule):
         event: Any,
         kind_metadata: KindMetadata,
         custom_resource_definitions_event_data: CustomResourceDefinitionsEventData,
-    ) -> Optional[CustomResourceEventResult]:
+    ) -> CustomResourceEventResult | None:
         """Callback for checking whether the given set of expected custom
         resource definitions was created
 
@@ -112,7 +112,7 @@ class WaitForCustomResourceDefinitionsModule(AbstractModule):
             created
         """
 
-        custom_resource_event_result: Optional[CustomResourceEventResult] = None
+        custom_resource_event_result: CustomResourceEventResult | None = None
 
         if event["type"] == "ADDED":
             encountered_crd_kind = cpo.lib.jmespath.get_jmespath_string("object.spec.names.kind", event)

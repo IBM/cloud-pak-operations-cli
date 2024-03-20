@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional
-
 import click
 
 import cpo.config.cluster_credentials_manager
@@ -28,7 +26,7 @@ from cpo.utils.logging import loglevel_command
 @click.option(
     "--cluster-name", help="Name of the Red Hat OpenShift on IBM Cloud cluster to be registered", required=True
 )
-def add(alias: Optional[str], cluster_name: str):
+def add(alias: str | None, cluster_name: str):
     """Register an existing Red Hat OpenShift on IBM Cloud cluster"""
 
     server = IBMCloudAPIManager().get_cluster_status(cluster_name).get_server_url()

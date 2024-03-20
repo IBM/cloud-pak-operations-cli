@@ -17,7 +17,6 @@ import re as regex
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from typing import Optional
 
 import requests
 import semver
@@ -136,7 +135,7 @@ class AbstractDependencyManagerPlugIn(ABC):
     def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:
         pass
 
-    def _get_latest_dependency_version_on_github(self, owner: str, repo: str) -> Optional[DependencyVersion]:
+    def _get_latest_dependency_version_on_github(self, owner: str, repo: str) -> DependencyVersion | None:
         """Returns the latest version of the dependency on GitHub
 
         This method parses the "name" key of the JSON document returned by the
@@ -186,7 +185,7 @@ class AbstractDependencyManagerPlugIn(ABC):
 
         Returns
         -------
-        Optional[DependencyVersion]
+        DependencyVersion | None
             latest version of the dependency or None if no release was found
         """
 
@@ -194,7 +193,7 @@ class AbstractDependencyManagerPlugIn(ABC):
         response.raise_for_status()
 
         response_json = json.loads(response.content)
-        result: Optional[DependencyVersion] = None
+        result: DependencyVersion | None = None
 
         if len(response_json) != 0:
             result = AbstractDependencyManagerPlugIn.parse_as_semantic_version(response_json[0]["name"])

@@ -19,7 +19,7 @@ import re as regex
 import subprocess
 
 from dataclasses import dataclass
-from typing import Any, Final, Optional
+from typing import Any, Final
 
 import cpo.utils.process
 
@@ -388,7 +388,7 @@ class IBMCloudAPIManager:
         if login_command_return_code != 0:
             raise CloudPakOperationsCLIException("Interactive login to IBM Cloud failed.")
 
-    def log_in_using_api_key(self, api_key: Optional[str] = None):
+    def log_in_using_api_key(self, api_key: str | None = None):
         """Log in to IBM Cloud using the given IBM Cloud API key
 
         Parameters
@@ -509,18 +509,18 @@ class IBMCloudAPIManager:
             print_captured_output=print_captured_output,
         )
 
-    def _read_ibmcloud_config_file_contents(self) -> Optional[Any]:
+    def _read_ibmcloud_config_file_contents(self) -> Any | None:
         """Returns the contents of the credentials file
 
         Returns
         -------
-            Optional[str]
+            str | None
                 contents of the credentials file or None if the credentials file does
                 not exist or is empty
         """
 
         ibmcloud_config_file_path = configuration_manager.get_ibmcloud_data_directory_path() / "config.json"
-        result: Optional[str] = None
+        result: str | None = None
 
         if ibmcloud_config_file_path.exists() and (ibmcloud_config_file_path.stat().st_size != 0):
             with open(ibmcloud_config_file_path) as json_file:
@@ -528,9 +528,9 @@ class IBMCloudAPIManager:
 
         return result
 
-    _IBMCLOUD_CLI_ERROR_OAUTH_TOKEN_EXPIRED_ERROR_MESSAGE: Final[
-        str
-    ] = "FAILED\nClassic: Login token is expired. Please update tokens using 'ibmcloud login' and try again.*"
+    _IBMCLOUD_CLI_ERROR_OAUTH_TOKEN_EXPIRED_ERROR_MESSAGE: Final[str] = (
+        "FAILED\nClassic: Login token is expired. Please update tokens using 'ibmcloud login' and try again.*"
+    )
 
 
 class PlugInManager:

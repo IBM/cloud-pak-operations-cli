@@ -15,7 +15,7 @@
 import json
 import pathlib
 
-from typing import Any, Optional
+from typing import Any
 
 import cpo
 
@@ -139,7 +139,7 @@ class ConfigurationManager:
 
         return pathlib.Path(cpo.__file__).parent
 
-    def get_value_from_credentials_file(self, key: str) -> Optional[str]:
+    def get_value_from_credentials_file(self, key: str) -> str | None:
         """Returns the value corresponding to the given key stored in the
         credentials file
 
@@ -150,30 +150,30 @@ class ConfigurationManager:
 
         Returns
         -------
-            Optional[str]
+            str | None
                 value corresponding to the given key or None if the key does not exist
         """
 
         credentials_file_contents = self.read_credentials_file_contents()
-        result: Optional[str] = None
+        result: str | None = None
 
         if (credentials_file_contents is not None) and (key in credentials_file_contents):
             result = credentials_file_contents[key]
 
         return result
 
-    def read_credentials_file_contents(self) -> Optional[Any]:
+    def read_credentials_file_contents(self) -> Any | None:
         """Returns the contents of the credentials file
 
         Returns
         -------
-            Optional[str]
+            str | None
                 contents of the credentials file or none of the credentials file does
                 not exist or is empty
         """
 
         credentials_file_path = self.get_credentials_file_path()
-        result: Optional[str] = None
+        result: str | None = None
 
         if credentials_file_path.exists() and (credentials_file_path.stat().st_size != 0):
             with open(credentials_file_path) as json_file:
@@ -229,7 +229,7 @@ class ConfigurationManager:
         if all(value is None for value in credentials_to_be_stored.values()):
             return
 
-        credentials: Optional[dict[Any, Any]] = None
+        credentials: dict[Any, Any] | None = None
         credentials_file_path = self.get_credentials_file_path()
 
         if credentials_file_path.exists():

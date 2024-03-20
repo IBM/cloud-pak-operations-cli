@@ -15,7 +15,7 @@
 import json
 import pathlib
 
-from typing import Any, Optional
+from typing import Any
 
 import click
 import semver
@@ -77,11 +77,11 @@ def get_cluster_credentials(ctx: click.Context, options: dict[str, Any]) -> Abst
         cluster credentials
     """
 
-    insecure_skip_tls_verify: Optional[bool] = (
+    insecure_skip_tls_verify: bool | None = (
         options["insecure_skip_tls_verify"] if "insecure_skip_tls_verify" in options else None
     )
 
-    result: Optional[AbstractCredentials] = None
+    result: AbstractCredentials | None = None
 
     if (
         ("server" in options)
@@ -130,7 +130,7 @@ def get_cluster_credentials(ctx: click.Context, options: dict[str, Any]) -> Abst
 
 
 def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, Any]) -> str:
-    result: Optional[str] = None
+    result: str | None = None
 
     if (
         ("server" in options)

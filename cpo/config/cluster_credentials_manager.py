@@ -15,7 +15,7 @@
 import json
 import pathlib
 
-from typing import Any, Optional, TypedDict
+from typing import Any, TypedDict
 
 from filelock import FileLock
 from tabulate import tabulate
@@ -40,7 +40,7 @@ class ClusterCredentialsManager:
     """Manages registered OpenShift clusters"""
 
     def __init__(self):
-        self._current_credentials: Optional[ContextData] = None
+        self._current_credentials: ContextData | None = None
 
     @file_lock
     def add_cluster(self, alias: str, server: str, type: str, cluster_data: ClusterData):
@@ -139,7 +139,7 @@ class ClusterCredentialsManager:
         return cluster
 
     @file_lock
-    def get_cluster(self, alias_or_server) -> Optional[AbstractCluster]:
+    def get_cluster(self, alias_or_server) -> AbstractCluster | None:
         """Returns metadata of the registered OpenShift cluster with the given
         alias or server URL
 
@@ -151,7 +151,7 @@ class ClusterCredentialsManager:
 
         Returns
         -------
-        Optional[AbstractCluster]
+        AbstractCluster | None
             metadata of the registered OpenShift cluster with the given alias or
             server URL or None if no cluster was found
         """
@@ -162,7 +162,7 @@ class ClusterCredentialsManager:
 
     def get_cluster_from_clusters_file_contents(
         self, clusters_file_contents: ClustersFileContents, alias_or_server
-    ) -> Optional[AbstractCluster]:
+    ) -> AbstractCluster | None:
         """Returns metadata of the registered OpenShift cluster with the given
         alias or server URL
 
@@ -176,12 +176,12 @@ class ClusterCredentialsManager:
 
         Returns
         -------
-        Optional[AbstractCluster]
+        AbstractCluster | None
             metadata of the registered OpenShift cluster with the given alias or
             server URL or None if no cluster was found
         """
 
-        result: Optional[AbstractCluster] = None
+        result: AbstractCluster | None = None
 
         for server, cluster_data in clusters_file_contents["clusters"].items():
             if (server == alias_or_server) or (
@@ -246,16 +246,16 @@ class ClusterCredentialsManager:
         return result
 
     @file_lock
-    def get_clusters_file_contents(self) -> Optional[ClustersFileContents]:
+    def get_clusters_file_contents(self) -> ClustersFileContents | None:
         """Returns the contents of the clusters file
 
         Returns
         -------
-        Optional[ClustersFileContents]
+        ClustersFileContents | None
             contents of the clusters file or None if it does not exist
         """
 
-        clusters_file_contents: Optional[ClustersFileContents] = None
+        clusters_file_contents: ClustersFileContents | None = None
         clusters_file_path = self.get_clusters_file_path()
 
         if clusters_file_path.exists():
@@ -274,10 +274,10 @@ class ClusterCredentialsManager:
             contents of the clusters file or a default value if it does not exist
         """
 
-        clusters_file_contents: Optional[ClustersFileContents] = self.get_clusters_file_contents()
+        clusters_file_contents = self.get_clusters_file_contents()
 
         if clusters_file_contents is None:
-            clusters_file_contents = {"clusters": {}, "current_cluster": ""}
+            clusters_file_contents = ClustersFileContents(clusters={}, current_cluster="")
         elif "clusters" not in clusters_file_contents:
             # TODO: check JSON schema
             raise CloudPakOperationsCLIException("Corrupt configuration file")
@@ -296,17 +296,17 @@ class ClusterCredentialsManager:
         return configuration_manager.get_cli_data_directory_path() / "clusters.json"
 
     @file_lock
-    def get_current_cluster(self) -> Optional[AbstractCluster]:
+    def get_current_cluster(self) -> AbstractCluster | None:
         """Returns metadata of the current registered OpenShift cluster
 
         Returns
         -------
-        Optional[AbstractCluster]
+        AbstractCluster | None
             metadata of the current registered OpenShift cluster or None if no
             current cluster is set
         """
 
-        cluster: Optional[AbstractCluster] = None
+        cluster: AbstractCluster | None = None
         clusters_file_contents = self.get_clusters_file_contents_with_default()
         server_of_current_cluster = clusters_file_contents["current_cluster"]
 

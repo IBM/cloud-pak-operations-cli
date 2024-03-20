@@ -17,7 +17,6 @@ import pathlib
 
 from importlib.metadata import entry_points
 from types import ModuleType
-from typing import Optional
 
 from cpo.lib.plugin_manager.package_data import PackageData
 from cpo.utils.error import CloudPakOperationsCLIException
@@ -66,7 +65,7 @@ class PluginManager:
     """
 
     def __init__(self):
-        self._package_data_dict: Optional[dict[str, PackageData]] = None
+        self._package_data_dict: dict[str, PackageData] | None = None
 
     def reload(self):
         """Reloads CLI plug-ins"""

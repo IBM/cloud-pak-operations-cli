@@ -21,7 +21,7 @@ import tempfile
 from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 from io import TextIOWrapper
-from typing import Final, Optional
+from typing import Final
 
 import click
 
@@ -44,7 +44,7 @@ class CopyrightYearRange:
     copyright header"""
 
     year_of_creation: int
-    year_of_last_modification: Optional[int]
+    year_of_last_modification: int | None
 
     def requires_modification(self, commit_year_range: CommitYearRange) -> bool:
         """Returns whether the stored years of creation and last modification
@@ -79,7 +79,7 @@ class CopyrightYearRange:
 
 @dataclass
 class CopyrightYearExtractionResult:
-    copyright_year_range: Optional[CopyrightYearRange]
+    copyright_year_range: CopyrightYearRange | None
     input_file_lines: list[str]
 
 
@@ -154,7 +154,7 @@ class CopyrightHeaderManager:
         if regex_result is None:
             return CopyrightYearExtractionResult(None, input_file_lines)
 
-        result: Optional[CopyrightYearExtractionResult] = None
+        result: CopyrightYearExtractionResult | None = None
 
         for copyright_header_line in CopyrightHeaderManager._COPYRIGHT_HEADER_REMAINING_LINES:
             input_file_line = input_file.readline()
@@ -188,7 +188,7 @@ class CopyrightHeaderManager:
     def _get_commit_date(self, commit: Commit) -> datetime:
         return datetime.fromtimestamp(commit.commit_time, tz=timezone(timedelta(seconds=commit.commit_timezone)))
 
-    def _get_commit_year_range(self, binary_file_name: bytes) -> Optional[CommitYearRange]:
+    def _get_commit_year_range(self, binary_file_name: bytes) -> CommitYearRange | None:
         """Returns the years of the first and last commit
 
         Parameters
@@ -198,13 +198,13 @@ class CopyrightHeaderManager:
 
         Returns
         -------
-        Optional[CommitYearRange]
+        CommitYearRange | None
             years of the first and last commit or None if the file has no commits
         """
 
         iterable = self._repo.get_walker(paths=[binary_file_name]).__iter__()
         first_walk_entry = last_walk_entry = next(iterable, None)
-        result: Optional[CommitYearRange] = None
+        result: CommitYearRange | None = None
 
         if first_walk_entry is not None and last_walk_entry is not None:
             for last_walk_entry in iterable:

@@ -20,7 +20,7 @@ import pathlib
 
 from dataclasses import dataclass, field
 from types import ModuleType
-from typing import Optional, cast
+from typing import cast
 
 import click
 
@@ -79,7 +79,7 @@ class LazyLoadingMultiCommand(click.Group):
 
         assert package.__file__ is not None
 
-        self._command_data: Optional[CommandData] = None
+        self._command_data: CommandData | None = None
         self._package_directories = SortedSet(
             [PackageDirectoryDetails(distribution_package_name, pathlib.Path(package.__file__).parent)]
         )
@@ -92,10 +92,10 @@ class LazyLoadingMultiCommand(click.Group):
         )
 
     # override
-    def get_command(self, ctx: click.Context, cmd_name: str) -> Optional[click.Command]:
+    def get_command(self, ctx: click.Context, cmd_name: str) -> click.Command | None:
         self._initialize_command_data_if_required()
 
-        command: Optional[click.Command] = None
+        command: click.Command | None = None
 
         if self._command_data is not None:
             command = self._command_data.commands[cmd_name].command if cmd_name in self._command_data.commands else None
@@ -109,8 +109,8 @@ class LazyLoadingMultiCommand(click.Group):
         return self._command_data.command_names if self._command_data is not None else []
 
     def _append_distribution_package_name_to_help_text(
-        self, help_text: Optional[str], distribution_package_name: str
-    ) -> Optional[str]:
+        self, help_text: str | None, distribution_package_name: str
+    ) -> str | None:
         suffix = f"[{distribution_package_name}]"
 
         return suffix if (help_text is None) or (help_text == "") else f"{help_text} {suffix}"
@@ -207,10 +207,13 @@ class LazyLoadingMultiCommand(click.Group):
                             LazyLoadingMultiCommand(
                                 package_element_descriptor.distribution_package_name,
                                 package,
-                                help=package.__doc__
-                                if package_element_descriptor.distribution_package_name == cpo.distribution_package_name
-                                else self._append_distribution_package_name_to_help_text(
-                                    package.__doc__, package_element_descriptor.distribution_package_name
+                                help=(
+                                    package.__doc__
+                                    if package_element_descriptor.distribution_package_name
+                                    == cpo.distribution_package_name
+                                    else self._append_distribution_package_name_to_help_text(
+                                        package.__doc__, package_element_descriptor.distribution_package_name
+                                    )
                                 ),
                                 name=None,
                             ),

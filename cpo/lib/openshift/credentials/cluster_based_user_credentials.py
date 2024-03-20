@@ -12,22 +12,22 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional
-
 from cpo.config.cluster_credentials_manager import cluster_credentials_manager
 from cpo.lib.cluster.cluster import AbstractCluster
 from cpo.lib.openshift.credentials.user_credentials import UserCredentials
 
 
 class ClusterBasedUserCredentials(UserCredentials):
-    def __init__(self, cluster: AbstractCluster, insecure_skip_tls_verify: Optional[bool] = None):
+    def __init__(self, cluster: AbstractCluster, insecure_skip_tls_verify: bool | None = None):
         super().__init__(
             cluster.get_server(),
             cluster.get_username(),
             cluster.get_password(),
-            insecure_skip_tls_verify
-            if insecure_skip_tls_verify is not None
-            else self._get_insecure_skip_tls_verify_from_cluster_data(cluster),
+            (
+                insecure_skip_tls_verify
+                if insecure_skip_tls_verify is not None
+                else self._get_insecure_skip_tls_verify_from_cluster_data(cluster)
+            ),
         )
 
         self._cluster = cluster

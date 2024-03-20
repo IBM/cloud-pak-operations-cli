@@ -14,7 +14,7 @@
 
 import logging
 
-from typing import Any, Optional
+from typing import Any
 
 import jmespath
 
@@ -44,7 +44,7 @@ class OpenShiftPlaybookRunner(PlaybookRunner):
 
         self._openshift_api_manager = OpenShiftAPIManager(credentials)
         self._token_expired = False
-        self.kube_config: Optional[dict[str, Any]] = None
+        self.kube_config: dict[str, Any] | None = None
 
     # override
     def run_playbook(self):

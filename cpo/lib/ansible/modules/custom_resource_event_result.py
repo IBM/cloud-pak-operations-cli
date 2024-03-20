@@ -13,10 +13,9 @@
 #  limitations under the License.
 
 from dataclasses import dataclass
-from typing import Optional
 
 
 @dataclass
 class CustomResourceEventResult:
     succeeded: bool
-    message: Optional[str] = None
+    message: str | None = None

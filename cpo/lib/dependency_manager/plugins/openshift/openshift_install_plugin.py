@@ -16,8 +16,6 @@ import io
 import re as regex
 import urllib.parse
 
-from typing import Optional
-
 import semver
 
 import cpo.utils.download
@@ -30,7 +28,7 @@ from cpo.utils.operating_system import OperatingSystem
 
 class OpenShiftInstallPlugIn(AbstractOpenShiftPlugIn):
     # override
-    def get_binary_name(self) -> Optional[str]:
+    def get_binary_name(self) -> str | None:
         return "openshift-install"
 
     # override

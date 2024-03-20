@@ -12,8 +12,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-from typing import Optional
-
 import click
 
 import cpo.config.cluster_credentials_manager
@@ -34,10 +32,10 @@ from cpo.utils.logging import loglevel_command
 )
 def edit(
     alias_or_server: str,
-    alias: Optional[str],
-    username: Optional[str],
-    password: Optional[str],
-    insecure_skip_tls_verify: Optional[bool],
+    alias: str | None,
+    username: str | None,
+    password: str | None,
+    insecure_skip_tls_verify: bool | None,
 ):
     """Edit metadata of a registered OpenShift cluster"""
 

@@ -15,7 +15,7 @@
 import logging
 
 from abc import ABC, abstractmethod
-from typing import Callable, Optional
+from typing import Callable
 
 import urllib3.exceptions
 
@@ -87,15 +87,15 @@ class AbstractModule(ABC):
         self,
         kind_metadata: KindMetadata,
         log_callback: Callable[[int, str], None],
-        success_callback: Callable[..., Optional[CustomResourceEventResult]],
+        success_callback: Callable[..., CustomResourceEventResult | None],
         **kwargs,
     ) -> CustomResourceEventResult:
         custom_objects_api = client.CustomObjectsApi()
-        custom_resource_event_result: Optional[CustomResourceEventResult] = None
+        custom_resource_event_result: CustomResourceEventResult | None = None
 
         while custom_resource_event_result is None:
             try:
-                resource_version: Optional[str] = None
+                resource_version: str | None = None
                 w = watch.Watch()
 
                 for event in w.stream(
@@ -123,15 +123,15 @@ class AbstractModule(ABC):
         project: str,
         kind_metadata: KindMetadata,
         log_callback: Callable[[int, str], None],
-        success_callback: Callable[..., Optional[CustomResourceEventResult]],
+        success_callback: Callable[..., CustomResourceEventResult | None],
         **kwargs,
     ) -> CustomResourceEventResult:
         custom_objects_api = client.CustomObjectsApi()
-        custom_resource_event_result: Optional[CustomResourceEventResult] = None
+        custom_resource_event_result: CustomResourceEventResult | None = None
 
         while custom_resource_event_result is None:
             try:
-                resource_version: Optional[str] = None
+                resource_version: str | None = None
                 w = watch.Watch()
 
                 for event in w.stream(

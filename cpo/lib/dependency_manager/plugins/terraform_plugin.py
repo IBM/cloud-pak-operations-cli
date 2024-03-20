@@ -17,8 +17,6 @@ import pathlib
 import stat
 import urllib.parse
 
-from typing import Optional
-
 import semver
 
 import cpo.config
@@ -57,7 +55,7 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
         self._extract_archive(archive_path, dependency_version.version, operating_system)
 
     # override
-    def get_binary_name(self) -> Optional[str]:
+    def get_binary_name(self) -> str | None:
         return "terraform"
 
     # override
