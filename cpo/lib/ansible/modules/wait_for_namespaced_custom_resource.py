@@ -1,4 +1,4 @@
-#  Copyright 2022, 2023 IBM Corporation
+#  Copyright 2022, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -11,6 +11,8 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+
+import logging
 
 from dataclasses import dataclass
 from typing import Any
@@ -100,7 +102,9 @@ class WaitForNamespacedCustomResourceModule(AbstractModule):
             )
 
             result = {"changed": False}
-        except Exception:
+        except Exception as exception:
+            self._log(logging.ERROR, str(exception))
+
             result = {"changed": False, "failed": True}
 
         self._module.exit_json(**result)
