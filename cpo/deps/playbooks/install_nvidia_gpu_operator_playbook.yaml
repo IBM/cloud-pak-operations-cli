@@ -1,0 +1,181 @@
+#  Copyright 2024 IBM Corporation
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+---
+- connection: local
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: "Create Namespace resource (name: {{ project }})"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          api_version: v1
+          kind: Namespace
+          metadata:
+            name: "{{ project }}"
+        state: present
+
+    - name: "Create OperatorGroup resource (name: nvidia-gpu-operator-group)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+            name: nvidia-gpu-operator-group
+            namespace: "{{ project }}"
+          spec:
+            targetNamespaces:
+              - nvidia-gpu-operator
+        state: present
+
+    - name: "Get channel"
+      kubernetes.core.k8s_info:
+        kind: PackageManifest
+        kubeconfig: "{{ kube_config }}"
+        name: gpu-operator-certified
+        namespace: openshift-marketplace
+      register: k8s_info_result
+
+    - set_fact:
+        channel: "{{ k8s_info_result | json_query('resources[0].status.defaultChannel') }}"
+
+    - set_fact:
+        starting_csv: "{{ k8s_info_result | json_query(query) | first }}"
+      vars:
+        query: "resources[0].status.channels[?name == '{{ channel }}'].currentCSV"
+
+    - name: "Create Subscription resource (name: gpu-operator-certified)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: gpu-operator-certified
+            namespace: "{{ project }}"
+          spec:
+            channel: "{{ channel }}"
+            installPlanApproval: Automatic
+            name: gpu-operator-certified
+            source: certified-operators
+            sourceNamespace: openshift-marketplace
+            startingCSV: "{{ starting_csv }}"
+        state: present
+
+    - name: "Waiting for creation of custom resource definitions"
+      wait_for_custom_resource_definitions:
+        kubeconfig: "{{ kube_config }}"
+        custom_resource_definitions:
+          - "ClusterPolicy"
+
+    - name: "Create ClusterPolicy resource (name: gpu-operator-certified)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: nvidia.com/v1
+          kind: ClusterPolicy
+          metadata:
+            name: gpu-cluster-policy
+            namespace: "{{ project }}"
+          spec:
+            daemonsets:
+              rollingUpdate:
+                maxUnavailable: "1"
+              updateStrategy: RollingUpdate
+            dcgm:
+              enabled: true
+            dcgmExporter:
+              config:
+                name: ""
+              enabled: true
+              serviceMonitor:
+                enabled: true
+            devicePlugin:
+              config:
+                default: ""
+                name: ""
+              enabled: true
+            driver:
+              certConfig:
+                name: ""
+              enabled: true
+              kernelModuleConfig:
+                name: ""
+              licensingConfig:
+                configMapName: ""
+                nlsEnabled: true
+              repoConfig:
+                configMapName: ""
+              upgradePolicy:
+                autoUpgrade: true
+                drain:
+                  deleteEmptyDir: false
+                  enable: false
+                  force: false
+                  timeoutSeconds: 300
+                maxParallelUpgrades: 1
+                maxUnavailable: 25%
+                podDeletion:
+                  deleteEmptyDir: false
+                  force: false
+                  timeoutSeconds: 300
+                waitForCompletion:
+                  timeoutSeconds: 0
+              useNvidiaDriverCRD: false
+              useOpenKernelModules: false
+              virtualTopology:
+                config: ""
+            gds:
+              enabled: false
+            gfd:
+              enabled: true
+            mig:
+              strategy: single
+            migManager:
+              enabled: true
+            nodeStatusExporter:
+              enabled: true
+            operator:
+              defaultRuntime: crio
+              initContainer: {}
+              use_ocp_driver_toolkit: true
+            sandboxDevicePlugin:
+              enabled: true
+            sandboxWorkloads:
+              defaultWorkload: container
+              enabled: false
+            toolkit:
+              enabled: true
+            validator:
+              plugin:
+                env:
+                  - name: WITH_WORKLOAD
+                    value: "false"
+            vfioManager:
+              enabled: true
+            vgpuDeviceManager:
+              enabled: true
+            vgpuManager:
+              enabled: false
+
+    - name: "Waiting for creation and readiness of custom resource (name: gpu-cluster-policy)"
+      wait_for_custom_resource:
+        custom_resource_name: "gpu-cluster-policy"
+        group: "nvidia.com"
+        jmespath_expression: "object.status.state == 'ready'"
+        kind: "ClusterPolicy"
+        kubeconfig: "{{ kube_config }}"
+        plural: "clusterpolicies"
+        version: "v1"
