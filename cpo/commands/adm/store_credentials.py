@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -31,7 +31,10 @@ def store_credentials(
     artifactory_username: str | None,
     ibm_cloud_pak_for_data_entitlement_key: str | None,
 ):
-    """Store credentials in a configuration file"""
+    """Store credentials
+
+    Credentials are stored in ~/.cpo/credentials.json.
+    """
 
     credentials_to_be_stored = locals().copy()
 

@@ -1,4 +1,4 @@
-#  Copyright 2022 IBM Corporation
+#  Copyright 2022, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ from cpo.utils.logging import loglevel_command
 
 @loglevel_command()
 def regenerate_api_key():
-    """Deletes the current IBM Cloud API key and generates a new one"""
+    """Regenerate the IBM Cloud API key"""
 
     ibm_cloud_api_manager = IBMCloudAPIManager()
     ibm_cloud_api_manager.regenerate_api_key()
