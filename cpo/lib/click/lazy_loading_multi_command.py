@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@ import importlib.util
 import logging
 import pathlib
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
+from functools import total_ordering
 from types import ModuleType
 from typing import cast
 
@@ -39,15 +40,26 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
+@total_ordering
 class CommandDetails:
     command: click.Command
+    command_name: str
     distribution_package_name: str
 
+    def __lt__(self, other: "CommandDetails") -> bool:
+        result: bool | None = None
 
-@dataclass
-class CommandData:
-    command_names: SortedSet = field(default_factory=SortedSet)
-    commands: dict[str, CommandDetails] = field(default_factory=dict)
+        if isinstance(self.command, click.Group) and not isinstance(other.command, click.Group):
+            result = True
+        elif not isinstance(self.command, click.Group) and isinstance(other.command, click.Group):
+            result = False
+        else:
+            result = self.command_name < other.command_name
+
+        return result
+
+
+CommandData = dict[str, CommandDetails]
 
 
 class LazyLoadingMultiCommand(click.Group):
@@ -98,7 +110,7 @@ class LazyLoadingMultiCommand(click.Group):
         command: click.Command | None = None
 
         if self._command_data is not None:
-            command = self._command_data.commands[cmd_name].command if cmd_name in self._command_data.commands else None
+            command = self._command_data[cmd_name].command if cmd_name in self._command_data else None
 
         return command
 
@@ -106,12 +118,12 @@ class LazyLoadingMultiCommand(click.Group):
     def list_commands(self, ctx: click.Context) -> list[str]:
         self._initialize_command_data_if_required()
 
-        return self._command_data.command_names if self._command_data is not None else []
+        return list(self._command_data.keys()) if self._command_data is not None else []
 
     def _append_distribution_package_name_to_help_text(
         self, help_text: str | None, distribution_package_name: str
     ) -> str | None:
-        suffix = f"[{distribution_package_name}]"
+        suffix = f"(plug-in: {distribution_package_name})"
 
         return suffix if (help_text is None) or (help_text == "") else f"{help_text} {suffix}"
 
@@ -162,12 +174,10 @@ class LazyLoadingMultiCommand(click.Group):
                 continue
 
             for command_name in command_dict:
-                if command_name in command_data.command_names:
+                if command_name in command_data:
                     self._raise_registration_error(command_name, command_data, package_element_descriptor)
 
-                command_data.command_names.add(command_name)
-
-            command_data.commands.update(command_dict)
+            command_data.update(command_dict)
 
     def _import_subpackages(self, command_data: CommandData, subpackages: list[PackageElementDescriptor]):
         """Imports the given subpackages and updates the given command data
@@ -186,8 +196,8 @@ class LazyLoadingMultiCommand(click.Group):
 
             command_name = package_element_descriptor.name.replace("_", "-")
 
-            if command_name in command_data.command_names:
-                command_details = command_data.commands[command_name]
+            if command_name in command_data:
+                command_details = command_data[command_name]
 
                 if not isinstance(command_details.command, LazyLoadingMultiCommand):
                     self._raise_registration_error(command_name, command_data, package_element_descriptor)
@@ -200,23 +210,25 @@ class LazyLoadingMultiCommand(click.Group):
             else:
                 package = self._import_module_from_file_location(package_element_descriptor)
 
-                command_data.command_names.add(command_name)
-                command_data.commands.update(
+                command_data.update(
                     {
                         command_name: CommandDetails(
                             LazyLoadingMultiCommand(
                                 package_element_descriptor.distribution_package_name,
                                 package,
                                 help=(
-                                    package.__doc__
+                                    f"[{package.__doc__}]"
                                     if package_element_descriptor.distribution_package_name
                                     == cpo.distribution_package_name
-                                    else self._append_distribution_package_name_to_help_text(
-                                        package.__doc__, package_element_descriptor.distribution_package_name
+                                    else "[{help_text}]".format(
+                                        help_text=self._append_distribution_package_name_to_help_text(
+                                            package.__doc__, package_element_descriptor.distribution_package_name
+                                        )
                                     )
                                 ),
                                 name=None,
                             ),
+                            command_name,
                             package_element_descriptor.distribution_package_name,
                         )
                     }
@@ -263,7 +275,7 @@ class LazyLoadingMultiCommand(click.Group):
                     self._import_modules(command_data, plugin_package_data.modules)
                     self._import_subpackages(command_data, plugin_package_data.subpackages)
 
-        self._command_data = command_data
+        self._command_data = dict(sorted(command_data.items(), key=lambda item: item[1]))
 
     def _is_builtin_package(self, package_directory_path: pathlib.Path) -> bool:
         return package_directory_path.is_relative_to(commands_package_path)
@@ -288,9 +300,7 @@ class LazyLoadingMultiCommand(click.Group):
 
         command_type_1 = "Command group" if str(package_element_descriptor.path).endswith("__init__.py") else "Command"
         command_type_2 = (
-            "command group"
-            if isinstance(command_data.commands[command_name].command, click.MultiCommand)
-            else "command"
+            "command group" if isinstance(command_data[command_name].command, click.MultiCommand) else "command"
         )
 
         command_hierarchy_path = (
@@ -303,7 +313,7 @@ class LazyLoadingMultiCommand(click.Group):
             f"{command_type_1} '{command_name}' (distribution package: '"
             f"{package_element_descriptor.distribution_package_name}'{command_hierarchy_path}) cannot be registered as "
             f"a {command_type_2} with the same name was already provided by distribution package '"
-            f"{command_data.commands[command_name].distribution_package_name}'"
+            f"{command_data[command_name].distribution_package_name}'"
         )
 
     def _search_for_commands(
@@ -337,6 +347,8 @@ class LazyLoadingMultiCommand(click.Group):
 
                 command_name = attribute_name.replace("_", "-")
 
-                commands[command_name] = CommandDetails(attribute, package_element_descriptor.distribution_package_name)
+                commands[command_name] = CommandDetails(
+                    attribute, command_name, package_element_descriptor.distribution_package_name
+                )
 
         return commands

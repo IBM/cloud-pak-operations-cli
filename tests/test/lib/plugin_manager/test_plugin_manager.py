@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -93,11 +93,11 @@ class TestPluginManager(unittest.TestCase):
         multi_command_1_commands = multi_command_1.list_commands(Mock())
 
         self.assertEqual(len(multi_command_1_commands), 5)
-        self.assertEqual(multi_command_1_commands[0], "bi-command-1")
-        self.assertEqual(multi_command_1_commands[1], "bi-group-1")
-        self.assertEqual(multi_command_1_commands[2], "command-1")
-        self.assertEqual(multi_command_1_commands[3], "command-in-init-file")
-        self.assertEqual(multi_command_1_commands[4], "group-1")
+        self.assertEqual(multi_command_1_commands[0], "bi-group-1")
+        self.assertEqual(multi_command_1_commands[1], "group-1")
+        self.assertEqual(multi_command_1_commands[2], "bi-command-1")
+        self.assertEqual(multi_command_1_commands[3], "command-1")
+        self.assertEqual(multi_command_1_commands[4], "command-in-init-file")
 
         multi_command_2 = multi_command_1.get_command(Mock(), "bi-group-1")
 
@@ -107,9 +107,9 @@ class TestPluginManager(unittest.TestCase):
         multi_command_2_commands = multi_command_2.list_commands(Mock())
 
         self.assertEqual(len(multi_command_2_commands), 3)
-        self.assertEqual(multi_command_2_commands[0], "bi-group-1-bi-command-1")
-        self.assertEqual(multi_command_2_commands[1], "bi-group-1-command-1")
-        self.assertEqual(multi_command_2_commands[2], "bi-group-2")
+        self.assertEqual(multi_command_2_commands[0], "bi-group-2")
+        self.assertEqual(multi_command_2_commands[1], "bi-group-1-bi-command-1")
+        self.assertEqual(multi_command_2_commands[2], "bi-group-1-command-1")
 
         multi_command_3 = multi_command_2.get_command(Mock(), "bi-group-2")
 
@@ -185,8 +185,8 @@ class TestPluginManager(unittest.TestCase):
         multi_command_2_commands = multi_command_2.list_commands(Mock())
 
         self.assertEqual(len(multi_command_2_commands), 3)
-        self.assertEqual(multi_command_2_commands[0], "bi-group-1-bi-command-1")
-        self.assertEqual(multi_command_2_commands[1], "bi-group-2")
+        self.assertEqual(multi_command_2_commands[0], "bi-group-2")
+        self.assertEqual(multi_command_2_commands[1], "bi-group-1-bi-command-1")
         self.assertEqual(multi_command_2_commands[2], "command-1")
 
     @patch(
@@ -246,9 +246,9 @@ class TestPluginManager(unittest.TestCase):
         multi_command_1_commands = multi_command_1.list_commands(Mock())
 
         self.assertEqual(len(multi_command_1_commands), 3)
-        self.assertEqual(multi_command_1_commands[0], "bi-command-1")
-        self.assertEqual(multi_command_1_commands[1], "bi-group-1")
-        self.assertEqual(multi_command_1_commands[2], "group-1")
+        self.assertEqual(multi_command_1_commands[0], "bi-group-1")
+        self.assertEqual(multi_command_1_commands[1], "group-1")
+        self.assertEqual(multi_command_1_commands[2], "bi-command-1")
 
     def _assert_multi_command(self, command: click.Command | None):
         self.assertIsNotNone(command)
