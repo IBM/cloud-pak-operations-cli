@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -24,11 +24,11 @@ from cpo.utils.logging import loglevel_command
 
 @loglevel_command()
 def update_dev():
-    """Update the CLI to the latest development version"""
+    """Update the CLI to the latest development code"""
 
     if metadata.version(distribution_package_name) != "0.0.1":
         raise CloudPakOperationsCLIException(
-            f"Current version is not a development version (use 'pip3 install --upgrade {distribution_package_name}' "
+            f"Current version is not a development version (use 'pip install --upgrade {distribution_package_name}' "
             f"to upgrade a release version)"
         )
 

@@ -1,4 +1,4 @@
-#  Copyright 2021 IBM Corporation
+#  Copyright 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,4 +12,17 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-__doc__ = "Modify the CLI configuration"
+import click
+
+import cpo.config
+
+from cpo.utils.logging import loglevel_command
+
+
+@loglevel_command()
+@click.option("--key", help="Key name which should be set", required=True)
+@click.option("--value", help="Value to which key should be set", required=True)
+def set_config_option(key: str, value: str):
+    """Set configuration option"""
+
+    cpo.config.configuration_manager.set_bool_config_value(key, value)

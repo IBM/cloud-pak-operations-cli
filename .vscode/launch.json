@@ -6,7 +6,7 @@
 	"configurations": [
 		{
 			"name": "Python: cpo",
-			"type": "python",
+			"type": "debugpy",
 			"request": "launch",
 			"module": "cpo.cpo",
 			"console": "internalConsole",
@@ -22,7 +22,7 @@
 		},
 		{
 			"name": "Python: unit tests (cpo)",
-			"type": "python",
+			"type": "debugpy",
 			"request": "launch",
 			"module": "pytest",
 			"console": "internalConsole",
@@ -38,7 +38,7 @@
 		},
 		{
 			"name": "Python: unit tests (scripts)",
-			"type": "python",
+			"type": "debugpy",
 			"request": "launch",
 			"module": "pytest",
 			"console": "internalConsole",
