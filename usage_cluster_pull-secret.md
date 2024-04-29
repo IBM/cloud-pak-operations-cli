@@ -1,5 +1,5 @@
 ---
-nav_order: 6
+nav_order: 7
 ---
 
 # Usage: Managing the global pull secret

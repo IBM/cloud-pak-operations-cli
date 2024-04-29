@@ -1,5 +1,5 @@
 ---
-nav_order: 9
+nav_order: 10
 ---
 
 # Usage: Managing Red Hat OpenShift on IBM Cloud clusters

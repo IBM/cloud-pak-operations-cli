@@ -1,15 +1,17 @@
 ---
-nav_order: 8
+nav_order: 5
 ---
 
-# Usage: Installing storage-related OpenShift resources
+# Usage: Install various operators
 
-## Installing Kubernetes NFS Subdir External Provisioner
+## Installing the Node Feature Discovery Operator
+
+This command installs the [Node Feature Discovery Operator](https://docs.openshift.com/container-platform/latest/hardware_enablement/psap-node-feature-discovery-operator.html)
 
 ### Syntax
 
 ```shell
-cpo cluster storage install-nfs-storage-class [OPTIONS]
+cpo aws operator install-node-feature-discovery-operator [OPTIONS]
 ```
 
 ### Parameters
@@ -23,22 +25,20 @@ cpo cluster storage install-nfs-storage-class [OPTIONS]
                                   validity
   --use-cluster TEXT              Alias or server URL of a registered
                                   OpenShift cluster to be used
-  --nfs-server TEXT               NFS server  [required]
-  --nfs-path TEXT                 NFS path  [default: /var/nfs]
-  --project TEXT                  Project used to install the Kubernetes NFS
-                                  Subdir External Provisioner  [default:
-                                  default]
+  --project TEXT                  OpenShift project  [default: openshift-nfd]
   --loglevel [DEBUG|INFO|WARNING|ERROR|CRITICAL]
                                   Log level
   --help                          Show this message and exit.
 ```
 
-## Installing Red Hat OpenShift Data Foundation (ODF)
+## Installing the NVIDIA GPU Operator
+
+This command installs the [NVIDIA GPU Operator](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/index.html).
 
 ### Syntax
 
 ```shell
-cpo cluster storage install-odf-storage-classes [OPTIONS]
+cpo aws operator install-nvidia-gpu-operator [OPTIONS]
 ```
 
 ### Parameters
@@ -52,9 +52,9 @@ cpo cluster storage install-odf-storage-classes [OPTIONS]
                                   validity
   --use-cluster TEXT              Alias or server URL of a registered
                                   OpenShift cluster to be used
+  --project TEXT                  OpenShift project  [default: nvidia-gpu-
+                                  operator]
   --loglevel [DEBUG|INFO|WARNING|ERROR|CRITICAL]
                                   Log level
   --help                          Show this message and exit.
 ```
-
-> Currently, opinionated configuration values are used for deploying the `StorageCluster` custom resource (see [Ansible playbook](https://github.com/IBM/cloud-pak-operations-cli/blob/master/cpo/deps/playbooks/deploy_odf_playbook.yaml)).
