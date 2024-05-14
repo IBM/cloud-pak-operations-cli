@@ -131,6 +131,19 @@ class AbstractDependencyManagerPlugIn(ABC):
 
         pass
 
+    def is_located_in_subdirectory(self) -> bool:
+        """Returns whether the plug-in is located in a subdirectory
+
+        The name of the subdirectory must equal the alias of the dependency.
+
+        Returns
+        -------
+        bool
+            True, if the plug-in is located in a subdirectory
+        """
+
+        return False
+
     @abstractmethod
     def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:
         pass
@@ -196,6 +209,6 @@ class AbstractDependencyManagerPlugIn(ABC):
         result: DependencyVersion | None = None
 
         if len(response_json) != 0:
-            result = AbstractDependencyManagerPlugIn.parse_as_semantic_version(response_json[0]["name"])
+            result = AbstractDependencyManagerPlugIn.parse_as_semantic_version(response_json[0]["tag_name"])
 
         return result

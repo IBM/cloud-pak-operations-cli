@@ -70,9 +70,10 @@ class TestDownloadDependencies(unittest.TestCase):
 
         bin_directory_path = cpo.config.configuration_manager.get_bin_directory_path()
 
-        for entry in bin_directory_path.iterdir():
-            if entry.is_file():
-                os.remove(entry)
+        if bin_directory_path.exists():
+            for entry in bin_directory_path.iterdir():
+                if entry.is_file():
+                    os.remove(entry)
 
         runner = click.testing.CliRunner()
         result = runner.invoke(cli, ["adm", "download-dependencies"])  # type: ignore
