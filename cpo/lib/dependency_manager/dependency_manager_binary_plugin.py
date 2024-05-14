@@ -98,4 +98,12 @@ class DependencyManagerBinaryPlugIn(AbstractDependencyManagerPlugIn):
             path of the binary associated with the dependency
         """
 
-        return configuration_manager.get_bin_directory_path() / f"{self.get_binary_name()}-{version}"
+        binary_path = configuration_manager.get_bin_directory_path()
+
+        if self.is_located_in_subdirectory():
+            binary_path /= f"{self.get_dependency_alias()}-{version}"
+            binary_path /= self.get_binary_name()
+        else:
+            binary_path /= f"{self.get_binary_name()}-{version}"
+
+        return binary_path
