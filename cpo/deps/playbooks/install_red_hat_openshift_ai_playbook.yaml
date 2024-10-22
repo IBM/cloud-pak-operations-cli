@@ -1,0 +1,85 @@
+#  Copyright 2024 IBM Corporation
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#  http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+---
+- connection: local
+  hosts: localhost
+  gather_facts: false
+  tasks:
+    - name: "Create Namespace resource (name: {{ project }})"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          api_version: v1
+          kind: Namespace
+          metadata:
+            name: "{{ project }}"
+        state: present
+
+    - name: "Create OperatorGroup resource (name: rhods-operator)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: operators.coreos.com/v1
+          kind: OperatorGroup
+          metadata:
+            name: rhods-operator
+            namespace: "{{ project }}"
+        state: present
+
+    - name: "Create Subscription resource (name: rhods-operator)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: operators.coreos.com/v1alpha1
+          kind: Subscription
+          metadata:
+            name: rhods-operator
+            namespace: "{{ project }}"
+          spec:
+            channel: embedded
+            config:
+              env:
+                - name: "DISABLE_DSC_CONFIG"
+            name: rhods-operator
+            source: redhat-operators
+            sourceNamespace: openshift-marketplace
+        state: present
+
+    - name: "Waiting for creation of custom resource definitions"
+      wait_for_custom_resource_definitions:
+        kubeconfig: "{{ kube_config }}"
+        custom_resource_definitions:
+          - "DataScienceCluster"
+          - "DSCInitialization"
+          - "FeatureTracker"
+
+    - name: "Create DSCInitialization resource (name: default-dsci)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: dscinitialization.opendatahub.io/v1
+          kind: DSCInitialization
+          metadata:
+            name: default-dsci
+          spec:
+            applicationsNamespace: redhat-ods-applications
+            monitoring:
+              managementState: Managed
+              namespace: redhat-ods-monitoring
+            serviceMesh:
+              managementState: Removed
+            trustedCABundle:
+              customCABundle: ""
+              managementState: Managed
+        state: present
