@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,22 +20,15 @@ from cpo.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.option("--artifactory-password", help="Artifactory password")
-@click.option("--artifactory-username", help="Artifactory username")
-@click.option(
-    "--ibm-cloud-pak-for-data-entitlement-key",
-    help="IBM Cloud Pak for Data entitlement key (see https://myibm.ibm.com/products-services/containerlibrary)",
-)
-def store_credentials(
-    artifactory_password: str | None,
-    artifactory_username: str | None,
-    ibm_cloud_pak_for_data_entitlement_key: str | None,
-):
-    """Store credentials
+@click.option("--credentials-key", help="Artifactory password", required=True)
+def rm(credentials_key: str):
+    """Remove credentials
 
     Credentials are stored in ~/.cpo/credentials.json.
     """
 
-    credentials_to_be_stored = locals().copy()
-
-    cpo.config.configuration_manager.store_credentials(credentials_to_be_stored)
+    cpo.config.configuration_manager.store_credentials(
+        {
+            credentials_key: "",
+        }
+    )

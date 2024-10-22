@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -20,16 +20,16 @@ import unittest.mock
 
 import click.testing
 
-import cpo.commands.adm.store_credentials
+import cpo.commands.adm.credentials.store
 import cpo.config
 import cpo.lib.click.utils
 
 from cpo.cpo import cli
 
 
-class TestStoreCredentialsCommand(unittest.TestCase):
-    def test_store_credentials(self):
-        """Tests that cpo adm store-credentials creates credentials.json"""
+class TestStoreCommand(unittest.TestCase):
+    def test_store(self):
+        """Tests that cpo adm credentials store creates credentials.json"""
 
         credentials_file_path = pathlib.Path(tempfile.gettempdir()) / "credentials.json"
 
@@ -46,20 +46,19 @@ class TestStoreCredentialsCommand(unittest.TestCase):
             cli,  # type: ignore
             [
                 "adm",
-                "store-credentials",
-                "--artifactory-password",
-                "artifactory_password",
-                "--artifactory-username",
-                "artifactory_username",
+                "credentials",
+                "store",
+                "--credentials-key",
+                "credentials_key",
+                "--credentials-value",
+                "credentials_value",
             ],
         )
 
         default_map = self._load_credentials_file(credentials_file_path)
 
-        self.assertIn("artifactory_password", default_map)
-        self.assertIn("artifactory_username", default_map)
-        self.assertEqual(default_map["artifactory_password"], "artifactory_password")
-        self.assertEqual(default_map["artifactory_username"], "artifactory_username")
+        self.assertIn("credentials_key", default_map)
+        self.assertEqual(default_map["credentials_key"], "credentials_value")
 
         # check that key-value pairs were removed from credentials.json
         runner = click.testing.CliRunner()
@@ -67,18 +66,16 @@ class TestStoreCredentialsCommand(unittest.TestCase):
             cli,  # type: ignore
             [
                 "adm",
-                "store-credentials",
-                "--artifactory-password",
-                "",
-                "--artifactory-username",
-                "",
+                "credentials",
+                "rm",
+                "--credentials-key",
+                "credentials_key",
             ],
         )
 
         default_map = self._load_credentials_file(credentials_file_path)
 
-        self.assertNotIn("artifactory_password", default_map)
-        self.assertNotIn("artifactory_username", default_map)
+        self.assertNotIn("credentials_key", default_map)
 
     def _load_credentials_file(self, credentials_file_path: pathlib.Path):
         json = cpo.lib.click.utils.create_default_map_from_json_file(credentials_file_path)
