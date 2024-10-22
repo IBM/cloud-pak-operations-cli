@@ -38,11 +38,16 @@ class PlaybookRunner(ABC):
         private_data_dir=configuration_manager.get_deps_directory_path() / "playbooks",
         variables: dict[str, Any] = {},
     ):
+        self._error_event_data = None
         self._playbook_name = playbook_name
         self._private_data_dir = private_data_dir
 
         for name, value in variables.items():
             setattr(self, name, value)
+
+    @property
+    def error_event_data(self) -> Any:
+        return self._error_event_data
 
     def run_playbook(self) -> dict[str, Any]:
         """Runs a playbook
@@ -72,6 +77,8 @@ class PlaybookRunner(ABC):
 
         if ("stdout" in event_data) and (event_data["stdout"] != ""):
             if ("event" in event_data) and (event_data["event"] == "runner_on_failed"):
+                self._error_event_data = event_data
+
                 logger.log(logging.ERROR, event_data["stdout"].removeprefix("\r\n"))
             else:
                 logger.log(logging.INFO, event_data["stdout"].removeprefix("\r\n"))
