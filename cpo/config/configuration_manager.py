@@ -13,20 +13,23 @@
 #  limitations under the License.
 
 import json
+import os
 import pathlib
 
-from typing import Any
+from typing import Any, Type, TypeVar
 
 import cpo
 
 from cpo.utils.error import CloudPakOperationsCLIException
 
+T = TypeVar("T")
+
 
 class ConfigurationManager:
     """Manages the CLI configuration"""
 
-    def get_bool_config_value(self, key: str, default_value: bool) -> bool:
-        """Gets the value for a given key from the settings file
+    def get_config_value(self, key: str, type: Type[T], default_value: T | None = None) -> T:
+        """Gets the value for the given key from the settings file
 
         Parameters
         ----------
@@ -39,22 +42,21 @@ class ConfigurationManager:
         result = default_value
 
         if self.get_settings_file_path().exists():
-            settings = json.loads(self.get_settings_file_path().read_text())
+            with open(self.get_settings_file_path()) as json_file:
+                settings = json.load(json_file)
 
             if key in settings:
-                value = str(settings[key])
+                value = settings[key]
 
-                if value.lower() in ConfigurationManager._supported_true_boolean_values:
-                    result = True
-                elif value.lower() in ConfigurationManager._supported_false_boolean_values:
-                    result = False
-                else:
-                    raise CloudPakOperationsCLIException(
-                        f"Expected value of configuration parameter '{key}' must be a boolean of the form "
-                        f"[{', '.join(ConfigurationManager._supported_true_boolean_values)}] or "
-                        f"[{', '.join(ConfigurationManager._supported_false_boolean_values)}] but found "
-                        f"'{value}'."
-                    )
+                if not isinstance(value, type):
+                    raise CloudPakOperationsCLIException(f"Configuration option '{key}' is not of expected type {type}")
+
+                result = value
+
+        if result is None:
+            raise CloudPakOperationsCLIException(
+                f"Configuration option '{key}' is not set and no default value was provided"
+            )
 
         return result
 
@@ -181,8 +183,8 @@ class ConfigurationManager:
 
         return result
 
-    def set_bool_config_value(self, key: str, value: str):
-        """Sets a given key:value pair in the settings file
+    def set_bool_config_value(self, key: str, value: bool):
+        """Sets a given key-value pair in the settings file
 
         Parameters
         ----------
@@ -192,20 +194,8 @@ class ConfigurationManager:
             value to be set for key
         """
 
-        if value.lower() not in (
-            ConfigurationManager._supported_true_boolean_values + ConfigurationManager._supported_false_boolean_values
-        ):
-            raise CloudPakOperationsCLIException(
-                f"Passed value '{value}' for '{key}' must be a boolean of the form "
-                f"[{', '.join(ConfigurationManager._supported_true_boolean_values)}] or "
-                f"[{', '.join(ConfigurationManager._supported_false_boolean_values)}]."
-            )
-
-        settings = {}
-
         if self.get_settings_file_path().exists():
             settings = json.loads(self.get_settings_file_path().read_text())
-
             settings[key] = value
         else:
             settings = {key: value}
@@ -253,5 +243,21 @@ class ConfigurationManager:
         with open(credentials_file_path, "w") as credentials_file:
             json.dump(credentials, credentials_file, indent="\t", sort_keys=True)
 
-    _supported_false_boolean_values = ["disable", "disabled", "false", "inactive", "no"]
-    _supported_true_boolean_values = ["active", "enable", "enabled", "true", "yes"]
+    def unset_config_value(self, key: str):
+        """Unsets the given key in the settings file
+
+        Parameters
+        ----------
+        key
+            name of the key to be deleted
+        """
+
+        if self.get_settings_file_path().exists():
+            settings: dict[str, Any] = json.loads(self.get_settings_file_path().read_text())
+
+            if settings.pop(key, None) is not None:
+                if len(settings) == 0:
+                    os.remove(self.get_settings_file_path())
+                else:
+                    with open(self.get_settings_file_path(), "w+") as f:
+                        f.write(json.dumps(settings, indent="\t", sort_keys=True))

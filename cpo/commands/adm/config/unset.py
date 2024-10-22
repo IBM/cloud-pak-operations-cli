@@ -20,9 +20,8 @@ from cpo.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.option("--key", help="Key name which should be set", required=True)
-@click.option("--value", help="Value to which key should be set", required=True)
-def set_config_option(key: str, value: str):
-    """Set configuration option"""
+@click.option("--key", help="Name of the key to be unset", required=True)
+def unset(key: str):
+    """Unset configuration option"""
 
-    cpo.config.configuration_manager.set_bool_config_value(key, value)
+    cpo.config.configuration_manager.unset_config_value(key)
