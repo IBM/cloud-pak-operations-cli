@@ -15,7 +15,7 @@
 import os
 import pathlib
 
-from typing import TypeVar
+from typing import Self, TypeVar
 
 import semver
 
@@ -37,7 +37,7 @@ class DependencyManager:
     """Responsible for managing dependencies"""
 
     @classmethod
-    def get_instance(cls) -> "DependencyManager":
+    def get_instance(cls) -> Self:
         """Returns the singleton instance of this class
 
         Returns
@@ -46,13 +46,13 @@ class DependencyManager:
             singleton instance of this class
         """
 
-        if DependencyManager._instance is None:
-            DependencyManager._instance = DependencyManager()
-            DependencyManager._instance.register_plugin(IBMCloudCLIPlugIn)
-            DependencyManager._instance.register_plugin(OpenShiftCLIPlugIn)
-            DependencyManager._instance.register_plugin(OpenShiftInstallPlugIn)
+        if cls._instance is None:
+            cls._instance = cls()
+            cls._instance.register_plugin(IBMCloudCLIPlugIn)
+            cls._instance.register_plugin(OpenShiftCLIPlugIn)
+            cls._instance.register_plugin(OpenShiftInstallPlugIn)
 
-        return DependencyManager._instance
+        return cls._instance
 
     def __init__(self):
         self._dependency_manager_dict: dict[type[AbstractDependencyManagerPlugIn], AbstractDependencyManagerPlugIn] = {}
@@ -267,4 +267,4 @@ class DependencyManager:
 
         return dependency_version
 
-    _instance: "DependencyManager | None" = None
+    _instance: Self | None = None

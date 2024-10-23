@@ -1,4 +1,4 @@
-FROM python:3.10
+FROM python:3.11
 COPY dist/*.whl /root
 RUN pip install /root/*.whl
 RUN useradd --create-home --gid 0 --no-log-init cpo
