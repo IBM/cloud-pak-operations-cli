@@ -1,4 +1,4 @@
-#  Copyright 2022, 2023 IBM Corporation
+#  Copyright 2022, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -40,7 +40,8 @@ from cpo.utils.logging import loglevel_command
 )
 @click.option(
     "--repository-url",
-    default="https://na.artifactory.swg-devops.com/artifactory/api/pypi/hyc-ibm-sap-cp4d-team-pypi-local/simple",
+    default="https://na.artifactory.swg-devops.com/artifactory/api/pypi/hyc-cloud-pak-operations-cli-team-pypi-local/"
+    "simple",
 )
 def ls(artifactory_username: str, artifactory_password: str, repository_url: str):
     """List available IBM-internal CLI plug-ins"""
