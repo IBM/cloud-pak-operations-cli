@@ -15,6 +15,7 @@
 import pathlib
 
 from dataclasses import dataclass
+from typing import Self
 
 
 @dataclass
@@ -29,10 +30,10 @@ class PackageData:
     """Stores descriptors for modules and subpackages within a
     package"""
 
-    @staticmethod
+    @classmethod
     def get_package_data(
-        distribution_package_name: str, command_hierarchy_path: str | None, package_path: pathlib.Path
-    ) -> "PackageData":
+        cls, distribution_package_name: str, command_hierarchy_path: str | None, package_path: pathlib.Path
+    ) -> Self:
         """Creates an object describing modules and subpackages within the
         package with the given path
 
@@ -54,7 +55,7 @@ class PackageData:
             given path
         """
 
-        package_data = PackageData()
+        package_data = cls()
 
         for file_path in package_path.iterdir():
             if file_path.is_dir() and (file_path / "__init__.py").exists():
