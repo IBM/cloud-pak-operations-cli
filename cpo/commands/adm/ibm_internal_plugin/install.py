@@ -1,4 +1,4 @@
-#  Copyright 2022, 2023 IBM Corporation
+#  Copyright 2022, 2024 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -45,7 +45,8 @@ logger = logging.getLogger(__name__)
 )
 @click.option(
     "--repository-url",
-    default="https://na.artifactory.swg-devops.com/artifactory/api/pypi/hyc-ibm-sap-cp4d-team-pypi-local/simple",
+    default="https://na.artifactory.swg-devops.com/artifactory/api/pypi/hyc-cloud-pak-operations-cli-team-pypi-local/"
+    "simple",
 )
 @click.option("--user", help="Install to user site-packages directory", is_flag=True)
 @click.option("--version", callback=get_semver_version, help="Plug-in version")

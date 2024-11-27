@@ -44,7 +44,8 @@ logger = logging.getLogger(__name__)
 )
 @click.option(
     "--repository-url",
-    default="https://na.artifactory.swg-devops.com/artifactory/api/pypi/hyc-ibm-sap-cp4d-team-pypi-local/simple",
+    default="https://na.artifactory.swg-devops.com/artifactory/api/pypi/hyc-cloud-pak-operations-cli-team-pypi-local/"
+    "simple",
 )
 @click.option("--user", help="Install to user site-packages directory", is_flag=True)
 def upgrade_plugins(
