@@ -20,8 +20,8 @@ from cpo.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.option("--credentials-key", help="Artifactory password", required=True)
-@click.option("--credentials-value", help="Artifactory username", required=True)
+@click.option("--credentials-key", help="Credentials key", required=True)
+@click.option("--credentials-value", help="Credentials value", required=True)
 def store(credentials_key: str, credentials_value: str):
     """Store credentials
 

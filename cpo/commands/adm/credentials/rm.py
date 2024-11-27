@@ -20,7 +20,7 @@ from cpo.utils.logging import loglevel_command
 
 
 @loglevel_command()
-@click.option("--credentials-key", help="Artifactory password", required=True)
+@click.option("--credentials-key", help="Credentials key", required=True)
 def rm(credentials_key: str):
     """Remove credentials
 
