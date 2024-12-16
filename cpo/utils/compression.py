@@ -114,7 +114,7 @@ def extract_tgz_archive(archive_path: pathlib.Path, target_directory_path: pathl
                 if is_directory_structure_to_be_ignored(**kwargs):
                     member.name = os.path.basename(member.name)
 
-                tar_file.extract(member, target_directory_path)
+                tar_file.extract(member, target_directory_path, filter="tar")
                 execute_post_extraction_func_if_exists(target_directory_path / member.name, **kwargs)
 
 
