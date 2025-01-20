@@ -13,22 +13,26 @@
 #  limitations under the License.
 
 import base64
+import dataclasses
+import json
+
+from dataclasses import dataclass
 
 import click
-
-from pydantic import BaseModel
 
 from cpo.utils.logging import loglevel_command
 
 
-class RegistryCredentials(BaseModel):
+@dataclass
+class RegistryCredentials:
     auth: str
     email: str
     password: str
     username: str
 
 
-class DockerConfigJSON(BaseModel):
+@dataclass
+class DockerConfigJSON:
     auths: dict[str, RegistryCredentials]
 
 
@@ -62,7 +66,7 @@ def print(
         }
     )
 
-    docker_config_json_str = docker_config_json.model_dump_json()
+    docker_config_json_str = json.dumps(dataclasses.asdict(docker_config_json), separators=(",", ":"))
 
     if encode_base64:
         click.echo(base64.standard_b64encode(docker_config_json_str.encode()).decode("utf-8"))

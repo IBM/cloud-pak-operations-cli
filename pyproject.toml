@@ -25,7 +25,6 @@ dependencies = [
 	"jsonschema",
 	"kubernetes >= 12",
 	"netifaces",
-	"pydantic",
 	"pypi_simple",
 	"pytest",
 	"pyyaml",
