@@ -1,4 +1,4 @@
-#  Copyright 2022, 2024 IBM Corporation
+#  Copyright 2022, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -90,7 +90,10 @@ class OpenShiftPlaybookRunner(PlaybookRunner):
             msg = cpo.lib.jmespath.get_jmespath_string("event_data.res.msg", event_data)
 
             unauthorized = msg.startswith("Exception '401\nReason: Unauthorized") or (
-                (msg == "MODULE FAILURE\nSee stdout/stderr for the exact error")
+                (
+                    (msg == "MODULE FAILURE: No start of json char found\nSee stdout/stderr for the exact error")
+                    or (msg == "MODULE FAILURE\nSee stdout/stderr for the exact error")
+                )
                 and (
                     "kubernetes.dynamic.exceptions.UnauthorizedError: 401\nReason: Unauthorized"
                     in cpo.lib.jmespath.get_jmespath_string("event_data.res.module_stderr", event_data)
