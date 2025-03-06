@@ -1,4 +1,4 @@
-#  Copyright 2024 IBM Corporation
+#  Copyright 2024, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -68,6 +68,8 @@
           - "NodeFeatureDiscovery"
           - "NodeFeatureRule"
 
+    # sources.pci.deviceLabelFields must be set to "vendor" in order for
+    # the NVIDIA GPU Operator to work
     - name: "Create NodeFeatureDiscovery resource (name: nfd-instance)"
       kubernetes.core.k8s:
         kubeconfig: "{{ kube_config }}"
@@ -146,7 +148,7 @@
                       - "03"
                       - "12"
                     deviceLabelFields:
-                      - "class"
+                      - "vendor"
             customConfig:
               configData: |
                 - name: "more.kernel.features"
