@@ -20,7 +20,7 @@
       kubernetes.core.k8s:
         kubeconfig: "{{ kube_config }}"
         resource_definition:
-          api_version: v1
+          apiVersion: v1
           kind: Namespace
           metadata:
             name: "{{ project }}"
@@ -47,7 +47,7 @@
             name: rhods-operator
             namespace: "{{ project }}"
           spec:
-            channel: embedded
+            channel: "{{ channel }}"
             config:
               env:
                 - name: "DISABLE_DSC_CONFIG"
@@ -83,3 +83,83 @@
               customCABundle: ""
               managementState: Managed
         state: present
+
+    - name: "Waiting for creation and readiness of custom resource (name: default-dsci)"
+      wait_for_custom_resource:
+        custom_resource_name: "default-dsci"
+        group: "dscinitialization.opendatahub.io"
+        jmespath_expression: "object.status.phase == 'Ready'"
+        kind: "DSCInitialization"
+        kubeconfig: "{{ kube_config }}"
+        plural: "dscinitializations"
+        version: "v1"
+
+    - name: "Create DataScienceCluster resource (name: default-dsc)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: datasciencecluster.opendatahub.io/v1
+          kind: DataScienceCluster
+          metadata:
+            name: default-dsc
+          spec:
+            components:
+              codeflare:
+                managementState: Removed
+              dashboard:
+                managementState: Removed
+              datasciencepipelines:
+                managementState: Removed
+              kserve:
+                defaultDeploymentMode: RawDeployment
+                managementState: Managed
+                serving:
+                  managementState: Removed
+                  name: knative-serving
+              kueue:
+                managementState: Removed
+              modelmeshserving:
+                managementState: Removed
+              ray:
+                managementState: Removed
+              trainingoperator:
+                managementState: Managed
+              trustyai:
+                managementState: Removed
+              workbenches:
+                managementState: Removed
+
+    - name: "Waiting for creation and readiness of custom resource (name: default-dsc)"
+      wait_for_custom_resource:
+        custom_resource_name: "default-dsc"
+        group: "datasciencecluster.opendatahub.io"
+        jmespath_expression: "object.status.phase == 'Ready'"
+        kind: "DataScienceCluster"
+        kubeconfig: "{{ kube_config }}"
+        plural: "datascienceclusters"
+        version: "v1"
+
+    - name: "Get channel"
+      kubernetes.core.k8s_info:
+        kind: ConfigMap
+        kubeconfig: "{{ kube_config }}"
+        name: inferenceservice-config
+        namespace: redhat-ods-applications
+      register: k8s_info_result
+
+    - set_fact:
+        ingress: '{{ k8s_info_result | json_query(''resources[0].data.ingress'') | replace(''"domainTemplate": "{{ .Name }}-{{ .Namespace }}.{{ .IngressDomain }}"'', ''"domainTemplate": "example.com"'') }}'
+
+    - name: "Patch ConfigMap resource (name: inferenceservice-config)"
+      kubernetes.core.k8s:
+        kubeconfig: "{{ kube_config }}"
+        resource_definition:
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            annotations:
+              opendatahub.io/managed: "false"
+            name: inferenceservice-config
+            namespace: redhat-ods-applications
+          data:
+            ingress: "{{ ingress }}"

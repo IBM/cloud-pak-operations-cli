@@ -32,6 +32,7 @@ from cpo.utils.logging import loglevel_command
 )
 @openshift_server_options
 @click.option("--project", default="redhat-ods-operator", help="OpenShift project", show_default=True)
+@click.option("--channel", default="stable-2.13", help="Red Hat OpenShift AI update channel", show_default=True)
 @click.pass_context
 def install_red_hat_openshift_ai_operator(
     ctx: click.Context,
@@ -42,6 +43,7 @@ def install_red_hat_openshift_ai_operator(
     insecure_skip_tls_verify: Optional[bool],
     use_cluster: Optional[str],
     project: str,
+    channel: str,
 ):
     """Install the Red Hat OpenShift AI Operator"""
 
@@ -51,6 +53,7 @@ def install_red_hat_openshift_ai_operator(
         "install_red_hat_openshift_ai_playbook.yaml",
         credentials,
         variables={
+            "channel": channel,
             "project": project,
         },
     ).run_playbook()
