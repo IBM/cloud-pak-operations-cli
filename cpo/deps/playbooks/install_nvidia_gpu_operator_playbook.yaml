@@ -20,7 +20,7 @@
       kubernetes.core.k8s:
         kubeconfig: "{{ kube_config }}"
         resource_definition:
-          api_version: v1
+          apiVersion: v1
           kind: Namespace
           metadata:
             name: "{{ project }}"
@@ -107,6 +107,8 @@
                 default: ""
                 name: ""
               enabled: true
+              mps:
+                root: "/run/nvidia/mps"
             driver:
               certConfig:
                 name: ""
@@ -137,6 +139,8 @@
               useOpenKernelModules: false
               virtualTopology:
                 config: ""
+            gdrcopy:
+              enabled: false
             gds:
               enabled: false
             gfd:
