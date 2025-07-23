@@ -1,4 +1,4 @@
-#  Copyright 2022, 2024 IBM Corporation
+#  Copyright 2022, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -25,13 +25,16 @@ from q import q
 
 import cpo.lib.jmespath
 
-from cpo.lib.ansible.modules.custom_resource_event_result import CustomResourceEventResult
+from cpo.lib.openshift.types.custom_resource_event_result import CustomResourceEventResult
 from cpo.lib.openshift.types.kind_metadata import KindMetadata
 
 
 class AbstractModule(ABC):
-    def __init__(self, config_dict: dict):
-        config.load_kube_config_from_dict(config_dict)
+    def __init__(self, config_dict: dict | None = None):
+        if config_dict is not None:
+            config.load_kube_config_from_dict(config_dict)
+        else:
+            config.load_kube_config()
 
     @abstractmethod
     def get_module(self) -> AnsibleModule:
@@ -107,6 +110,42 @@ class AbstractModule(ABC):
                 ):
                     resource_version = cpo.lib.jmespath.get_jmespath_string("object.metadata.resourceVersion", event)
                     custom_resource_event_result = success_callback(event, kind_metadata=kind_metadata, **kwargs)
+
+                    if custom_resource_event_result is not None:
+                        w.stop()
+            except client.ApiException as exception:
+                self._handle_api_exception(exception, log_callback)
+                resource_version = None
+            except urllib3.exceptions.ProtocolError as exception:
+                self._handle_protocol_error(exception, log_callback)
+
+        return custom_resource_event_result
+
+    def _wait_for_namespaced_core_resource(
+        self,
+        function: Callable,
+        project: str,
+        log_callback: Callable[[int, str], None],
+        success_callback: Callable[..., CustomResourceEventResult | None],
+        **kwargs,
+    ) -> CustomResourceEventResult:
+        custom_resource_event_result: CustomResourceEventResult | None = None
+
+        while custom_resource_event_result is None:
+            try:
+                resource_version: str | None = None
+                w = watch.Watch()
+
+                for event in w.stream(
+                    function,
+                    project,
+                    resource_version=resource_version,
+                ):
+                    resource_version = cpo.lib.jmespath.get_jmespath_string(
+                        "raw_object.metadata.resourceVersion", event
+                    )
+
+                    custom_resource_event_result = success_callback(event, None, **kwargs)
 
                     if custom_resource_event_result is not None:
                         w.stop()

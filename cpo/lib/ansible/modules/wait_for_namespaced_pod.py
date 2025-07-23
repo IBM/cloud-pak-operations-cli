@@ -1,4 +1,4 @@
-#  Copyright 2024, 2025 IBM Corporation
+#  Copyright 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ansible.module_utils.basic import AnsibleModule
+from kubernetes import client
 
 import cpo.lib.jmespath
 
@@ -32,14 +33,10 @@ class CustomResourceEventData:
     custom_resource_name: str
 
 
-class WaitForCustomResourceModule(AbstractModule):
+class WaitForNamespacedPodModule(AbstractModule):
     def __init__(self):
         argument_spec = {
             "custom_resource_name": {
-                "type": "str",
-                "required": True,
-            },
-            "group": {
                 "type": "str",
                 "required": True,
             },
@@ -47,19 +44,11 @@ class WaitForCustomResourceModule(AbstractModule):
                 "type": "str",
                 "required": False,
             },
-            "kind": {
-                "type": "str",
-                "required": True,
-            },
             "kubeconfig": {
                 "type": "dict",
                 "required": False,
             },
-            "plural": {
-                "type": "str",
-                "required": True,
-            },
-            "version": {
+            "project": {
                 "type": "str",
                 "required": True,
             },
@@ -67,16 +56,11 @@ class WaitForCustomResourceModule(AbstractModule):
 
         self._module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-        super().__init__(self._module.params["kubeconfig"])
+        super().__init__(self._module.params["kubeconfig"] if "kubeconfig" in self._module.params else None)
 
-        self._custom_resource_name: str = self._module.params["custom_resource_name"]
-        self._jmespath_expression: str | None = self._module.params["jmespath_expression"]
-        self._kind_metadata = KindMetadata(
-            self._module.params["group"],
-            self._module.params["kind"],
-            self._module.params["plural"],
-            self._module.params["version"],
-        )
+        self._custom_resource_name: str = self._module.params["custom_resource_name"]  # type: ignore
+        self._jmespath_expression: str | None = self._module.params["jmespath_expression"]  # type: ignore
+        self._project: str = self._module.params["project"]  # type: ignore
 
     # override
     def get_module(self) -> AnsibleModule:
@@ -84,11 +68,12 @@ class WaitForCustomResourceModule(AbstractModule):
 
     # override
     def run(self):
-        result: dict | None
+        result: dict | None = None
 
         try:
-            self._wait_for_custom_resource(
-                self._kind_metadata,
+            self._wait_for_namespaced_core_resource(
+                client.CoreV1Api().list_namespaced_pod,
+                self._project,
                 self._log,
                 self._success_callback,
                 # passed to _add_event_indicates_custom_resource_definitions_are_created
@@ -109,7 +94,7 @@ class WaitForCustomResourceModule(AbstractModule):
         custom_resource_event_result: CustomResourceEventResult | None = None
 
         if (event["type"] == "ADDED") or (event["type"] == "MODIFIED"):
-            resource_name = cpo.lib.jmespath.get_jmespath_string("object.metadata.name", event)
+            resource_name = cpo.lib.jmespath.get_jmespath_string("raw_object.metadata.name", event)
 
             try:
                 if resource_name == custom_resource_event_data.custom_resource_name:
@@ -124,7 +109,7 @@ class WaitForCustomResourceModule(AbstractModule):
 
 
 def main():
-    WaitForCustomResourceModule().run()
+    WaitForNamespacedPodModule().run()
 
 
 if __name__ == "__main__":
