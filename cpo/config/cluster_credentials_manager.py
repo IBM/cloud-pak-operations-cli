@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -333,11 +333,11 @@ class ClusterCredentialsManager:
         if self._current_credentials is None:
             credentials_file_path = configuration_manager.get_credentials_file_path()
 
-            if credentials_file_path.exists() and (credentials_file_path.stat().st_size != 0):
-                with open(credentials_file_path) as json_file:
-                    self._current_credentials = json.load(json_file)
-            else:
-                self._current_credentials = {}
+            self._current_credentials = (
+                self._get_credentials_file_contents(credentials_file_path)
+                if credentials_file_path.exists() and (credentials_file_path.stat().st_size != 0)
+                else {}
+            )
 
             current_cluster = self.get_current_cluster()
 
@@ -442,6 +442,10 @@ class ClusterCredentialsManager:
         clusters_file_contents = self.get_clusters_file_contents_with_default()
 
         return clusters_file_contents["clusters"]
+
+    def _get_credentials_file_contents(self, credentials_file_path: pathlib.Path) -> ContextData:
+        with open(credentials_file_path) as json_file:
+            return json.load(json_file)
 
     def _invalidate_current_credentials(self):
         """Invalidates current credentials"""

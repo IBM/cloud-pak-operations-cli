@@ -34,6 +34,9 @@
 		"click",
 		"--trailing-comma"
 	],
+	"python.analysis.exclude": [
+		"build"
+	],
 	"python.analysis.typeCheckingMode": "basic",
 	"python.defaultInterpreterPath": "${workspaceFolder}/.venv",
 	"python.testing.pytestEnabled": false,

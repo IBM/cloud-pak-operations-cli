@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,6 +15,7 @@
 import cpo.config.cluster_credentials_manager
 import cpo.lib.click.utils
 
+from cpo.lib.openshift.oc import login
 from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.logging import loglevel_command
 
@@ -24,12 +25,15 @@ from cpo.utils.logging import loglevel_command
         cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_credentials()
     )
 )
-def login():
-    """Log in to the current OpenShift cluster"""
+def oc_login():
+    """Log in to the current OpenShift cluster
+
+    This command modifies ~/.kube/config.
+    """
 
     current_cluster = cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
 
     if current_cluster is None:
         raise CloudPakOperationsCLIException("No current cluster selected")
 
-    current_cluster.login()
+    login(current_cluster)

@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,8 +13,6 @@
 #  limitations under the License.
 
 import cpo.config
-import cpo.lib.ibmcloud
-import cpo.lib.openshift.oc
 
 from cpo.lib.cluster.cluster import AbstractCluster, ClusterData
 from cpo.lib.ibmcloud import INTERNAL_KEY_NAME_FOR_IBM_CLOUD_API_KEY
@@ -25,6 +23,7 @@ class ROKSCluster(AbstractCluster):
     def __init__(self, server: str, cluster_data: ClusterData):
         super().__init__(server, cluster_data)
 
+    # override
     def get_password(self) -> str:
         api_key = cpo.config.configuration_manager.get_value_from_credentials_file(
             INTERNAL_KEY_NAME_FOR_IBM_CLOUD_API_KEY
@@ -37,15 +36,6 @@ class ROKSCluster(AbstractCluster):
 
         return api_key
 
+    # override
     def get_username(self) -> str:
         return "apikey"
-
-    def login(self):
-        api_key = cpo.config.configuration_manager.get_value_from_credentials_file(
-            cpo.lib.ibmcloud.INTERNAL_KEY_NAME_FOR_IBM_CLOUD_API_KEY
-        )
-
-        if api_key is None:
-            raise CloudPakOperationsCLIException("IBM Cloud API key not found in stored credentials")
-
-        cpo.lib.openshift.oc.log_in_to_openshift_cluster_with_password(self.server, "apikey", api_key)

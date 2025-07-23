@@ -1,4 +1,4 @@
-#  Copyright 2021, 2022 IBM Corporation
+#  Copyright 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,6 +14,8 @@
 
 import click
 
+import cpo.lib.openshift.oc
+
 from cpo.lib.ibmcloud.ibm_cloud_api_manager import IBMCloudAPIManager
 from cpo.lib.ibmcloud.oc.cluster.roks_cluster_factory import roks_cluster_factory
 from cpo.utils.error import CloudPakOperationsCLIException
@@ -22,13 +24,14 @@ from cpo.utils.logging import loglevel_command
 
 @loglevel_command()
 @click.option("--cluster-name", help="cluster name", required=True)
-def login(cluster_name: str):
+def oc_login(cluster_name: str):
     """Log in to a Red Hat OpenShift on IBM Cloud cluster"""
 
     cluster_status = IBMCloudAPIManager().get_cluster_status(cluster_name)
 
     if cluster_status.is_ready():
         cluster = roks_cluster_factory.create_cluster(cluster_status.get_server_url(), {})
-        cluster.login()
+
+        cpo.lib.openshift.oc.login(cluster)
     else:
         raise CloudPakOperationsCLIException(f"Cluster {cluster_name} is not yet ready")

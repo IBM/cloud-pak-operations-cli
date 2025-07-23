@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -181,39 +181,3 @@ def get_semver_version(ctx, param, value: str | None) -> semver.Version | None:
         return semver.Version.parse(value) if value is not None else None
     except Exception as exception:
         raise click.BadParameter(str(exception))
-
-
-def log_in_to_openshift_cluster(ctx: click.Context, options: dict[str, Any]):
-    if (
-        ("server" in options)
-        and (options["server"] is not None)
-        and ("username" in options)
-        and (options["username"] is not None)
-        and ("password" in options)
-        and (options["password"] is not None)
-        and (("token" not in options) or (options["token"] is None))
-        and (("use_cluster" not in options) or (options["use_cluster"] is None))
-    ):
-        cpo.lib.openshift.oc.log_in_to_openshift_cluster_with_password(
-            options["server"], options["username"], options["password"]
-        )
-    elif (
-        ("server" in options)
-        and (options["server"] is not None)
-        and (("username" not in options) or (options["username"] is None))
-        and (("password" not in options) or (options["password"] is None))
-        and ("token" in options)
-        and (options["token"] is not None)
-        and (("use_cluster" not in options) or (options["use_cluster"] is None))
-    ):
-        cpo.lib.openshift.oc.log_in_to_openshift_cluster_with_token(options["server"], options["token"])
-    elif ("use_cluster" in options) and (options["use_cluster"] is not None):
-        cluster_credentials_manager.get_cluster_or_raise_exception(options["use_cluster"]).login()
-    elif (current_cluster := cluster_credentials_manager.get_current_cluster()) is not None:
-        current_cluster.login()
-    else:
-        raise click.UsageError(
-            "You must either set options --server/--username/--password, --server/--token, --use-cluster, or set a "
-            "current cluster.",
-            ctx,
-        )
