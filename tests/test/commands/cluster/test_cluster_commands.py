@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ from typing import TypedDict
 
 import click.testing
 
-import cpo.config
 import cpo.lib.cluster
 import cpo.lib.cluster.cluster_factory
 
@@ -47,10 +46,6 @@ class UnitTestCluster(AbstractCluster):
     # override
     def get_username(self) -> str:
         return ""
-
-    # override
-    def login(self):
-        pass
 
 
 class UnitTestClusterFactory(cpo.lib.cluster.cluster_factory.AbstractClusterFactory):

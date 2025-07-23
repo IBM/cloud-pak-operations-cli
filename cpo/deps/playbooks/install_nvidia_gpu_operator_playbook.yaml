@@ -52,9 +52,9 @@
         channel: "{{ k8s_info_result | json_query('resources[0].status.defaultChannel') }}"
 
     - set_fact:
-        starting_csv: "{{ k8s_info_result | json_query(query) | first }}"
+        starting_csv: "{{ k8s_info_result | json_query(current_csv) | first }}"
       vars:
-        query: "resources[0].status.channels[?name == '{{ channel }}'].currentCSV"
+        current_csv: "resources[0].status.channels[?name == '{{ channel }}'].currentCSV"
 
     - name: "Create Subscription resource (name: gpu-operator-certified)"
       kubernetes.core.k8s:
@@ -108,13 +108,14 @@
                 name: ""
               enabled: true
               mps:
-                root: "/run/nvidia/mps"
+                root: /run/nvidia/mps
             driver:
               certConfig:
                 name: ""
               enabled: true
               kernelModuleConfig:
                 name: ""
+              kernelModuleType: auto
               licensingConfig:
                 configMapName: ""
                 nlsEnabled: true
@@ -136,7 +137,6 @@
                 waitForCompletion:
                   timeoutSeconds: 0
               useNvidiaDriverCRD: false
-              useOpenKernelModules: false
               virtualTopology:
                 config: ""
             gdrcopy:

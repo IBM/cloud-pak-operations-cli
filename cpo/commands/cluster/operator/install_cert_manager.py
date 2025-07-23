@@ -1,4 +1,4 @@
-#  Copyright 2024, 2025 IBM Corporation
+#  Copyright 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ import click
 
 import cpo.config.cluster_credentials_manager
 import cpo.lib.click.utils
-import cpo.utils.network
 
 from cpo.lib.ansible.openshift_playbook_runner import OpenShiftPlaybookRunner
 from cpo.lib.openshift.utils.click import openshift_server_options
@@ -31,10 +30,9 @@ from cpo.utils.logging import loglevel_command
     )
 )
 @openshift_server_options
-@click.option("--project", default="redhat-ods-operator", help="OpenShift project", show_default=True)
-@click.option("--channel", default="stable-2.19", help="Red Hat OpenShift AI update channel", show_default=True)
+@click.option("--project", default="cert-manager-operator", help="OpenShift project", show_default=True)
 @click.pass_context
-def install_red_hat_openshift_ai_operator(
+def install_cert_manager_operator(
     ctx: click.Context,
     server: Optional[str],
     username: Optional[str],
@@ -43,17 +41,15 @@ def install_red_hat_openshift_ai_operator(
     insecure_skip_tls_verify: Optional[bool],
     use_cluster: Optional[str],
     project: str,
-    channel: str,
 ):
-    """Install the Red Hat OpenShift AI Operator"""
+    """Install the cert-manager Operator for Red Hat OpenShift"""
 
     credentials = cpo.lib.click.utils.get_cluster_credentials(ctx, locals().copy())
 
     OpenShiftPlaybookRunner(
-        "install_red_hat_openshift_ai_playbook.yaml",
+        "install_cert_manager_operator_playbook.yaml",
         credentials,
         variables={
-            "channel": channel,
             "project": project,
         },
     ).run_playbook()

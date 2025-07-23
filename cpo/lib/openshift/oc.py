@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -19,10 +19,15 @@ from typing import Final
 
 import semver
 
-import cpo.config
-import cpo.utils.network
+from kubernetes.config.config_exception import ConfigException
+from kubernetes.config.kube_config import list_kube_config_contexts
+from pydantic import TypeAdapter
+
+import cpo.lib.openshift.credentials.cluster_based_user_credentials
 import cpo.utils.process
 
+from cpo.lib.cluster.cluster import AbstractCluster
+from cpo.lib.cluster.types.context import Context
 from cpo.lib.dependency_manager.dependency_manager import DependencyManager
 from cpo.lib.dependency_manager.plugins.openshift.openshift_cli_plugin import OpenShiftCLIPlugIn
 from cpo.lib.openshift.types.get_pod_entry import GetPodEntry
@@ -99,12 +104,13 @@ def get_current_token() -> str:
         current OAuth access token stored in ~/.kube/config
     """
 
-    oc_whoami_args = [
-        "whoami",
-        "--show-token",
-    ]
-
-    oc_whoami_command_result = execute_oc_command(oc_whoami_args, capture_output=True)
+    oc_whoami_command_result = execute_oc_command(
+        [
+            "whoami",
+            "--show-token",
+        ],
+        capture_output=True,
+    )
 
     return oc_whoami_command_result.stdout.rstrip()
 
@@ -155,40 +161,47 @@ def get_image_registry_hostname(route_name: str = "default-route") -> str:
         Image Registry hostname for the given route name
     """
 
-    oc_get_route_args = [
-        "get",
-        "route",
-        "--namespace",
-        "openshift-image-registry",
-        "--output",
-        "jsonpath='{.items[?(@.metadata.name==\"" + route_name + "\")].spec.host}'",
-    ]
-
     oc_get_route_command_result = (
-        execute_oc_command(oc_get_route_args, capture_output=True).stdout.removeprefix("'").removesuffix("'")
+        execute_oc_command(
+            [
+                "get",
+                "route",
+                "--namespace",
+                "openshift-image-registry",
+                "--output",
+                "jsonpath='{.items[?(@.metadata.name==\"" + route_name + "\")].spec.host}'",
+            ],
+            capture_output=True,
+        )
+        .stdout.removeprefix("'")
+        .removesuffix("'")
     )
 
     return oc_get_route_command_result
 
 
 def get_openshift_version() -> semver.Version:
-    oc_version_args = ["version", "--output", "json"]
-    oc_version_command_result = json.loads(execute_oc_command(oc_version_args, capture_output=True).stdout)
+    oc_version_command_result = json.loads(
+        execute_oc_command(["version", "--output", "json"], capture_output=True).stdout
+    )
 
     return semver.Version.parse(oc_version_command_result["openshiftVersion"])
 
 
 def get_persistent_volume_name(namespace: str, persistent_volume_claim_name: str) -> str:
-    oc_get_pvc_args = [
-        "get",
-        "pvc",
-        "--namespace",
-        namespace,
-        "--output",
-        "json",
-    ]
-
-    oc_get_pvc_command_result = json.loads(execute_oc_command(oc_get_pvc_args, capture_output=True).stdout)
+    oc_get_pvc_command_result = json.loads(
+        execute_oc_command(
+            [
+                "get",
+                "pvc",
+                "--namespace",
+                namespace,
+                "--output",
+                "json",
+            ],
+            capture_output=True,
+        ).stdout
+    )
 
     if len(oc_get_pvc_command_result["items"]) == 0:
         raise CloudPakOperationsCLIException(
@@ -202,15 +215,18 @@ def get_persistent_volume_name(namespace: str, persistent_volume_claim_name: str
 
 
 def get_persistent_volume_id(persistent_volume_name: str):
-    oc_get_pv_args = [
-        "get",
-        "pv",
-        "--output",
-        f"jsonpath='{{.items[?(@.metadata.name==\"{persistent_volume_name}\")].metadata.labels.volumeId}}'",
-    ]
-
     oc_get_pv_command_result = (
-        execute_oc_command(oc_get_pv_args, capture_output=True).stdout.removeprefix("'").removesuffix("'")
+        execute_oc_command(
+            [
+                "get",
+                "pv",
+                "--output",
+                f"jsonpath='{{.items[?(@.metadata.name==\"{persistent_volume_name}\")].metadata.labels.volumeId}}'",
+            ],
+            capture_output=True,
+        )
+        .stdout.removeprefix("'")
+        .removesuffix("'")
     )
 
     if oc_get_pv_command_result == "":
@@ -241,11 +257,9 @@ def log_in_to_openshift_cluster_with_token(server: str, token: str):
 def get_deployment_name(search_string: str) -> list[str]:
     """Returns the available OpenShift deployment(s) for a given search string"""
 
-    oc_get_deployments_args = ["get", "deployments"]
-
-    oc_get_deployments_result = execute_oc_command(oc_get_deployments_args, capture_output=True).stdout
-
+    oc_get_deployments_result = execute_oc_command(["get", "deployments"], capture_output=True).stdout
     result = []
+
     for line in oc_get_deployments_result.splitlines():
         if search_string in line:
             result.append(line.split()[0].strip())
@@ -261,11 +275,9 @@ def get_deployment_name(search_string: str) -> list[str]:
 def get_pod_name(search_string: str) -> list[str]:
     """Returns the available OpenShift pod(s) for a given search string"""
 
-    oc_get_pods_args = ["get", "pods"]
-
-    oc_get_pods_result = execute_oc_command(oc_get_pods_args, capture_output=True).stdout
-
+    oc_get_pods_result = execute_oc_command(["get", "pods"], capture_output=True).stdout
     result = []
+
     for line in oc_get_pods_result.splitlines():
         if search_string in line:
             result.append(line.split()[0].strip())
@@ -279,11 +291,8 @@ def get_pod_name(search_string: str) -> list[str]:
 def get_pod_status(pod_name: str) -> GetPodEntry:
     """Returns the current pod status for a given pod name"""
 
-    oc_get_pods_args = ["get", "pods"]
+    oc_get_pods_result = execute_oc_command(["get", "pods"], capture_output=True).stdout
 
-    oc_get_pods_result = execute_oc_command(oc_get_pods_args, capture_output=True).stdout
-
-    line = ""
     for line in oc_get_pods_result.splitlines():
         if pod_name in line:
             break
@@ -294,12 +303,50 @@ def get_pod_status(pod_name: str) -> GetPodEntry:
 def get_custom_resource(custom_resource_kind: str, custom_resource_id: str) -> dict:
     """Get the custom resource for a given kind and ID"""
 
-    oc_get_custom_resource_args = ["get", custom_resource_kind, custom_resource_id, "--output", "json"]
-
     oc_get_custom_resource_result = json.loads(
-        execute_oc_command(oc_get_custom_resource_args, capture_output=True).stdout
+        execute_oc_command(
+            ["get", custom_resource_kind, custom_resource_id, "--output", "json"], capture_output=True
+        ).stdout
     )
     return oc_get_custom_resource_result
+
+
+def login(current_cluster: AbstractCluster):
+    credentials = cpo.lib.openshift.credentials.cluster_based_user_credentials.ClusterBasedUserCredentials(
+        current_cluster
+    )
+    credentials.refresh_access_token()
+
+    username = current_cluster.get_username()
+
+    if username == "kubeadmin":
+        username = "kube:admin"
+
+    kube_config_cluster = current_cluster.get_server().removeprefix("https://").replace(".", "-")
+    kube_config_username = f"{username}/{kube_config_cluster}"
+    default_project_context = f"default/{kube_config_cluster}/{username}"
+
+    execute_oc_command(
+        ["config", "set-credentials", kube_config_username, "--token", credentials.get_access_token()],
+        capture_output=True,
+    )
+
+    try:
+        kube_config_contexts = TypeAdapter(tuple[list[Context], Context]).validate_python(list_kube_config_contexts())
+        current_context = kube_config_contexts[1]
+
+        if current_context.context.cluster != kube_config_cluster:
+            contexts = kube_config_contexts[0]
+
+            if not _context_exists(contexts, default_project_context):
+                set_cluster(kube_config_cluster, current_cluster)
+
+            set_context(kube_config_cluster, kube_config_username, default_project_context)
+            use_context(kube_config_cluster, username)
+    except ConfigException:
+        set_cluster(kube_config_cluster, current_cluster)
+        set_context(kube_config_cluster, kube_config_username, default_project_context)
+        use_context(kube_config_cluster, username)
 
 
 def replace_custom_resource(custom_resource_json: dict):
@@ -310,3 +357,50 @@ def replace_custom_resource(custom_resource_json: dict):
         oc_set_custom_resource_args = ["replace", "--filename", json_file.name]
 
         execute_oc_command(oc_set_custom_resource_args)
+
+
+def set_cluster(kube_config_cluster: str, current_cluster: AbstractCluster):
+    execute_oc_command(
+        [
+            "config",
+            "set-cluster",
+            kube_config_cluster,
+            "--insecure-skip-tls-verify=true",
+            "--server",
+            current_cluster.get_server(),
+        ],
+        capture_output=True,
+    )
+
+
+def set_context(kube_config_cluster: str, kube_config_username: str, default_project_context):
+    execute_oc_command(
+        [
+            "config",
+            "set-context",
+            default_project_context,
+            "--cluster",
+            kube_config_cluster,
+            "--namespace",
+            "default",
+            "--user",
+            kube_config_username,
+        ],
+        capture_output=True,
+    )
+
+
+def use_context(kube_config_cluster: str, username: str):
+    execute_oc_command(["config", "use-context", f"default/{kube_config_cluster}/{username}"], capture_output=True)
+
+
+def _context_exists(contexts: list[Context], context_name: str) -> bool:
+    result = False
+
+    for context in contexts:
+        if context.name == context_name:
+            result = True
+
+            break
+
+    return result

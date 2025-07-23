@@ -1,4 +1,4 @@
-#  Copyright 2022, 2024 IBM Corporation
+#  Copyright 2022, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,8 +22,8 @@ from ansible.module_utils.basic import AnsibleModule
 import cpo.lib.jmespath
 
 from cpo.lib.ansible.modules.abstract_module import AbstractModule
-from cpo.lib.ansible.modules.custom_resource_event_result import CustomResourceEventResult
 from cpo.lib.jmespath import JmespathPathExpressionNotFoundException
+from cpo.lib.openshift.types.custom_resource_event_result import CustomResourceEventResult
 from cpo.lib.openshift.types.kind_metadata import KindMetadata
 
 
@@ -53,7 +53,7 @@ class WaitForNamespacedCustomResourceModule(AbstractModule):
             },
             "kubeconfig": {
                 "type": "dict",
-                "required": True,
+                "required": False,
             },
             "plural": {
                 "type": "str",
@@ -70,18 +70,19 @@ class WaitForNamespacedCustomResourceModule(AbstractModule):
         }
 
         self._module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
-        super().__init__(self._module.params["kubeconfig"])  # type: ignore
 
-        self._custom_resource_name: str = self._module.params["custom_resource_name"]  # type: ignore
-        self._jmespath_expression: str | None = self._module.params["jmespath_expression"]  # type: ignore
+        super().__init__(self._module.params["kubeconfig"])
+
+        self._custom_resource_name: str = self._module.params["custom_resource_name"]
+        self._jmespath_expression: str | None = self._module.params["jmespath_expression"]
         self._kind_metadata = KindMetadata(
-            self._module.params["group"],  # type: ignore
-            self._module.params["kind"],  # type: ignore
-            self._module.params["plural"],  # type: ignore
-            self._module.params["version"],  # type: ignore
+            self._module.params["group"],
+            self._module.params["kind"],
+            self._module.params["plural"],
+            self._module.params["version"],
         )
 
-        self._project: str = self._module.params["project"]  # type: ignore
+        self._project: str = self._module.params["project"]
 
     # override
     def get_module(self) -> AnsibleModule:

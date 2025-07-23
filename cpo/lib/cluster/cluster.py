@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -35,8 +35,4 @@ class AbstractCluster(ABC):
 
     @abstractmethod
     def get_username(self) -> str:
-        pass
-
-    @abstractmethod
-    def login(self):
         pass

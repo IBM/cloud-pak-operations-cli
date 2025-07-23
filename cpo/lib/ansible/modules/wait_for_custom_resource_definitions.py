@@ -1,4 +1,4 @@
-#  Copyright 2022, 2024 IBM Corporation
+#  Copyright 2022, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ from ansible.module_utils.basic import AnsibleModule
 import cpo.lib.jmespath
 
 from cpo.lib.ansible.modules.abstract_module import AbstractModule
-from cpo.lib.ansible.modules.custom_resource_event_result import CustomResourceEventResult
+from cpo.lib.openshift.types.custom_resource_event_result import CustomResourceEventResult
 from cpo.lib.openshift.types.kind_metadata import KindMetadata
 
 
@@ -41,17 +41,15 @@ class WaitForCustomResourceDefinitionsModule(AbstractModule):
             },
             "kubeconfig": {
                 "type": "dict",
-                "required": True,
+                "required": False,
             },
         }
 
         self._module = AnsibleModule(argument_spec=argument_spec, supports_check_mode=True)
 
-        super().__init__(self._module.params["kubeconfig"])  # type: ignore
+        super().__init__(self._module.params["kubeconfig"])
 
-        self._custom_resource_definitions: list[str] = self._module.params[
-            "custom_resource_definitions"
-        ]  # type: ignore
+        self._custom_resource_definitions: list[str] = self._module.params["custom_resource_definitions"]
 
     # override
     def get_module(self) -> AnsibleModule:
