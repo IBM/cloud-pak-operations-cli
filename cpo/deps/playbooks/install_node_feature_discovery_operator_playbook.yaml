@@ -29,7 +29,7 @@
             name: "{{ project }}"
         state: present
 
-    - name: "Create OperatorGroup resource (name: openshift-nfd)"
+    - name: "Create OperatorGroup resource (name prefix: openshift-nfd-)"
       kubernetes.core.k8s:
         kubeconfig: "{{ kube_config }}"
         resource_definition:
