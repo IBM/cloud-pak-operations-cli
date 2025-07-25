@@ -34,7 +34,13 @@ class AbstractModule(ABC):
         if config_dict is not None:
             config.load_kube_config_from_dict(config_dict)
         else:
-            config.load_kube_config()
+            try:
+                config.load_kube_config()
+            except config.ConfigException as exception:
+                if str(exception) == "Invalid kube-config file. No configuration found.":
+                    config.load_incluster_config()
+                else:
+                    raise
 
     @abstractmethod
     def get_module(self) -> AnsibleModule:
