@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@ import ipaddress
 import socket
 import warnings
 
-import netifaces
+import ifaddr
 import urllib3
 import urllib3.exceptions
 
@@ -69,17 +69,10 @@ def get_local_ipv4_addresses() -> list[ipaddress.IPv4Address]:
 
     result: list[ipaddress.IPv4Address] = []
 
-    for interface in netifaces.interfaces():
-        ifaddresses = netifaces.ifaddresses(interface)
-
-        if netifaces.AF_INET in ifaddresses:
-            # IPv4 address is bound to NIC
-            ifaddress = ifaddresses[netifaces.AF_INET][0]
-
-            ip_address = ipaddress.ip_address(ifaddress["addr"])
-
-            if isinstance(ip_address, ipaddress.IPv4Address):
-                result.append(ip_address)
+    for adapter in ifaddr.get_adapters():
+        for ip in adapter.ips:
+            if ip.is_IPv4:
+                result.append(ipaddress.IPv4Address(ip.ip))
 
     result.sort()
 
