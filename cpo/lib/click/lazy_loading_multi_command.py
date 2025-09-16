@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
 #  limitations under the License.
 
 import importlib
-import importlib.metadata
 import importlib.util
 import logging
 import pathlib
@@ -299,9 +298,7 @@ class LazyLoadingMultiCommand(click.Group):
         """
 
         command_type_1 = "Command group" if str(package_element_descriptor.path).endswith("__init__.py") else "Command"
-        command_type_2 = (
-            "command group" if isinstance(command_data[command_name].command, click.MultiCommand) else "command"
-        )
+        command_type_2 = "command group" if isinstance(command_data[command_name].command, click.Group) else "command"
 
         command_hierarchy_path = (
             f", command hierarchy path: '{package_element_descriptor.command_hierarchy_path}'"

@@ -1,4 +1,4 @@
-#  Copyright 2023 IBM Corporation
+#  Copyright 2023, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -11,7 +11,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-
 
 import pathlib
 import shutil
@@ -54,17 +53,21 @@ class IBMInternalPluginInstaller:
                 packages = client.get_project_page(project_name).packages
                 sdists = list(filter(lambda package: package.package_type == "sdist", packages))
                 sdists.sort(
-                    key=lambda distribution_package: semver.Version.parse(distribution_package.version)
-                    if distribution_package.version is not None
-                    else semver.Version(0),
+                    key=lambda distribution_package: (
+                        semver.Version.parse(distribution_package.version)
+                        if distribution_package.version is not None
+                        else semver.Version(0)
+                    ),
                     reverse=True,
                 )
 
                 wheels = list(filter(lambda package: package.package_type == "wheel", packages))
                 wheels.sort(
-                    key=lambda distribution_package: semver.Version.parse(distribution_package.version)
-                    if distribution_package.version is not None
-                    else semver.Version(0),
+                    key=lambda distribution_package: (
+                        semver.Version.parse(distribution_package.version)
+                        if distribution_package.version is not None
+                        else semver.Version(0)
+                    ),
                     reverse=True,
                 )
 
