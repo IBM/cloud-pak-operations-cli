@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -102,7 +102,7 @@ class TestPluginManager(unittest.TestCase):
         multi_command_2 = multi_command_1.get_command(Mock(), "bi-group-1")
 
         self._assert_multi_command(multi_command_2)
-        assert isinstance(multi_command_2, click.MultiCommand)
+        assert isinstance(multi_command_2, click.Group)
 
         multi_command_2_commands = multi_command_2.list_commands(Mock())
 
@@ -114,7 +114,7 @@ class TestPluginManager(unittest.TestCase):
         multi_command_3 = multi_command_2.get_command(Mock(), "bi-group-2")
 
         self._assert_multi_command(multi_command_3)
-        assert isinstance(multi_command_3, click.MultiCommand)
+        assert isinstance(multi_command_3, click.Group)
 
         multi_command_3_commands = multi_command_3.list_commands(Mock())
 
@@ -253,4 +253,4 @@ class TestPluginManager(unittest.TestCase):
     def _assert_multi_command(self, command: click.Command | None):
         self.assertIsNotNone(command)
         assert command is not None
-        self.assertIsInstance(command, click.MultiCommand)
+        self.assertIsInstance(command, click.Group)

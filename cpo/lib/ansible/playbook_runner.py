@@ -1,4 +1,4 @@
-#  Copyright 2022, 2024 IBM Corporation
+#  Copyright 2022, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -129,7 +129,6 @@ class PlaybookRunner(ABC):
             artifact_dir=configuration_manager.get_cli_data_directory_path() / "artifacts",
             envvars={
                 "ANSIBLE_INVENTORY_UNPARSED_WARNING": False,
-                "ANSIBLE_JINJA2_NATIVE": True,
                 "ANSIBLE_LIBRARY": configuration_manager.get_root_package_path() / "lib" / "ansible" / "modules",
                 "ANSIBLE_LOCALHOST_WARNING": False,
             },
