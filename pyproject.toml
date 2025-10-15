@@ -14,7 +14,7 @@ classifiers = [
 ]
 dependencies = [
 	"ansible_runner",
-	"ansible",
+	"ansible >= 12",
 	"asyncssh",
 	"click-option-group",
 	"click",
@@ -42,7 +42,7 @@ description = "IBM Cloud Pak Operations CLI"
 dynamic = ["version"]
 name = "cloud-pak-operations-cli"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 
 [project.scripts]
 cpo = "cpo.cpo:cli"

@@ -15,7 +15,7 @@
 import logging
 import re as regex
 
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any
 
 import ansible_runner
@@ -79,9 +79,10 @@ class PlaybookRunner(ABC):
             if ("event" in event_data) and (event_data["event"] == "runner_on_failed"):
                 self._error_event_data = event_data
 
-                logger.log(logging.ERROR, event_data["stdout"].removeprefix("\r\n"))
+                if self._raise_exception_if_runner_on_failed():
+                    logger.error(event_data["stdout"].removeprefix("\r\n"))
             else:
-                logger.log(logging.INFO, event_data["stdout"].removeprefix("\r\n"))
+                logger.info(event_data["stdout"].removeprefix("\r\n"))
 
     def _get_extra_vars(self) -> dict:
         """Returns extra vars/additional variables
@@ -116,6 +117,10 @@ class PlaybookRunner(ABC):
         playbook_name = f"{class_name_using_snake_case}.yaml".lower()
 
         return playbook_name
+
+    @abstractmethod
+    def _raise_exception_if_runner_on_failed(self) -> bool:
+        pass
 
     def _run_playbook(self) -> Runner:
         """Runs the playbook with the name passed in the constructor
