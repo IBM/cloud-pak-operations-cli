@@ -16,8 +16,6 @@ import logging
 
 from typing import Any
 
-import jmespath
-
 import cpo.lib.jmespath
 
 from cpo.config import configuration_manager
@@ -71,6 +69,13 @@ class OpenShiftPlaybookRunner(PlaybookRunner):
             else:
                 raise CloudPakOperationsCLIException("Ansible playbook failed")
 
+    def _check_if_unauthorized(self, event_data: Any) -> bool:
+        msg = cpo.lib.jmespath.get_jmespath_string("event_data.res.msg", event_data)
+
+        return msg.startswith("Exception '401\nReason: Unauthorized") or msg.startswith(
+            "Task failed: Module failed: 401\nReason: Unauthorized"
+        )
+
     # override
     def _event_handler(self, event_data: Any):
         try:
@@ -83,21 +88,6 @@ class OpenShiftPlaybookRunner(PlaybookRunner):
 
         super()._event_handler(event_data)
 
-    def _check_if_unauthorized(self, event_data: Any) -> bool:
-        unauthorized = jmespath.search("event_data.res.reason", event_data) == "Unauthorized"
-
-        if not unauthorized:
-            msg = cpo.lib.jmespath.get_jmespath_string("event_data.res.msg", event_data)
-
-            unauthorized = msg.startswith("Exception '401\nReason: Unauthorized") or (
-                (
-                    (msg == "MODULE FAILURE: No start of json char found\nSee stdout/stderr for the exact error")
-                    or (msg == "MODULE FAILURE\nSee stdout/stderr for the exact error")
-                )
-                and (
-                    "kubernetes.dynamic.exceptions.UnauthorizedError: 401\nReason: Unauthorized"
-                    in cpo.lib.jmespath.get_jmespath_string("event_data.res.module_stderr", event_data)
-                )
-            )
-
-        return unauthorized
+    # override
+    def _raise_exception_if_runner_on_failed(self) -> bool:
+        return not self._token_expired

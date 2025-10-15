@@ -18,7 +18,8 @@
 			// and, for example, ansible-playbook is not found otherwise
 			"env": {
 				"PATH": "${workspaceFolder}/.venv/bin:${env:PATH}"
-			}
+			},
+			"subProcess": false
 		},
 		{
 			"name": "Python: unit tests (cpo)",
@@ -34,7 +35,8 @@
 			// and, for example, ansible-playbook is not found otherwise
 			"env": {
 				"PATH": "${workspaceFolder}/.venv/bin:${env:PATH}"
-			}
+			},
+			"subProcess": false
 		},
 		{
 			"name": "Python: unit tests (scripts)",
