@@ -15,7 +15,7 @@
 import logging
 import re as regex
 
-from abc import ABC, abstractmethod
+from abc import ABC
 from typing import Any
 
 import ansible_runner
@@ -118,9 +118,8 @@ class PlaybookRunner(ABC):
 
         return playbook_name
 
-    @abstractmethod
     def _raise_exception_if_runner_on_failed(self) -> bool:
-        pass
+        return True
 
     def _run_playbook(self) -> Runner:
         """Runs the playbook with the name passed in the constructor
