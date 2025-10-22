@@ -1,4 +1,4 @@
-#  Copyright 2023, 2024 IBM Corporation
+#  Copyright 2023, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -61,7 +61,7 @@ class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
         self._extract_archive(archive_path, dependency_version.version, operating_system)
 
     # override
-    def get_latest_dependency_version(self) -> DependencyVersion:
+    def get_latest_dependency_version(self, github_access_token: str | None) -> DependencyVersion:
         """Returns the latest version of the OpenShift CLI
 
         Returns

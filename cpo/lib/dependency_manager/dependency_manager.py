@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -82,11 +82,16 @@ class DependencyManager:
 
         return latest_downloaded_binary_version.version
 
-    def download_latest_dependencies_if_required(self):
+    def download_latest_dependencies_if_required(self, github_access_token: str | None):
         """Downloads latest dependencies if required
 
         The versions of the downloaded dependencies are stored in
         ~/.cpo/binaries.json.
+
+        Parameters
+        ----------
+        github_access_token
+            GitHub access token
         """
 
         for dependency_manager_plugin in self._dependency_manager_plugins:
@@ -95,7 +100,7 @@ class DependencyManager:
             ):
                 binary_alias = dependency_manager_plugin.get_dependency_alias()
                 latest_downloaded_binary_version = binaries_manager.get_latest_downloaded_binary_version(binary_alias)
-                latest_dependency_version = dependency_manager_plugin.get_latest_dependency_version()
+                latest_dependency_version = dependency_manager_plugin.get_latest_dependency_version(github_access_token)
 
                 if (latest_downloaded_binary_version is None) or (
                     latest_dependency_version.version.compare(latest_downloaded_binary_version.version) == 1
@@ -111,6 +116,7 @@ class DependencyManager:
         capture_output=False,
         check=True,
         print_captured_output=False,
+        github_access_token: str | None = None,
     ) -> cpo.utils.process.ProcessResult:
         """Executes the binary provided by the dependency corresponding to the
         dependency manager plug-in of the given type
@@ -161,7 +167,7 @@ class DependencyManager:
 
         if dependency_version is None:
             if latest_downloaded_binary_version is None:
-                latest_dependency_version = plugin.get_latest_dependency_version()
+                latest_dependency_version = plugin.get_latest_dependency_version(github_access_token)
 
                 plugin.download_dependency_version(latest_dependency_version)
                 binaries_manager.set_latest_downloaded_binary_version(
@@ -257,10 +263,13 @@ class DependencyManager:
         self._dependency_manager_plugins.append(plugin)
 
     def _download_dependency(
-        self, plugin: AbstractDependencyManagerPlugIn, dependency_version: DependencyVersion | None = None
+        self,
+        plugin: AbstractDependencyManagerPlugIn,
+        dependency_version: DependencyVersion | None = None,
+        github_access_token: str | None = None,
     ) -> DependencyVersion:
         if dependency_version is None:
-            dependency_version = plugin.get_latest_dependency_version()
+            dependency_version = plugin.get_latest_dependency_version(github_access_token)
 
         plugin.download_dependency_version(dependency_version)
         binaries_manager.set_latest_downloaded_binary_version(plugin.get_dependency_alias(), dependency_version.version)

@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -67,8 +67,8 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
         return "Terraform"
 
     # override
-    def get_latest_dependency_version(self) -> DependencyVersion:
-        latest_version = self._get_latest_dependency_version_on_github("hashicorp", "terraform")
+    def get_latest_dependency_version(self, github_access_token: str | None) -> DependencyVersion:
+        latest_version = self._get_latest_dependency_version_on_github("hashicorp", "terraform", github_access_token)
 
         if latest_version is None:
             raise CloudPakOperationsCLIException(f"No {self.get_dependency_name()} release could be found on GitHub")

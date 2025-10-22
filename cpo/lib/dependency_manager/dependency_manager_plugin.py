@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -118,9 +118,14 @@ class AbstractDependencyManagerPlugIn(ABC):
         pass
 
     @abstractmethod
-    def get_latest_dependency_version(self) -> DependencyVersion:
+    def get_latest_dependency_version(self, github_access_token: str | None) -> DependencyVersion:
         """Returns the latest version of the dependency available at the
         official download location
+
+        Parameters
+        ----------
+        github_access_token
+            GitHub access token
 
         Returns
         -------
@@ -148,7 +153,9 @@ class AbstractDependencyManagerPlugIn(ABC):
     def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:
         pass
 
-    def _get_latest_dependency_version_on_github(self, owner: str, repo: str) -> DependencyVersion | None:
+    def _get_latest_dependency_version_on_github(
+        self, owner: str, repo: str, github_access_token: str | None
+    ) -> DependencyVersion | None:
         """Returns the latest version of the dependency on GitHub
 
         This method parses the "name" key of the JSON document returned by the
@@ -191,6 +198,8 @@ class AbstractDependencyManagerPlugIn(ABC):
 
         Parameters
         ----------
+        github_access_token
+            GitHub access token
         owner
             GitHub repository owner
         repo
@@ -202,7 +211,12 @@ class AbstractDependencyManagerPlugIn(ABC):
             latest version of the dependency or None if no release was found
         """
 
-        response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/releases")
+        headers = {}
+
+        if github_access_token is not None:
+            headers["Authorization"] = f"Bearer {github_access_token}"
+
+        response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/releases", headers=headers)
         response.raise_for_status()
 
         response_json = json.loads(response.content)
