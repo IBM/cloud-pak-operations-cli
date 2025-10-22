@@ -1,4 +1,4 @@
-#  Copyright 2021, 2023 IBM Corporation
+#  Copyright 2021, 2025 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -12,12 +12,15 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+import click
+
 from cpo.lib.dependency_manager.dependency_manager import DependencyManager
 from cpo.utils.logging import loglevel_command
 
 
 @loglevel_command()
-def download_dependencies():
+@click.option("--github-access-token", help="GitHub access token used for retrieving the latest release information")
+def download_dependencies(github_access_token: str | None):
     """Download dependencies"""
 
-    DependencyManager.get_instance().download_latest_dependencies_if_required()
+    DependencyManager.get_instance().download_latest_dependencies_if_required(github_access_token)
