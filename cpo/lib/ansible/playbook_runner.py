@@ -1,4 +1,4 @@
-#  Copyright 2022, 2025 IBM Corporation
+#  Copyright 2022, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ import ansible_runner
 from ansible_runner.runner import Runner
 
 from cpo.config import configuration_manager
+from cpo.lib.jmespath import get_jmespath_string, get_jmespath_value
 from cpo.utils.error import CloudPakOperationsCLIException
 
 logger = logging.getLogger(__name__)
@@ -39,6 +40,7 @@ class PlaybookRunner(ABC):
         variables: dict[str, Any] = {},
     ):
         self._error_event_data = None
+        self._fact_cache: dict[str, Any] = {}
         self._playbook_name = playbook_name
         self._private_data_dir = private_data_dir
 
@@ -63,7 +65,7 @@ class PlaybookRunner(ABC):
         if runner.status == "failed":
             raise CloudPakOperationsCLIException("Ansible playbook failed")
 
-        return runner.get_fact_cache("localhost")
+        return self._fact_cache
 
     def _event_handler(self, event_data: Any):
         """Callback invoked by Ansible Runner in case Ansible Runner itself
@@ -75,14 +77,24 @@ class PlaybookRunner(ABC):
             Ansible Runner event data
         """
 
-        if ("stdout" in event_data) and (event_data["stdout"] != ""):
-            if ("event" in event_data) and (event_data["event"] == "runner_on_failed"):
-                self._error_event_data = event_data
+        if "event" in event_data:
+            if event_data["event"] == "runner_on_failed":
+                if ("stdout" in event_data) and (event_data["stdout"] != ""):
+                    self._error_event_data = event_data
 
-                if self._raise_exception_if_runner_on_failed():
-                    logger.error(event_data["stdout"].removeprefix("\r\n"))
+                    if self._raise_exception_if_runner_on_failed():
+                        logger.error(event_data["stdout"].removeprefix("\r\n"))
+            elif event_data["event"] == "runner_on_ok":
+                self._runner_on_ok_event_handler(event_data)
+
+                if ("stdout" in event_data) and (event_data["stdout"] != ""):
+                    logger.info(event_data["stdout"].removeprefix("\r\n"))
+            elif event_data["event"] == "playbook_on_task_start":
+                if ("stdout" in event_data) and (event_data["stdout"] != ""):
+                    logger.info(event_data["stdout"].removeprefix("\r\n"))
             else:
-                logger.info(event_data["stdout"].removeprefix("\r\n"))
+                if ("stdout" in event_data) and (event_data["stdout"] != ""):
+                    logger.debug(event_data["stdout"].removeprefix("\r\n"))
 
     def _get_extra_vars(self) -> dict:
         """Returns extra vars/additional variables
@@ -147,6 +159,28 @@ class PlaybookRunner(ABC):
         assert isinstance(runner, Runner)
 
         return runner
+
+    def _runner_on_ok_event_handler(self, event_data: Any):
+        """Handles Ansible runner events of type 'runner_on_ok'
+
+        If a 'set_fact' task was executed, store the set facts in a fact cache.
+
+        Note that runner.get_fact_cache() is deprecated:
+        https://github.com/ansible/ansible-runner/issues/1441
+        """
+
+        if get_jmespath_string("event_data.task_action", event_data) == "set_fact":
+            res = get_jmespath_value("event_data.res", event_data)
+
+            if "ansible_facts" in res:
+                for key, value in res["ansible_facts"].items():
+                    self._fact_cache[key] = value
+            elif "results" in res:
+                results: list = res["results"]
+
+                for result in results:
+                    for key, value in result["ansible_facts"].items():
+                        self._fact_cache[key] = value
 
     def _sanitize_extra_vars(self, extravars: dict) -> dict:
         """Sanitizes the given dictionary by removing pairs whose key starts
