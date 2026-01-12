@@ -83,6 +83,7 @@
               customCABundle: ""
               managementState: Managed
         state: present
+      retries: 3
 
     - name: "Waiting for creation and readiness of custom resource (name: default-dsci)"
       wait_for_custom_resource:

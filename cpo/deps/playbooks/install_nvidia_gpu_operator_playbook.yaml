@@ -90,6 +90,8 @@
             name: gpu-cluster-policy
             namespace: "{{ project }}"
           spec:
+            cdi:
+              enabled: true
             daemonsets:
               rollingUpdate:
                 maxUnavailable: "1"
@@ -117,8 +119,8 @@
                 name: ""
               kernelModuleType: auto
               licensingConfig:
-                configMapName: ""
                 nlsEnabled: true
+                secretName: ""
               repoConfig:
                 configMapName: ""
               upgradePolicy:
@@ -164,9 +166,7 @@
               enabled: true
             validator:
               plugin:
-                env:
-                  - name: WITH_WORKLOAD
-                    value: "false"
+                env: []
             vfioManager:
               enabled: true
             vgpuDeviceManager:
