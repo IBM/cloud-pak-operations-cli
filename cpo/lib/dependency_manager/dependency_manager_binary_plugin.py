@@ -1,4 +1,4 @@
-#  Copyright 2023, 2024 IBM Corporation
+#  Copyright 2023, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -17,8 +17,6 @@ import pathlib
 
 from abc import abstractmethod
 
-import semver
-
 import cpo.utils.process
 
 from cpo.config import configuration_manager
@@ -28,7 +26,7 @@ from cpo.lib.dependency_manager.dependency_manager_plugin import AbstractDepende
 class DependencyManagerBinaryPlugIn(AbstractDependencyManagerPlugIn):
     def execute_binary(
         self,
-        version: semver.Version,
+        version: str,
         args: list[str],
         env: dict[str, str] = os.environ.copy(),
         capture_output=False,
@@ -84,7 +82,7 @@ class DependencyManagerBinaryPlugIn(AbstractDependencyManagerPlugIn):
 
         pass
 
-    def get_binary_path(self, version: semver.Version) -> pathlib.Path:
+    def get_binary_path(self, version: str) -> pathlib.Path:
         """Returns the path of the binary associated with the dependency
 
         Parameters

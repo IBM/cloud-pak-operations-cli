@@ -1,4 +1,4 @@
-#  Copyright 2021, 2025 IBM Corporation
+#  Copyright 2021, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -16,8 +16,6 @@ import os
 import pathlib
 import stat
 import urllib.parse
-
-import semver
 
 import cpo.config
 import cpo.utils.compression
@@ -39,7 +37,7 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
         }
 
     # override
-    def download_dependency_version(self, dependency_version: DependencyVersion):
+    def download_dependency_version(self, version: str):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name_suffix = self._operating_system_to_file_name_suffix_dict.get(operating_system)
 
@@ -48,11 +46,11 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
                 f"{self.get_dependency_name()} does not support {operating_system.value}"
             )
 
-        file_name = f"terraform_{str(dependency_version)}_{file_name_suffix}"
-        url = f"https://releases.hashicorp.com/terraform/{str(dependency_version)}/{file_name}"
+        file_name = f"terraform_{version}_{file_name_suffix}"
+        url = f"https://releases.hashicorp.com/terraform/{version}/{file_name}"
         archive_path = cpo.utils.download.download_file(urllib.parse.urlsplit(url))
 
-        self._extract_archive(archive_path, dependency_version.version, operating_system)
+        self._extract_archive(archive_path, version, operating_system)
 
     # override
     def get_binary_name(self) -> str | None:
@@ -79,7 +77,7 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
     def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:
         return operating_system in self._operating_system_to_file_name_suffix_dict
 
-    def _extract_archive(self, archive_path: pathlib.Path, version: semver.Version, operating_system: OperatingSystem):
+    def _extract_archive(self, archive_path: pathlib.Path, version: str, operating_system: OperatingSystem):
         """Extracts the given archive in a dependency-specific manner
 
         Parameters
@@ -89,6 +87,10 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
         operating_system
             current operating system
         """
+
+        member_identification_func: cpo.utils.compression.MemberIdentificationFunc = lambda path, file_type: (
+            os.path.basename(path) == "terraform"
+        )
 
         target_directory_path = cpo.config.configuration_manager.get_bin_directory_path()
 
@@ -104,6 +106,7 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
             cpo.utils.compression.extract_archive(
                 archive_path,
                 target_directory_path,
+                memberIdentificationFunc=member_identification_func,
                 postExtractionFunc=post_extraction_func,
             )
         else:
