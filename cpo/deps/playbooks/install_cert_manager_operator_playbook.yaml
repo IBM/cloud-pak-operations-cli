@@ -26,7 +26,7 @@
             name: "{{ project }}"
         state: present
 
-    - name: "Create OperatorGroup resource (name prefix: datastax-operator)"
+    - name: "Create OperatorGroup resource (name prefix: openshift-cert-manager-operator)"
       kubernetes.core.k8s:
         kubeconfig: "{{ kube_config }}"
         resource_definition:
@@ -39,7 +39,7 @@
             targetNamespaces: []
         state: present
 
-    - name: "Create Subscription resource (name: cass-operator-community)"
+    - name: "Create Subscription resource (name: openshift-cert-manager-operator)"
       kubernetes.core.k8s:
         kubeconfig: "{{ kube_config }}"
         resource_definition:
