@@ -1,4 +1,4 @@
-#  Copyright 2023, 2025 IBM Corporation
+#  Copyright 2023, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -21,7 +21,6 @@ import urllib.parse
 from abc import abstractmethod
 
 import requests
-import semver
 
 import cpo.config
 import cpo.utils.compression
@@ -37,7 +36,7 @@ from cpo.utils.operating_system import OperatingSystem
 
 class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
     # override
-    def download_dependency_version(self, dependency_version: DependencyVersion):
+    def download_dependency_version(self, version: str):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name = self._get_operating_system_file_name_dict().get(operating_system)
 
@@ -46,19 +45,17 @@ class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
                 f"{self.get_dependency_name()} does not support {operating_system.value}"
             )
 
-        url = f"https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{str(dependency_version)}/{file_name}"
+        url = f"https://mirror.openshift.com/pub/openshift-v4/clients/ocp/{version}/{file_name}"
 
         try:
             archive_path = cpo.utils.download.download_file(urllib.parse.urlsplit(url))
         except requests.exceptions.HTTPError as exception:
             if (exception.response is not None) and (exception.response.status_code == 404):
-                raise CloudPakOperationsCLIException(
-                    f"{self.get_dependency_name()} {dependency_version} does not exist"
-                )
+                raise CloudPakOperationsCLIException(f"{self.get_dependency_name()} {version} does not exist")
             else:
                 raise
 
-        self._extract_archive(archive_path, dependency_version.version, operating_system)
+        self._extract_archive(archive_path, version, operating_system)
 
     # override
     def get_latest_dependency_version(self, github_access_token: str | None) -> DependencyVersion:
@@ -83,7 +80,7 @@ class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
     def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:
         return operating_system in self._get_operating_system_file_name_dict()
 
-    def _extract_archive(self, archive_path: pathlib.Path, version: semver.Version, operating_system: OperatingSystem):
+    def _extract_archive(self, archive_path: pathlib.Path, version: str, operating_system: OperatingSystem):
         """Extracts the given archive in a dependency-specific manner
 
         Parameters
@@ -120,7 +117,7 @@ class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
     def _get_operating_system_file_name_dict(self) -> dict[OperatingSystem, str]:
         pass
 
-    def _parse_version_from_versions_file(self, file_contents: str) -> semver.Version:
+    def _parse_version_from_versions_file(self, file_contents: str) -> str:
         """Parses the version contained in the given file contents
 
         Parameters
@@ -130,7 +127,7 @@ class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
 
         Returns
         -------
-        semver.Version
+        str
             parsed version
         """
 
@@ -142,6 +139,4 @@ class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
         if search_result is None:
             raise CloudPakOperationsCLIException(f"{self.get_dependency_name()} version could not be parsed")
 
-        version = semver.Version.parse(f"{search_result.group(1)}")
-
-        return version
+        return search_result.group(1)

@@ -1,4 +1,4 @@
-#  Copyright 2021, 2025 IBM Corporation
+#  Copyright 2021, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,8 +15,6 @@
 import os
 import pathlib
 import urllib.parse
-
-import semver
 
 import cpo.config
 import cpo.utils.compression
@@ -40,7 +38,7 @@ class IBMCloudCLIPlugIn(DependencyManagerBinaryPlugIn):
         }
 
     # override
-    def download_dependency_version(self, dependency_version: DependencyVersion):
+    def download_dependency_version(self, version: str):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name_suffix = self._operating_system_to_file_name_suffix_dict.get(operating_system)
 
@@ -49,16 +47,16 @@ class IBMCloudCLIPlugIn(DependencyManagerBinaryPlugIn):
                 f"{self.get_dependency_name()} does not support {operating_system.value}"
             )
 
-        file_name = f"IBM_Cloud_CLI_{str(dependency_version)}_{file_name_suffix}"
-        url = f"https://download.clis.cloud.ibm.com/ibm-cloud-cli/{str(dependency_version)}/binaries/{file_name}"
+        file_name = f"IBM_Cloud_CLI_{version}_{file_name_suffix}"
+        url = f"https://download.clis.cloud.ibm.com/ibm-cloud-cli/{version}/binaries/{file_name}"
         archive_path = cpo.utils.download.download_file(urllib.parse.urlsplit(url))
 
-        self._extract_archive(archive_path, dependency_version.version, operating_system)
+        self._extract_archive(archive_path, version, operating_system)
 
     # override
     def execute_binary(
         self,
-        version: semver.Version,
+        version: str,
         args: list[str],
         env: dict[str, str] = os.environ.copy(),
         capture_output=False,
@@ -107,7 +105,7 @@ class IBMCloudCLIPlugIn(DependencyManagerBinaryPlugIn):
     def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:
         return operating_system in self._operating_system_to_file_name_suffix_dict
 
-    def _extract_archive(self, archive_path: pathlib.Path, version: semver.Version, operating_system: OperatingSystem):
+    def _extract_archive(self, archive_path: pathlib.Path, version: str, operating_system: OperatingSystem):
         """Extracts the given archive in a dependency-specific manner
 
         Parameters

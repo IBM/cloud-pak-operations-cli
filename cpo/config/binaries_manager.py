@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2021, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -15,10 +15,7 @@
 import json
 import pathlib
 
-import semver
-
 from cpo.config import configuration_manager
-from cpo.lib.dependency_manager.dependency_manager_plugin import DependencyVersion
 
 BinariesFileContents = dict[str, str]
 
@@ -74,15 +71,15 @@ class BinariesManager:
 
         return configuration_manager.get_cli_data_directory_path() / "binaries.json"
 
-    def get_latest_downloaded_binary_version(self, binary_alias: str) -> DependencyVersion | None:
+    def get_latest_downloaded_binary_version(self, binary_alias: str) -> str | None:
         binaries = self._get_binary_versions()
 
-        return DependencyVersion(semver.Version.parse(binaries[binary_alias])) if binary_alias in binaries else None
+        return binaries[binary_alias] if binary_alias in binaries else None
 
-    def set_latest_downloaded_binary_version(self, binary_alias: str, version: semver.Version):
+    def set_latest_downloaded_binary_version(self, binary_alias: str, version: str):
         binary_versions = self._get_binary_versions()
 
-        binary_versions[binary_alias] = str(version)
+        binary_versions[binary_alias] = version
         self._save_binaries_file()
 
     def _get_binary_versions(self) -> dict[str, str]:

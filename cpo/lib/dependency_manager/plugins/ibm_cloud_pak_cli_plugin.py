@@ -1,4 +1,4 @@
-#  Copyright 2021, 2025 IBM Corporation
+#  Copyright 2021, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,8 +14,6 @@
 
 import pathlib
 import urllib.parse
-
-import semver
 
 import cpo.config
 import cpo.utils.compression
@@ -37,14 +35,14 @@ class IBMCloudPakCLIPlugIn(DependencyManagerBinaryPlugIn):
         }
 
     # override
-    def download_dependency_version(self, dependency_version: DependencyVersion):
+    def download_dependency_version(self, version: str):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name_infix = self._operating_system_to_file_name_infix_dict[operating_system]
         file_name = f"cloudctl-{file_name_infix}-amd64.tar.gz"
-        url = f"https://github.com/IBM/cloud-pak-cli/releases/download/v{str(dependency_version)}/{file_name}"
+        url = f"https://github.com/IBM/cloud-pak-cli/releases/download/v{version}/{file_name}"
         archive_path = cpo.utils.download.download_file(urllib.parse.urlsplit(url))
 
-        self._extract_archive(archive_path, dependency_version.version, operating_system)
+        self._extract_archive(archive_path, version, operating_system)
 
     # override
     def get_binary_name(self) -> str | None:
@@ -71,7 +69,7 @@ class IBMCloudPakCLIPlugIn(DependencyManagerBinaryPlugIn):
     def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:
         return operating_system in self._operating_system_to_file_name_infix_dict
 
-    def _extract_archive(self, archive_path: pathlib.Path, version: semver.Version, operating_system: OperatingSystem):
+    def _extract_archive(self, archive_path: pathlib.Path, version: str, operating_system: OperatingSystem):
         """Extracts the given archive in a dependency-specific manner
 
         Parameters

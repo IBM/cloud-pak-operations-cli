@@ -1,4 +1,4 @@
-#  Copyright 2021, 2025 IBM Corporation
+#  Copyright 2021, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -44,16 +44,13 @@ class IBMCloudTerraformProviderPlugIn(AbstractDependencyManagerPlugIn):
         }
 
     # override
-    def download_dependency_version(self, dependency_version: DependencyVersion):
+    def download_dependency_version(self, version: str):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name = self._ibmcloud_terraform_provider_plugin_configuration_data_dict[operating_system][
             "ibm_cloud_terraform_provider_file_name"
-        ].format(version=str(dependency_version))
+        ].format(version=version)
 
-        url = (
-            f"https://github.com/IBM-Cloud/terraform-provider-ibm/releases/download/v"
-            f"{str(dependency_version)}/{file_name}"
-        )
+        url = f"https://github.com/IBM-Cloud/terraform-provider-ibm/releases/download/v{version}/{file_name}"
 
         archive_path = cpo.utils.download.download_file(urllib.parse.urlsplit(url))
         target_directory_path = self.get_terraform_plugins_directory_path()

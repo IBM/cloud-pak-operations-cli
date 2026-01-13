@@ -1,4 +1,4 @@
-#  Copyright 2021, 2025 IBM Corporation
+#  Copyright 2021, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -13,70 +13,38 @@
 #  limitations under the License.
 
 import json
-import re as regex
 
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
 
 import requests
-import semver
 
-from cpo.utils.error import CloudPakOperationsCLIException
 from cpo.utils.operating_system import OperatingSystem
 
 
-@dataclass
 class DependencyVersion:
-    version: semver.Version
-    version_string: str | None = None
+    def __init__(self, version: str):
+        self._version = version
+        self._version_without_prefix = version.removeprefix("v")
 
-    def __str__(self) -> str:
-        return str(self.version)
+    @property
+    def version(self) -> str:
+        return self._version
+
+    @property
+    def version_without_prefix(self) -> str:
+        return self._version_without_prefix
 
 
 class AbstractDependencyManagerPlugIn(ABC):
     """Base class of all dependency manager plug-in classes"""
 
-    @classmethod
-    def parse_as_semantic_version(cls, version_number: str) -> DependencyVersion:
-        """Parses the given version number string as a semantic version
-
-        If the given string is a version number containing a major, minor, and
-        patch version, leading zeros of each version are stripped before parsing
-        the version number as a semantic version.
-
-        Parameters
-        ----------
-            version
-                version number string
-
-        Returns
-        -------
-            DependencyVersion
-                dependency version based on the parsed version number string
-        """
-
-        search_result = regex.search("v(\\d+)\\.(\\d+)\\.(\\d+)$", version_number)
-
-        if search_result is None:
-            raise CloudPakOperationsCLIException(f"String could not be parsed as semantic version: {version_number}")
-
-        major = search_result.group(1) if search_result.group(1) == "0" else search_result.group(1).lstrip("0")
-        minor = search_result.group(2) if search_result.group(2) == "0" else search_result.group(2).lstrip("0")
-        patch = search_result.group(3) if search_result.group(3) == "0" else search_result.group(3).lstrip("0")
-
-        return DependencyVersion(
-            semver.Version.parse(f"{major}.{minor}.{patch}"),
-            f"{search_result.group(1)}.{search_result.group(2)}.{search_result.group(3)}",
-        )
-
     @abstractmethod
-    def download_dependency_version(self, dependency_version: DependencyVersion):
+    def download_dependency_version(self, version: str):
         """Downloads the given version of the dependency
 
         Parameters
         ----------
-        dependency_version
+        version
             version of the dependency to be downloaded
         """
 
@@ -223,6 +191,6 @@ class AbstractDependencyManagerPlugIn(ABC):
         result: DependencyVersion | None = None
 
         if len(response_json) != 0:
-            result = AbstractDependencyManagerPlugIn.parse_as_semantic_version(response_json[0]["tag_name"])
+            result = DependencyVersion(response_json[0]["tag_name"])
 
         return result
