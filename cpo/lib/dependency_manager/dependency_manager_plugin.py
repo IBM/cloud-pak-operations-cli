@@ -184,13 +184,13 @@ class AbstractDependencyManagerPlugIn(ABC):
         if github_access_token is not None:
             headers["Authorization"] = f"Bearer {github_access_token}"
 
-        response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/releases", headers=headers)
+        response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest", headers=headers)
         response.raise_for_status()
 
         response_json = json.loads(response.content)
         result: DependencyVersion | None = None
 
         if len(response_json) != 0:
-            result = DependencyVersion(response_json[0]["tag_name"])
+            result = DependencyVersion(response_json["tag_name"])
 
         return result
