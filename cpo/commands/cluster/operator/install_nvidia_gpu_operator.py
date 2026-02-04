@@ -31,6 +31,7 @@ from cpo.utils.logging import loglevel_command
     )
 )
 @openshift_server_options
+@click.option("--channel", help="NVIDIA GPU Operator channel  [default: latest version]")
 @click.option("--project", default="nvidia-gpu-operator", help="OpenShift project", show_default=True)
 @click.pass_context
 def install_nvidia_gpu_operator(
@@ -41,6 +42,7 @@ def install_nvidia_gpu_operator(
     token: Optional[str],
     insecure_skip_tls_verify: Optional[bool],
     use_cluster: Optional[str],
+    channel: str | None,
     project: str,
 ):
     """Install the NVIDIA GPU Operator"""
@@ -51,6 +53,7 @@ def install_nvidia_gpu_operator(
         "install_nvidia_gpu_operator_playbook.yaml",
         credentials,
         variables={
+            "channel": channel,
             "project": project,
         },
     ).run_playbook()
