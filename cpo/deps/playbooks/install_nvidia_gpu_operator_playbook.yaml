@@ -40,7 +40,7 @@
               - nvidia-gpu-operator
         state: present
 
-    - name: "Get channel"
+    - name: "Get package manifest"
       kubernetes.core.k8s_info:
         kind: PackageManifest
         kubeconfig: "{{ kube_config }}"
@@ -49,12 +49,12 @@
       register: k8s_info_result
 
     - set_fact:
-        channel: "{{ k8s_info_result | json_query('resources[0].status.defaultChannel') }}"
+        channel_effective: "{{ k8s_info_result | json_query('resources[0].status.defaultChannel') if channel is undefined or (channel | length == 0) else channel }}"
 
     - set_fact:
         starting_csv: "{{ k8s_info_result | json_query(current_csv) | first }}"
       vars:
-        current_csv: "resources[0].status.channels[?name == '{{ channel }}'].currentCSV"
+        current_csv: "resources[0].status.channels[?name == '{{ channel_effective }}'].currentCSV"
 
     - name: "Create Subscription resource (name: gpu-operator-certified)"
       kubernetes.core.k8s:
@@ -66,7 +66,7 @@
             name: gpu-operator-certified
             namespace: "{{ project }}"
           spec:
-            channel: "{{ channel }}"
+            channel: "{{ channel_effective }}"
             installPlanApproval: Automatic
             name: gpu-operator-certified
             source: certified-operators
