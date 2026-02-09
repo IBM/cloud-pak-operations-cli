@@ -12,12 +12,20 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
+from typing import Any
+
 from pydantic import BaseModel
+
+
+class NamedExtension(BaseModel):
+    name: str
+    extension: Any
 
 
 class ContextDetails(BaseModel):
     cluster: str
-    namespace: str
+    extensions: list[NamedExtension] | None = None
+    namespace: str | None = None
     user: str
 
 
