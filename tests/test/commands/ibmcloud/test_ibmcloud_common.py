@@ -25,11 +25,13 @@ class TestIBMCloudCommon(unittest.TestCase):
     @patch.object(
         IBMCloudAPIManager,
         "execute_ibmcloud_command",
-        lambda self, args, capture_output=False, check=True, print_captured_output=False, skip_login=False: ProcessResult(  # noqa: E501
-            command=[],
-            stderr=[],
-            stdout=[(pathlib.Path(__file__).parent / "dependencies/ibmcloud_generate_api_key.json").read_text()],
-            return_code=0,
+        lambda self, args, capture_output=False, check=True, print_captured_output=False, skip_login=False: (
+            ProcessResult(  # noqa: E501
+                command=[],
+                stderr=[],
+                stdout=[(pathlib.Path(__file__).parent / "dependencies/ibmcloud_generate_api_key.json").read_text()],
+                return_code=0,
+            )
         ),
     )
     def test_generate_api_key(self):
