@@ -66,7 +66,7 @@ class DependencyManager:
 
         Returns
         -------
-        semver.Version
+        str
             version of the downloaded dependency
         """
 

@@ -63,7 +63,7 @@ class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
 
         Returns
         -------
-        semver.Version
+        DependencyVersion
             latest version of the OpenShift CLI
         """
 

@@ -16,8 +16,6 @@ import io
 import re as regex
 import urllib.parse
 
-import semver
-
 import cpo.utils.download
 import cpo.utils.operating_system
 
@@ -39,12 +37,12 @@ class OpenShiftInstallPlugIn(AbstractOpenShiftPlugIn):
     def get_dependency_name(self) -> str:
         return "openshift-install"
 
-    def get_latest_minor_release_version(self, minor_release: str) -> semver.Version:
+    def get_latest_minor_release_version(self, minor_release: str) -> str:
         """Returns the latest version of the OpenShift CLI
 
         Returns
         -------
-        semver.Version
+        str
             latest version of the OpenShift CLI
         """
 
