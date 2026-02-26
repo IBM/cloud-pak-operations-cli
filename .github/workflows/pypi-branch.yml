@@ -13,10 +13,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         # https://github.com/actions/checkout
-        with:
-          fetch-depth: 0
-          # https://github.com/actions/checkout/issues/299
-          ref: ${{ github.event.pull_request.head.sha }}
       - name: Set up Python 3.12
         uses: actions/setup-python@v5
         # https://github.com/actions/setup-python
