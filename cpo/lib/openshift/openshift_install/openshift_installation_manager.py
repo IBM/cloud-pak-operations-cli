@@ -92,7 +92,7 @@ class OpenShiftInstallationManager(ABC):
 
         process_result = DependencyManager.get_instance().execute_binary(
             OpenShiftInstallPlugIn,
-            ocp_version,
+            str(ocp_version),
             args,
             capture_output=True,
             env=self._get_environment(),
