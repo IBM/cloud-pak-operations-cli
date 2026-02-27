@@ -51,11 +51,36 @@ cpo-get-current-cluster-alias = "cpo.scripts.get_current_cluster_alias:get_curre
 [project.urls]
 repository = "https://github.com/IBM/cloud-pak-operations-cli"
 
+[dependency-groups]
+dev = [
+    "ruff",
+]
+
 [tool.pytest.ini_options]
 filterwarnings = [
 	# https://setuptools.pypa.io/en/latest/history.html#v67-3-2
 	"ignore::DeprecationWarning",
 ]
+
+[tool.ruff]
+exclude = [
+	".venv",
+]
+fix = true
+line-length = 120
+
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle errors
+    "F", # Pyflakes
+    "I", # isort
+    "W", # pycodestyle warnings
+]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-wrap-aliases = true
+lines-between-types = 1
 
 [tool.setuptools-git-versioning]
 enabled = true

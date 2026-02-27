@@ -93,17 +93,15 @@ class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
             f"{self.get_binary_name()}.exe" if (operating_system == OperatingSystem.WINDOWS) else self.get_binary_name()
         )
 
-        member_identification_func: cpo.utils.compression.MemberIdentificationFunc = lambda path, file_type: (
-            ((os.path.basename(path) == binary_name_with_os_specific_extension))
-            and (file_type == cpo.utils.file.FileType.RegularFile)
-        )
-
         target_directory_path = cpo.config.configuration_manager.get_bin_directory_path()
 
         cpo.utils.compression.extract_archive(
             archive_path,
             target_directory_path,
-            memberIdentificationFunc=member_identification_func,
+            memberIdentificationFunc=lambda path, file_type: (
+                (os.path.basename(path) == binary_name_with_os_specific_extension)
+                and (file_type == cpo.utils.file.FileType.RegularFile)
+            ),
         )
 
         source_file_name = pathlib.Path(f"{target_directory_path}/{binary_name_with_os_specific_extension}")

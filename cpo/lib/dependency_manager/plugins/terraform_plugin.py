@@ -88,26 +88,20 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
             current operating system
         """
 
-        member_identification_func: cpo.utils.compression.MemberIdentificationFunc = lambda path, file_type: (
-            os.path.basename(path) == "terraform"
-        )
-
         target_directory_path = cpo.config.configuration_manager.get_bin_directory_path()
 
         if (operating_system == cpo.utils.operating_system.OperatingSystem.LINUX_X86_64) or (
             operating_system == cpo.utils.operating_system.OperatingSystem.MAC_OS
         ):
-            # change file mode (see https://bugs.python.org/issue15795)
-            post_extraction_func: cpo.utils.compression.PostExtractionFunc = lambda path: os.chmod(
-                path,
-                os.stat(path).st_mode | stat.S_IXGRP | stat.S_IXOTH | stat.S_IXUSR,
-            )
-
             cpo.utils.compression.extract_archive(
                 archive_path,
                 target_directory_path,
-                memberIdentificationFunc=member_identification_func,
-                postExtractionFunc=post_extraction_func,
+                memberIdentificationFunc=lambda path, file_type: os.path.basename(path) == "terraform",
+                # change file mode (see https://bugs.python.org/issue15795)
+                postExtractionFunc=lambda path: os.chmod(
+                    path,
+                    os.stat(path).st_mode | stat.S_IXGRP | stat.S_IXOTH | stat.S_IXUSR,
+                ),
             )
         else:
             cpo.utils.compression.extract_archive(archive_path, target_directory_path)
