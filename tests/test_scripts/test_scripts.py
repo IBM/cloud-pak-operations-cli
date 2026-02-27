@@ -23,6 +23,8 @@ from tempfile import TemporaryDirectory
 import click.testing
 import dulwich.repo
 
+from dulwich import porcelain
+
 from scripts.scripts import cli
 
 
@@ -39,13 +41,13 @@ class TestScripts(unittest.TestCase):
                 if element.name.endswith(".py_input"):
                     shutil.copy(element, tempdir + "/" + element.stem + ".py")
 
-                    repo.stage(element.stem + ".py")
+                    porcelain.add(repo, [element.stem + ".py"])
                 elif element.name.endswith(".py_expected"):
                     with open(element) as input_file, open(pathlib.Path(tempdir) / element.name, "w") as output_file:
                         for line in input_file:
                             output_file.write(line.replace("{current_year}", str(datetime.today().year)))
 
-            repo.do_commit(b"")
+            porcelain.commit(repo, message=b" ")
 
             # run "update-copyright-headers" command
             runner = click.testing.CliRunner()
