@@ -18,6 +18,7 @@ import pathlib
 from abc import ABC, abstractmethod
 
 import asyncssh
+import asyncssh.constants
 import click
 import colorama
 
@@ -173,10 +174,10 @@ def create_remote_client_ssh_session(print_output: bool) -> type[asyncssh.SSHCli
                 )
 
         # override
-        def connection_made(self, channel: asyncssh.SSHClientChannel):
+        def connection_made(self, chan: asyncssh.SSHClientChannel):
             """see asyncssh.SSHClientSession.connection_made()"""
 
-            self._channel = channel
+            self._channel = chan
 
         # override
         def data_received(self, data, datatype):
@@ -184,7 +185,7 @@ def create_remote_client_ssh_session(print_output: bool) -> type[asyncssh.SSHCli
 
             assert isinstance(data, str)
 
-            if datatype == asyncssh.EXTENDED_DATA_STDERR:
+            if datatype == asyncssh.constants.EXTENDED_DATA_STDERR:
                 self._received_data += data
 
                 if print_output:
