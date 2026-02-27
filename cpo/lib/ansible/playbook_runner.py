@@ -16,6 +16,7 @@ import logging
 import re as regex
 
 from abc import ABC
+from types import MappingProxyType
 from typing import Any
 
 import ansible_runner
@@ -96,7 +97,7 @@ class PlaybookRunner(ABC):
                 if ("stdout" in event_data) and (event_data["stdout"] != ""):
                     logger.debug(event_data["stdout"].removeprefix("\r\n"))
 
-    def _get_extra_vars(self) -> dict:
+    def _get_extra_vars(self) -> MappingProxyType[str, Any]:
         """Returns extra vars/additional variables
 
         Returns
@@ -182,7 +183,7 @@ class PlaybookRunner(ABC):
                     for key, value in result["ansible_facts"].items():
                         self._fact_cache[key] = value
 
-    def _sanitize_extra_vars(self, extravars: dict) -> dict:
+    def _sanitize_extra_vars(self, extravars: MappingProxyType[str, Any]) -> dict:
         """Sanitizes the given dictionary by removing pairs whose key starts
         with an underscore or whose value is None
 
