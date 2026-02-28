@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2021, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -41,7 +41,9 @@ class ClusterBasedUserCredentials(UserCredentials):
 
     # override
     def persist_access_token(self, token: str):
-        self._cluster = cluster_credentials_manager.add_cluster_data(self._cluster.get_server(), {"token": token})
+        self._cluster = cluster_credentials_manager.get_cluster_from_cluster_file_entry(
+            cluster_credentials_manager.add_cluster_data(self._cluster.get_server(), {"token": token})
+        )
 
     def _get_insecure_skip_tls_verify_from_cluster_data(self, cluster: AbstractCluster) -> bool:
         cluster_data = cluster.get_cluster_data()

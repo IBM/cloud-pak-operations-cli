@@ -1,4 +1,4 @@
-#  Copyright 2021, 2025 IBM Corporation
+#  Copyright 2021, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -23,7 +23,9 @@ import semver
 import cpo.lib.openshift.oc
 
 from cpo.config.cluster_credentials_manager import cluster_credentials_manager
-from cpo.lib.openshift.credentials.cluster_based_user_credentials import ClusterBasedUserCredentials
+from cpo.lib.openshift.credentials.cluster_based_user_credentials import (
+    ClusterBasedUserCredentials,
+)
 from cpo.lib.openshift.credentials.credentials import AbstractCredentials
 from cpo.lib.openshift.credentials.token_credentials import TokenCredentials
 from cpo.lib.openshift.credentials.user_credentials import UserCredentials
@@ -52,10 +54,13 @@ def get_alias_or_server(ctx: click.Context, options: dict[str, Any]) -> str:
     result = options.get("use_cluster")
 
     if result is None:
-        if (current_cluster := cluster_credentials_manager.get_current_cluster()) is not None:
-            result = current_cluster.get_server()
+        if (current_cluster_file_entry := cluster_credentials_manager.get_current_cluster_file_entry()) is not None:
+            result = current_cluster_file_entry.server
         else:
-            raise click.UsageError("You must either set option --use-cluster or set a current cluster.", ctx)
+            raise click.UsageError(
+                "You must either set option --use-cluster or set a current cluster.",
+                ctx,
+            )
 
     return result
 
@@ -164,7 +169,9 @@ def get_oc_login_command_for_remote_host(ctx: click.Context, options: dict[str, 
         )
     elif (current_cluster := cluster_credentials_manager.get_current_cluster()) is not None:
         result = cpo.lib.openshift.oc.get_oc_login_command_with_password_for_remote_host(
-            current_cluster.get_server(), current_cluster.get_username(), current_cluster.get_password()
+            current_cluster.get_server(),
+            current_cluster.get_username(),
+            current_cluster.get_password(),
         )
     else:
         raise click.UsageError(

@@ -1,4 +1,4 @@
-#  Copyright 2021, 2024 IBM Corporation
+#  Copyright 2021, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -26,13 +26,13 @@ from cpo.utils.logging import loglevel_command
 def current(print_alias: bool | None):
     """Get the current registered OpenShift cluster"""
 
-    current_cluster = cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster()
+    current_cluster_file_entry = (
+        cpo.config.cluster_credentials_manager.cluster_credentials_manager.get_current_cluster_file_entry()
+    )
 
-    if current_cluster is not None:
+    if current_cluster_file_entry is not None:
         if not print_alias:
-            click.echo(current_cluster.get_server())
+            click.echo(current_cluster_file_entry.server)
         else:
-            cluster_data = current_cluster.get_cluster_data()
-
-            if "alias" in cluster_data:
-                click.echo(cluster_data["alias"])
+            if "alias" in current_cluster_file_entry.cluster_data:
+                click.echo(current_cluster_file_entry.cluster_data["alias"])
