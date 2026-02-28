@@ -1,4 +1,4 @@
-#  Copyright 2021, 2025 IBM Corporation
+#  Copyright 2021, 2026 IBM Corporation
 #
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -14,8 +14,7 @@
 
 import click
 
-import cpo.config.cluster_credentials_manager
-
+from cpo.config.cluster_credentials_manager import cluster_credentials_manager
 from cpo.lib.openshift.oc import login
 from cpo.utils.logging import loglevel_command
 
@@ -30,7 +29,7 @@ from cpo.utils.logging import loglevel_command
 def use(alias_or_server: str, oc_login: bool):
     """Set the current registered OpenShift cluster"""
 
-    current_cluster = cpo.config.cluster_credentials_manager.cluster_credentials_manager.set_cluster(alias_or_server)
+    current_clusters_file_entry = cluster_credentials_manager.set_cluster(alias_or_server)
 
     if oc_login:
-        login(current_cluster)
+        login(cluster_credentials_manager.get_cluster_from_cluster_file_entry(current_clusters_file_entry))
