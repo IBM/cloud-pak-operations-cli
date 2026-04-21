@@ -36,7 +36,7 @@ from cpo.utils.operating_system import OperatingSystem
 
 class AbstractOpenShiftPlugIn(DependencyManagerBinaryPlugIn):
     # override
-    def download_dependency_version(self, version: str):
+    def download_dependency_version(self, github_access_token: str | None, version: str):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name = self._get_operating_system_file_name_dict().get(operating_system)
 

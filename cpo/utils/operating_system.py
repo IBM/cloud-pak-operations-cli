@@ -19,7 +19,8 @@ from enum import Enum
 
 class OperatingSystem(Enum):
     LINUX_X86_64 = "Linux"
-    MAC_OS = "macOS"
+    MAC_OS_AMD64 = "macOS (amd64)"
+    MAC_OS_ARM64 = "macOS (arm64)"
     WINDOWS = "Windows"
 
 
@@ -37,7 +38,12 @@ def get_operating_system():
     system = platform.system()
 
     if system == "Darwin":
-        result = OperatingSystem.MAC_OS
+        if machine == "amd64":
+            result = OperatingSystem.MAC_OS_AMD64
+        elif machine == "arm64":
+            result = OperatingSystem.MAC_OS_ARM64
+        else:
+            raise ValueError("Unsupported macOS architecture: " + machine)
     elif system == "Linux":
         if machine == "x86_64":
             result = OperatingSystem.LINUX_X86_64

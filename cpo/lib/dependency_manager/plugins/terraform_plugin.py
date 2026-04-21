@@ -32,12 +32,13 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
     def __init__(self):
         self._operating_system_to_file_name_suffix_dict = {
             OperatingSystem.LINUX_X86_64: "linux_amd64.zip",
-            OperatingSystem.MAC_OS: "darwin_amd64.zip",
+            OperatingSystem.MAC_OS_AMD64: "darwin_amd64.zip",
+            OperatingSystem.MAC_OS_ARM64: "darwin_arm64.zip",
             OperatingSystem.WINDOWS: "windows_amd64.zip",
         }
 
     # override
-    def download_dependency_version(self, version: str):
+    def download_dependency_version(self, github_access_token: str | None, version: str):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name_suffix = self._operating_system_to_file_name_suffix_dict.get(operating_system)
 
@@ -90,14 +91,16 @@ class TerraformPlugin(DependencyManagerBinaryPlugIn):
 
         target_directory_path = cpo.config.configuration_manager.get_bin_directory_path()
 
-        if (operating_system == cpo.utils.operating_system.OperatingSystem.LINUX_X86_64) or (
-            operating_system == cpo.utils.operating_system.OperatingSystem.MAC_OS
+        if (
+            (operating_system == cpo.utils.operating_system.OperatingSystem.LINUX_X86_64)
+            or (operating_system == cpo.utils.operating_system.OperatingSystem.MAC_OS_AMD64)
+            or (operating_system == cpo.utils.operating_system.OperatingSystem.MAC_OS_ARM64)
         ):
             cpo.utils.compression.extract_archive(
                 archive_path,
                 target_directory_path,
                 memberIdentificationFunc=lambda path, file_type: os.path.basename(path) == "terraform",
-                # change file mode (see https://bugs.python.org/issue15795)
+                # change file mode (see https://github.com/python/cpython/issues/59999)
                 postExtractionFunc=lambda path: os.chmod(
                     path,
                     os.stat(path).st_mode | stat.S_IXGRP | stat.S_IXOTH | stat.S_IXUSR,

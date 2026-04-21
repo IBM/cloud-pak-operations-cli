@@ -33,8 +33,12 @@ class IBMCloudTerraformProviderPlugIn(AbstractDependencyManagerPlugIn):
                 "ibm_cloud_terraform_provider_file_name": "terraform-provider-ibm_{version}_linux_amd64.zip",
                 "terraform_plugins_directory_path": ".terraform.d/plugins",
             },
-            OperatingSystem.MAC_OS: {
+            OperatingSystem.MAC_OS_AMD64: {
                 "ibm_cloud_terraform_provider_file_name": "terraform-provider-ibm_{version}_darwin_amd64.zip",
+                "terraform_plugins_directory_path": ".terraform.d/plugins",
+            },
+            OperatingSystem.MAC_OS_ARM64: {
+                "ibm_cloud_terraform_provider_file_name": "terraform-provider-ibm_{version}_darwin_arm64.zip",
                 "terraform_plugins_directory_path": ".terraform.d/plugins",
             },
             OperatingSystem.WINDOWS: {
@@ -44,7 +48,7 @@ class IBMCloudTerraformProviderPlugIn(AbstractDependencyManagerPlugIn):
         }
 
     # override
-    def download_dependency_version(self, version: str):
+    def download_dependency_version(self, github_access_token: str | None, version: str):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name = self._ibmcloud_terraform_provider_plugin_configuration_data_dict[operating_system][
             "ibm_cloud_terraform_provider_file_name"
