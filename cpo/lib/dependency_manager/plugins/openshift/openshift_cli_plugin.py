@@ -33,6 +33,7 @@ class OpenShiftCLIPlugIn(AbstractOpenShiftPlugIn):
     def _get_operating_system_file_name_dict(self) -> dict[OperatingSystem, str]:
         return {
             OperatingSystem.LINUX_X86_64: "openshift-client-linux.tar.gz",
-            OperatingSystem.MAC_OS: "openshift-client-mac.tar.gz",
+            OperatingSystem.MAC_OS_AMD64: "openshift-client-mac.tar.gz",
+            OperatingSystem.MAC_OS_ARM64: "openshift-client-mac-arm64.tar.gz",
             OperatingSystem.WINDOWS: "openshift-client-windows.zip",
         }

@@ -33,12 +33,13 @@ class IBMCloudCLIPlugIn(DependencyManagerBinaryPlugIn):
     def __init__(self):
         self._operating_system_to_file_name_suffix_dict = {
             OperatingSystem.LINUX_X86_64: "linux_amd64.tgz",
-            OperatingSystem.MAC_OS: "macos.tgz",
+            OperatingSystem.MAC_OS_AMD64: "macos.tgz",
+            OperatingSystem.MAC_OS_ARM64: "macos_arm64.tgz",
             OperatingSystem.WINDOWS: "windows_amd64.zip",
         }
 
     # override
-    def download_dependency_version(self, version: str):
+    def download_dependency_version(self, github_access_token: str | None, version: str):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name_suffix = self._operating_system_to_file_name_suffix_dict.get(operating_system)
 

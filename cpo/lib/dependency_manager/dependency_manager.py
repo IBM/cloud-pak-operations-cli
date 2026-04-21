@@ -160,7 +160,10 @@ class DependencyManager:
             if latest_downloaded_binary_version is None:
                 latest_dependency_version = plugin.get_latest_dependency_version(github_access_token)
 
-                plugin.download_dependency_version(latest_dependency_version.version_without_prefix)
+                plugin.download_dependency_version(
+                    github_access_token, latest_dependency_version.version_without_prefix
+                )
+
                 binaries_manager.set_latest_downloaded_binary_version(
                     plugin.get_dependency_alias(), latest_dependency_version.version_without_prefix
                 )
@@ -169,7 +172,7 @@ class DependencyManager:
 
             version = latest_downloaded_binary_version
         elif not plugin.get_binary_path(version).exists():
-            plugin.download_dependency_version(version)
+            plugin.download_dependency_version(github_access_token, version)
 
             if latest_downloaded_binary_version is None:
                 binaries_manager.set_latest_downloaded_binary_version(plugin.get_dependency_alias(), version)
@@ -257,7 +260,7 @@ class DependencyManager:
         if dependency_version is None:
             dependency_version = plugin.get_latest_dependency_version(github_access_token)
 
-        plugin.download_dependency_version(dependency_version.version_without_prefix)
+        plugin.download_dependency_version(github_access_token, dependency_version.version_without_prefix)
         binaries_manager.set_latest_downloaded_binary_version(
             plugin.get_dependency_alias(), dependency_version.version_without_prefix
         )

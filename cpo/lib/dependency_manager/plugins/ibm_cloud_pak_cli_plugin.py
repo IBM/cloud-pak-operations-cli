@@ -30,12 +30,13 @@ class IBMCloudPakCLIPlugIn(DependencyManagerBinaryPlugIn):
     def __init__(self):
         self._operating_system_to_file_name_infix_dict = {
             OperatingSystem.LINUX_X86_64: "linux",
-            OperatingSystem.MAC_OS: "darwin",
+            OperatingSystem.MAC_OS_AMD64: "darwin",
+            OperatingSystem.MAC_OS_ARM64: "darwin",
             OperatingSystem.WINDOWS: "win",
         }
 
     # override
-    def download_dependency_version(self, version: str):
+    def download_dependency_version(self, github_access_token: str | None, version: str):
         operating_system = cpo.utils.operating_system.get_operating_system()
         file_name_infix = self._operating_system_to_file_name_infix_dict[operating_system]
         file_name = f"cloudctl-{file_name_infix}-amd64.tar.gz"

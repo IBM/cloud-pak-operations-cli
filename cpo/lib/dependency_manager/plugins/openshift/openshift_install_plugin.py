@@ -64,5 +64,6 @@ class OpenShiftInstallPlugIn(AbstractOpenShiftPlugIn):
     def _get_operating_system_file_name_dict(self) -> dict[OperatingSystem, str]:
         return {
             OperatingSystem.LINUX_X86_64: "openshift-install-linux.tar.gz",
-            OperatingSystem.MAC_OS: "openshift-install-mac.tar.gz",
+            OperatingSystem.MAC_OS_AMD64: "openshift-install-mac.tar.gz",
+            OperatingSystem.MAC_OS_ARM64: "openshift-install-mac-arm64.tar.gz",
         }

@@ -39,11 +39,13 @@ class AbstractDependencyManagerPlugIn(ABC):
     """Base class of all dependency manager plug-in classes"""
 
     @abstractmethod
-    def download_dependency_version(self, version: str):
+    def download_dependency_version(self, github_access_token: str | None, version: str):
         """Downloads the given version of the dependency
 
         Parameters
         ----------
+        github_access_token
+            GitHub access token
         version
             version of the dependency to be downloaded
         """
@@ -121,6 +123,75 @@ class AbstractDependencyManagerPlugIn(ABC):
     def is_operating_system_supported(self, operating_system: OperatingSystem) -> bool:
         pass
 
+    def _get_latest_asset_names_on_github(
+        self, owner: str, repo: str, github_access_token: str | None
+    ) -> list[str] | None:
+        """Returns the asset names of the latest version of the dependency on
+        GitHub
+
+        This method parses the "assets" key of the JSON document returned by the
+        GitHub Releases API, which has the following structure:
+
+        {
+            "url": […],
+            "html_url": […],
+            "assets_url": […],
+            "upload_url": […],
+            "tarball_url": […],
+            "zipball_url": […],
+            "id": […],
+            "node_id": […],
+            "tag_name": […],
+            "target_commitish": […],
+            "name": "v1.0.0",
+            "body": […],
+            "draft": […],
+            "prerelease": […],
+            "created_at": […],
+            "published_at": […],
+            "author": {
+                […]
+            },
+            "assets": [
+                […]
+            ]
+        }
+
+        GitHub Releases API: https://developer.github.com/v3/repos/releases/
+
+        Parameters
+        ----------
+        github_access_token
+            GitHub access token
+        owner
+            GitHub repository owner
+        repo
+            GitHub repository name
+
+        Returns
+        -------
+        list[str] | None
+            list of asset names of the latest version of the dependency on GitHub or
+            None if the latest release was found
+        """
+
+        headers = {}
+
+        if github_access_token is not None:
+            headers["Authorization"] = f"Bearer {github_access_token}"
+
+        response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest", headers=headers)
+        result: list[str] | None = None
+
+        if response.ok:
+            response_json = json.loads(response.content)
+
+            result = [asset["name"] for asset in response_json["assets"]]
+        elif response.status_code != 404:
+            response.raise_for_status()
+
+        return result
+
     def _get_latest_dependency_version_on_github(
         self, owner: str, repo: str, github_access_token: str | None
     ) -> DependencyVersion | None:
@@ -129,38 +200,30 @@ class AbstractDependencyManagerPlugIn(ABC):
         This method parses the "name" key of the JSON document returned by the
         GitHub Releases API, which has the following structure:
 
-        [
-            {
-                "url": […],
-                "html_url": […],
-                "assets_url": […],
-                "upload_url": […],
-                "tarball_url": […],
-                "zipball_url": […],
-                "id": […],
-                "node_id": […],
-                "tag_name": […],
-                "target_commitish": […],
-                "name": "v1.0.0",
-                "body": […],
-                "draft": […],
-                "prerelease": […],
-                "created_at": […],
-                "published_at": […],
-                "author": {
-                    […]
-                },
-                "assets": [
-                    […]
-                ]
-            },
-            {
-                […]
-                "name": "v2.0.0",
+        {
+            "url": […],
+            "html_url": […],
+            "assets_url": […],
+            "upload_url": […],
+            "tarball_url": […],
+            "zipball_url": […],
+            "id": […],
+            "node_id": […],
+            "tag_name": […],
+            "target_commitish": […],
+            "name": "v1.0.0",
+            "body": […],
+            "draft": […],
+            "prerelease": […],
+            "created_at": […],
+            "published_at": […],
+            "author": {
                 […]
             },
-            […]
-        ]
+            "assets": [
+                […]
+            ]
+        }
 
         GitHub Releases API: https://developer.github.com/v3/repos/releases/
 
@@ -176,7 +239,7 @@ class AbstractDependencyManagerPlugIn(ABC):
         Returns
         -------
         DependencyVersion | None
-            latest version of the dependency or None if no release was found
+            latest version of the dependency or None if the latest release was found
         """
 
         headers = {}
@@ -185,12 +248,13 @@ class AbstractDependencyManagerPlugIn(ABC):
             headers["Authorization"] = f"Bearer {github_access_token}"
 
         response = requests.get(f"https://api.github.com/repos/{owner}/{repo}/releases/latest", headers=headers)
-        response.raise_for_status()
-
-        response_json = json.loads(response.content)
         result: DependencyVersion | None = None
 
-        if len(response_json) != 0:
+        if response.ok:
+            response_json = json.loads(response.content)
+
             result = DependencyVersion(response_json["tag_name"])
+        elif response.status_code != 404:
+            response.raise_for_status()
 
         return result
