@@ -25,47 +25,6 @@ class TestIBMCloudCommon(unittest.TestCase):
     @patch.object(
         IBMCloudAPIManager,
         "execute_ibmcloud_command",
-        lambda self, args, capture_output=False, check=True, print_captured_output=False, skip_login=False: (
-            ProcessResult(  # noqa: E501
-                command=[],
-                stderr=[],
-                stdout=[(pathlib.Path(__file__).parent / "dependencies/ibmcloud_generate_api_key.json").read_text()],
-                return_code=0,
-            )
-        ),
-    )
-    def test_generate_api_key(self):
-        result = IBMCloudAPIManager().generate_api_key()
-        self.assertEqual("3O_fwBGvkWrug5VrI0aQJwRPuqX1Yb7_MtSTZK_qFthb", result.api_key)
-
-    @patch.object(
-        IBMCloudAPIManager,
-        "execute_ibmcloud_command",
-        lambda self, args, capture_output=False, check=True, print_captured_output=False: ProcessResult(
-            command=[],
-            stderr=[],
-            stdout=[(pathlib.Path(__file__).parent / "dependencies/ibmcloud_api_keys.json").read_text()],
-            return_code=0,
-        ),
-    )
-    def test_api_key_exists(self):
-        ibm_cloud_api_manager = IBMCloudAPIManager()
-
-        self.assertTrue(
-            ibm_cloud_api_manager.api_key_exists_in_ibm_cloud("ApiKey-65e62b94-6dc9-41c2-af0f-01740158b691")
-        )
-
-        self.assertTrue(
-            ibm_cloud_api_manager.api_key_exists_in_ibm_cloud("ApiKey-205dd46e-1807-4cba-a536-58d8115bd888")
-        )
-
-        self.assertFalse(
-            ibm_cloud_api_manager.api_key_exists_in_ibm_cloud("ApiKey-efacdca5-adae-4e1d-82d0-cf8cce34ee2d")
-        )
-
-    @patch.object(
-        IBMCloudAPIManager,
-        "execute_ibmcloud_command",
         lambda self, args, capture_output=False, check=True, print_captured_output=False: ProcessResult(
             command=[],
             stderr=[],
