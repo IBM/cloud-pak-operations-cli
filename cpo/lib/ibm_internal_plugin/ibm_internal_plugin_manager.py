@@ -81,7 +81,19 @@ class IBMInternalPluginInstaller:
     def install(self, distribution_package_name: str, **kwargs):
         """Install IBM-internal CLI plug-in"""
 
-        args = [
+        program = shutil.which("uv")
+        args = ["pip"] if program is not None else []
+
+        if program is None:
+            program = shutil.which("pip")
+
+        if program is None:
+            program = shutil.which("pip3")
+
+        if program is None:
+            raise CloudPakOperationsCLIException("uv/pip(3) executable not found")
+
+        args += [
             "install",
             "--extra-index-url",
             "https://pypi.org/simple",
@@ -99,13 +111,5 @@ class IBMInternalPluginInstaller:
         version = kwargs.get("version")
 
         args.append(distribution_package_name if version is None else f"{distribution_package_name}=={version}")
-
-        program = shutil.which("pip")
-
-        if program is None:
-            program = shutil.which("pip3")
-
-        if program is None:
-            raise CloudPakOperationsCLIException("pip(3) executable not found")
 
         cpo.utils.process.execute_command(pathlib.Path(program), args)
