@@ -23,7 +23,6 @@
 		"build"
 	],
 	"python.analysis.typeCheckingMode": "basic",
-	"python.defaultInterpreterPath": "${workspaceFolder}/.venv",
 	"python.testing.pytestEnabled": false,
 	"python.testing.unittestArgs": [
 		"--start-directory",

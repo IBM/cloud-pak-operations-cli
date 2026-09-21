@@ -13,11 +13,11 @@
 #  limitations under the License.
 
 import logging
+import pathlib
 import re as regex
 
 from abc import ABC
-from types import MappingProxyType
-from typing import Any
+from typing import Any, cast
 
 import ansible_runner
 
@@ -37,9 +37,11 @@ class PlaybookRunner(ABC):
         self,
         playbook_name: str,
         *,
+        ansible_library_paths: list[pathlib.Path] = [],
         private_data_dir=configuration_manager.get_deps_directory_path() / "playbooks",
         variables: dict[str, Any] = {},
     ):
+        self._ansible_library_paths = ansible_library_paths
         self._error_event_data = None
         self._fact_cache: dict[str, Any] = {}
         self._playbook_name = playbook_name
@@ -90,6 +92,11 @@ class PlaybookRunner(ABC):
 
                 if ("stdout" in event_data) and (event_data["stdout"] != ""):
                     logger.info(event_data["stdout"].removeprefix("\r\n"))
+            elif event_data["event"] == "runner_item_on_ok":
+                self._runner_item_on_ok_event_handler(event_data)
+
+                if ("stdout" in event_data) and (event_data["stdout"] != ""):
+                    logger.info(event_data["stdout"].removeprefix("\r\n"))
             elif event_data["event"] == "playbook_on_task_start":
                 if ("stdout" in event_data) and (event_data["stdout"] != ""):
                     logger.info(event_data["stdout"].removeprefix("\r\n"))
@@ -97,7 +104,7 @@ class PlaybookRunner(ABC):
                 if ("stdout" in event_data) and (event_data["stdout"] != ""):
                     logger.debug(event_data["stdout"].removeprefix("\r\n"))
 
-    def _get_extra_vars(self) -> MappingProxyType[str, Any]:
+    def _get_extra_vars(self) -> dict[str, Any]:
         """Returns extra vars/additional variables
 
         Returns
@@ -106,7 +113,7 @@ class PlaybookRunner(ABC):
             dictionary of extra vars/additional variables
         """
 
-        return self.__dict__
+        return cast(dict[str, Any], self.__dict__)
 
     def _get_playbook_name_from_class_name(self) -> str:
         """Returns the playbook name
@@ -142,11 +149,14 @@ class PlaybookRunner(ABC):
         Runner
             object returned by Ansible Runner for post-processing purposes"""
 
+        base_library_path = configuration_manager.get_root_package_path() / "lib" / "ansible" / "modules"
+        ansible_library = ":".join(str(p) for p in [base_library_path] + self._ansible_library_paths)
+
         runner = ansible_runner.run(
             artifact_dir=configuration_manager.get_cli_data_directory_path() / "artifacts",
             envvars={
                 "ANSIBLE_INVENTORY_UNPARSED_WARNING": False,
-                "ANSIBLE_LIBRARY": configuration_manager.get_root_package_path() / "lib" / "ansible" / "modules",
+                "ANSIBLE_LIBRARY": ansible_library,
                 "ANSIBLE_LOCALHOST_WARNING": False,
             },
             extravars=self._sanitize_extra_vars(self._get_extra_vars()),
@@ -164,7 +174,13 @@ class PlaybookRunner(ABC):
     def _runner_on_ok_event_handler(self, event_data: Any):
         """Handles Ansible runner events of type 'runner_on_ok'
 
-        If a 'set_fact' task was executed, store the set facts in a fact cache.
+        If a non-looped 'set_fact' task was executed, store the set facts in a
+        fact cache.
+
+        For looped 'set_fact' tasks, the summary 'runner_on_ok' event carries
+        each iteration's own incremental value in res['results'] and is ignored
+        here. The per-iteration facts are handled by
+        _runner_item_on_ok_event_handler() instead.
 
         Note that runner.get_fact_cache() is deprecated:
         https://github.com/ansible/ansible-runner/issues/1441
@@ -176,14 +192,24 @@ class PlaybookRunner(ABC):
             if "ansible_facts" in res:
                 for key, value in res["ansible_facts"].items():
                     self._fact_cache[key] = value
-            elif "results" in res:
-                results: list = res["results"]
 
-                for result in results:
-                    for key, value in result["ansible_facts"].items():
-                        self._fact_cache[key] = value
+    def _runner_item_on_ok_event_handler(self, event_data: Any):
+        """Handles Ansible runner events of type 'runner_item_on_ok'
 
-    def _sanitize_extra_vars(self, extravars: MappingProxyType[str, Any]) -> dict:
+        These events are fired once per loop iteration for a looped 'set_fact'
+        task. Each event carries the fact value as it stands after that
+        iteration directly in res['ansible_facts'], making them the
+        authoritative source of truth for accumulated facts.
+        """
+
+        if get_jmespath_string("event_data.task_action", event_data) == "set_fact":
+            res = get_jmespath_value("event_data.res", event_data)
+
+            if "ansible_facts" in res:
+                for key, value in res["ansible_facts"].items():
+                    self._fact_cache[key] = value
+
+    def _sanitize_extra_vars(self, extravars: dict[str, Any]) -> dict:
         """Sanitizes the given dictionary by removing pairs whose key starts
         with an underscore or whose value is None
 
